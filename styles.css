@@ -1,0 +1,47 @@
+.block-assessfreq.block-assessfreq-row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.block-assessfreq.block-assessfreq-row-hidden {
+    display: none;
+}
+
+.block-assessfreq .block-assessfreq-month {
+    width: 270px;
+}
+
+.block-assessfreq .block-assessfreq-month thead {
+    text-align: center;
+}
+
+.block-assessfreq .block-assessfreq-month td {
+    border: 1px solid #dddddd;
+    width: 36px;
+    height: 36px;
+    text-align: center;
+}
+
+.block-assessfreq-heat-0 {
+    background-color: #fdf9cd;
+}
+
+.block-assessfreq-heat-1 {
+    background-color: #a2dab5;
+}
+
+.block-assessfreq-heat-2 {
+    background-color: #41b7c5;
+}
+
+.block-assessfreq-heat-3 {
+    background-color: #2d7fb9;
+}
+
+.block-assessfreq-heat-4 {
+    background-color: #283b94;
+}
+
+.block-assessfreq-heat-5 {
+    background-color: #8c0010;
+}
