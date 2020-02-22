@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Assessment Frequency';
 $string['title'] = 'Assessment Frequency';
 $string['privacy:metadata'] = 'The assessment frequency plugin does not store any user data.';
+$string['task:dataprocess'] = 'Data collection task';
 $string['jan'] = 'January';
 $string['feb'] = 'February';
 $string['mar'] = 'March';
