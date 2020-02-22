@@ -48,7 +48,7 @@ define(['core/ajax'], function(ajax) {
         for (let i = 0; i < num; i++) {
             // Setup some elements.
             let container = document.createElement("div");
-            container.classList.add("block-assessfreq-month");
+            container.classList.add("local-assessfreq-month");
             let table = document.createElement("table");
             let thead = document.createElement("thead");
             let tbody = document.createElement("tbody");
@@ -121,7 +121,7 @@ define(['core/ajax'], function(ajax) {
                     cell = document.createElement("td");
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
-                        var heatClass = "block-assessfreq-heat-" + monthEvents[date]['heat'];
+                        var heatClass = "local-assessfreq-heat-" + monthEvents[date]['heat'];
                         cell.classList.add(heatClass);
                     }
                     if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
@@ -157,8 +157,8 @@ define(['core/ajax'], function(ajax) {
             // TODO: add an alert here like you did for the async backup stuff.
             window.console.log(response);
         }).then(function(){
-            calendarContainer.classList.remove("block-assessfreq.block-assessfreq-row-hidden");
-            calendarContainer.classList.add("block-assessfreq.block-assessfreq-row");
+            calendarContainer.classList.remove("local-assessfreq.local-assessfreq-row-hidden");
+            calendarContainer.classList.add("local-assessfreq.local-assessfreq-row");
             spinner.remove();
         });
     }

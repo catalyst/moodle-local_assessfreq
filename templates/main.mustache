@@ -24,17 +24,17 @@
 }}
 
 
-<span id="block-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
+<span id="local-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
     <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
 </span>
 
-<div id="block-assessfreq-{{uniqid}}" class="block-assessfreq block-assessfreq-row" data-region="assessfreq">
+<div id="local-assessfreq-{{uniqid}}" class="local-assessfreq local-assessfreq-row" data-region="assessfreq">
     <!-- Table content gets added here by JS. -->
 </div>
 {{#js}}
 require(['local_assessfreq/main'], function(Main) {
-    var root = document.getElementById('block-assessfreq-{{uniqid}}');
-    var spinner = document.getElementById('block-assessfreq-spinner-{{uniqid}}');
+    var root = document.getElementById('local-assessfreq-{{uniqid}}');
+    var spinner = document.getElementById('local-assessfreq-spinner-{{uniqid}}');
     Main.init(root, spinner);
 });
 {{/js}}
