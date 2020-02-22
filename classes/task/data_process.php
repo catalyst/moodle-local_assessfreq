@@ -59,6 +59,7 @@ class data_process extends scheduled_task {
         // We also don't care if a due date for an event is changed in the past.
 
         // So get latest data from DB and use it as the start point.
+        // Due dates may have changed since we last ran report. So delete all events in DB later than today and replace them.
 
         // Add stuff to cache.
 
