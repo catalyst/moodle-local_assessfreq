@@ -55,6 +55,11 @@ class data_process extends scheduled_task {
 
         // Get events from database.
 
+        // We dont't want to reprocess data.
+        // We also don't care if a due date for an event is changed in the past.
+
+        // So get latest data from DB and use it as the start point.
+
         // Add stuff to cache.
 
     }
