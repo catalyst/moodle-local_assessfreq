@@ -13,19 +13,30 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Plugin administration pages are defined here.
+ * A report to display site level assessment frequency.
  *
  * @package     local_assessfreq
  * @copyright   2020 Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once('../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 
-defined('MOODLE_INTERNAL') || die();
+$baseurl = $CFG->wwwroot . "/local/assessfreq/report.php";
 
-if ($hassiteconfig) {
-    // Report link.
-    $ADMIN->add('reports', new admin_externalpage('local_assessfreq_report',
-        get_string('pluginname', 'local_assessfreq'), "$CFG->wwwroot/local/assessfreq/report.php"));
-}
+// Calls require_login and performs permissions checks for admin pages.
+admin_externalpage_setup('local_smartmedia_report', '', null, '',
+    array('pagelayout' => 'report'));
+
+$title = get_string('pluginname', 'local_assessfreq');
+$url = new moodle_url($baseurl);
+
+$PAGE->set_url($url);
+$PAGE->set_context(context_system::instance());
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+
+echo $OUTPUT->header();
+
+echo $OUTPUT->footer();
