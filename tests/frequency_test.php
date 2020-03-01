@@ -160,4 +160,51 @@ class frequency_testcase extends advanced_testcase {
         $this->assertEquals(2, $result);
 
     }
+
+    /**
+     * Test getting the map.
+     */
+    public function test_get_module_events() {
+        $this->resetAfterTest();
+
+        // Create a course with activity..
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(
+            array('format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => COMPLETION_ENABLED),
+            array('createsections' => true));
+        $assignrow = $generator->create_module('assign', array(
+            'course' => $course->id,
+            'duedate' => 123456
+        ));
+        $assign = new assign(context_module::instance($assignrow->cmid), false, false);
+
+        $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.duedate
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON cm.module = m.id
+            INNER JOIN {context} c ON cm.id = c.instanceid
+            INNER JOIN {assign} a ON cm.instance = a.id
+            INNER JOIN {course} course ON cm.course = course.id
+                 WHERE m.name = ?
+                       AND c.contextlevel = ?
+                       AND a.duedate > ?
+                       AND cm.visible = ?
+                       AND course.visible = ?';
+        $params = array('assign', CONTEXT_MODULE, 0, 1, 1);
+
+        $frequency = new frequency();
+
+        // We're testing a private method, so we need to setup reflector magic.
+        $method = new ReflectionMethod('\local_assessfreq\frequency', 'get_module_events');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $result = $method->invoke($frequency, $sql, $params);
+
+        foreach ($result as $record) {
+            error_log(print_r($record, true));
+        }
+        $result->close();
+
+    }
+
 }

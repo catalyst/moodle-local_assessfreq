@@ -24,8 +24,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
-    // Report link.
-    $ADMIN->add('reports', new admin_externalpage('local_assessfreq_report',
-        get_string('pluginname', 'local_assessfreq'), "$CFG->wwwroot/local/assessfreq/report.php"));
+if (!$hassiteconfig) {
+    return;
 }
+
+// Site wide admin settings.
+$settings = new admin_settingpage('local_assessfreq', get_string('pluginname', 'local_assessfreq'));
+
+// TODO: Add whicch activities we should include in the reports
+// TODO: add a look back and look ahead (wiht enabled switch) to figure out how far we go back.
+// TODO: add setting to filter visible courses or not
+// TODO: add setting to filter visibile activities or not.
+
+$ADMIN->add('localplugins', $settings);
+
+get_context_info_array($contextid)
+
+// Report link.
+$ADMIN->add('reports', new admin_externalpage('local_assessfreq_report',
+    get_string('pluginname', 'local_assessfreq'), "$CFG->wwwroot/local/assessfreq/report.php"));
+

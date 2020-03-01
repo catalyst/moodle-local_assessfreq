@@ -124,4 +124,78 @@ class frequency {
         return $freqarray;
     }
 
+    /**
+     * Get the modules to use in data collection.
+     * This is based on plugin configuration.
+     *
+     * @return array $modules The enabled modules.
+     */
+    private function get_modules() : array {
+        // TODO: Get these from plugin config rather than hard code.
+        return array ('assign', 'book', 'choice', 'data', 'feedback', 'forum', 'lesson', 'quiz', 'scorm', 'workshop');
+    }
+
+    /**
+     * Generate SQL to use to get activity info.
+     *
+     * @param string $module Activity module to get data for.
+     * @return string $sql The generated SQL.
+     */
+    private function get_sql_query(string $module) : string {
+        $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.duedate
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON cm.module = m.id
+            INNER JOIN {context} c ON cm.id = c.instanceid
+            INNER JOIN {' . $module . '} a ON cm.instance = a.id
+            INNER JOIN {course} course ON cm.course = course.id
+                 WHERE m.name = ?
+                       AND c.contextlevel = ?
+                       AND a.duedate > ?
+                       AND cm.visible = ?
+                       AND course.visible = ?';
+
+        return $sql;
+    }
+
+    /**
+     *
+     * @param string $sql
+     * @param array $params
+     * @return \moodle_recordset
+     */
+    private function get_module_events(string $sql, array $params) : \moodle_recordset {
+        global $DB;
+
+        $recordset = $DB->get_recordset_sql($sql, $params);
+
+        return $recordset;
+    }
+
+    /**
+     *
+     */
+    private function process_site_events($module) {
+        global $DB;
+
+        //
+
+        $enabledmods = $this->get_modules();
+        $queries = array();
+        $params = array(
+            $module,
+            CONTEXT_MODULE,
+            0,
+            1,
+            1
+        );
+
+        // Itterate through modules and generate sql.
+        foreach ($enabledmods as $module) {
+            $queries[] = $this->get_sql_query($module);
+        }
+
+
+
+    }
+
 }
