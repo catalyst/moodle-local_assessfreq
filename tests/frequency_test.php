@@ -201,7 +201,9 @@ class frequency_testcase extends advanced_testcase {
         $result = $method->invoke($frequency, $sql, $params);
 
         foreach ($result as $record) {
-            error_log(print_r($record, true));
+            $this->assertEquals($course->id, $record->course);
+            $this->assertEquals($assign->get_context()->id, $record->contextid);
+            $this->assertEquals(123456, $record->duedate);
         }
         $result->close();
 

@@ -171,6 +171,10 @@ class frequency {
         return $recordset;
     }
 
+    private function process_module_events(\moodle_recordset $recordset) {
+
+    }
+
     /**
      *
      */

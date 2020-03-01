@@ -38,8 +38,6 @@ $settings = new admin_settingpage('local_assessfreq', get_string('pluginname', '
 
 $ADMIN->add('localplugins', $settings);
 
-get_context_info_array($contextid)
-
 // Report link.
 $ADMIN->add('reports', new admin_externalpage('local_assessfreq_report',
     get_string('pluginname', 'local_assessfreq'), "$CFG->wwwroot/local/assessfreq/report.php"));
