@@ -39,105 +39,6 @@ use local_assessfreq\frequency;
 class frequency_testcase extends advanced_testcase {
 
     /**
-     * Test getting the raw events.
-     */
-    public function test_get_events() {
-        $this->resetAfterTest();
-
-        $user = $this->getDataGenerator()->create_user();
-        $course1 = $this->getDataGenerator()->create_course();
-        $course2 = $this->getDataGenerator()->create_course();
-
-        $this->resetAfterTest(true);
-        $this->setAdminuser();
-        $this->getDataGenerator()->enrol_user($user->id, $course1->id);
-        $this->getDataGenerator()->enrol_user($user->id, $course2->id);
-
-        for ($i = 1; $i < 2; $i++) {
-            create_event([
-                'name' => sprintf('Event %d', $i),
-                'eventtype' => 'user',
-                'userid' => $user->id,
-                'timesort' => $i,
-                'type' => CALENDAR_EVENT_TYPE_ACTION,
-                'courseid' => $course1->id,
-            ]);
-        }
-
-        for ($i = 2; $i < 4; $i++) {
-            create_event([
-                'name' => sprintf('Event %d', $i),
-                'eventtype' => 'user',
-                'userid' => $user->id,
-                'timesort' => $i,
-                'type' => CALENDAR_EVENT_TYPE_ACTION,
-                'courseid' => $course2->id,
-            ]);
-        }
-
-        $frequency = new frequency();
-
-        // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\local_assessfreq\frequency', 'get_events');
-        $method->setAccessible(true); // Allow accessing of private method.
-        $result = $method->invoke($frequency);
-
-        $this->assertCount(3, $result); // Should be 3 events across 2 courses.
-        $this->assertEquals('Event 1', $result[0]->get_name());
-        $this->assertEquals('Event 2', $result[1]->get_name());
-        $this->assertEquals('Event 3', $result[2]->get_name());
-    }
-
-    /**
-     * Test getting the frequency array.
-     */
-    public function test_get_frequency_array() {
-        $this->resetAfterTest();
-        //$this->setUser();
-
-        $user = $this->getDataGenerator()->create_user();
-        $course1 = $this->getDataGenerator()->create_course();
-        $course2 = $this->getDataGenerator()->create_course();
-
-        $this->resetAfterTest(true);
-        $this->setAdminuser();
-        $this->getDataGenerator()->enrol_user($user->id, $course1->id);
-        $this->getDataGenerator()->enrol_user($user->id, $course2->id);
-
-        for ($i = 1; $i < 3; $i++) {
-            create_event([
-                'name' => sprintf('Event %d', $i),
-                'eventtype' => 'user',
-                'userid' => $user->id,
-                'timesort' => $i,
-                'timestart' => 1581227776,
-                'type' => CALENDAR_EVENT_TYPE_ACTION,
-                'courseid' => $course1->id,
-            ]);
-        }
-
-        for ($i = 3; $i < 6; $i ++) {
-            create_event([
-                'name' => sprintf('Event %d', $i),
-                'eventtype' => 'user',
-                'userid' => $user->id,
-                'timesort' => $i,
-                'timestart' => 1581170400,
-                'type' => CALENDAR_EVENT_TYPE_ACTION,
-                'courseid' => $course2->id
-            ]);
-        }
-
-        $frequency = new frequency();
-        $result = $frequency->get_frequency_array();
-
-        $this->assertEquals(2, $result[2020][2][9]['number']);
-        $this->assertEquals(3, $result[2020][2][8]['number']);
-        $this->assertEquals(0, $result[2020][2][9]['heat']);
-        $this->assertEquals(1, $result[2020][2][8]['heat']);
-    }
-
-    /**
      * Test getting the map.
      */
     public function test_get_map() {
@@ -363,5 +264,42 @@ class frequency_testcase extends advanced_testcase {
 
         $count = $DB->count_records('local_assessfreq_site');
         $this->assertEquals(1, $count); // Should be one record.
+    }
+
+    /**
+     * Test process module events method.
+     */
+    public function test_get_event_users() {
+        $this->resetAfterTest();
+
+        global $DB;
+        $frequency = new frequency();
+        // Create a course with activity.
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(
+            array('format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => COMPLETION_ENABLED),
+            array('createsections' => true));
+        $assignrow1 = $generator->create_module('assign', array(
+            'course' => $course->id,
+            'duedate' => 1585359375
+        ));
+        $assign1 = new assign(context_module::instance($assignrow1->cmid), false, false);
+
+        // Create some users.
+        $user1 = $generator->create_user();
+        $user2 = $generator->create_user();
+
+        // Enrol users into the course.
+        $generator->enrol_user($user1->id, $course->id, 'student');
+        $generator->enrol_user($user2->id, $course->id, 'student');
+
+        // We're testing a private method, so we need to setup reflector magic.
+        $method = new ReflectionMethod('\local_assessfreq\frequency', 'get_event_users');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $result = $method->invoke($frequency, $assign1->get_context()->id, 'assign');
+        //error_log(print_r($result, true));
+
     }
 }

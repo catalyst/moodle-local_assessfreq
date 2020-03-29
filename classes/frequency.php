@@ -74,6 +74,25 @@ class frequency {
     );
 
     /**
+     * Map of capabilities that users must have
+     * before that activity event applies to them.
+     *
+     * @var array $capabilitymap
+     */
+    private $capabilitymap = array (
+        'assign' => array('mod/assign:submit', 'mod/assign:view'),
+        'choice' =>  array(),
+        'data' =>  array(),
+        'feedback' =>  array(),
+        'forum' =>  array(),
+        'lesson' => array(),
+        'quiz' =>  array(),
+        'scorm' =>  array(),
+        'workshop' =>  array()
+    );
+
+
+    /**
      * Size of batch to insert records into database.
      *
      * @var integer $batchsize
@@ -96,57 +115,6 @@ class frequency {
         }
 
         return $result;
-    }
-
-    /**
-     * Get the raw events for the current user.
-     *
-     * @return array $events An array of the raw events.
-     */
-    private function get_events() : array {
-
-        $vault = \core_calendar\local\event\container::get_event_vault();
-
-        // TODO: Get events has a limit of 20 by default need to work around this.
-        // TODO: need to filter to a particular user.
-        $events = $vault->get_events();
-
-        // get_times
-        return $events;
-
-    }
-
-    /**
-     * Generate a frequency array of the events.
-     * The form of the array is:
-     * [yyyy][mm][dd]['number'] = number of events that day.
-     *
-     * @return array $freqarray The array of even frequencies.
-     */
-    public function get_frequency_array() : array {
-        $freqarray = array();
-
-        // Get the raw events.
-        $events = $this->get_events();
-
-        // Iterate through the events, building the frequency array.
-        foreach ($events as $event) {
-            $eventtimes = $event->get_times();
-            $endtime = $eventtimes->get_end_time();
-            $year = $endtime->format('Y');
-            $month = $endtime->format('n');
-            $day = $endtime->format('j');
-
-            // Construct the multidimensional array.
-            if (empty($freqarray[$year][$month][$day])) {
-                $freqarray[$year][$month][$day] = array('number' => 1, 'heatimecloset' => $this->get_map(1));
-            } else {
-                $freqarray[$year][$month][$day]['number']++;
-                $freqarray[$year][$month][$day]['heat'] = $this->get_map($freqarray[$year][$month][$day]['number']);
-            }
-        }
-
-        return $freqarray;
     }
 
     /**
@@ -279,9 +247,36 @@ class frequency {
             $params = array($module, CONTEXT_MODULE, $duedate, 1, 1);
             $moduleevents = $this->get_module_events($sql, $params); // Get all events for module.
             $recordsprocessed += $this->process_module_events($moduleevents); // Store events.
-
-            return $recordsprocessed;
         }
+        return $recordsprocessed;
+    }
+
+
+    private function get_event_users(int $contextid, string $module) : array {
+        $context = \context::instance_by_id($contextid);
+        $users = get_enrolled_users($context, 'mod/assignment:submit');
+
+        return $users;
+    }
+
+    /**
+     * Process user events.
+     * Get all events for users and store results in the database.
+     *
+     * @param int $duedate The timestamp to start processing from.
+     * @return int $recordsprocessed The number of records processed.
+     */
+    public function process_user_events(int $duedate) : int {
+        $recordsprocessed = 0;
+
+        // Get recordset of site events where date is greater than now.
+        // We don't care about updating events in the past.
+
+        // For each site event get list of users that the event aplies to.
+
+        // Store result in database in a many-to-many table.
+
+        return $recordsprocessed;
     }
 
     /**
