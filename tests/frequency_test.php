@@ -162,12 +162,12 @@ class frequency_testcase extends advanced_testcase {
     }
 
     /**
-     * Test getting the map.
+     * Test getting a modules events.
      */
     public function test_get_module_events() {
         $this->resetAfterTest();
 
-        // Create a course with activity..
+        // Create a course with activity.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course(
             array('format' => 'topics', 'numsections' => 3,
@@ -209,4 +209,159 @@ class frequency_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test format time method.
+     */
+    public function test_format_time() {
+        $frequency = new frequency();
+        $timestamp = 1585445775;
+
+        // We're testing a private method, so we need to setup reflector magic.
+        $method = new ReflectionMethod('\local_assessfreq\frequency', 'format_time');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $result = $method->invoke($frequency, $timestamp);
+
+        $this->assertEquals(2020, $result['endyear']);
+        $this->assertEquals(03, $result['endmonth']);
+        $this->assertEquals(29, $result['endday']);
+    }
+
+    /**
+     * Test process module events method.
+     */
+    public function test_process_module_events() {
+        $this->resetAfterTest();
+
+        global $DB;
+        $frequency = new frequency();
+        // Create a course with activity.
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(
+            array('format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => COMPLETION_ENABLED),
+            array('createsections' => true));
+        $assignrow1 = $generator->create_module('assign', array(
+            'course' => $course->id,
+            'duedate' => 1585359375
+        ));
+        $assignrow2 = $generator->create_module('assign', array(
+            'course' => $course->id,
+            'duedate' => 1585445775
+        ));
+        $assign1 = new assign(context_module::instance($assignrow1->cmid), false, false);
+        $assign2 = new assign(context_module::instance($assignrow2->cmid), false, false);
+
+        $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.duedate
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON cm.module = m.id
+            INNER JOIN {context} c ON cm.id = c.instanceid
+            INNER JOIN {assign} a ON cm.instance = a.id
+            INNER JOIN {course} course ON cm.course = course.id
+                 WHERE m.name = ?
+                       AND c.contextlevel = ?
+                       AND a.duedate > ?
+                       AND cm.visible = ?
+                       AND course.visible = ?';
+        $params = array('assign', CONTEXT_MODULE, 0, 1, 1);
+
+        // We're testing a private method, so we need to setup reflector magic.
+        $method = new ReflectionMethod('\local_assessfreq\frequency', 'get_module_events');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $recordset = $method->invoke($frequency, $sql, $params);
+
+        // We're testing a private method, so we need to setup reflector magic.
+        $method = new ReflectionMethod('\local_assessfreq\frequency', 'process_module_events');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $result = $method->invoke($frequency, $recordset);
+        $this->assertEquals(2, $result); // Check the expected number of records inserted.
+
+        // Check actual records in the DB.
+        $record1 = $DB->get_record('local_assessfreq_site', array('instanceid' => $assign1->get_course_module()->instance));
+        $record2 = $DB->get_record('local_assessfreq_site', array('instanceid' => $assign2->get_course_module()->instance));
+
+        $this->assertEquals(28, $record1->endday);
+        $this->assertEquals(29, $record2->endday);
+    }
+
+    /**
+     * Test process site events method.
+     */
+    public function test_process_site_events() {
+        $this->resetAfterTest();
+
+        global $DB;
+        // Create a course with activity.
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(
+            array('format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => COMPLETION_ENABLED),
+            array('createsections' => true));
+        $assignrow1 = $generator->create_module('assign', array(
+            'course' => $course->id,
+            'duedate' => 1585359375
+        ));
+        $assignrow2 = $generator->create_module('assign', array(
+            'course' => $course->id,
+            'duedate' => 1585445775
+        ));
+        new assign(context_module::instance($assignrow1->cmid), false, false);
+        $assign2 = new assign(context_module::instance($assignrow2->cmid), false, false);
+
+        $now = 1585359400;
+        $frequency = new frequency();
+        $result = $frequency->process_site_events($now);
+
+        $this->assertEquals(1, $result);
+
+        // Check actual records in the DB.
+        $record = $DB->get_record('local_assessfreq_site', array('instanceid' => $assign2->get_course_module()->instance));
+        $this->assertEquals(29, $record->endday);
+    }
+
+    /**
+     * Test process site events method.
+     */
+    public function test_delete_events() {
+        $this->resetAfterTest();
+
+        global $DB;
+        // Create a course with activity.
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(
+            array('format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => COMPLETION_ENABLED),
+            array('createsections' => true));
+        $assignrow1 = $generator->create_module('assign', array(
+            'course' => $course->id,
+            'duedate' => 1585359375
+        ));
+        $assignrow2 = $generator->create_module('assign', array(
+            'course' => $course->id,
+            'duedate' => 1585445775
+        ));
+        new assign(context_module::instance($assignrow1->cmid), false, false);
+        new assign(context_module::instance($assignrow2->cmid), false, false);
+
+        $frequency = new frequency();
+        $result = $frequency->process_site_events(0);
+
+        $this->assertEquals(2, $result);
+
+        // Delete events from date.
+        $now = 1585359375;
+        $frequency->delete_events($now);
+
+        $count = $DB->count_records('local_assessfreq_site');
+        $this->assertEquals(0, $count); // Should be no records.
+
+        $result = $frequency->process_site_events(0);
+        $now = 1585359400;
+        $frequency->delete_events($now);
+
+        $count = $DB->count_records('local_assessfreq_site');
+        $this->assertEquals(1, $count); // Should be one record.
+    }
 }

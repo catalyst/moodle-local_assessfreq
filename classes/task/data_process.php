@@ -50,19 +50,18 @@ class data_process extends scheduled_task {
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-
-        mtrace('local_assessfreq: Processing data for overview report');
-
-        // Get events from database.
+        mtrace('local_assessfreq: Processing event data');
+        $now = time();
+        $frequency = new \local_assessfreq\frequency();
 
         // We dont't want to reprocess data.
         // We also don't care if a due date for an event is changed in the past.
-
         // So get latest data from DB and use it as the start point.
+
         // Due dates may have changed since we last ran report. So delete all events in DB later than today and replace them.
+        $frequency->delete_events($now); // Delete event records greaer than now.
+        $frequency->process_site_events($now); // Process records in the future
 
-        // Add stuff to cache.
-
+        // TODO: Add stuff to cache.
     }
-
 }
