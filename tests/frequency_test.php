@@ -267,7 +267,7 @@ class frequency_testcase extends advanced_testcase {
     }
 
     /**
-     * Test process module events method.
+     * Test process getting events for users.
      */
     public function test_get_event_users() {
         $this->resetAfterTest();
@@ -299,7 +299,9 @@ class frequency_testcase extends advanced_testcase {
         $method->setAccessible(true); // Allow accessing of private method.
 
         $result = $method->invoke($frequency, $assign1->get_context()->id, 'assign');
-        //error_log(print_r($result, true));
+
+        $this->assertEquals($user1->id, $result[$user1->id]->id);
+        $this->assertEquals($user2->id, $result[$user2->id]->id);
 
     }
 }

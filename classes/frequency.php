@@ -251,10 +251,22 @@ class frequency {
         return $recordsprocessed;
     }
 
-
+    /**
+     * Get all user IDs that a particular event applies to.
+     *
+     * @param int $contextid The context ID in a course for the event to check.
+     * @param string $module The type of module the event is for.
+     * @return array $users An array of user IDs.
+     */
     private function get_event_users(int $contextid, string $module) : array {
         $context = \context::instance_by_id($contextid);
-        $users = get_enrolled_users($context, 'mod/assignment:submit');
+        $capabilities = $this->capabilitymap[$module];
+        $users = array();
+
+        foreach ($capabilities as $capability) {
+            $enrolledusers = get_enrolled_users($context, $capability, 0, 'u.id');
+            $users = array_replace($users, $enrolledusers);
+        }
 
         return $users;
     }
