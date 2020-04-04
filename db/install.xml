@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/assessfreq/db" VERSION="20200301" COMMENT="XMLDB file for Moodle local/assessfreq"
+<XMLDB PATH="local/assessfreq/db" VERSION="20200403" COMMENT="XMLDB file for Moodle local/assessfreq"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -21,6 +21,19 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="modid" UNIQUE="true" FIELDS="module, instanceid" COMMENT="Index of module and instance id"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_assessfreq_user" COMMENT="Stores relationship between users and events">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="userid from the user table"/>
+        <FIELD NAME="eventid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id from the local assessfreq site table"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userevent" UNIQUE="false" FIELDS="userid, eventid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

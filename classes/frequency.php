@@ -272,6 +272,48 @@ class frequency {
     }
 
     /**
+     * Get stored events from a specified date.
+     *
+     * @param int $duedate The duedate to get events from.
+     * @return \moodle_recordset Recordset of event info.
+     */
+    private function get_stored_events(int $duedate) : \moodle_recordset {
+        global $DB;
+
+        $select = 'timeend >= ?';
+        $params = array($duedate);
+        $recordset = $DB->get_recordset_select(
+            'local_assessfreq_site',
+            $select,
+            $params,
+            'timeend DESC',
+            'id, contextid, module');
+
+        return $recordset;
+    }
+
+    /**
+     * Take and array of users and prepare them
+     * for insertion into the database.
+     *
+     * @param array $users The array of users to link to the event.
+     * @param int $eventid The related event id.
+     * @return array $userrecords Array of objects ready to store in database.
+     */
+    private function prepare_user_event_records(array $users, int $eventid) : array {
+        $userrecords = array();
+        foreach($users as $user) {
+            $record = new \stdClass();
+            $record->userid = $user->id;
+            $record->eventid = $eventid;
+
+            $userrecords[] = $record;
+        }
+
+        return $userrecords;
+    }
+
+    /**
      * Process user events.
      * Get all events for users and store results in the database.
      *
@@ -279,14 +321,22 @@ class frequency {
      * @return int $recordsprocessed The number of records processed.
      */
     public function process_user_events(int $duedate) : int {
+        global $DB;
         $recordsprocessed = 0;
 
         // Get recordset of site events where date is greater than now.
         // We don't care about updating events in the past.
+        $eventset = $this->get_stored_events($duedate);
+        foreach ($eventset as $event){
+            // For each site event get list of users that the event aplies to.
+            $users = $this->get_event_users($event->contextid, $event->module);
+            $userrecords = $this->prepare_user_event_records($users, $event->id);
 
-        // For each site event get list of users that the event aplies to.
-
-        // Store result in database in a many-to-many table.
+            // Store result in database in a many-to-many table.
+            $DB->insert_records('local_assessfreq_user', $userrecords);
+            $recordsprocessed += count($userrecords);
+        }
+        $eventset->close();
 
         return $recordsprocessed;
     }
@@ -298,8 +348,25 @@ class frequency {
      */
     public function delete_events(int $duedate) : void {
         global $DB;
-
         $select = 'timeend >= ?';
-        $DB->delete_records_select('local_assessfreq_site', $select, array($duedate));
+
+        // We do the following in a transaction to maintain data consistency.
+        try {
+            $transaction = $DB->start_delegated_transaction();
+            $userevents = $DB->get_fieldset_select('local_assessfreq_site', 'id', $select, array($duedate));
+
+            // Delete site events.
+            $DB->delete_records_select('local_assessfreq_site', $select, array($duedate));
+
+            // Delete user events.
+            list($insql, $inparams) = $DB->get_in_or_equal($userevents);
+            $inselect = "eventid $insql";
+            $DB->delete_records_select('local_assessfreq_user', $inselect, $inparams);
+
+            $transaction->allow_commit();
+
+        } catch(\Exception $e) {
+            $transaction->rollback($e);
+        }s
     }
 }

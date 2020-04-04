@@ -39,6 +39,71 @@ use local_assessfreq\frequency;
 class frequency_testcase extends advanced_testcase {
 
     /**
+     *
+     * @var stdClass $course Test course.
+     */
+    protected $course;
+
+    /**
+     *
+     * @var stdClass First test assign.
+     */
+    protected $assign1;
+
+    /**
+     *
+     * @var stdClass Second test assign.
+     */
+    protected $assign2;
+
+    /**
+     *
+     * @var stdClass First test user.
+     */
+    protected $user1;
+
+    /**
+     *
+     * @var stdClass Second test user.
+     */
+    protected $user2;
+
+    /**
+     * Set up conditions for tests.
+     */
+    public function setUp() {
+        $this->resetAfterTest();
+        // Create a course with activity.
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(
+            array('format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1),
+            array('createsections' => true));
+        $assignrow1 = $generator->create_module('assign', array(
+            'course' => $course->id,
+            'duedate' => 1585359375
+        ));
+        $assignrow2 = $generator->create_module('assign', array(
+            'course' => $course->id,
+            'duedate' => 1585445775
+        ));
+        $this->assign1 = new assign(context_module::instance($assignrow1->cmid), false, false);
+        $this->assign2 = new assign(context_module::instance($assignrow2->cmid), false, false);
+        $this->course = $course;
+
+        // Create some users.
+        $user1 = $generator->create_user();
+        $user2 = $generator->create_user();
+
+        // Enrol users into the course.
+        $generator->enrol_user($user1->id, $course->id, 'student');
+        $generator->enrol_user($user2->id, $course->id, 'student');
+
+        $this->user1 = $user1;
+        $this->user2 = $user2;
+    }
+
+    /**
      * Test getting the map.
      */
     public function test_get_map() {
@@ -66,20 +131,6 @@ class frequency_testcase extends advanced_testcase {
      * Test getting a modules events.
      */
     public function test_get_module_events() {
-        $this->resetAfterTest();
-
-        // Create a course with activity.
-        $generator = $this->getDataGenerator();
-        $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => COMPLETION_ENABLED),
-            array('createsections' => true));
-        $assignrow = $generator->create_module('assign', array(
-            'course' => $course->id,
-            'duedate' => 123456
-        ));
-        $assign = new assign(context_module::instance($assignrow->cmid), false, false);
-
         $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.duedate
                   FROM {course_modules} cm
             INNER JOIN {modules} m ON cm.module = m.id
@@ -100,11 +151,12 @@ class frequency_testcase extends advanced_testcase {
         $method->setAccessible(true); // Allow accessing of private method.
 
         $result = $method->invoke($frequency, $sql, $params);
+        $contextids = array($this->assign1->get_context()->id, $this->assign2->get_context()->id);
 
         foreach ($result as $record) {
-            $this->assertEquals($course->id, $record->course);
-            $this->assertEquals($assign->get_context()->id, $record->contextid);
-            $this->assertEquals(123456, $record->duedate);
+            $this->assertEquals($this->course->id, $record->course);
+            $this->assertContains($record->contextid, $contextids);
+            $this->assertEquals('assign', $record->name);
         }
         $result->close();
 
@@ -132,26 +184,9 @@ class frequency_testcase extends advanced_testcase {
      * Test process module events method.
      */
     public function test_process_module_events() {
-        $this->resetAfterTest();
 
         global $DB;
         $frequency = new frequency();
-        // Create a course with activity.
-        $generator = $this->getDataGenerator();
-        $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => COMPLETION_ENABLED),
-            array('createsections' => true));
-        $assignrow1 = $generator->create_module('assign', array(
-            'course' => $course->id,
-            'duedate' => 1585359375
-        ));
-        $assignrow2 = $generator->create_module('assign', array(
-            'course' => $course->id,
-            'duedate' => 1585445775
-        ));
-        $assign1 = new assign(context_module::instance($assignrow1->cmid), false, false);
-        $assign2 = new assign(context_module::instance($assignrow2->cmid), false, false);
 
         $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.duedate
                   FROM {course_modules} cm
@@ -180,8 +215,8 @@ class frequency_testcase extends advanced_testcase {
         $this->assertEquals(2, $result); // Check the expected number of records inserted.
 
         // Check actual records in the DB.
-        $record1 = $DB->get_record('local_assessfreq_site', array('instanceid' => $assign1->get_course_module()->instance));
-        $record2 = $DB->get_record('local_assessfreq_site', array('instanceid' => $assign2->get_course_module()->instance));
+        $record1 = $DB->get_record('local_assessfreq_site', array('instanceid' => $this->assign1->get_course_module()->instance));
+        $record2 = $DB->get_record('local_assessfreq_site', array('instanceid' => $this->assign2->get_course_module()->instance));
 
         $this->assertEquals(28, $record1->endday);
         $this->assertEquals(29, $record2->endday);
@@ -191,25 +226,7 @@ class frequency_testcase extends advanced_testcase {
      * Test process site events method.
      */
     public function test_process_site_events() {
-        $this->resetAfterTest();
-
         global $DB;
-        // Create a course with activity.
-        $generator = $this->getDataGenerator();
-        $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => COMPLETION_ENABLED),
-            array('createsections' => true));
-        $assignrow1 = $generator->create_module('assign', array(
-            'course' => $course->id,
-            'duedate' => 1585359375
-        ));
-        $assignrow2 = $generator->create_module('assign', array(
-            'course' => $course->id,
-            'duedate' => 1585445775
-        ));
-        new assign(context_module::instance($assignrow1->cmid), false, false);
-        $assign2 = new assign(context_module::instance($assignrow2->cmid), false, false);
 
         $now = 1585359400;
         $frequency = new frequency();
@@ -218,7 +235,7 @@ class frequency_testcase extends advanced_testcase {
         $this->assertEquals(1, $result);
 
         // Check actual records in the DB.
-        $record = $DB->get_record('local_assessfreq_site', array('instanceid' => $assign2->get_course_module()->instance));
+        $record = $DB->get_record('local_assessfreq_site', array('instanceid' => $this->assign2->get_course_module()->instance));
         $this->assertEquals(29, $record->endday);
     }
 
@@ -226,28 +243,12 @@ class frequency_testcase extends advanced_testcase {
      * Test process site events method.
      */
     public function test_delete_events() {
-        $this->resetAfterTest();
-
         global $DB;
-        // Create a course with activity.
-        $generator = $this->getDataGenerator();
-        $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => COMPLETION_ENABLED),
-            array('createsections' => true));
-        $assignrow1 = $generator->create_module('assign', array(
-            'course' => $course->id,
-            'duedate' => 1585359375
-        ));
-        $assignrow2 = $generator->create_module('assign', array(
-            'course' => $course->id,
-            'duedate' => 1585445775
-        ));
-        new assign(context_module::instance($assignrow1->cmid), false, false);
-        new assign(context_module::instance($assignrow2->cmid), false, false);
 
+        $duedate = 0;
         $frequency = new frequency();
-        $result = $frequency->process_site_events(0);
+        $result = $frequency->process_site_events($duedate);
+        $frequency->process_user_events($duedate);
 
         $this->assertEquals(2, $result);
 
@@ -255,53 +256,60 @@ class frequency_testcase extends advanced_testcase {
         $now = 1585359375;
         $frequency->delete_events($now);
 
-        $count = $DB->count_records('local_assessfreq_site');
-        $this->assertEquals(0, $count); // Should be no records.
+        $count1 = $DB->count_records('local_assessfreq_site');
+        $this->assertEquals(0, $count1); // Should be no records.
 
-        $result = $frequency->process_site_events(0);
+        $count2 = $DB->count_records('local_assessfreq_user');
+        $this->assertEquals(0, $count2); // Should be no records.
+
+        $result = $frequency->process_site_events($duedate);
+        $frequency->process_user_events($duedate);
         $now = 1585359400;
         $frequency->delete_events($now);
 
-        $count = $DB->count_records('local_assessfreq_site');
-        $this->assertEquals(1, $count); // Should be one record.
+        $count1 = $DB->count_records('local_assessfreq_site');
+        $this->assertEquals(1, $count1); // Should be one record.
+
+        $count2 = $DB->count_records('local_assessfreq_user');
+        $this->assertEquals(2, $count2); // Should be two record.
     }
 
     /**
      * Test process getting events for users.
      */
     public function test_get_event_users() {
-        $this->resetAfterTest();
-
-        global $DB;
         $frequency = new frequency();
-        // Create a course with activity.
-        $generator = $this->getDataGenerator();
-        $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => COMPLETION_ENABLED),
-            array('createsections' => true));
-        $assignrow1 = $generator->create_module('assign', array(
-            'course' => $course->id,
-            'duedate' => 1585359375
-        ));
-        $assign1 = new assign(context_module::instance($assignrow1->cmid), false, false);
-
-        // Create some users.
-        $user1 = $generator->create_user();
-        $user2 = $generator->create_user();
-
-        // Enrol users into the course.
-        $generator->enrol_user($user1->id, $course->id, 'student');
-        $generator->enrol_user($user2->id, $course->id, 'student');
 
         // We're testing a private method, so we need to setup reflector magic.
         $method = new ReflectionMethod('\local_assessfreq\frequency', 'get_event_users');
         $method->setAccessible(true); // Allow accessing of private method.
 
-        $result = $method->invoke($frequency, $assign1->get_context()->id, 'assign');
+        $result = $method->invoke($frequency, $this->assign1->get_context()->id, 'assign');
 
-        $this->assertEquals($user1->id, $result[$user1->id]->id);
-        $this->assertEquals($user2->id, $result[$user2->id]->id);
+        $this->assertEquals($this->user1->id, $result[$this->user1->id]->id);
+        $this->assertEquals($this->user2->id, $result[$this->user2->id]->id);
 
+    }
+
+    /**
+     * Test process processing user events.
+     */
+    public function test_process_user_events() {
+        global $DB;
+
+        $duedate = 0;
+        $frequency = new frequency();
+        $frequency->process_site_events($duedate);
+        $result = $frequency->process_user_events($duedate);
+
+        // Check expected record count was returned.
+        $this->assertEquals(4, $result);
+
+        // Check the reocrds in the database.
+        $count1 = $DB->count_records('local_assessfreq_user', array('userid' => $this->user1->id));
+        $count2 = $DB->count_records('local_assessfreq_user', array('userid' => $this->user2->id));
+
+        $this->assertEquals(2, $count1);
+        $this->assertEquals(2, $count2);
     }
 }

@@ -63,5 +63,7 @@ class data_process extends scheduled_task {
         $frequency->process_site_events($now); // Process records in the future.
         // TODO: process user events.s
         // TODO: Add stuff to cache.
+
+        // TODO: Add some logging and an event or two.
     }
 }
