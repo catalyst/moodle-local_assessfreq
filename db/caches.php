@@ -30,15 +30,19 @@ $definitions = [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false,
-        'datasource' => 'local_assessfreq\cache\siteevents',
+        'simpledata' => false
+    ],
+    'courseevents' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'simplekeys' => true,
+        'simpledata' => false
     ],
     'userevents' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false,
-        'datasource' => 'local_assessfreq\cache\userevents',
+        'simpledata' => false
     ],
 ];
 

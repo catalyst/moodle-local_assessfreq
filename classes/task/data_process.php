@@ -61,7 +61,8 @@ class data_process extends scheduled_task {
         // Due dates may have changed since we last ran report. So delete all events in DB later than today and replace them.
         $frequency->delete_events($now); // Delete event records greaer than now.
         $frequency->process_site_events($now); // Process records in the future.
-        // TODO: process user events.s
+        $frequency->process_user_events($now); // Process user events.
+
         // TODO: Add stuff to cache.
 
         // TODO: Add some logging and an event or two.

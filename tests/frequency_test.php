@@ -312,4 +312,24 @@ class frequency_testcase extends advanced_testcase {
         $this->assertEquals(2, $count1);
         $this->assertEquals(2, $count2);
     }
+
+    /**
+     * Test process processing user events.
+     */
+    public function test_filter_event_data() {
+        global $DB;
+
+        //         $cache = cache::make('local_assessfreq', 'siteevents');
+        //         $cache->get_events('fo000000o');
+    }
+
+    /**
+     * Test process processing user events.
+     */
+    public function test_get_site_events() {
+        global $DB;
+
+        //         $cache = cache::make('local_assessfreq', 'siteevents');
+        //         $cache->get_events('fo000000o');
+    }
 }

@@ -24,6 +24,8 @@
 
 namespace local_assessfreq;
 
+use cache;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/calendar/lib.php');
@@ -91,6 +93,12 @@ class frequency {
         'workshop' =>  array()
     );
 
+    /**
+     * Expiry period for caches.
+     *
+     * @var int $expiryperiod.
+     */
+    private $expiryperiod = 60 * 60; // One hour.
 
     /**
      * Size of batch to insert records into database.
@@ -367,6 +375,90 @@ class frequency {
 
         } catch(\Exception $e) {
             $transaction->rollback($e);
-        }s
+        }
     }
+
+    /**
+     * Filter event dates by time period.
+     * We do this PHP side not DB as we cache all the events.
+     *
+     * @param array $events
+     * @param int $from
+     * @param int $to
+     * @return array
+     */
+    private function filter_event_data(array $events, int $from, int $to) : array {
+        $filteredevents = array();
+
+        foreach ($events as $event) {
+            if ($event->timeend >= $from && $event->timend < $to ) {
+                $filteredevents[] = $event;
+            }
+        }
+
+        return $filteredevents;
+    }
+
+    /**
+     * Get site events.
+     * This is events across all courses.
+     *
+     * @param string $module The module to get events for or all events.
+     * @param int $from The timestamp to get events from.
+     * @param int $to The timestamp to get events to.
+     * @return array $events An array of site events
+     */
+    public function get_site_events(string $module='all', int $from=0, int $to=0) : array {
+        global $DB;
+        $events = array();
+
+        // Try to get value from cache.
+        $sitecache = cache::make('local_assessfreq', 'siteevents');
+        $data = $sitecache->get($module);
+
+        if ($data && (time() < $data->expiry)) { // Valid cache data.
+            // Only return data for chosen range.
+            $events = $this->filter_event_data($data->events, $from, $to);
+        } else {  // Not valid cache data.
+
+            // Get data from database.
+            if ($$module == 'all'){
+                $rawevents = $DB->get_records('local_assessfreq_site');
+            } else {
+                $rawevents = $DB->get_records('local_assessfreq_site', array('module' => $module));
+            }
+
+            $events = $this->filter_event_data($rawevents, $from, $to);
+
+            // Update cache.
+            if (!empty($events)) {
+                $expiry = time() + $this->expiryperiod;
+                $data = new \stdClass();
+                $data->expiry = $expiry;
+                $data->events = $rawevents;
+                $sitecache->set($module, $data);
+            }
+        }
+        return $events;
+    }
+
+    public function get_course_events(int $courseid, string $module, int $from=0, int $to=0) : array {
+        $events = array();
+
+        $cachekey = $courseid . '_' . $module;
+
+        return $events;
+    }
+
+    public function get_user_events(int $userid, string $module, int $from=0, int $to=0) : array {
+        $events = array();
+
+        $cachekey = $userid . '_' . $module;
+
+        return $events;
+    }
+
+
+
+
 }
