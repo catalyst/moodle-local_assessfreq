@@ -340,7 +340,6 @@ class frequency_testcase extends advanced_testcase {
         // Expect latest event.
         $result = $method->invoke($frequency, $records, 1585359376, 0);
         $this->assertEquals(1585445775, $result[0]->timeend);
-
     }
 
     /**
@@ -366,6 +365,64 @@ class frequency_testcase extends advanced_testcase {
 
         $data = $sitecache->get('forum');
         $this->assertEmpty($data);
+    }
 
+    /**
+     * Test getting course events and cache.
+     */
+    public function test_get_course_events() {
+        $duedate = 0;
+        $frequency = new frequency();
+        $frequency->process_site_events($duedate);
+
+        $coursecache = cache::make('local_assessfreq', 'courseevents');
+        $cachekey = (string)$this->course->id . '_all';
+        $data = $coursecache->get($cachekey);
+        $this->assertEmpty($data);
+
+        $result = $frequency->get_course_events($this->course->id, 'all', 0, 0, false);
+        $this->assertCount(2, $result);
+
+        $data = $coursecache->get($cachekey);
+        $this->assertCount(2, $data->events);
+
+        $result = $frequency->get_course_events($this->course->id, 'forum', 0, 0, true);
+        $this->assertEmpty($result);
+
+        $result = $frequency->get_course_events(3, 'all', 0, 0, true);
+        $this->assertEmpty($result);
+
+        $data = $coursecache->get('forum');
+        $this->assertEmpty($data);
+    }
+
+    /**
+     * Test getting user events and cache.
+     */
+    public function test_get_user_events() {
+        $duedate = 0;
+        $frequency = new frequency();
+        $frequency->process_site_events($duedate);
+        $frequency->process_user_events($duedate);
+
+        $usercache = cache::make('local_assessfreq', 'userevents');
+        $cachekey = (string)$this->user1->id . '_all';
+        $data = $usercache->get($cachekey);
+        $this->assertEmpty($data);
+
+        $result = $frequency->get_user_events($this->user1->id, 'all', 0, 0, false);
+        $this->assertCount(2, $result);
+
+        $data = $usercache->get($cachekey);
+        $this->assertCount(2, $data->events);
+
+        $result = $frequency->get_user_events($this->user1->id, 'forum', 0, 0, true);
+        $this->assertEmpty($result);
+
+        $result = $frequency->get_user_events(3, 'all', 0, 0, true);
+        $this->assertEmpty($result);
+
+        $data = $usercache->get('forum');
+        $this->assertEmpty($data);
     }
 }

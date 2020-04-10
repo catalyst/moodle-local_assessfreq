@@ -438,7 +438,7 @@ class frequency {
             $events = $this->filter_event_data($rawevents, $from, $to);
 
             // Update cache.
-            if (!empty($events)) {
+            if (!empty($rawevents)) {
                 $expiry = time() + $this->expiryperiod;
                 $data = new \stdClass();
                 $data->expiry = $expiry;
@@ -449,23 +449,100 @@ class frequency {
         return $events;
     }
 
-    public function get_course_events(int $courseid, string $module, int $from=0, int $to=0, bool $cache=true) : array {
+    /**
+     * Return events for a given course.
+     *
+     * @param int $courseid Course ID to get events for.
+     * @param string $module The module to get events for or all events.
+     * @param int $from The timestamp to get events from.
+     * @param int $to The timestamp to get events to.
+     * @param bool $cache If false cache won't be used fresh data will be retrieved from DB.
+     * @return array $events An array of site events
+     */
+    public function get_course_events(int $courseid, string $module='all', int $from=0, int $to=0, bool $cache=true) : array {
+        global $DB;
         $events = array();
+        $cachekey = (string)$courseid . '_' . $module;
 
-        $cachekey = $courseid . '_' . $module;
+        // Try to get value from cache.
+        $coursecache = cache::make('local_assessfreq', 'courseevents');
+        $data = $coursecache->get($cachekey);
+
+        if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
+            // Only return data for chosen range.
+            $events = $this->filter_event_data($data->events, $from, $to);
+        } else {  // Not valid cache data.
+
+            // Get data from database.
+            if ($module == 'all'){
+                $rawevents = $DB->get_records('local_assessfreq_site', array('courseid' => $courseid));
+            } else {
+                $rawevents = $DB->get_records('local_assessfreq_site', array('module' => $module, 'courseid' => $courseid));
+            }
+
+            $events = $this->filter_event_data($rawevents, $from, $to);
+
+            // Update cache.
+            if (!empty($rawevents)) {
+                $expiry = time() + $this->expiryperiod;
+                $data = new \stdClass();
+                $data->expiry = $expiry;
+                $data->events = $rawevents;
+                $coursecache->set($cachekey, $data);
+            }
+        }
 
         return $events;
     }
 
-    public function get_user_events(int $userid, string $module, int $from=0, int $to=0, bool $cache=true) : array {
+    /**
+     * Return events for a given user.
+     *
+     * @param int $userid user ID to get events for.
+     * @param string $module The module to get events for or all events.
+     * @param int $from The timestamp to get events from.
+     * @param int $to The timestamp to get events to.
+     * @param bool $cache If false cache won't be used fresh data will be retrieved from DB.
+     * @return array $events An array of site events
+     */
+    public function get_user_events(int $userid, string $module='all', int $from=0, int $to=0, bool $cache=true) : array {
+        global $DB;
         $events = array();
+        $cachekey = (string)$userid . '_' . $module;
 
-        $cachekey = $userid . '_' . $module;
+        // Try to get value from cache.
+        $usercache = cache::make('local_assessfreq', 'userevents');
+        $data = $usercache->get($cachekey);
+
+        if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
+            // Only return data for chosen range.
+            $events = $this->filter_event_data($data->events, $from, $to);
+        } else {  // Not valid cache data.
+            $sql = 'SELECT s.*
+                          FROM {local_assessfreq_site} s
+                    INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id
+                         WHERE u.userid = ?';
+            // Get data from database.
+            if ($module == 'all'){
+                $rawevents = $DB->get_records_sql($sql, array($userid));
+            } else {
+                $sql .= ' AND s.module = ?';
+                $rawevents = $DB->get_records_sql($sql, array($userid, $module));
+            }
+
+            $events = $this->filter_event_data($rawevents, $from, $to);
+
+            // Update cache.
+            if (!empty($rawevents)) {
+                $expiry = time() + $this->expiryperiod;
+                $data = new \stdClass();
+                $data->expiry = $expiry;
+                $data->events = $rawevents;
+                $usercache->set($cachekey, $data);
+            }
+        }
 
         return $events;
     }
-
-
-
 
 }

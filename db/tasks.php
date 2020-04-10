@@ -31,7 +31,7 @@ $tasks = array(
     array(
         'classname' => 'local_assessfreq\task\data_process',
         'blocking' => 0,
-        'minute' => '*/5',
+        'minute' => '*/15',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',
