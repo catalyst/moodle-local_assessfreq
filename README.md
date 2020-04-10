@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mattporritt/moodle-local_assessfreq.svg?branch=master)](https://travis-ci.org/mattporritt/moodle-local_assessfreq)
+
 # Assessment frequency #
 
 TODO Describe the plugin shortly here.

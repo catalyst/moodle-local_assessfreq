@@ -1,0 +1,57 @@
+sudo: false
+
+notifications:
+  email: false
+
+language: php
+
+dist: bionic
+
+addons:
+  firefox: latest
+  chrome: stable
+  postgresql: "10"
+
+services:
+  - mysql
+
+php:
+  - 7.1
+  - 7.2
+  - 7.3
+env:
+  matrix:
+    - DB=pgsql MOODLE_BRANCH=MOODLE_37_STABLE
+    - DB=mysqli MOODLE_BRANCH=MOODLE_37_STABLE
+    - DB=pgsql MOODLE_BRANCH=MOODLE_38_STABLE
+    - DB=mysqli MOODLE_BRANCH=MOODLE_38_STABLE
+    - DB=pgsql MOODLE_BRANCH=master
+    - DB=mysqli MOODLE_BRANCH=master
+        
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/.npm
+
+before_install:
+  - phpenv config-rm xdebug.ini
+  - nvm install 8.9
+  - nvm use 8.9
+  - cd ../..
+  - composer selfupdate
+  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
+  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+
+install:
+  - moodle-plugin-ci install
+
+script:
+  - moodle-plugin-ci phplint
+  - moodle-plugin-ci codechecker
+  - moodle-plugin-ci validate
+  - moodle-plugin-ci savepoints
+  - moodle-plugin-ci mustache
+  - moodle-plugin-ci grunt
+  - moodle-plugin-ci phpdoc
+  - moodle-plugin-ci phpunit
+ #  - moodle-plugin-ci behat
