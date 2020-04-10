@@ -314,22 +314,58 @@ class frequency_testcase extends advanced_testcase {
     }
 
     /**
-     * Test process processing user events.
+     * Test filtering event by dater events.
      */
     public function test_filter_event_data() {
         global $DB;
 
-        //         $cache = cache::make('local_assessfreq', 'siteevents');
-        //         $cache->get_events('fo000000o');
+        $duedate = 0;
+        $frequency = new frequency();
+        $frequency->process_site_events($duedate);
+
+        $records = $DB->get_records('local_assessfreq_site');
+
+        // We're testing a private method, so we need to setup reflector magic.
+        $method = new ReflectionMethod('\local_assessfreq\frequency', 'filter_event_data');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        // Expect two results
+        $result = $method->invoke($frequency, $records, 0, 0);
+        $this->assertCount(2, $result);
+
+        // Expect earliest event.
+        $result = $method->invoke($frequency, $records, 0, 1585445775);
+        $this->assertEquals(1585359375, $result[0]->timeend);
+
+        // Expect latest event.
+        $result = $method->invoke($frequency, $records, 1585359376, 0);
+        $this->assertEquals(1585445775, $result[0]->timeend);
+
     }
 
     /**
-     * Test process processing user events.
+     * Test getting site events and cache.
      */
     public function test_get_site_events() {
-        global $DB;
+        $duedate = 0;
+        $frequency = new frequency();
+        $frequency->process_site_events($duedate);
 
-        //         $cache = cache::make('local_assessfreq', 'siteevents');
-        //         $cache->get_events('fo000000o');
+        $sitecache = cache::make('local_assessfreq', 'siteevents');
+        $data = $sitecache->get('all');
+        $this->assertEmpty($data);
+
+        $result = $frequency->get_site_events('all', 0, 0, false);
+        $this->assertCount(2, $result);
+
+        $data = $sitecache->get('all');
+        $this->assertCount(2, $data->events);
+
+        $result = $frequency->get_site_events('forum', 0, 0, true);
+        $this->assertEmpty($result);
+
+        $data = $sitecache->get('forum');
+        $this->assertEmpty($data);
+
     }
 }
