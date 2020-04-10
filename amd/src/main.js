@@ -45,7 +45,7 @@ define(['core/ajax'], function(ajax) {
      */
     function createTables(calendarContainer, month, num) {
         // Itterate through and build are tables.
-        for (let i = 0; i < num; i++) {
+        for (var i = 0; i < num; i++) {
             // Setup some elements.
             let container = document.createElement("div");
             container.classList.add("local-assessfreq-month");

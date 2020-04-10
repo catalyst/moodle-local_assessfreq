@@ -8,6 +8,9 @@ language: php
 dist: bionic
 
 addons:
+  apt:
+    packages:
+      - openjdk-8-jre
   firefox: latest
   chrome: stable
   postgresql: "10"
@@ -20,13 +23,18 @@ php:
   - 7.2
   - 7.3
 env:
-  matrix:
-    - DB=pgsql MOODLE_BRANCH=MOODLE_37_STABLE
-    - DB=mysqli MOODLE_BRANCH=MOODLE_37_STABLE
-    - DB=pgsql MOODLE_BRANCH=MOODLE_38_STABLE
-    - DB=mysqli MOODLE_BRANCH=MOODLE_38_STABLE
-    - DB=pgsql MOODLE_BRANCH=master
-    - DB=mysqli MOODLE_BRANCH=master
+  - DB=pgsql MOODLE_BRANCH=MOODLE_37_STABLE
+  - DB=mysqli MOODLE_BRANCH=MOODLE_37_STABLE
+  - DB=pgsql MOODLE_BRANCH=MOODLE_38_STABLE
+  - DB=mysqli MOODLE_BRANCH=MOODLE_38_STABLE
+  - DB=pgsql MOODLE_BRANCH=master
+  - DB=mysqli MOODLE_BRANCH=master
+matrix:
+  exclude:
+    - php: 7.1
+      env: DB=pgsql MOODLE_BRANCH=master
+    - php: 7.1
+      env: DB=mysqli MOODLE_BRANCH=master
         
 cache:
   directories:
