@@ -329,7 +329,7 @@ class frequency_testcase extends advanced_testcase {
         $method = new ReflectionMethod('\local_assessfreq\frequency', 'filter_event_data');
         $method->setAccessible(true); // Allow accessing of private method.
 
-        // Expect two results
+        // Expect two results.
         $result = $method->invoke($frequency, $records, 0, 0);
         $this->assertCount(2, $result);
 

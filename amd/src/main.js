@@ -83,7 +83,6 @@ define(['core/ajax'], function(ajax) {
             month++;
         }
 
-
     }
 
     /**

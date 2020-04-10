@@ -15,7 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Block assessfreq trigger Web Service
+ * Block assessfreq trigger Web Service.
+ *
  * calendarContainer, spinner
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
@@ -42,7 +43,7 @@ class local_assessfreq_external extends external_api {
     public static function get_frequency_parameters() {
         return new external_function_parameters(
             array(
-                //if I had any parameters, they would be described here. But I don't have any, so this array is empty.
+                // If I had any parameters, they would be described here. But I don't have any, so this array is empty.
             )
         );
     }
@@ -76,7 +77,7 @@ class local_assessfreq_external extends external_api {
     public static function get_strings_parameters() {
         return new external_function_parameters(
             array(
-                //if I had any parameters, they would be described here. But I don't have any, so this array is empty.
+                // If I had any parameters, they would be described here. But I don't have any, so this array is empty.
             )
         );
     }

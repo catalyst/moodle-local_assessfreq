@@ -83,14 +83,14 @@ class frequency {
      */
     private $capabilitymap = array (
         'assign' => array('mod/assign:submit', 'mod/assign:view'),
-        'choice' =>  array(),
-        'data' =>  array(),
-        'feedback' =>  array(),
-        'forum' =>  array(),
+        'choice' => array(),
+        'data' => array(),
+        'feedback' => array(),
+        'forum' => array(),
         'lesson' => array(),
-        'quiz' =>  array(),
-        'scorm' =>  array(),
-        'workshop' =>  array()
+        'quiz' => array(),
+        'scorm' => array(),
+        'workshop' => array()
     );
 
     /**
@@ -116,8 +116,8 @@ class frequency {
     private function get_map(int $count) : int {
         $result = 0;
 
-        foreach($this->map as $key => $value) {
-            if($count > $key) {
+        foreach ($this->map as $key => $value) {
+            if ($count > $key) {
                 $result = $value;
             }
         }
@@ -205,7 +205,7 @@ class frequency {
         $toinsert = array();
 
         foreach ($recordset as $record) {
-            // Iterate through the records and insert to database in batches
+            // Iterate through the records and insert to database in batches.
             $timeelements = $this->format_time($record->duedate);
             $insertrecord = new \stdClass();
             $insertrecord->module = $record->name;
@@ -219,7 +219,7 @@ class frequency {
 
             $toinsert[] = $insertrecord;
 
-            if(count($toinsert) == $this->batchsize){
+            if (count($toinsert) == $this->batchsize) {
                 // Insert in database.
                 $DB->insert_records('local_assessfreq_site', $toinsert);
                 $toinsert = array(); // Reset array.
@@ -227,7 +227,7 @@ class frequency {
             }
         }
 
-        // Insert any remaining records that don't make a full batch
+        // Insert any remaining records that don't make a full batch.
         if (count($toinsert) > 0) {
             $DB->insert_records('local_assessfreq_site', $toinsert);
             $recordsprocessed += count($toinsert);
@@ -310,7 +310,7 @@ class frequency {
      */
     private function prepare_user_event_records(array $users, int $eventid) : array {
         $userrecords = array();
-        foreach($users as $user) {
+        foreach ($users as $user) {
             $record = new \stdClass();
             $record->userid = $user->id;
             $record->eventid = $eventid;
@@ -335,7 +335,7 @@ class frequency {
         // Get recordset of site events where date is greater than now.
         // We don't care about updating events in the past.
         $eventset = $this->get_stored_events($duedate);
-        foreach ($eventset as $event){
+        foreach ($eventset as $event) {
             // For each site event get list of users that the event aplies to.
             $users = $this->get_event_users($event->contextid, $event->module);
             $userrecords = $this->prepare_user_event_records($users, $event->id);
@@ -373,7 +373,7 @@ class frequency {
 
             $transaction->allow_commit();
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $transaction->rollback($e);
         }
     }
@@ -429,7 +429,7 @@ class frequency {
         } else {  // Not valid cache data.
 
             // Get data from database.
-            if ($module == 'all'){
+            if ($module == 'all') {
                 $rawevents = $DB->get_records('local_assessfreq_site');
             } else {
                 $rawevents = $DB->get_records('local_assessfreq_site', array('module' => $module));
@@ -474,7 +474,7 @@ class frequency {
         } else {  // Not valid cache data.
 
             // Get data from database.
-            if ($module == 'all'){
+            if ($module == 'all') {
                 $rawevents = $DB->get_records('local_assessfreq_site', array('courseid' => $courseid));
             } else {
                 $rawevents = $DB->get_records('local_assessfreq_site', array('module' => $module, 'courseid' => $courseid));
@@ -523,7 +523,7 @@ class frequency {
                     INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id
                          WHERE u.userid = ?';
             // Get data from database.
-            if ($module == 'all'){
+            if ($module == 'all') {
                 $rawevents = $DB->get_records_sql($sql, array($userid));
             } else {
                 $sql .= ' AND s.module = ?';
