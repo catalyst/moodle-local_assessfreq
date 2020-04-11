@@ -53,18 +53,44 @@ class data_process extends scheduled_task {
         mtrace('local_assessfreq: Processing event data');
         $now = time();
         $frequency = new \local_assessfreq\frequency();
+        $context = \context_system::instance();
 
         // We dont't want to reprocess data.
         // We also don't care if a due date for an event is changed in the past.
         // So get latest data from DB and use it as the start point.
 
         // Due dates may have changed since we last ran report. So delete all events in DB later than today and replace them.
+        mtrace('local_assessfreq: Deleting old event data');
+        $actionstart = time();
         $frequency->delete_events($now); // Delete event records greaer than now.
+        $actionduration = time() - $actionstart;
+        $event = \local_assessfreq\event\event_processed::create(array(
+            'context' => $context,
+            'other' => array('action' => 'delete', 'duration' => $actionduration)
+        ));
+        $event->trigger();
+        mtrace('local_assessfreq: Deleting old event data finished in: ' . $actionduration . ' seconds');
+
+        mtrace('local_assessfreq: Processing site events');
+        $actionstart = time();
         $frequency->process_site_events($now); // Process records in the future.
+        $actionduration = time() - $actionstart;
+        $event = \local_assessfreq\event\event_processed::create(array(
+            'context' => $context,
+            'other' => array('action' => 'site', 'duration' => $actionduration)
+        ));
+        $event->trigger();
+        mtrace('local_assessfreq: Processing site events finished in: ' . $actionduration . ' seconds');
+
+        mtrace('local_assessfreq: Processing user events');
+        $actionstart = time();
         $frequency->process_user_events($now); // Process user events.
-
-        // TODO: Add stuff to cache.
-
-        // TODO: Add some logging and an event or two.
+        $actionduration = time() - $actionstart;
+        $event = \local_assessfreq\event\event_processed::create(array(
+            'context' => $context,
+            'other' => array('action' => 'user', 'duration' => $actionduration)
+        ));
+        $event->trigger();
+        mtrace('local_assessfreq: Processing user events finished in: ' . $actionduration . ' seconds');
     }
 }
