@@ -19,7 +19,7 @@
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_assessfreq;
@@ -367,9 +367,11 @@ class frequency {
             $DB->delete_records_select('local_assessfreq_site', $select, array($duedate));
 
             // Delete user events.
-            list($insql, $inparams) = $DB->get_in_or_equal($userevents);
-            $inselect = "eventid $insql";
-            $DB->delete_records_select('local_assessfreq_user', $inselect, $inparams);
+            if (!empty($userevents)) {
+                list($insql, $inparams) = $DB->get_in_or_equal($userevents);
+                $inselect = "eventid $insql";
+                $DB->delete_records_select('local_assessfreq_user', $inselect, $inparams);
+            }
 
             $transaction->allow_commit();
 
@@ -543,6 +545,24 @@ class frequency {
         }
 
         return $events;
+    }
+
+    public function process_conflicts() : array {
+        $conflicts = array();
+
+        // Final result should look like this.
+        $conflicts['eventid'] = array(
+            array(
+                'conflicteventid' => 123,
+                'effecteduserids' => array(1,2,3)
+            ),
+            array(
+                'conflicteventid' => 456,
+                'effecteduserids' => array(4,5,6)
+            ),
+        );
+
+        return $conflicts;
     }
 
 }

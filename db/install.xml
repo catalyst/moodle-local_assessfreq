@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/assessfreq/db" VERSION="20200403" COMMENT="XMLDB file for Moodle local/assessfreq"
+<XMLDB PATH="local/assessfreq/db" VERSION="20200414" COMMENT="XMLDB file for Moodle local/assessfreq"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -11,6 +11,7 @@
         <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id number from the modules native table"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the course that contains the module"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The context id of the module instance"/>
+        <FIELD NAME="timestart" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The time the event starts."/>
         <FIELD NAME="timeend" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The timestamp of when the activity is due"/>
         <FIELD NAME="endyear" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="The year the activity is due"/>
         <FIELD NAME="endmonth" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="The month the activity is due"/>
@@ -34,6 +35,32 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="userevent" UNIQUE="false" FIELDS="userid, eventid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_assessfreq_conflict" COMMENT="Table to store event conflict data.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="eventid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the record in the events site table"/>
+        <FIELD NAME="conflicteventid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the record in the events site table that conflicts"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="conflict" UNIQUE="true" FIELDS="eventid, conflicteventid" COMMENT="index of eventid and conflicteventid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_assessfreq_conf_user" COMMENT="Table stores the relationship between users and conflicts.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of user that conflict applies to"/>
+        <FIELD NAME="conflictid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The record id from the conflict table that the user conflicts with."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid_conflictid" UNIQUE="true" FIELDS="userid, conflictid" COMMENT="index of user and conflictid"/>
       </INDEXES>
     </TABLE>
   </TABLES>
