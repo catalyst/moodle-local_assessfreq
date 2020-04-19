@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class history_process_task extends adhoc_task {
+class history_process extends adhoc_task {
 
     /**
      * Do the job.
@@ -43,9 +43,13 @@ class history_process_task extends adhoc_task {
     public function execute() {
         mtrace('local_assessfreq: Processing historic event data');
 
-        // TODO: only run if scheduled task is not running.
+        // Only run if scheduled task is not running.
         // Throw an error if it is and this task will be retried after a delay.
         // The scheduled task won't start while this job is pending.
+        $schedtask = \core\task\manager::get_scheduled_task(\local_assessfreq\task\data_process::class);
+        if ($schedtask->get_lock()){
+            throw new \moodle_exception('local_assessfreq_scheduled_task_running');
+        }
 
         $frequency = new \local_assessfreq\frequency();
         $context = \context_system::instance();

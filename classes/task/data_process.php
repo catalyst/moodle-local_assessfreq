@@ -56,15 +56,11 @@ class data_process extends scheduled_task {
         $context = \context_system::instance();
 
         // Only run scheduled task if there is not an ad-hoc task pending or processing historic data.
-        $adhoctask = \core\task\manager::get_adhoc_tasks(\local_assessfreq\task\history_process_task::class);
+        $adhoctask = \core\task\manager::get_adhoc_tasks(\local_assessfreq\task\history_process::class);
         if (!empty($adhoctask)) {
             mtrace('local_assessfreq: Stopping early historic processing task pending');
             return;
         }
-
-        // We dont't want to reprocess data.
-        // We also don't care if a due date for an event is changed in the past.
-        // So get latest data from DB and use it as the start point.
 
         // Due dates may have changed since we last ran report. So delete all events in DB later than today and replace them.
         mtrace('local_assessfreq: Deleting old event data');

@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 function xmldb_fileconverter_unoconv_install() {
     // Create an adhoc task that will process all historical event data.
-    $task = new \local_assessfreq\task\history_process_task();
+    $task = new \local_assessfreq\task\history_process();
     \core\task\manager::queue_adhoc_task($task, true);
 }
