@@ -521,9 +521,9 @@ class frequency {
             $events = $this->filter_event_data($data->events, $from, $to);
         } else {  // Not valid cache data.
             $sql = 'SELECT s.*
-                          FROM {local_assessfreq_site} s
-                    INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id
-                         WHERE u.userid = ?';
+                      FROM {local_assessfreq_site} s
+                INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id
+                     WHERE u.userid = ?';
             // Get data from database.
             if ($module == 'all') {
                 $rawevents = $DB->get_records_sql($sql, array($userid));
@@ -547,8 +547,48 @@ class frequency {
         return $events;
     }
 
-    public function process_conflicts() : array {
+
+    private function get_conflicts(int $now) : array {
+        global $DB;
         $conflicts = array();
+
+        // A conflict is an overlapping date range for two or more quizzes where the quiz has at least one common student.
+        $eventsql = 'SELECT lasa.id as eventid, lasb.id as conflictid
+                       FROM {local_assessfreq_site} lasa
+                 INNER JOIN {local_assessfreq_site} lasb ON (lasa.timestart > lasb.timestart AND lasa.timestart < lasb.timeend)
+                                                         OR (lasa.timeend > lasb.timestart AND lasa.timeend < lasb.timeend)
+                                                         OR (lasa.timeend > lasb.timeend AND lasa.timestart < lasb.timestart)
+                      WHERE lasa.module = ?
+                            AND lasb.module = ?
+                            AND lasa.timestart > ?';
+        $eventparams = array('quiz', 'quiz', $now, $now);
+        $recordset = $DB->get_recordset_sql($eventsql, $eventparams);
+
+        foreach ($recordset as $record) {
+            $usersql = 'SELECT DISTINCT laua.userid
+                          FROM {local_assessfreq_user} laua
+                    INNER JOIN {local_assessfreq_user} laub on laua.userid = laub.userid
+                         WHERE laua.eventid = ?
+                               AND laub.eventid = ?';
+
+            $userparams = array($record->eventid, $record->conflictid);
+            $users = $DB->get_fieldset_sql($usersql, $userparams);
+
+            if (!empty($users)) {
+                $conflict = new \stdClass();
+                $conflict->eventid = $record->eventid;
+                $conflict->conflictid = $record->conflictid;
+                $conflict->users = $users;
+
+                $conflicts[] = $conflict;
+            }
+        }
+        $recordset->close();
+
+        return $conflicts;
+    }
+
+    public function process_conflicts() : array {
 
         // Final result should look like this.
         $conflicts['eventid'] = array(

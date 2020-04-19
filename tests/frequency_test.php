@@ -73,6 +73,9 @@ class frequency_testcase extends advanced_testcase {
      */
     public function setUp() {
         $this->resetAfterTest();
+
+        global $CFG;
+
         // Create a course with activity.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course(
@@ -424,5 +427,142 @@ class frequency_testcase extends advanced_testcase {
 
         $data = $usercache->get('forum');
         $this->assertEmpty($data);
+    }
+
+    /**
+     * Test getting conflict data.
+     */
+    public function test_get_conflicts() {
+        global $DB;
+
+        // Setup records in DB.
+        $lasrecord1 = new \stdClass();
+        $lasrecord1->module = 'quiz';
+        $lasrecord1->instanceid = 1;
+        $lasrecord1->courseid = 2;
+        $lasrecord1->contextid = 4;
+        $lasrecord1->timestart = 1585728000; // 2020-04-01 @ 8:00:00am GMT.
+        $lasrecord1->timeend = 1585814400; // 2020-04-02 @ 8:00:00am GMT.
+        $lasrecord1->endyear = 2020;
+        $lasrecord1->endmonth = 4;
+        $lasrecord1->endday = 2;
+
+        $lasrecord2 = new \stdClass();
+        $lasrecord2->module = 'quiz';
+        $lasrecord2->instanceid = 2;
+        $lasrecord2->courseid = 2;
+        $lasrecord2->contextid = 5;
+        $lasrecord2->timestart = 1585814401; // 2020-04-02 @ 8:00:01am GMT.
+        $lasrecord2->timeend = 1585900800; // 2020-04-03 @ 8:00:00am GMT.
+        $lasrecord2->endyear = 2020;
+        $lasrecord2->endmonth = 4;
+        $lasrecord2->endday = 3;
+
+        $lasrecord3 = new \stdClass();
+        $lasrecord3->module = 'quiz';
+        $lasrecord3->instanceid = 3;
+        $lasrecord3->courseid = 2;
+        $lasrecord3->contextid = 6;
+        $lasrecord3->timestart = 1585900801; // 2020-04-03 @ 8:00:01am GMT.
+        $lasrecord3->timeend = 1586073600; // 2020-04-05 @ 8:00:00am GMT.
+        $lasrecord3->endyear = 2020;
+        $lasrecord3->endmonth = 4;
+        $lasrecord3->endday = 5;
+
+        $lasrecord4 = new \stdClass();
+        $lasrecord4->module = 'quiz';
+        $lasrecord4->instanceid = 4;
+        $lasrecord4->courseid = 2;
+        $lasrecord4->contextid = 7;
+        $lasrecord4->timestart = 1585987200; // 2020-04-04 @ 8:00:00am GMT.
+        $lasrecord4->timeend = 1586160000; // 2020-04-06 @ 8:00:00am GMT.
+        $lasrecord4->endyear = 2020;
+        $lasrecord4->endmonth = 4;
+        $lasrecord4->endday = 6;
+
+        $lasrecord5 = new \stdClass();
+        $lasrecord5->module = 'quiz';
+        $lasrecord5->instanceid = 5;
+        $lasrecord5->courseid = 2;
+        $lasrecord5->contextid = 8;
+        $lasrecord5->timestart = 1586073601; // 2020-04-05 @ 8:00:01am GMT.
+        $lasrecord5->timeend = 1586246400; // 2020-04-07 @ 8:00:00am GMT.
+        $lasrecord5->endyear = 2020;
+        $lasrecord5->endmonth = 4;
+        $lasrecord5->endday = 7;
+
+        $lasrecord6 = new \stdClass();
+        $lasrecord6->module = 'assign';
+        $lasrecord6->instanceid = 6;
+        $lasrecord6->courseid = 2;
+        $lasrecord6->contextid = 7;
+        $lasrecord6->timestart = 1586084400; // 2020-04-05 @ 11:00:00am GMT.
+        $lasrecord6->timeend = 1586160000; // 2020-04-06 @ 8:00:00am GMT.
+        $lasrecord6->endyear = 2020;
+        $lasrecord6->endmonth = 4;
+        $lasrecord6->endday = 6;
+
+        $lasrecord7 = new \stdClass();
+        $lasrecord7->module = 'quiz';
+        $lasrecord7->instanceid = 7;
+        $lasrecord7->courseid = 2;
+        $lasrecord7->contextid = 7;
+        $lasrecord7->timestart = 1586073601; // 2020-04-05 @ 8:00:01am GMT.
+        $lasrecord7->timeend = 1586246400; // 2020-04-07 @ 8:00:00am GMT.
+        $lasrecord7->endyear = 2020;
+        $lasrecord7->endmonth = 4;
+        $lasrecord7->endday = 6;
+
+        // Record 1 and 2 should not overlap.
+        // Record 3 overlaps Record 4.
+        // Record 4 overlaps Record 5.
+        // So Record 4 should have two conflicts (record 3 and 5).
+        // So Record 3 and 5 should have one conflict (record 4).
+        // Record 6 should not have any conflicts because it is not a quiz.
+        // Record 7 should not have any conflicts because it has no users.
+
+        //  Insert records in to database.
+        $records = array($lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4, $lasrecord5, $lasrecord6, $lasrecord7);
+        $userids = array(234, 456, 789);
+        $eventarray = array();
+        foreach ($records as $record){
+            $eventid = $DB->insert_record('local_assessfreq_site', $record);
+            $eventarray[$record->instanceid] = $eventid;
+            if ($record->instanceid != 7) { // Don't add users for record 7.
+                foreach ($userids as $userid) {
+                    if ($userid == 789 && $record->instanceid == 3) {
+                        continue;
+                    }
+                    $userrecord = new \stdClass();
+                    $userrecord->userid = $userid;
+                    $userrecord->eventid = $eventid;
+                    $DB->insert_record('local_assessfreq_user', $userrecord);
+                }
+            }
+
+        }
+
+        $frequency = new frequency();
+
+        // We're testing a private method, so we need to setup reflector magic.
+        $method = new ReflectionMethod('\local_assessfreq\frequency', 'get_conflicts');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $results = $method->invoke($frequency, 0);
+
+        // Expect total of 4 conflicts.
+        $this->assertCount(4, $results);
+
+        // Make sure we don't have any references to records that don't have conflicts.
+        foreach ($results as $result) {
+            $this->assertNotEquals($eventarray[1], $result->eventid);
+            $this->assertNotEquals($eventarray[1], $result->conflictid);
+            $this->assertNotEquals($eventarray[2], $result->eventid);
+            $this->assertNotEquals($eventarray[2], $result->conflictid);
+            $this->assertNotEquals($eventarray[7], $result->eventid);
+            $this->assertNotEquals($eventarray[7], $result->conflictid);
+        }
+
+
     }
 }
