@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A scheduled task to generate data used in plugin reports.
+ * Adhoc task to process historical data used in plugin.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
@@ -23,53 +23,35 @@
  */
 namespace local_assessfreq\task;
 
-use core\task\scheduled_task;
+use core\task\adhoc_task;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * A scheduled task to generate data used in plugin reports.
+ * Adhoc task to process historical data used in plugin.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class data_process extends scheduled_task {
-
-    /**
-     * Get a descriptive name for this task (shown to admins).
-     *
-     * @return string
-     */
-    public function get_name() {
-        return get_string('task:dataprocess', 'local_assessfreq');
-    }
+class history_process_task extends adhoc_task {
 
     /**
      * Do the job.
      * Throw exceptions on errors (the job will be retried).
      */
     public function execute() {
-        mtrace('local_assessfreq: Processing event data');
-        $now = time();
+        mtrace('local_assessfreq: Processing historic event data');
+
+        // TODO: only run if scheduled task is not running.
+        // Throw an error if it is and this task will be retried after a delay.
+        // The scheduled task won't start while this job is pending.
+
         $frequency = new \local_assessfreq\frequency();
         $context = \context_system::instance();
 
-        // Only run scheduled task if there is not an ad-hoc task pending or processing historic data.
-        $adhoctask = \core\task\manager::get_adhoc_tasks(\local_assessfreq\task\history_process_task::class);
-        if (!empty($adhoctask)) {
-            mtrace('local_assessfreq: Stopping early historic processing task pending');
-            return;
-        }
-
-        // We dont't want to reprocess data.
-        // We also don't care if a due date for an event is changed in the past.
-        // So get latest data from DB and use it as the start point.
-
-        // Due dates may have changed since we last ran report. So delete all events in DB later than today and replace them.
-        mtrace('local_assessfreq: Deleting old event data');
         $actionstart = time();
-        $frequency->delete_events($now); // Delete event records greaer than now.
+        $frequency->delete_events(0); // Delete ALL event records.
         $actionduration = time() - $actionstart;
         $event = \local_assessfreq\event\event_processed::create(array(
             'context' => $context,
@@ -80,7 +62,7 @@ class data_process extends scheduled_task {
 
         mtrace('local_assessfreq: Processing site events');
         $actionstart = time();
-        $frequency->process_site_events($now); // Process records in the future.
+        $frequency->process_site_events(0); // Process ALL records.
         $actionduration = time() - $actionstart;
         $event = \local_assessfreq\event\event_processed::create(array(
             'context' => $context,
@@ -91,7 +73,7 @@ class data_process extends scheduled_task {
 
         mtrace('local_assessfreq: Processing user events');
         $actionstart = time();
-        $frequency->process_user_events($now); // Process user events.
+        $frequency->process_user_events(0); // Process ALL user events.
         $actionduration = time() - $actionstart;
         $event = \local_assessfreq\event\event_processed::create(array(
             'context' => $context,

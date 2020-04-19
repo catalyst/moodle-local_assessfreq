@@ -28,17 +28,25 @@ if (!$hassiteconfig) {
     return;
 }
 
-// Site wide admin settings.
-$settings = new admin_settingpage('local_assessfreq', get_string('pluginname', 'local_assessfreq'));
+// Site wide plugin admin settings.
+$sitesettings = new admin_settingpage('local_assessfreq', get_string('pluginsettings', 'local_assessfreq'));
 
-// TODO: Add whicch activities we should include in the reports
-// TODO: add a look back and look ahead (wiht enabled switch) to figure out how far we go back.
+// Settings page historic data processing.
+$historysettings = new admin_externalpage(
+    'local_assessfreq_history',
+    get_string('clearhistory', 'local_assessfreq'),
+    new moodle_url('/local/assessfreq/history.php'));
+
+// TODO: Add which activities we should include in the reports
 // TODO: add setting to filter visible courses or not
 // TODO: add setting to filter visibile activities or not.
 
-$ADMIN->add('localplugins', $settings);
+// Build the admin menu tree.
+$ADMIN->add('localplugins', new admin_category('local_assessfreq_settings',
+    get_string('pluginname', 'local_assessfreq')));
+$ADMIN->add('local_assessfreq_settings', $sitesettings);
+$ADMIN->add('local_assessfreq_settings', $historysettings);
 
 // Report link.
 $ADMIN->add('reports', new admin_externalpage('local_assessfreq_report',
     get_string('pluginname', 'local_assessfreq'), "$CFG->wwwroot/local/assessfreq/report.php"));
-
