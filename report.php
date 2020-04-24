@@ -27,16 +27,18 @@ $baseurl = $CFG->wwwroot . "/local/assessfreq/report.php";
 
 // Calls require_login and performs permissions checks for admin pages.
 admin_externalpage_setup('local_smartmedia_report', '', null, '',
-    array('pagelayout' => 'report'));
+    array('pagelayout' => 'admin'));
 
 $title = get_string('pluginname', 'local_assessfreq');
 $url = new moodle_url($baseurl);
+$context = context_system::instance();
 
 $PAGE->set_url($url);
-$PAGE->set_context(context_system::instance());
+$PAGE->set_context($context);
 $PAGE->set_title($title);
-$PAGE->set_heading($title);
+$PAGE->set_heading($title . ' Dashboard');
+$PAGE->requires->js_call_amd('local_assessfreq/reportcard', 'init', array($context->id));
 
-echo $OUTPUT->header();
+$output = $PAGE->get_renderer('local_assessfreq');
 
-echo $OUTPUT->footer();
+echo $output->render_report($baseurl);

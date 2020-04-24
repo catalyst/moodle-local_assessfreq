@@ -1,0 +1,58 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_timeline/nav-day-filter
+
+    This template renders the day range selector for the timeline view.
+
+    Example context (json):
+    {}
+}}
+<div data-region="year-filter" class="dropdown">
+    <button type="button" class="btn btn-outline-secondary dropdown-toggle icon-no-margin" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            aria-label="Select Year" aria-controls="menudayfilter">
+        {{#pix}} i/duration {{/pix}} Select Year
+        <span class="sr-only" data-active-item-text>
+                2019
+                2020
+        </span>
+    </button>
+    <div id="menudayfilter" role="menu" class="dropdown-menu" data-show-active-item>
+         <h6 class="dropdown-header">Select Year</h6>
+        <a
+            class="dropdown-item"
+            href="#"
+            data-year="2019"
+            data-filtername="next7days"
+            aria-label="2019"
+            role="menuitem"
+        >
+            2019
+        </a>
+        <a
+            class="dropdown-item active"
+            href="#"
+            data-year="2020"
+            data-filtername="next30days"
+            aria-label="2020"
+            role="menuitem"
+            aria-current="true"
+        >
+            2020
+        </a>
+    </div>
+</div>

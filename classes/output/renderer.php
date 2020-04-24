@@ -37,12 +37,32 @@ use plugin_renderer_base;
 class renderer extends plugin_renderer_base {
 
     /**
-     * Return the main content for the block overview.
+     * Render the html for the report summary.
      *
-     * @param main $main The main renderable
-     * @return string HTML string
+     * @return string html to display.
      */
-    public function render_main(main $main) {
-        return $this->render_from_template('local_assessfreq/main', $main->export_for_template($this));
+    public function render_report_cards() {
+        $context = new \stdClass();
+
+        $assessduemonth = new assess_due_month();
+        $context->assessduemonth = $assessduemonth->export_for_template($this);
+
+        return $this->render_from_template('local_assessfreq/report-cards', $context);
+    }
+
+    /**
+     * Get the html to render the local_smartmedia report.
+     *
+     * @param string $baseurl the base url to render this report on.
+     * @return string $html the html to display.
+     */
+    public function render_report(string $baseurl) : string {
+            $html = '';
+            $html .= $this->header();
+            // content goes here.
+            $html .= $this->render_report_cards();
+            $html .= $this->footer();
+
+            return $html;
     }
 }
