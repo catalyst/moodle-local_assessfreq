@@ -26,11 +26,6 @@ namespace local_assessfreq\output;
 
 defined('MOODLE_INTERNAL') || die;
 
-use renderable;
-use renderer_base;
-use stdClass;
-use templatable;
-
 /**
  * Renderable for assessments due by month card.
  *
@@ -38,7 +33,7 @@ use templatable;
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class assess_due_month implements renderable, templatable {
+class assess_by_month {
 
     /**
      * Generate the markup for the process summary chart,
@@ -46,30 +41,9 @@ class assess_due_month implements renderable, templatable {
      *
      * @return $output The generated chart to be fed to a template.
      */
-    private function get_assess_due_chart() {
-        global $OUTPUT;
+    public function get_assess_due_chart(): string {
 
+        return 'foo bar, bar joo bar.';
 
-
-        return;
-
-    }
-
-    /**
-     * Export the renderer data in a format that is suitable for a
-     * mustache template.
-     *
-     * @param renderer_base $output Used to do a final render of any components that need to be rendered for export.
-     *
-     * @return stdClass $context for use in template rendering.
-     * @throws \dml_exception
-     * @throws \coding_exception
-     */
-    public function export_for_template(renderer_base $output) {
-        $context = new stdClass();
-
-        $context->process_summary = $this->get_assess_due_chart();
-
-        return $context;
     }
 }

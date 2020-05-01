@@ -28,7 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Assessment Frequency';
 $string['title'] = 'Assessment Frequency';
 
-$string['assessbymonth'] = 'Assessment due by month';
+$string['assessbymonth'] = 'Assessments due by month';
+$string['assessoverview'] = 'Assessment overviews for year:';
 $string['cachedef_siteevents'] = 'Assessment frequency course event cache';
 $string['cachedef_siteevents'] = 'Assessment frequency site event cache';
 $string['cachedef_userevents'] = 'Assessment frequency user event cache';
@@ -40,7 +41,9 @@ $string['privacy:metadata'] = 'The assessment frequency plugin does not store an
 $string['pluginsettings'] = 'Plugin settings';
 $string['reprocessall'] = 'Reprocess all events';
 $string['reprocessall_desc'] = 'This will delete ALL existing event records from the database and start a process to reprocess all events. This will happen in the background.';
+$string['selectyear'] = 'Select year';
 $string['task:dataprocess'] = 'Data collection task';
+$string['toggleoverview'] = 'Toggle overview graphs';
 $string['jan'] = 'January';
 $string['feb'] = 'February';
 $string['mar'] = 'March';

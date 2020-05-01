@@ -51,3 +51,38 @@ function local_assessfreq_coursemodule_standard_elements($formwrapper, $mform) {
         $mform->setExpanded('timing');
     }
 }
+
+/**
+ * Returns the name of the user preferences as well as the details this plugin uses.
+ *
+ * @return array
+ */
+function local_assessfreq_user_preferences() {
+
+    $preferences['local_assessfreq_overview_year_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => date('Y'),
+        'type' => PARAM_INT
+    );
+
+    return $preferences;
+}
+
+/**
+ *
+ * @param string $args
+ * @return string
+ */
+function local_assessfreq_output_fragment_get_assess_by_month($args): string {
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+
+    $assesschart = new \local_assessfreq\output\assess_by_month();
+
+    $chart = $assesschart->get_assess_due_chart();
+
+    return $chart;
+
+}
+
+

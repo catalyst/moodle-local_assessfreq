@@ -21,12 +21,28 @@
 
     Example context (json):
     {
-        "total": "$5,123,456",
-        "convertedtotal": "$5,123,456",
-        "file_summary" : "",
-        "process_summary" : ""
+
     }
 }}
-<div id="report-summary" class="card-deck">
-    {{> local_assessfreq/assess-due-month}}
+<div id="local-assessfreq-report-summary">
+    <div class="row no-gutters">
+	    <div class="col-sm d-flex justify-content-start">
+	       <div class="collapse show local-assessfreq-report-overview">
+	           {{> local_assessfreq/nav-year-filter}}
+	        </div>
+	    </div>
+	    <div class="col-sm d-flex justify-content-end">
+	        <button  id="local-assessfreq-hide-report-btn" class="btn btn-outline-secondary" type="button" data-toggle="collapse"
+	         data-target=".local-assessfreq-report-overview" aria-expanded="true" aria-controls="collapseOverview">
+	            {{#pix}} t/expanded {{/pix}} {{# str }} toggleoverview, local_assessfreq {{/ str }}
+	        </button>
+	    </div>
+    </div>
+    <div id="local-assessfreq-report-overview" class="collapse show local-assessfreq-report-overview ">
+        <h4>{{# str }} assessoverview, local_assessfreq {{/ str }} <span class="local-assessfreq-year">{{ currentyear }}</span></h4>
+        <div id="local-assessfreq-report-cards" class="card-deck">
+            {{> local_assessfreq/assess-due-month}}
+        </div>
+    </div>
+
 </div>

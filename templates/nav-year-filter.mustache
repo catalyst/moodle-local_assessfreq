@@ -15,44 +15,37 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_timeline/nav-day-filter
+    @template local_assessfreq/nav-year-filter
 
     This template renders the day range selector for the timeline view.
 
     Example context (json):
     {}
 }}
-<div data-region="year-filter" class="dropdown">
-    <button type="button" class="btn btn-outline-secondary dropdown-toggle icon-no-margin" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-            aria-label="Select Year" aria-controls="menudayfilter">
-        {{#pix}} i/duration {{/pix}} Select Year
+<div id="local-assessfreq-cards-year" data-region="year-filter" class="dropdown">
+    <button type="button" class="btn btn-outline-secondary dropdown-toggle icon-no-margin"
+     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            aria-label="{{strselect}}" aria-controls="menudayfilter">
+        {{#pix}} i/duration {{/pix}} {{# str }} selectyear, local_assessfreq {{/ str }}
         <span class="sr-only" data-active-item-text>
-                2019
-                2020
+            {{#years}}
+                {{#year}}{{val}}{{/year}}
+            {{/years}}
         </span>
     </button>
     <div id="menudayfilter" role="menu" class="dropdown-menu" data-show-active-item>
-         <h6 class="dropdown-header">Select Year</h6>
+        <h6 class="dropdown-header">{{# str }} selectyear, local_assessfreq {{/ str }}</h6>
+        {{#years}}
         <a
-            class="dropdown-item"
+            class="dropdown-item {{#year}}{{#active}}active{{/active}}{{/year}}"
             href="#"
-            data-year="2019"
-            data-filtername="next7days"
-            aria-label="2019"
+            data-year="{{#year}}{{val}}{{/year}}"
+            aria-label="{{#year}}{{val}}{{/year}}"
             role="menuitem"
         >
-            2019
+            {{#year}}{{val}}{{/year}}
         </a>
-        <a
-            class="dropdown-item active"
-            href="#"
-            data-year="2020"
-            data-filtername="next30days"
-            aria-label="2020"
-            role="menuitem"
-            aria-current="true"
-        >
-            2020
-        </a>
+        {{/years}}
+
     </div>
 </div>

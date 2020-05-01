@@ -359,6 +359,7 @@ class frequency_testcase extends advanced_testcase {
 
         $result = $frequency->get_site_events('all', 0, 0, false);
         $this->assertCount(2, $result);
+        error_log(print_r($result, true));
 
         $data = $sitecache->get('all');
         $this->assertCount(2, $data->events);

@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function xmldb_fileconverter_unoconv_install() {
+function xmldb_local_assessfreq_install() {
     // Create an adhoc task that will process all historical event data.
     $task = new \local_assessfreq\task\history_process();
     \core\task\manager::queue_adhoc_task($task, true);

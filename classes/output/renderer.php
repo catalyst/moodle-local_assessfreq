@@ -37,15 +37,27 @@ use plugin_renderer_base;
 class renderer extends plugin_renderer_base {
 
     /**
-     * Render the html for the report summary.
+     * Render the html for the report cards.
+     * Most content is loaded by ajax
      *
      * @return string html to display.
      */
     public function render_report_cards() {
-        $context = new \stdClass();
+        $preferenceyear = get_user_preferences('local_assessfreq_overview_year_preference', date('Y'));
+        $years = array(2019, 2020, 2021); // TODO: Generate the year options from avialable database data.
+        $context = array('years' => array(), 'currentyear' => $preferenceyear);
 
-        $assessduemonth = new assess_due_month();
-        $context->assessduemonth = $assessduemonth->export_for_template($this);
+        if (!empty($years)) {
+            foreach ($years as $year) {
+                if ($year == $preferenceyear) {
+                    $context['years'][] = array('year' => array('val' => $year, 'active' => 'true'));
+                } else {
+                    $context['years'][] = array('year' => array('val' => $year));
+                }
+            }
+        } else {
+            $context['years'][] = array('year' => array('val' => $preferenceyear, 'active' => 'true'));
+        }
 
         return $this->render_from_template('local_assessfreq/report-cards', $context);
     }
