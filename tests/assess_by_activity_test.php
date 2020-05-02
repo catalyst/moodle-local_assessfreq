@@ -45,53 +45,85 @@ class assess_by_activity_testcase extends advanced_testcase {
     /**
      * Test gett assess due by month chart method.
      */
-    public function test_get_assess_due_chart() {
+    public function test_get_assess_activity_chart() {
         global $DB;
         $year = 2020;
 
         // Make some records to put in the database;
         // Every even month should have two entries and every odd month one entry.
         $records = array();
-        $month = 1;
-        for ($i = 1; $i <= 24; $i++) {
 
-            if ($i > 12 && ($month % 2 != 0)) {
-                $month ++;
-                continue;
-            }
+        $lasrecord1 = new \stdClass();
+        $lasrecord1->module = 'quiz';
+        $lasrecord1->instanceid = 1;
+        $lasrecord1->courseid = 2;
+        $lasrecord1->contextid = 4;
+        $lasrecord1->timestart = 1585728000; // 2020-04-01 @ 8:00:00am GMT.
+        $lasrecord1->timeend = 1585814400; // 2020-04-02 @ 8:00:00am GMT.
+        $lasrecord1->endyear = 2020;
+        $lasrecord1->endmonth = 4;
+        $lasrecord1->endday = 2;
 
-            $record = new \stdClass();
-            $record->module = 'quiz';
-            $record->instanceid = $i;
-            $record->courseid = 2;
-            $record->contextid = $i;
-            $record->timestart = 0; // Start can be fake for this test.
-            $record->timeend = 0; // End can be fake for this test.
-            $record->endyear = $year;
-            $record->endmonth = $month;
-            $record->endday = 1;
+        $lasrecord2 = new \stdClass();
+        $lasrecord2->module = 'assign';
+        $lasrecord2->instanceid = 2;
+        $lasrecord2->courseid = 2;
+        $lasrecord2->contextid = 5;
+        $lasrecord2->timestart = 1585814401; // 2020-04-02 @ 8:00:01am GMT.
+        $lasrecord2->timeend = 1585900800; // 2020-04-03 @ 8:00:00am GMT.
+        $lasrecord2->endyear = 2020;
+        $lasrecord2->endmonth = 4;
+        $lasrecord2->endday = 3;
 
-            $records[] = $record;
+        $lasrecord3 = new \stdClass();
+        $lasrecord3->module = 'assign';
+        $lasrecord3->instanceid = 3;
+        $lasrecord3->courseid = 2;
+        $lasrecord3->contextid = 6;
+        $lasrecord3->timestart = 1585900801; // 2020-04-03 @ 8:00:01am GMT.
+        $lasrecord3->timeend = 1586073600; // 2020-04-05 @ 8:00:00am GMT.
+        $lasrecord3->endyear = 2020;
+        $lasrecord3->endmonth = 4;
+        $lasrecord3->endday = 5;
 
-            if ($month == 12) {
-                $month = 0;
-            }
-            $month ++;
-        }
+        $lasrecord4 = new \stdClass();
+        $lasrecord4->module = 'forum';
+        $lasrecord4->instanceid = 4;
+        $lasrecord4->courseid = 2;
+        $lasrecord4->contextid = 7;
+        $lasrecord4->timestart = 1585987200; // 2020-04-04 @ 8:00:00am GMT.
+        $lasrecord4->timeend = 1586160000; // 2020-04-06 @ 8:00:00am GMT.
+        $lasrecord4->endyear = 2020;
+        $lasrecord4->endmonth = 4;
+        $lasrecord4->endday = 6;
+
+        $lasrecord5 = new \stdClass();
+        $lasrecord5->module = 'forum';
+        $lasrecord5->instanceid = 5;
+        $lasrecord5->courseid = 2;
+        $lasrecord5->contextid = 8;
+        $lasrecord5->timestart = 1585987200; // 2020-04-04 @ 8:00:00am GMT.
+        $lasrecord5->timeend = 1586160000; // 2020-04-06 @ 8:00:00am GMT.
+        $lasrecord5->endyear = 2021;
+        $lasrecord5->endmonth = 4;
+        $lasrecord5->endday = 6;
+
+        $records = array($lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4, $lasrecord5);
 
         $DB->insert_records('local_assessfreq_site', $records);
 
         $assessbymonth = new assess_by_activity();
-        $result = $assessbymonth->get_assess_due_chart($year);
+        $result = $assessbymonth->get_assess_activity_chart($year);
         $values = $result->get_series()[0]->get_values();
 
-        foreach ($values as $value) {
-            if ($value % 2 != 0) {
-                $count = 1;
-            } else {
-                $count = 2;
-            }
-            $this->assertEquals($count, $value);
-        }
+        $this->assertEquals(2, $values[0]);
+        $this->assertEquals(0, $values[1]);
+        $this->assertEquals(0, $values[2]);
+        $this->assertEquals(0, $values[3]);
+        $this->assertEquals(1, $values[4]);
+        $this->assertEquals(0, $values[5]);
+        $this->assertEquals(1, $values[6]);
+        $this->assertEquals(0, $values[7]);
+        $this->assertEquals(0, $values[8]);
     }
 }

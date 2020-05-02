@@ -131,7 +131,7 @@ class frequency {
      *
      * @return array $modules The enabled modules.
      */
-    private function get_modules() : array {
+    public function get_modules() : array {
         // TODO: Get these from plugin config rather than hard code.
         return array ('assign', 'choice', 'data', 'feedback', 'forum', 'lesson', 'quiz', 'scorm', 'workshop');
     }

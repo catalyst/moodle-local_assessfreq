@@ -48,38 +48,26 @@ class assess_by_activity {
 
         // Get events for the supplied year.
         $frequency = new frequency();
-        $yeardata = $frequency->get_events_due_by_month($year);
+        $modules = $frequency->get_modules();
+        $activitydata = $frequency->get_events_due_by_activity($year);
         $seriesdata = array();
-        $charttitle = get_string('assessbymonth', 'local_assessfreq');
+        $labels = array();
+        $charttitle = get_string('assessbyactivity', 'local_assessfreq');
 
-        // There is always 12 months in a year,
-        // even if we don't have data for them all.
-        for ($i = 0; $i <= 11; $i++) {
-            if (!empty($yeardata[$i])) {
-                $seriesdata[] = $yeardata[$i]->count;
+        foreach ($modules as $module) {
+            if (!empty($activitydata[$module])) {
+                $seriesdata[] = $activitydata[$module]->count;
             } else {
                 $seriesdata[] = 0;
             }
+            $labels[] =  get_string('modulename', $module);
         }
 
         // Create chart object
         $events = new \core\chart_series($charttitle, $seriesdata);
-        $labels = array(
-            get_string('jan', 'local_assessfreq'),
-            get_string('feb', 'local_assessfreq'),
-            get_string('mar', 'local_assessfreq'),
-            get_string('apr', 'local_assessfreq'),
-            get_string('may', 'local_assessfreq'),
-            get_string('jun', 'local_assessfreq'),
-            get_string('jul', 'local_assessfreq'),
-            get_string('aug', 'local_assessfreq'),
-            get_string('sep', 'local_assessfreq'),
-            get_string('oct', 'local_assessfreq'),
-            get_string('nov', 'local_assessfreq'),
-            get_string('dec', 'local_assessfreq'),
-        );
 
         $chart = new \core\chart_bar();
+        $chart->set_horizontal(true);
         $chart->add_series($events);
         $chart->set_labels($labels);
 
