@@ -18,12 +18,12 @@
  * Plugin cache definitions.
  *
  * @package    local_assessfreq
- * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
+ * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>by_
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+by_
 // Cache definitions.
 $definitions = [
     'siteevents' => [
@@ -57,6 +57,12 @@ $definitions = [
         'simpledata' => false
     ],
     'eventsdueactivity' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'simplekeys' => true,
+        'simpledata' => false
+    ],
+    'monthlyuser' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
