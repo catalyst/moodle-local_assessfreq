@@ -26,6 +26,7 @@ namespace local_assessfreq\output;
 defined('MOODLE_INTERNAL') || die;
 
 use plugin_renderer_base;
+use local_assessfreq\frequency;
 
 /**
  * Assessment Frequency block rendrer.
@@ -44,7 +45,13 @@ class renderer extends plugin_renderer_base {
      */
     public function render_report_cards() {
         $preferenceyear = get_user_preferences('local_assessfreq_overview_year_preference', date('Y'));
-        $years = array(2019, 2020, 2021); // TODO: Generate the year options from avialable database data.
+        $frequency = new frequency();
+        $years = $frequency->get_years_has_events();
+
+        if (empty($years)) {
+            $years = array(date('Y'));
+        }
+
         $context = array('years' => array(), 'currentyear' => $preferenceyear);
 
         if (!empty($years)) {
@@ -71,7 +78,6 @@ class renderer extends plugin_renderer_base {
     public function render_report(string $baseurl) : string {
             $html = '';
             $html .= $this->header();
-            // content goes here.
             $html .= $this->render_report_cards();
             $html .= $this->footer();
 

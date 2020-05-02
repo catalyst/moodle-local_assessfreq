@@ -586,6 +586,50 @@ class frequency {
         return $events;
     }
 
+    /**
+     *
+     * @param int $year
+     * @param bool $cache$events
+     * @return array $events
+     */
+    public function get_events_due_by_activity(int $year, bool $cache=true): array {
+        global $DB;
+        $events = array();
+        $cachekey = (string)$year . '_activity';
+
+        // Try to get value from cache.
+        $usercache = cache::make('local_assessfreq', 'eventsdueactivity');
+        $data = $usercache->get($cachekey);
+
+        if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
+            $events = $data->events;
+        } else {  // Not valid cache data.
+            $params = array($year);
+            $sql = 'SELECT module, COUNT(id)
+                      FROM {local_assessfreq_site}
+                     WHERE endyear = ?
+                  GROUP BY module
+                  ORDER BY module ASC';
+            $events = $DB->get_records_sql($sql, $params);
+        }
+
+        // Update cache.
+        if (!empty($events)) {
+            $expiry = time() + $this->expiryperiod;
+            $data = new \stdClass();
+            $data->expiry = $expiry;
+            $data->events = $events;
+            $usercache->set($cachekey, $data);
+        }
+
+        return $events;
+    }
+
+    /**
+     *
+     * @param bool $cache
+     * @return array
+     */
     public function get_years_has_events(bool $cache=true): array {
         global $DB;
         $years = array();
@@ -599,8 +643,8 @@ class frequency {
             $years = $data->events;
         } else {  // Not valid cache data.
             $sql = 'SELECT DISTINCT endyear FROM {local_assessfreq_site}';
-            $yearrecordss = $DB->get_records_sql($sql);
-            $years = array_keys($yearrecordss);
+            $yearrecords = $DB->get_records_sql($sql);
+            $years = array_keys($yearrecords);
         }
 
         // Update cache.

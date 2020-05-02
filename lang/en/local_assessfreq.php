@@ -28,8 +28,10 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Assessment Frequency';
 $string['title'] = 'Assessment Frequency';
 
+$string['assessbyactivity'] = 'Assessments by activity';
 $string['assessbymonth'] = 'Assessments due by month';
 $string['assessoverview'] = 'Assessment overviews for year:';
+$string['cachedef_eventsdueactivity'] = 'Events due by activity cache';
 $string['cachedef_eventsduemonth'] = 'Events due by month cache';
 $string['cachedef_siteevents'] = 'Assessment frequency course event cache';
 $string['cachedef_siteevents'] = 'Assessment frequency site event cache';
