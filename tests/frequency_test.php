@@ -620,4 +620,122 @@ class frequency_testcase extends advanced_testcase {
         $this->assertCount(12, $data->events);
     }
 
+    /**
+     * Test getting course events and cache.
+     * Check behavior if there is no data.
+     */
+    public function test_get_events_due_by_month_no_data() {
+        $year = 2020;
+
+        // Cache should be initially empty.
+        $eventduecache = cache::make('local_assessfreq', 'eventsduemonth');
+        $cachekey = (string)$year;
+        $data = $eventduecache->get($cachekey);
+        $this->assertEmpty($data);
+
+        $frequency = new frequency();
+        $results = $frequency->get_events_due_by_month($year);
+
+        $this->assertEmpty($results);
+
+        $data = $eventduecache->get($cachekey);
+        $this->assertEmpty($data);
+    }
+
+    /**
+     * Test years that have events.
+     */
+    public function test_get_years_has_events() {
+        global $DB;
+
+        // Make some records to put in the database;
+        // Every even month should have two entries and every odd month one entry.
+        $records = array();
+
+        $lasrecord1 = new \stdClass();
+        $lasrecord1->module = 'quiz';
+        $lasrecord1->instanceid = 1;
+        $lasrecord1->courseid = 2;
+        $lasrecord1->contextid = 4;
+        $lasrecord1->timestart = 1585728000; // 2020-04-01 @ 8:00:00am GMT.
+        $lasrecord1->timeend = 1585814400; // 2020-04-02 @ 8:00:00am GMT.
+        $lasrecord1->endyear = 2019;
+        $lasrecord1->endmonth = 4;
+        $lasrecord1->endday = 2;
+
+        $lasrecord2 = new \stdClass();
+        $lasrecord2->module = 'quiz';
+        $lasrecord2->instanceid = 2;
+        $lasrecord2->courseid = 2;
+        $lasrecord2->contextid = 5;
+        $lasrecord2->timestart = 1585814401; // 2020-04-02 @ 8:00:01am GMT.
+        $lasrecord2->timeend = 1585900800; // 2020-04-03 @ 8:00:00am GMT.
+        $lasrecord2->endyear = 2020;
+        $lasrecord2->endmonth = 4;
+        $lasrecord2->endday = 3;
+
+        $lasrecord3 = new \stdClass();
+        $lasrecord3->module = 'quiz';
+        $lasrecord3->instanceid = 3;
+        $lasrecord3->courseid = 2;
+        $lasrecord3->contextid = 6;
+        $lasrecord3->timestart = 1585900801; // 2020-04-03 @ 8:00:01am GMT.
+        $lasrecord3->timeend = 1586073600; // 2020-04-05 @ 8:00:00am GMT.
+        $lasrecord3->endyear = 2020;
+        $lasrecord3->endmonth = 4;
+        $lasrecord3->endday = 5;
+
+        $lasrecord4 = new \stdClass();
+        $lasrecord4->module = 'quiz';
+        $lasrecord4->instanceid = 4;
+        $lasrecord4->courseid = 2;
+        $lasrecord4->contextid = 7;
+        $lasrecord4->timestart = 1585987200; // 2020-04-04 @ 8:00:00am GMT.
+        $lasrecord4->timeend = 1586160000; // 2020-04-06 @ 8:00:00am GMT.
+        $lasrecord4->endyear = 2021;
+        $lasrecord4->endmonth = 4;
+        $lasrecord4->endday = 6;
+
+        $records = array($lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4);
+
+        $DB->insert_records('local_assessfreq_site', $records);
+
+        // Cache should be initially empty.
+        $yeareventscache = cache::make('local_assessfreq', 'yearevents');
+        $cachekey = 'yearevents';
+        $data = $yeareventscache->get($cachekey);
+        $this->assertEmpty($data);
+
+        $frequency = new frequency();
+        $results = $frequency->get_years_has_events();
+
+        $this->assertCount(3, $results);
+        $this->assertContains(2019, $results);
+        $this->assertContains(2020, $results);
+        $this->assertContains(2021, $results);
+
+        $data = $yeareventscache->get($cachekey);
+        $this->assertCount(3, $data->events);
+    }
+
+    /**
+     * Test years that have events.
+     * Check behavior if there is no data.
+     */
+    public function test_get_years_has_events_no_data() {
+        // Cache should be initially empty.
+        $yeareventscache = cache::make('local_assessfreq', 'yearevents');
+        $cachekey = 'yearevents';
+        $data = $yeareventscache->get($cachekey);
+        $this->assertEmpty($data);
+
+        $frequency = new frequency();
+        $results = $frequency->get_years_has_events();
+
+        $this->assertEmpty($results);
+
+        $data = $yeareventscache->get($cachekey);
+        $this->assertEmpty($data);
+    }
+
 }

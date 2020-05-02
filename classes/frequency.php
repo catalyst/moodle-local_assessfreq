@@ -550,8 +550,8 @@ class frequency {
     /**
      *
      * @param int $year
-     * @param bool $cache
-     * @return array
+     * @param bool $cache$events
+     * @return array $events
      */
     public function get_events_due_by_month(int $year, bool $cache=true): array {
         global $DB;
@@ -563,7 +563,7 @@ class frequency {
         $data = $usercache->get($cachekey);
 
         if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
-            $events = $data;
+            $events = $data->events;
         } else {  // Not valid cache data.
             $params = array($year);
             $sql = 'SELECT endmonth, COUNT(id)
@@ -584,6 +584,35 @@ class frequency {
         }
 
         return $events;
+    }
+
+    public function get_years_has_events(bool $cache=true): array {
+        global $DB;
+        $years = array();
+        $cachekey = 'yearevents';
+
+        // Try to get value from cache.
+        $usercache = cache::make('local_assessfreq', 'yearevents');
+        $data = $usercache->get($cachekey);
+
+        if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
+            $years = $data->events;
+        } else {  // Not valid cache data.
+            $sql = 'SELECT DISTINCT endyear FROM {local_assessfreq_site}';
+            $yearrecordss = $DB->get_records_sql($sql);
+            $years = array_keys($yearrecordss);
+        }
+
+        // Update cache.
+        if (!empty($years)) {
+            $expiry = time() + $this->expiryperiod;
+            $data = new \stdClass();
+            $data->expiry = $expiry;
+            $data->events = $years;
+            $usercache->set($cachekey, $data);
+        }
+
+        return $years;
     }
 
     private function get_conflicts(int $now) : array {

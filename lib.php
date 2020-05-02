@@ -77,9 +77,11 @@ function local_assessfreq_output_fragment_get_assess_by_month($args): string {
     $context = $args['context'];
     has_capability('moodle/site:config', $context);
 
+    $data = json_decode($args['data']);
+
     $assesschart = new \local_assessfreq\output\assess_by_month();
 
-    $chart = $assesschart->get_assess_due_chart();
+    $chart = $assesschart->get_assess_due_chart($data->year);
     $chartdata = json_encode($chart);
 
     return $chartdata;

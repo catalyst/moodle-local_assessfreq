@@ -50,5 +50,11 @@ $definitions = [
         'simplekeys' => true,
         'simpledata' => false
     ],
+    'yearevents' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'simplekeys' => true,
+        'simpledata' => false
+    ],
 ];
 
