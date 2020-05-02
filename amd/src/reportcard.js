@@ -60,24 +60,29 @@ define(
     function assessByMonth() {
         var cardid = 'local-assessfreq-assess-due-month';
         var cardElement = document.getElementById(cardid);
+        var spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
+        var chartbody = cardElement.getElementsByClassName('chart-body')[0];
+        var params = {'data': JSON.stringify({'year' : yearselect})};
 
-        // Call an ajax method that returns all the info we need.
-        // This includes:
-        // Lang strings for the block.
-        // Values for year selection.
-        // Initial data set.
+        spinner.classList.remove('hide'); // Show sinner if not already shown.
 
-        var params = {'data': JSON.stringify([])};
         Fragment.loadFragment('local_assessfreq', 'get_assess_by_month', contextid, params)
         .done(function(response) {
-            // Load card body.
-            window.console.log(response);
+
+            var context = { 'withtable' : true, 'chartdata' : response };
+            Templates.render('core/chart', context)
+            .done(function(html, js) {
+                spinner.classList.add('hide'); // Hide sinner if not already hidden.
+                // Load card body.
+                Templates.replaceNodeContents(chartbody, html, js);
+            }).fail(function() {
+                Notification.exception(new Error('Failed to load chart template.'));
+                return;
+            });
             return;
         }).fail(function() {
             Notification.exception(new Error('Failed to load card year filter'));
             return;
-        }).then(function() {
-            // And then?
         });
     }
 
@@ -94,6 +99,9 @@ define(
             var yeartitle = document.getElementById('local-assessfreq-report-overview')
                                 .getElementsByClassName('local-assessfreq-year')[0];
             yeartitle.innerHTML = yearselect;
+
+            // Process loading for the assessments by month card.
+            assessByMonth();
         }
     }
 

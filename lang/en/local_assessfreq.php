@@ -33,6 +33,7 @@ $string['assessoverview'] = 'Assessment overviews for year:';
 $string['cachedef_siteevents'] = 'Assessment frequency course event cache';
 $string['cachedef_siteevents'] = 'Assessment frequency site event cache';
 $string['cachedef_userevents'] = 'Assessment frequency user event cache';
+$string['cachedef_eventsduemonth'] = 'Events due by month cache';
 $string['clearhistory'] = 'Clear history';
 $string['confirmreprocess'] = 'Delete ALL history and reprocess?';
 $string['eventeventprocessed'] = 'event_processed';

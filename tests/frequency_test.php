@@ -359,7 +359,6 @@ class frequency_testcase extends advanced_testcase {
 
         $result = $frequency->get_site_events('all', 0, 0, false);
         $this->assertCount(2, $result);
-        error_log(print_r($result, true));
 
         $data = $sitecache->get('all');
         $this->assertCount(2, $data->events);
@@ -563,7 +562,62 @@ class frequency_testcase extends advanced_testcase {
             $this->assertNotEquals($eventarray[7], $result->eventid);
             $this->assertNotEquals($eventarray[7], $result->conflictid);
         }
-
-
     }
+
+    /**
+     * Test getting course events and cache.
+     */
+    public function test_get_events_due_by_month() {
+        global $DB;
+        $year = 2020;
+
+        // Make some records to put in the database;
+        // Every even month should have two entries and every odd month one entry.
+        $records = array();
+        $month = 1;
+        for ($i = 1; $i <= 24; $i++) {
+
+            if ($i > 12 && ($month % 2 != 0)) {
+                $month ++;
+                continue;
+            }
+
+            $record = new \stdClass();
+            $record->module = 'quiz';
+            $record->instanceid = $i;
+            $record->courseid = 2;
+            $record->contextid = $i;
+            $record->timestart = 0; // Start can be fake for this test.
+            $record->timeend = 0; // End can be fake for this test.
+            $record->endyear = $year;
+            $record->endmonth = $month;
+            $record->endday = 1;
+
+            $records[] = $record;
+
+            if ($month == 12) {
+                $month = 0;
+            }
+            $month ++;
+        }
+
+        $DB->insert_records('local_assessfreq_site', $records);
+
+        // Cache should be initially empty.
+        $eventduecache = cache::make('local_assessfreq', 'eventsduemonth');
+        $cachekey = (string)$year;
+        $data = $eventduecache->get($cachekey);
+        $this->assertEmpty($data);
+
+        $frequency = new frequency();
+        $results = $frequency->get_events_due_by_month($year);
+
+        $this->assertCount(12, $results);
+        $this->assertEquals(1, $results[1]->count);
+        $this->assertEquals(2, $results[2]->count);
+
+        $data = $eventduecache->get($cachekey);
+        $this->assertCount(12, $data->events);
+    }
+
 }

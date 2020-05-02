@@ -41,9 +41,17 @@ class assess_by_month {
      *
      * @return $output The generated chart to be fed to a template.
      */
-    public function get_assess_due_chart(): string {
+    public function get_assess_due_chart(): \core\chart_base {
+        global $OUTPUT;
 
-        return 'foo bar, bar joo bar.';
+        $events = new \core\chart_series('My series title', array(1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1));
+        $labels = array('j', 'f', 'm', 'a', 'm', 'j', 'j', 'a', 's', 'o', 'n', 'd');
+
+        $chart = new \core\chart_bar();
+        $chart->add_series($events);
+        $chart->set_labels($labels);
+
+        return $chart;
 
     }
 }
