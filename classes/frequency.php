@@ -595,7 +595,7 @@ class frequency {
     public function get_events_due_monthly_by_user(int $year, bool $cache=true): array {
         global $DB;
         $events = array();
-        $cachekey = (string)$year ;
+        $cachekey = (string)$year;
 
         // Try to get value from cache.
         $usercache = cache::make('local_assessfreq', 'monthlyuser');
@@ -605,11 +605,12 @@ class frequency {
             $events = $data->events;
         } else {  // Not valid cache data.
             $params = array($year);
-            $sql = 'SELECT endmonth, COUNT(id)
-                      FROM {local_assessfreq_site}
-                     WHERE endyear = ?
-                  GROUP BY endmonth
-                  ORDER BY endmonth ASC';
+            $sql = 'SELECT s.endmonth, COUNT(u.id)
+                      FROM {local_assessfreq_site} s
+                INNER JOIN {local_assessfreq_user} u ON s.id = u.eventid
+                     WHERE s.endyear = ?
+                  GROUP BY s.endmonth
+                  ORDER BY s.endmonth ASC';
             $events = $DB->get_records_sql($sql, $params);
         }
 

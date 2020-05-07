@@ -827,4 +827,61 @@ class frequency_testcase extends advanced_testcase {
         $this->assertCount(3, $data->events);
     }
 
+    /**
+    * Test getting user events and cache.
+    */
+    public function test_events_due_monthly_by_user() {
+        global $DB;
+        $year = 2020;
+
+        // Make some records to put in the database;
+        // Every month should have an increasing ammount of users.
+        for ($i = 1; $i <= 12; $i++) {
+            $record = new \stdClass();
+            $record->module = 'quiz';
+            $record->instanceid = $i;
+            $record->courseid = 2;
+            $record->contextid = $i;
+            $record->timestart = 0; // Start can be fake for this test.
+            $record->timeend = 0; // End can be fake for this test.
+            $record->endyear = $year;
+            $record->endmonth = $i;
+            $record->endday = 1;
+
+            $eventid = $DB->insert_record('local_assessfreq_site', $record, true);
+
+            for ($j = 1; $j <= $i; $j++) {
+                $userrecord = new \stdClass();
+                $userrecord->userid = $j;
+                $userrecord->eventid = $eventid;
+
+                $DB->insert_record('local_assessfreq_user', $userrecord, true);
+            }
+
+        }
+
+        // Cache should be initially empty.
+        $monthlyusercache = cache::make('local_assessfreq', 'monthlyuser');
+        $cachekey = (string)$year;
+        $data = $monthlyusercache->get($cachekey);
+        $this->assertEmpty($data);
+
+        $frequency = new frequency();
+        $results = $frequency->get_events_due_monthly_by_user($year);
+
+         $this->assertCount(12, $results);
+         $this->assertEquals(1, $results[1]->count);
+         $this->assertEquals(2, $results[2]->count);
+         $this->assertEquals(3, $results[3]->count);
+         $this->assertEquals(4, $results[4]->count);
+         $this->assertEquals(5, $results[5]->count);
+         $this->assertEquals(6, $results[6]->count);
+         $this->assertEquals(7, $results[7]->count);
+
+         $data = $monthlyusercache->get($cachekey);
+         $this->assertCount(12, $data->events);
+    }
+
+
+
 }

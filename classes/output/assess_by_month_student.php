@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderable for assessments due by month card.
+ * Renderable for assessments due by month student card.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_assessfreq\output;
@@ -29,28 +29,28 @@ use local_assessfreq\frequency;
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Renderable for assessments due by month card.
+ * Renderable for assessments due by month student card.
  *
  * @package    local_assessfreq * Renderable summary for the AWS Elastic Transcode report.
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class assess_by_month {
+class assess_by_month_student {
 
     /**
      * Generate the markup for the process summary chart,
-     * used in the smart media dashboard.
+     * used in the dashboard.
      *
      * @param int $year Year to get chart data for.
      * @return \core\chart_base $chart Generated chart object.
      */
-    public function get_assess_due_chart(int $year): \core\chart_base {
+    public function get_assess_due_student_chart(int $year): \core\chart_base {
 
         // Get events for the supplied year.
         $frequency = new frequency();
-        $yeardata = $frequency->get_events_due_by_month($year);
+        $yeardata = $frequency->get_events_due_monthly_by_user($year);
         $seriesdata = array();
-        $charttitle = get_string('assessbymonth', 'local_assessfreq');
+        $charttitle = get_string('assessbymonthstudents', 'local_assessfreq');
 
         // There is always 12 months in a year,
         // even if we don't have data for them all.

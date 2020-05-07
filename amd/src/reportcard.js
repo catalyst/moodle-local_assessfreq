@@ -115,6 +115,35 @@ define(
         });
     }
 
+    function assessByMonthStudent() {
+        var cardid = 'local-assessfreq-assess-due-month-student';
+        var cardElement = document.getElementById(cardid);
+        var spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
+        var chartbody = cardElement.getElementsByClassName('chart-body')[0];
+        var params = {'data': JSON.stringify({'year' : yearselect})};
+
+        spinner.classList.remove('hide'); // Show sinner if not already shown.
+
+        Fragment.loadFragment('local_assessfreq', 'get_assess_by_month_student', contextid, params)
+        .done(function(response) {
+
+            var context = { 'withtable' : true, 'chartdata' : response };
+            Templates.render('core/chart', context)
+            .done(function(html, js) {
+                spinner.classList.add('hide'); // Hide sinner if not already hidden.
+                // Load card body.
+                Templates.replaceNodeContents(chartbody, html, js);
+            }).fail(function() {
+                Notification.exception(new Error('Failed to load chart template.'));
+                return;
+            });
+            return;
+        }).fail(function() {
+            Notification.exception(new Error('Failed to load card year filter'));
+            return;
+        });
+    }
+
     function yearButtonAction(event) {
         var element = event.target;
 
@@ -132,6 +161,7 @@ define(
             // Process loading for the assessments by month card.
             assessByMonth();
             assessByActivity();
+            assessByMonthStudent();
         }
     }
 
@@ -149,6 +179,7 @@ define(
 
         assessByMonth(); // Process loading for the assessments by month card.
         assessByActivity(); // Process loading for the assessments by activity type card.
+        assessByMonthStudent(); // Process loading for the assessments by student per month card.
 
     };
 

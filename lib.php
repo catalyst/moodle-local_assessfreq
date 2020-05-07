@@ -105,3 +105,22 @@ function local_assessfreq_output_fragment_get_assess_by_activity($args): string 
 
     return $chartdata;
 }
+
+/**
+ *
+ * @param string $args
+ * @return string
+ */
+function local_assessfreq_output_fragment_get_assess_by_month_student($args): string {
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+
+    $data = json_decode($args['data']);
+
+    $assesschart = new \local_assessfreq\output\assess_by_month_student();
+
+    $chart = $assesschart->get_assess_due_student_chart($data->year);
+    $chartdata = json_encode($chart);
+
+    return $chartdata;
+}

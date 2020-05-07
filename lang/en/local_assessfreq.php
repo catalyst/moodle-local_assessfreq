@@ -30,6 +30,7 @@ $string['title'] = 'Assessment Frequency';
 
 $string['assessbyactivity'] = 'Assessments by activity';
 $string['assessbymonth'] = 'Assessments due by month';
+$string['assessbymonthstudents'] = 'Students with assessments due by month';
 $string['assessoverview'] = 'Assessment overviews for year:';
 $string['cachedef_eventsdueactivity'] = 'Events due by activity cache';
 $string['cachedef_eventsduemonth'] = 'Events due by month cache';
