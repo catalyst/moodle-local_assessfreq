@@ -113,7 +113,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $DB->insert_records('local_assessfreq_site', $records);
 
         $assessbymonth = new assess_by_activity();
-        $result = $assessbymonth->get_assess_activity_chart($year);
+        $result = $assessbymonth->get_assess_by_activity_chart($year);
         $values = $result->get_series()[0]->get_values();
 
         $this->assertEquals(2, $values[0]);

@@ -44,7 +44,7 @@ class assess_by_month_student {
      * @param int $year Year to get chart data for.
      * @return \core\chart_base $chart Generated chart object.
      */
-    public function get_assess_due_student_chart(int $year): \core\chart_base {
+    public function get_assess_by_month_student_chart(int $year): \core\chart_base {
 
         // Get events for the supplied year.
         $frequency = new frequency();

@@ -44,7 +44,7 @@ class assess_by_activity {
      * @param int $year Year to get chart data for.
      * @return \core\chart_base $chart Generated chart object.
      */
-    public function get_assess_activity_chart(int $year): \core\chart_base {
+    public function get_assess_by_activity_chart(int $year): \core\chart_base {
 
         // Get events for the supplied year.
         $frequency = new frequency();

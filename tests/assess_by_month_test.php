@@ -82,7 +82,7 @@ class assess_by_month_testcase extends advanced_testcase {
         $DB->insert_records('local_assessfreq_site', $records);
 
         $assessbymonth = new assess_by_month();
-        $result = $assessbymonth->get_assess_due_chart($year);
+        $result = $assessbymonth->get_assess_by_month_chart($year);
         $values = $result->get_series()[0]->get_values();
 
         foreach ($values as $value) {

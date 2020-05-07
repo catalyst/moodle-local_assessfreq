@@ -73,54 +73,27 @@ function local_assessfreq_user_preferences() {
  * @param string $args
  * @return string
  */
-function local_assessfreq_output_fragment_get_assess_by_month($args): string {
+function local_assessfreq_output_fragment_get_chart($args): string {
+    $allowedcalls = array(
+        'assess_by_month',
+        'assess_by_activity',
+        'assess_by_month_student'
+    );
+
     $context = $args['context'];
     has_capability('moodle/site:config', $context);
-
     $data = json_decode($args['data']);
 
-    $assesschart = new \local_assessfreq\output\assess_by_month();
+    if (in_array($data->call, $allowedcalls)) {
+        $classname = '\\local_assessfreq\\output\\' . $data->call;
+        $methodname = 'get_' . $data->call . '_chart';
+    } else {
+        throw new moodle_exception('Call not allowed');
+    }
 
-    $chart = $assesschart->get_assess_due_chart($data->year);
+    $assesschart = new $classname();
+    $chart = $assesschart->$methodname($data->year);
+
     $chartdata = json_encode($chart);
-
-    return $chartdata;
-}
-
-/**
- *
- * @param string $args
- * @return string
- */
-function local_assessfreq_output_fragment_get_assess_by_activity($args): string {
-    $context = $args['context'];
-    has_capability('moodle/site:config', $context);
-
-    $data = json_decode($args['data']);
-
-    $assesschart = new \local_assessfreq\output\assess_by_activity();
-
-    $chart = $assesschart->get_assess_activity_chart($data->year);
-    $chartdata = json_encode($chart);
-
-    return $chartdata;
-}
-
-/**
- *
- * @param string $args
- * @return string
- */
-function local_assessfreq_output_fragment_get_assess_by_month_student($args): string {
-    $context = $args['context'];
-    has_capability('moodle/site:config', $context);
-
-    $data = json_decode($args['data']);
-
-    $assesschart = new \local_assessfreq\output\assess_by_month_student();
-
-    $chart = $assesschart->get_assess_due_student_chart($data->year);
-    $chartdata = json_encode($chart);
-
     return $chartdata;
 }
