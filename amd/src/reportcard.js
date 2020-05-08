@@ -31,6 +31,7 @@ define(
     var Reportcard = {};
     var contextid;
     var yearselect;
+    var yearselectheatmap;
     var cards = [
         {cardId: 'local-assessfreq-assess-due-month', call: 'assess_by_month'},
         {cardId: 'local-assessfreq-assess-by-activity', call: 'assess_by_activity'},
@@ -114,6 +115,25 @@ define(
         }
     }
 
+    function yearHeatmapButtonAction(event) {
+        var element = event.target;
+
+        if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselectheatmap) { // Only act on certain elements.
+            yearselectheatmap = element.dataset.year;
+
+            // Save selection as a user preference.
+            updateUserPreferences('local_assessfreq_heatmap_year_preference', yearselectheatmap);
+
+            // Update card data based on selected year.
+            var yeartitle = document.getElementById('local-assessfreq-report-heatmap')
+                                .getElementsByClassName('local-assessfreq-year')[0];
+            yeartitle.innerHTML = yearselectheatmap;
+
+            // Process loading heatmap.
+            window.console.log('TODO: load heatmap');
+        }
+    }
+
     /**
      * Initialise method for report card rendering.
      *
@@ -122,9 +142,15 @@ define(
     Reportcard.init = function(context) {
         contextid = context;
 
+        // Set up event listener and related actions for year dropdown on report cards.
         var cardsYearSelectElement = document.getElementById('local-assessfreq-cards-year');
         yearselect = cardsYearSelectElement.getElementsByClassName('active')[0].dataset.year;
         cardsYearSelectElement.addEventListener("click", yearButtonAction);
+
+        // Set up event listener and related actions for year dropdown on heatmp.
+        var cardsYearSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-year');
+        yearselectheatmap = cardsYearSelectHeatmapElement.getElementsByClassName('active')[0].dataset.year;
+        cardsYearSelectHeatmapElement.addEventListener("click", yearHeatmapButtonAction);
 
         // Process loading for the assessment cards.
         getCardCharts();

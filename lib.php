@@ -65,6 +65,12 @@ function local_assessfreq_user_preferences() {
         'type' => PARAM_INT
     );
 
+    $preferences['local_assessfreq_heatmap_year_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => date('Y'),
+        'type' => PARAM_INT
+    );
+
     return $preferences;
 }
 

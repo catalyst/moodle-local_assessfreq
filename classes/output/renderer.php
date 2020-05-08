@@ -43,7 +43,7 @@ class renderer extends plugin_renderer_base {
      *
      * @return string html to display.
      */
-    public function render_report_cards() {
+    public function render_report_cards(): string {
         $preferenceyear = get_user_preferences('local_assessfreq_overview_year_preference', date('Y'));
         $frequency = new frequency();
         $years = $frequency->get_years_has_events();
@@ -69,6 +69,39 @@ class renderer extends plugin_renderer_base {
         return $this->render_from_template('local_assessfreq/report-cards', $context);
     }
 
+    public function render_report_heatmap(): string {
+        $preferenceyear = get_user_preferences('local_assessfreq_heatmap_year_preference', date('Y'));
+        $frequency = new frequency();
+        $years = $frequency->get_years_has_events();
+        $modules = $frequency->get_modules();
+
+        if (empty($years)) {
+            $years = array(date('Y'));
+        }
+
+        $context = array('years' => array(), 'currentyear' => $preferenceyear, 'modules' => array());
+
+        if (!empty($years)) {
+            foreach ($years as $year) {
+                if ($year == $preferenceyear) {
+                    $context['years'][] = array('year' => array('val' => $year, 'active' => 'true'));
+                } else {
+                    $context['years'][] = array('year' => array('val' => $year));
+                }
+            }
+        } else {
+            $context['years'][] = array('year' => array('val' => $preferenceyear, 'active' => 'true'));
+        }
+
+        $context['modules'][] = array('module' => array('val' => 'all', 'name' => get_string('all'),  'active' => 'true'));
+        foreach ($modules as $module) {
+            $modulename = get_string('modulename', $module);
+            $context['modules'][] = array('module' => array('val' => $module, 'name' => $modulename));
+        }
+
+        return $this->render_from_template('local_assessfreq/report-heatmap', $context);
+    }
+
     /**
      * Get the html to render the local_smartmedia report.
      *
@@ -79,6 +112,7 @@ class renderer extends plugin_renderer_base {
             $html = '';
             $html .= $this->header();
             $html .= $this->render_report_cards();
+            $html .= $this->render_report_heatmap();
             $html .= $this->footer();
 
             return $html;
