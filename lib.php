@@ -71,6 +71,13 @@ function local_assessfreq_user_preferences() {
         'type' => PARAM_INT
     );
 
+    $preferences['local_assessfreq_heatmap_metric_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 'assess',
+        'type' => PARAM_ALPHA
+    );
+
+
     return $preferences;
 }
 

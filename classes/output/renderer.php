@@ -71,15 +71,23 @@ class renderer extends plugin_renderer_base {
 
     public function render_report_heatmap(): string {
         $preferenceyear = get_user_preferences('local_assessfreq_heatmap_year_preference', date('Y'));
-        $frequency = new frequency();
-        $years = $frequency->get_years_has_events();
-        $modules = $frequency->get_modules();
+        $preferencemetric = get_user_preferences('local_assessfreq_heatmap_metric_preference', 'assess');
 
+        $frequency = new frequency();
+
+        // Initial context setup
+        $context = array(
+            'years' => array(),
+            'currentyear' => $preferenceyear,
+            'modules' => array(),
+            'metrics' => array(),
+        );
+
+        // Get years that have events and load into context.
+        $years = $frequency->get_years_has_events();
         if (empty($years)) {
             $years = array(date('Y'));
         }
-
-        $context = array('years' => array(), 'currentyear' => $preferenceyear, 'modules' => array());
 
         if (!empty($years)) {
             foreach ($years as $year) {
@@ -93,11 +101,16 @@ class renderer extends plugin_renderer_base {
             $context['years'][] = array('year' => array('val' => $preferenceyear, 'active' => 'true'));
         }
 
+        // Get modules for filters and load into context.
+        $modules = $frequency->get_modules();
         $context['modules'][] = array('module' => array('val' => 'all', 'name' => get_string('all'),  'active' => 'true'));
         foreach ($modules as $module) {
             $modulename = get_string('modulename', $module);
             $context['modules'][] = array('module' => array('val' => $module, 'name' => $modulename));
         }
+
+        // Get metric details and load into context.
+        $context['metrics'] = array($preferencemetric => 'true');
 
         return $this->render_from_template('local_assessfreq/report-heatmap', $context);
     }

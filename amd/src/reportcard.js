@@ -32,6 +32,8 @@ define(
     var contextid;
     var yearselect;
     var yearselectheatmap;
+    var metricselectheatmap;
+
     var cards = [
         {cardId: 'local-assessfreq-assess-due-month', call: 'assess_by_month'},
         {cardId: 'local-assessfreq-assess-by-activity', call: 'assess_by_activity'},
@@ -134,6 +136,70 @@ define(
         }
     }
 
+    function metricHeatmapButtonAction(event) {
+        var element = event.target;
+
+        if (element.tagName.toLowerCase() === 'a' && element.dataset.metric != metricselectheatmap) {
+            metricselectheatmap = element.dataset.metric;
+
+            // Save selection as a user preference.
+            updateUserPreferences('local_assessfreq_heatmap_metric_preference', metricselectheatmap);
+
+            // Process loading heatmap.
+            window.console.log('TODO: load heatmap');
+        }
+    }
+
+    function updateHeatmap(links) {
+        // Get list of links with active class.
+        // Compare to global to see if there are any changes.
+        // If list has changed fetch heatmap.
+        window.console.log('updating heatmap');
+
+    }
+
+    function moduleListChildrenEvents(element) {
+        var links = element.getElementsByTagName('a');
+        var all = links[0];
+
+        for (let link of links) {
+            let module = link.dataset.module;
+
+            if (module.toLowerCase() === 'all') {
+                link.addEventListener("click", function(event){
+                    event.preventDefault();
+                    // Remove active class from all other links.
+                    for (let link of links) {
+                        link.classList.remove('active');
+                    }
+                    updateHeatmap(links); // Call function to update heatmap.
+                });
+            } else if (module.toLowerCase() === 'close') {
+                link.addEventListener("click", function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    var dropdownmenu = document.getElementById('local-assessfreq-heatmap-modules-filter');
+                    dropdownmenu.classList.remove('show');
+
+                    updateHeatmap(links); // Call function to update heatmap.
+                });
+
+            } else {
+                link.addEventListener("click", function(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    all.classList.remove('active');
+
+                    event.target.classList.toggle('active');
+                    updateHeatmap(links);
+                });
+            }
+
+        }
+    }
+
     /**
      * Initialise method for report card rendering.
      *
@@ -151,6 +217,15 @@ define(
         var cardsYearSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-year');
         yearselectheatmap = cardsYearSelectHeatmapElement.getElementsByClassName('active')[0].dataset.year;
         cardsYearSelectHeatmapElement.addEventListener("click", yearHeatmapButtonAction);
+
+        // Set up event listener and related actions for metric dropdown on heatmp.
+        var cardsMetricSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-metrics');
+        metricselectheatmap = cardsMetricSelectHeatmapElement.getElementsByClassName('active')[0].dataset.metric;
+        cardsMetricSelectHeatmapElement.addEventListener("click", metricHeatmapButtonAction);
+
+        // Set up event listener and related actions for module dropdown on heatmp.
+        var cardsModulesSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-modules');
+        moduleListChildrenEvents(cardsModulesSelectHeatmapElement);
 
         // Process loading for the assessment cards.
         getCardCharts();

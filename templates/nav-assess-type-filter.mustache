@@ -33,7 +33,7 @@
             {{/modules}}
         </span>
     </button>
-    <div id="menudayfilter" role="menu" class="dropdown-menu" data-show-active-item>
+    <div id="local-assessfreq-heatmap-modules-filter" role="menu" class="dropdown-menu" data-show-active-item>
         <h6 class="dropdown-header">{{# str }} selectassessment, local_assessfreq {{/ str }}</h6>
         {{#modules}}
         <a
@@ -46,6 +46,15 @@
             {{#module}}{{name}}{{/module}}
         </a>
         {{/modules}}
-
+        <div class="dropdown-divider"></div>
+         <a
+            class="dropdown-item"
+            href="#"
+            data-module="close"
+            aria-label="{{# str }} closeapply, local_assessfreq {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} closeapply, local_assessfreq {{/ str }}
+        </a>
     </div>
 </div>
