@@ -33,6 +33,8 @@ define(
     var yearselect;
     var yearselectheatmap;
     var metricselectheatmap;
+    var heatmapOptionsJson = '';
+    var timeout;
 
     var cards = [
         {cardId: 'local-assessfreq-assess-due-month', call: 'assess_by_month'},
@@ -112,12 +114,12 @@ define(
                                 .getElementsByClassName('local-assessfreq-year')[0];
             yeartitle.innerHTML = yearselect;
 
-            // Process loading for the assessment cards.
-            getCardCharts();
+            updateHeatmap(); // Call function to update heatmap.
         }
     }
 
     function yearHeatmapButtonAction(event) {
+        event.preventDefault();
         var element = event.target;
 
         if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselectheatmap) { // Only act on certain elements.
@@ -131,12 +133,12 @@ define(
                                 .getElementsByClassName('local-assessfreq-year')[0];
             yeartitle.innerHTML = yearselectheatmap;
 
-            // Process loading heatmap.
-            window.console.log('TODO: load heatmap');
+            updateHeatmap(); // Call function to update heatmap.
         }
     }
 
     function metricHeatmapButtonAction(event) {
+        event.preventDefault();
         var element = event.target;
 
         if (element.tagName.toLowerCase() === 'a' && element.dataset.metric != metricselectheatmap) {
@@ -145,17 +147,41 @@ define(
             // Save selection as a user preference.
             updateUserPreferences('local_assessfreq_heatmap_metric_preference', metricselectheatmap);
 
-            // Process loading heatmap.
-            window.console.log('TODO: load heatmap');
+            updateHeatmap(); // Call function to update heatmap.
         }
     }
 
-    function updateHeatmap(links) {
-        // Get list of links with active class.
-        // Compare to global to see if there are any changes.
-        // If list has changed fetch heatmap.
-        window.console.log('updating heatmap');
+    function updateHeatmap() {
+        // Dirty debouncing.
+        clearTimeout(timeout);
+        timeout = setTimeout(function(){
 
+            // Get current state of select menu items.
+            var cardsModulesSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-modules');
+            var links = cardsModulesSelectHeatmapElement.getElementsByTagName('a');
+            var modules = [];
+
+            for (let link of links) {
+                if (link.classList.contains('active')) {
+                    let module = link.dataset.module;
+                    modules.push(module);
+                }
+            }
+
+            var optionsObj = {
+                    'year' : yearselectheatmap,
+                    'metric' : metricselectheatmap,
+                    'modules' : modules
+            };
+
+            var optionsJson = JSON.stringify(optionsObj);
+
+            if(optionsJson !== heatmapOptionsJson) { // Compare to global to see if there are any changes.
+                // If list has changed fetch heatmap and update user preference.
+                heatmapOptionsJson = optionsJson;
+                window.console.log('updating user preference');
+            }
+        }, 750); // Debounce delay.
     }
 
     function moduleListChildrenEvents(element) {
@@ -172,7 +198,7 @@ define(
                     for (let link of links) {
                         link.classList.remove('active');
                     }
-                    updateHeatmap(links); // Call function to update heatmap.
+                    updateHeatmap(); // Call function to update heatmap.
                 });
             } else if (module.toLowerCase() === 'close') {
                 link.addEventListener("click", function(event){
@@ -182,7 +208,7 @@ define(
                     var dropdownmenu = document.getElementById('local-assessfreq-heatmap-modules-filter');
                     dropdownmenu.classList.remove('show');
 
-                    updateHeatmap(links); // Call function to update heatmap.
+                    updateHeatmap(); // Call function to update heatmap.
                 });
 
             } else {
@@ -193,7 +219,7 @@ define(
                     all.classList.remove('active');
 
                     event.target.classList.toggle('active');
-                    updateHeatmap(links);
+                    updateHeatmap();
                 });
             }
 
