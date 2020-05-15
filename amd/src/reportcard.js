@@ -33,6 +33,7 @@ define(
     var yearselect;
     var yearselectheatmap;
     var metricselectheatmap;
+    var modulesJson = '';
     var heatmapOptionsJson = '';
     var timeout;
 
@@ -68,6 +69,9 @@ define(
     }
 
     /**
+     * For each of the cards on the dashbaord get their corresponding chart data.
+     * Data is based on the year variable from the corresponding dropdown.
+     * Chart data is loaded via ajax.
      *
      */
     function getCardCharts() {
@@ -100,6 +104,12 @@ define(
         });
     }
 
+    /**
+     * Get and process the selected year from the dropdown,
+     * and update the corresponding user perference.
+     *
+     * @param {event} event The triggered event for the element.
+     */
     function yearButtonAction(event) {
         var element = event.target;
 
@@ -114,10 +124,16 @@ define(
                                 .getElementsByClassName('local-assessfreq-year')[0];
             yeartitle.innerHTML = yearselect;
 
-            updateHeatmap(); // Call function to update heatmap.
+            updateHeatmapDebounce(); // Call function to update heatmap.
         }
     }
 
+    /**
+     * Get and process the selected year from the dropdown for the heatmap display,
+     * and update the corresponding user perference.
+     *
+     * @param {event} event The triggered event for the element.
+     */
     function yearHeatmapButtonAction(event) {
         event.preventDefault();
         var element = event.target;
@@ -133,10 +149,16 @@ define(
                                 .getElementsByClassName('local-assessfreq-year')[0];
             yeartitle.innerHTML = yearselectheatmap;
 
-            updateHeatmap(); // Call function to update heatmap.
+            updateHeatmapDebounce(); // Call function to update heatmap.
         }
     }
 
+    /**
+     * Get and process the selected assessment metric from the dropdown for the heatmap display,
+     * and update the corresponding user perference.
+     *
+     * @param {event} event The triggered event for the element.
+     */
     function metricHeatmapButtonAction(event) {
         event.preventDefault();
         var element = event.target;
@@ -147,43 +169,65 @@ define(
             // Save selection as a user preference.
             updateUserPreferences('local_assessfreq_heatmap_metric_preference', metricselectheatmap);
 
-            updateHeatmap(); // Call function to update heatmap.
+            updateHeatmapDebounce(); // Call function to update heatmap.
         }
     }
 
-    function updateHeatmap() {
-        // Dirty debouncing.
+    /**
+     * Quick and dirty debounce method for the heatmap settings menu.
+     * This stops the ajax method that updates the heatmap from being updated
+     * while the user is still checking options.
+     *
+     */
+    function updateHeatmapDebounce() {
         clearTimeout(timeout);
-        timeout = setTimeout(function(){
-
-            // Get current state of select menu items.
-            var cardsModulesSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-modules');
-            var links = cardsModulesSelectHeatmapElement.getElementsByTagName('a');
-            var modules = [];
-
-            for (let link of links) {
-                if (link.classList.contains('active')) {
-                    let module = link.dataset.module;
-                    modules.push(module);
-                }
-            }
-
-            var optionsObj = {
-                    'year' : yearselectheatmap,
-                    'metric' : metricselectheatmap,
-                    'modules' : modules
-            };
-
-            var optionsJson = JSON.stringify(optionsObj);
-
-            if(optionsJson !== heatmapOptionsJson) { // Compare to global to see if there are any changes.
-                // If list has changed fetch heatmap and update user preference.
-                heatmapOptionsJson = optionsJson;
-                window.console.log('updating user preference');
-            }
-        }, 750); // Debounce delay.
+        timeout = setTimeout(updateHeatmap(), 750);
     }
 
+    /**
+     * Update the heatmap based on the current filter settings.
+     *
+     */
+    function updateHeatmap() {
+        // Get current state of select menu items.with
+        var cardsModulesSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-modules');
+        var links = cardsModulesSelectHeatmapElement.getElementsByTagName('a');
+        var modules = [];
+
+        for (let link of links) {
+            if (link.classList.contains('active')) {
+                let module = link.dataset.module;
+                modules.push(module);
+            }
+        }
+
+        // Save selection as a user preference.
+        if (modulesJson !== JSON.stringify(modules)) {
+            modulesJson = JSON.stringify(modules);
+            updateUserPreferences('local_assessfreq_heatmap_modules_preference', modulesJson);
+        }
+
+        // Build settings object.
+        var optionsObj = {
+                'year' : yearselectheatmap,
+                'metric' : metricselectheatmap,
+                'modules' : modules
+        };
+
+        var optionsJson = JSON.stringify(optionsObj);
+
+        if(optionsJson !== heatmapOptionsJson) { // Compare to global to see if there are any changes.
+            // If list has changed fetch heatmap and update user preference.
+            heatmapOptionsJson = optionsJson;
+            window.console.log('getting heatmap data');
+        }
+    }
+
+    /**
+     * Add the event listeners to the modules in the module select dropdown.
+     *
+     * @param {element} element The dropdown HTML element that contains the list of modules as links.
+     */
     function moduleListChildrenEvents(element) {
         var links = element.getElementsByTagName('a');
         var all = links[0];
@@ -198,7 +242,7 @@ define(
                     for (let link of links) {
                         link.classList.remove('active');
                     }
-                    updateHeatmap(); // Call function to update heatmap.
+                    updateHeatmapDebounce(); // Call function to update heatmap.
                 });
             } else if (module.toLowerCase() === 'close') {
                 link.addEventListener("click", function(event){
@@ -208,7 +252,7 @@ define(
                     var dropdownmenu = document.getElementById('local-assessfreq-heatmap-modules-filter');
                     dropdownmenu.classList.remove('show');
 
-                    updateHeatmap(); // Call function to update heatmap.
+                    updateHeatmapDebounce(); // Call function to update heatmap.
                 });
 
             } else {
@@ -219,7 +263,7 @@ define(
                     all.classList.remove('active');
 
                     event.target.classList.toggle('active');
-                    updateHeatmap();
+                    updateHeatmapDebounce();
                 });
             }
 
