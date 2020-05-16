@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/fragment', 'core/templates'],
-   function(Ajax, Fragment, Templates) {
+define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'local_assessfreq/calendar'],
+   function(Ajax, Fragment, Templates, Notification, Calendar) {
 
     /**
      * Module level variables.
@@ -120,7 +120,7 @@ define(['core/ajax', 'core/fragment', 'core/templates'],
 
              // Update card data based on selected year.
              var yeartitle = document.getElementById('local-assessfreq-report-overview')
-             .getElementsByClassName('local-assessfreq-year')[0];
+                 .getElementsByClassName('local-assessfreq-year')[0];
              yeartitle.innerHTML = yearselect;
 
              getCardCharts(); // Process loading for the assessment cards.
@@ -136,6 +136,11 @@ define(['core/ajax', 'core/fragment', 'core/templates'],
     function updateHeatmapDebounce() {
         clearTimeout(timeout);
         timeout = setTimeout(updateHeatmap(), 750);
+    }
+
+    function generateHeatmap() {
+        const calendar = Calendar.generate(yearselectheatmap);
+        window.console.log(calendar);
     }
 
     /**
@@ -173,7 +178,8 @@ define(['core/ajax', 'core/fragment', 'core/templates'],
         if(optionsJson !== heatmapOptionsJson) { // Compare to global to see if there are any changes.
             // If list has changed fetch heatmap and update user preference.
             heatmapOptionsJson = optionsJson;
-            window.console.log('getting heatmap data.');
+
+            generateHeatmap();
         }
     }
 
@@ -301,6 +307,7 @@ define(['core/ajax', 'core/fragment', 'core/templates'],
 
         // Get the data for the heatmap.
         updateHeatmap();
+
     };
 
     return Reportcard;
