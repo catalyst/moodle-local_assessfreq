@@ -26,7 +26,7 @@ require_once($CFG->libdir . '/adminlib.php');
 $baseurl = $CFG->wwwroot . "/local/assessfreq/report.php";
 
 // Calls require_login and performs permissions checks for admin pages.
-admin_externalpage_setup('local_smartmedia_report', '', null, '',
+admin_externalpage_setup('local_assessfreq_report', '', null, '',
     array('pagelayout' => 'admin'));
 
 $title = get_string('pluginname', 'local_assessfreq');

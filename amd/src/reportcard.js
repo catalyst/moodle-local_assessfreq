@@ -21,9 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(
-    ['core/fragment', 'core/templates', 'core/notification', 'core/ajax'],
-    function(Fragment, Templates, Notification, Ajax) {
+define(['core/ajax', 'core/fragment', 'core/templates'],
+   function(Ajax, Fragment, Templates) {
 
     /**
      * Module level variables.
@@ -33,9 +32,9 @@ define(
     var yearselect;
     var yearselectheatmap;
     var metricselectheatmap;
+    var timeout;
     var modulesJson = '';
     var heatmapOptionsJson = '';
-    var timeout;
 
     var cards = [
         {cardId: 'local-assessfreq-assess-due-month', call: 'assess_by_month'},
@@ -49,17 +48,17 @@ define(
      * @param {string} type The name of the attribute you're updating
      * @param {string} value The value of the attribute you're updating
      */
-     function updateUserPreferences(type, value) {
+    function updateUserPreferences(type, value) {
         var request = {
-            methodname: 'core_user_update_user_preferences',
-            args: {
-                preferences: [
-                    {
-                        type: type,
-                        value: value
-                    }
-                ]
-            }
+                methodname: 'core_user_update_user_preferences',
+                args: {
+                    preferences: [
+                        {
+                            type: type,
+                            value: value
+                        }
+                        ]
+                }
         };
 
         Ajax.call([request])[0]
@@ -68,63 +67,113 @@ define(
         });
     }
 
+     /**
+      * For each of the cards on the dashbaord get their corresponding chart data.
+      * Data is based on the year variable from the corresponding dropdown.
+      * Chart data is loaded via ajax.
+      *
+      */
+     function getCardCharts() {
+         cards.forEach(function(cardData) {
+             var cardElement = document.getElementById(cardData.cardId);
+             var spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
+             var chartbody = cardElement.getElementsByClassName('chart-body')[0];
+             var params = {'data': JSON.stringify({'year' : yearselect, 'call': cardData.call})};
+
+             spinner.classList.remove('hide'); // Show sinner if not already shown.
+
+             Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
+             .done(function(response) {
+
+                 var context = { 'withtable' : true, 'chartdata' : response };
+                 Templates.render('core/chart', context)
+                 .done(function(html, js) {
+                     spinner.classList.add('hide'); // Hide sinner if not already hidden.
+                     // Load card body.
+                     Templates.replaceNodeContents(chartbody, html, js);
+                 }).fail(function() {
+                     Notification.exception(new Error('Failed to load chart template.'));
+                     return;
+                 });
+                 return;
+             }).fail(function() {
+                 Notification.exception(new Error('Failed to load card year filter'));
+                 return;
+             });
+         });
+     }
+
+     /**
+      * Get and process the selected year from the dropdown,
+      * and update the corresponding user perference.
+      *
+      * @param {event} event The triggered event for the element.
+      */
+     function yearButtonAction(event) {
+         var element = event.target;
+
+         if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselect) { // Only act on certain elements.
+             yearselect = element.dataset.year;
+
+             // Save selection as a user preference.
+             updateUserPreferences('local_assessfreq_overview_year_preference', yearselect);
+
+             // Update card data based on selected year.
+             var yeartitle = document.getElementById('local-assessfreq-report-overview')
+             .getElementsByClassName('local-assessfreq-year')[0];
+             yeartitle.innerHTML = yearselect;
+
+             getCardCharts(); // Process loading for the assessment cards.
+         }
+     }
+
     /**
-     * For each of the cards on the dashbaord get their corresponding chart data.
-     * Data is based on the year variable from the corresponding dropdown.
-     * Chart data is loaded via ajax.
+     * Quick and dirty debounce method for the heatmap settings menu.
+     * This stops the ajax method that updates the heatmap from being updated
+     * while the user is still checking options.
      *
      */
-    function getCardCharts() {
-        cards.forEach(function(cardData) {
-            var cardElement = document.getElementById(cardData.cardId);
-            var spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
-            var chartbody = cardElement.getElementsByClassName('chart-body')[0];
-            var params = {'data': JSON.stringify({'year' : yearselect, 'call': cardData.call})};
-
-            spinner.classList.remove('hide'); // Show sinner if not already shown.
-
-            Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
-            .done(function(response) {
-
-                var context = { 'withtable' : true, 'chartdata' : response };
-                Templates.render('core/chart', context)
-                .done(function(html, js) {
-                    spinner.classList.add('hide'); // Hide sinner if not already hidden.
-                    // Load card body.
-                    Templates.replaceNodeContents(chartbody, html, js);
-                }).fail(function() {
-                    Notification.exception(new Error('Failed to load chart template.'));
-                    return;
-                });
-                return;
-            }).fail(function() {
-                Notification.exception(new Error('Failed to load card year filter'));
-                return;
-            });
-        });
+    function updateHeatmapDebounce() {
+        clearTimeout(timeout);
+        timeout = setTimeout(updateHeatmap(), 750);
     }
 
     /**
-     * Get and process the selected year from the dropdown,
-     * and update the corresponding user perference.
+     * Update the heatmap based on the current filter settings.
      *
-     * @param {event} event The triggered event for the element.
      */
-    function yearButtonAction(event) {
-        var element = event.target;
+    function updateHeatmap() {
+        // Get current state of select menu items.with
+        var cardsModulesSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-modules');
+        var links = cardsModulesSelectHeatmapElement.getElementsByTagName('a');
+        var modules = [];
 
-        if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselect) { // Only act on certain elements.
-            yearselect = element.dataset.year;
+        for (var i = 0; i < links.length; i++) {
+            if (links[i].classList.contains('active')) {
+                let module = links[i].dataset.module;
+                modules.push(module);
+            }
+        }
 
-            // Save selection as a user preference.
-            updateUserPreferences('local_assessfreq_overview_year_preference', yearselect);
+        // Save selection as a user preference.
+        if (modulesJson !== JSON.stringify(modules)) {
+            modulesJson = JSON.stringify(modules);
+            updateUserPreferences('local_assessfreq_heatmap_modules_preference', modulesJson);
+        }
 
-            // Update card data based on selected year.
-            var yeartitle = document.getElementById('local-assessfreq-report-overview')
-                                .getElementsByClassName('local-assessfreq-year')[0];
-            yeartitle.innerHTML = yearselect;
+        // Build settings object.
+        var optionsObj = {
+                'year' : yearselectheatmap,
+                'metric' : metricselectheatmap,
+                'modules' : modules
+        };
 
-            updateHeatmapDebounce(); // Call function to update heatmap.
+        var optionsJson = JSON.stringify(optionsObj);
+
+        if(optionsJson !== heatmapOptionsJson) { // Compare to global to see if there are any changes.
+            // If list has changed fetch heatmap and update user preference.
+            heatmapOptionsJson = optionsJson;
+            window.console.log('getting heatmap data.');
         }
     }
 
@@ -146,7 +195,7 @@ define(
 
             // Update card data based on selected year.
             var yeartitle = document.getElementById('local-assessfreq-report-heatmap')
-                                .getElementsByClassName('local-assessfreq-year')[0];
+                .getElementsByClassName('local-assessfreq-year')[0];
             yeartitle.innerHTML = yearselectheatmap;
 
             updateHeatmapDebounce(); // Call function to update heatmap.
@@ -174,56 +223,6 @@ define(
     }
 
     /**
-     * Quick and dirty debounce method for the heatmap settings menu.
-     * This stops the ajax method that updates the heatmap from being updated
-     * while the user is still checking options.
-     *
-     */
-    function updateHeatmapDebounce() {
-        clearTimeout(timeout);
-        timeout = setTimeout(updateHeatmap(), 750);
-    }
-
-    /**
-     * Update the heatmap based on the current filter settings.
-     *
-     */
-    function updateHeatmap() {
-        // Get current state of select menu items.with
-        var cardsModulesSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-modules');
-        var links = cardsModulesSelectHeatmapElement.getElementsByTagName('a');
-        var modules = [];
-
-        for (let link of links) {
-            if (link.classList.contains('active')) {
-                let module = link.dataset.module;
-                modules.push(module);
-            }
-        }
-
-        // Save selection as a user preference.
-        if (modulesJson !== JSON.stringify(modules)) {
-            modulesJson = JSON.stringify(modules);
-            updateUserPreferences('local_assessfreq_heatmap_modules_preference', modulesJson);
-        }
-
-        // Build settings object.
-        var optionsObj = {
-                'year' : yearselectheatmap,
-                'metric' : metricselectheatmap,
-                'modules' : modules
-        };
-
-        var optionsJson = JSON.stringify(optionsObj);
-
-        if(optionsJson !== heatmapOptionsJson) { // Compare to global to see if there are any changes.
-            // If list has changed fetch heatmap and update user preference.
-            heatmapOptionsJson = optionsJson;
-            window.console.log('getting heatmap data');
-        }
-    }
-
-    /**
      * Add the event listeners to the modules in the module select dropdown.
      *
      * @param {element} element The dropdown HTML element that contains the list of modules as links.
@@ -232,20 +231,20 @@ define(
         var links = element.getElementsByTagName('a');
         var all = links[0];
 
-        for (let link of links) {
-            let module = link.dataset.module;
+        for (var i = 0; i < links.length; i++) {
+            let module = links[i].dataset.module;
 
             if (module.toLowerCase() === 'all') {
-                link.addEventListener("click", function(event){
+                links[i].addEventListener("click", function(event){
                     event.preventDefault();
                     // Remove active class from all other links.
-                    for (let link of links) {
-                        link.classList.remove('active');
+                    for (var j = 0; j < links.length; j++) {
+                        links[j].classList.remove('active');
                     }
                     updateHeatmapDebounce(); // Call function to update heatmap.
                 });
             } else if (module.toLowerCase() === 'close') {
-                link.addEventListener("click", function(event){
+                links[i].addEventListener("click", function(event){
                     event.preventDefault();
                     event.stopPropagation();
 
@@ -256,7 +255,7 @@ define(
                 });
 
             } else {
-                link.addEventListener("click", function(event){
+                links[i].addEventListener("click", function(event){
                     event.preventDefault();
                     event.stopPropagation();
 
@@ -300,6 +299,8 @@ define(
         // Process loading for the assessment cards.
         getCardCharts();
 
+        // Get the data for the heatmap.
+        updateHeatmap();
     };
 
     return Reportcard;
