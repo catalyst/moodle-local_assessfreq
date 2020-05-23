@@ -139,8 +139,13 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
     }
 
     function generateHeatmap() {
-        const calendar = Calendar.generate(yearselectheatmap);
-        window.console.log(calendar);
+        Calendar.generate(yearselectheatmap).then(calendar => {
+            window.console.log(calendar);
+            return;
+        }).catch(function() {
+            Notification.exception(new Error('Failed to load calendar'));
+            return;
+        });
     }
 
     /**

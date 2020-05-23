@@ -21,42 +21,79 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
+define(['core/str', 'core/notification'], function(Str, Notification) {
 
     /**
      * Module level variables.
      */
     var Calendar = {};
-    var stringArray = [];
+    const stringArr = [
+        {key: 'sun', component: 'calendar'},
+        {key: 'mon', component: 'calendar'},
+        {key: 'tue', component: 'calendar'},
+        {key: 'wed', component: 'calendar'},
+        {key: 'thu', component: 'calendar'},
+        {key: 'fri', component: 'calendar'},
+        {key: 'sat', component: 'calendar'},
+        {key: 'jan', component: 'local_assessfreq'},
+        {key: 'feb', component: 'local_assessfreq'},
+        {key: 'mar', component: 'local_assessfreq'},
+        {key: 'apr', component: 'local_assessfreq'},
+        {key: 'may', component: 'local_assessfreq'},
+        {key: 'jun', component: 'local_assessfreq'},
+        {key: 'jul', component: 'local_assessfreq'},
+        {key: 'aug', component: 'local_assessfreq'},
+        {key: 'sep', component: 'local_assessfreq'},
+        {key: 'oct', component: 'local_assessfreq'},
+        {key: 'nov', component: 'local_assessfreq'},
+        {key: 'dec', component: 'local_assessfreq'},
+    ];
+    var stringResult;
 
-    function createTables(dateObj) {
-        window.console.log(dateObj);
-        window.console.log(stringArray);
-    }
+
+    const createTables = (dateObj) => {
+        return new Promise((resolve, reject) => {
+            /*stuff using username, password*/
+            window.console.log(dateObj);
+            var foo = 1;
+            if (foo == 1) {
+                resolve('foobar');
+            } else {
+                reject(Error("It broke"));
+            }
+        });
+    };
 
     /**
      * Initialise method for report card rendering.
      *
      * @param {integer} context The current context id.
      */
-    Calendar.generate = function(year) {
-        const dateObj = new Date(year, 0, 1);
+    Calendar.generate = (year) => {
+        return new Promise((resolve, reject) => {
+            const dateObj = new Date(year, 0, 1);
+            var good = true;
 
-        // Make ajax call to get all the strings we'll need.
-        // This is more efficient than making an ajax call per string.
-        Ajax.call([{
-            methodname: 'local_assessfreq_get_strings',
-            args: {},
-        }])[0].done(function(response) {
-            stringArray = JSON.parse(response);
-        }).fail(function() {
-            Notification.exception(new Error('Failed to calendar strings'));
-            return;
-        }).then(
-            createTables(dateObj)
-        );
-
-        return dateObj;
+            Str.get_strings(stringArr).catch(() => { // Get required strings.
+                Notification.exception(new Error('Failed to load strings'));
+                good = false;
+                return;
+            }).then(stringReturn => { // Save string to global to be used later.
+                stringResult = stringReturn;
+                window.console.log(stringResult);
+                return dateObj;
+            }).then(createTables) // Create tables for calendar.
+            .then(tree => { // TODO: Fill tables with calendar data.
+                window.console.log(tree);
+                return;
+            }).then(() => { // Return the result of the generate function.
+                if (good == true) {
+                    resolve('Calender generate done');
+                } else {
+                    reject(Error('Could not generate calendar'));
+                }
+            });
+        });
 
     };
 
