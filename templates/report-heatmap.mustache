@@ -45,8 +45,10 @@
     </div>
     <div id="local-assessfreq-report-heatmap" class="local-assessfreq-report-heatmap card">
         <h4>{{# str }} assessheatmap, local_assessfreq {{/ str }} <span class="local-assessfreq-year">{{ currentyear }}</span></h4>
-        <div id="local-assessfreq-report-heatmap-months" class="">
-            the stack of content goes here.
+        <div id="local-assessfreq-report-heatmap-months" class="local-assessfreq local-assessfreq-row">
+            <span id="local-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
+                <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
+            </span>
         </div>
     </div>
 

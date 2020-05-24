@@ -139,11 +139,12 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
     }
 
     function generateHeatmap() {
-        Calendar.generate(yearselectheatmap).then(calendar => {
-            window.console.log(calendar);
+        Calendar.generate(yearselectheatmap, 0, 11).then(calendar => {
+            let calendarContainer = document.getElementById('local-assessfreq-report-heatmap-months');
+            calendarContainer.innerHTML = calendar.innerHTML;
             return;
-        }).catch(function() {
-            Notification.exception(new Error('Failed to load calendar'));
+        }).catch(function(exc) {
+            Notification.exception(new Error(exc));
             return;
         });
     }

@@ -49,17 +49,136 @@ define(['core/str', 'core/notification'], function(Str, Notification) {
         {key: 'dec', component: 'local_assessfreq'},
     ];
     var stringResult;
+    const today = new Date();
 
+    /**
+     * Check how many days in a month code.
+     * from https://dzone.com/articles/determining-number-days-month.
+     */
+    const daysInMonth = (month, year) => {
+        return 32 - new Date(year, month, 32).getDate();
+    };
 
-    const createTables = (dateObj) => {
+    /**
+     *
+     */
+    const createTables = ({year, startMonth, endMonth}) => {
         return new Promise((resolve, reject) => {
-            /*stuff using username, password*/
-            window.console.log(dateObj);
-            var foo = 1;
-            if (foo == 1) {
-                resolve('foobar');
+            let calendarContainer = document.createElement('div');
+            let month = startMonth;
+
+            // Itterate through and build are tables.
+            for (let i = startMonth; i <= endMonth; i++) {
+                // Setup some elements.
+                let container = document.createElement('div');
+                container.classList.add('local-assessfreq-month');
+                let table = document.createElement('table');
+                let thead = document.createElement('thead');
+                let tbody = document.createElement('tbody');
+                tbody.id = 'calendar-body-' + i;
+                let monthRow = document.createElement('tr');
+                let dayrow = document.createElement('tr');
+                let monthHeader = document.createElement('th');
+                monthHeader.colSpan = 7;
+                monthHeader.innerHTML = stringResult[(7 + month)];
+
+                for (let j = 0; j < 7; j++) {
+                    let dayHeader = document.createElement('th');
+                    dayHeader.innerHTML = stringResult[j];
+                    dayrow.appendChild(dayHeader);
+                }
+
+                // Construct the table.
+                monthRow.appendChild(monthHeader);
+
+                thead.appendChild(monthRow);
+                thead.appendChild(dayrow);
+
+                table.appendChild(thead);
+                table.appendChild(tbody);
+
+                container.appendChild(table);
+
+                // Add to parent.
+                calendarContainer.appendChild(container);
+
+                // Increment variables.
+                month++;
+            }
+
+            if ((typeof year === 'undefined') || (typeof startMonth === 'undefined') || (typeof endMonth === 'undefined')) {
+                reject(Error('Failed to create calendar tables.'));
             } else {
-                reject(Error("It broke"));
+                const resultObj = {
+                        calendarContainer : calendarContainer,
+                        year : year,
+                        startMonth : startMonth
+                };
+                resolve(resultObj);
+            }
+        });
+    };
+
+    /**
+     * Generate calendar markup for the month.
+     */
+    const populateCalendarDays = (table, year, month) => {
+        let firstDay = (new Date(year, month)).getDay();  // Get the starting day of the month.
+        let date = 1;  // Creating all cells.
+
+        for (let i = 0; i < 6; i++) {
+            let row = document.createElement("tr"); // Creates a table row.
+
+            // Creating individual cells, filing them up with data.
+            for (let j = 0; j < 7; j++) {
+                if (i === 0 && j < firstDay) {
+                    var cell = document.createElement("td");
+                    var cellText = document.createTextNode("");
+                    cell.appendChild(cellText);
+                    row.appendChild(cell);
+                }
+                else if (date > daysInMonth(month, year)) { // Break if we have generated all the days for this month.
+                    break;
+                }
+                else {
+                    cell = document.createElement("td");
+                    cellText = document.createTextNode(date);
+                    if (date === today.getDate()
+                            && parseInt(year) === today.getFullYear() && parseInt(month) === today.getMonth()) {
+
+                        cell.classList.add("bg-info");
+                    } // Color today's date.
+                    cell.appendChild(cellText);
+                    row.appendChild(cell);
+                    date++;
+                }
+
+            }
+            table.appendChild(row); // Appending each row into calendar body.
+        }
+    };
+
+    /**
+     *
+     */
+    const populateCalendar = ({calendarContainer, year, startMonth}) => {
+        return new Promise((resolve, reject) => {
+            // Get the table boodies.
+            let tables = calendarContainer.getElementsByTagName("tbody");
+            let month = startMonth;
+
+            // For each table body populate with calendar.
+            for (var i = 0; i < tables.length; i++) {
+                let table = tables[i];
+                populateCalendarDays(table, year, month);
+                month++;
+            }
+
+
+            if (typeof calendarContainer === 'undefined') {
+                reject(Error('Failed to populate calendar tables.'));
+            } else {
+                resolve(calendarContainer);
             }
         });
     };
@@ -69,26 +188,25 @@ define(['core/str', 'core/notification'], function(Str, Notification) {
      *
      * @param {integer} context The current context id.
      */
-    Calendar.generate = (year) => {
+    Calendar.generate = (year, startMonth, endMonth) => {
         return new Promise((resolve, reject) => {
-            const dateObj = new Date(year, 0, 1);
-            var good = true;
+            const dateObj = {
+                    year : year,
+                    startMonth : startMonth,
+                    endMonth : endMonth
+            };
 
             Str.get_strings(stringArr).catch(() => { // Get required strings.
                 Notification.exception(new Error('Failed to load strings'));
-                good = false;
                 return;
             }).then(stringReturn => { // Save string to global to be used later.
                 stringResult = stringReturn;
-                window.console.log(stringResult);
                 return dateObj;
             }).then(createTables) // Create tables for calendar.
-            .then(tree => { // TODO: Fill tables with calendar data.
-                window.console.log(tree);
-                return;
-            }).then(() => { // Return the result of the generate function.
-                if (good == true) {
-                    resolve('Calender generate done');
+            .then(populateCalendar)
+            .then((calendarHTML) => { // Return the result of the generate function.
+                if (typeof calendarHTML !== 'undefined') {
+                    resolve(calendarHTML);
                 } else {
                     reject(Error('Could not generate calendar'));
                 }
