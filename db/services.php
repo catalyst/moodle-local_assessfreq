@@ -26,12 +26,12 @@ defined('MOODLE_INTERNAL') || die();
 
 // Define the web service functions to install.
 $functions = array(
-        'local_assessfreq_get_assess_by_month' => array(
-                'classname'   => 'local_assessfreq_external',
-                'methodname'  => 'get_assess_by_month',
-                'classpath'   => 'local/assessfreq/externallib.php',
-                'description' => 'Returns data for assessments by month card.',
-                'type'        => 'read',
-                'ajax' => true
-        ),
+    'local_assessfreq_get_frequency' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_frequency',
+        'classpath' => 'local/assessfreq/externallib.php',
+        'description' => 'Returns event frequency map.',
+        'type' => 'read',
+        'ajax' => true
+    ),
 );

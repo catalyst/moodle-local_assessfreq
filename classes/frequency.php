@@ -699,6 +699,52 @@ class frequency {
         return $years;
     }
 
+    /**
+     * Generate a frequency array of the events.
+     * The form of the array is:
+     * [yyyy][mm][dd]['number'] = number of events that day.
+     *
+     * @return array $freqarray The array of even frequencies.
+     */
+    public function get_frequency_array(int $year, string $metric, array $modules) : array {
+        $freqarray = array();
+        $events = array();
+        $from = mktime(0, 0, 0, 1, 1, $year);
+        $to = mktime(23, 59, 59, 12, 31, $year);
+
+        // TODO: Handle metrics.
+
+        // Get the raw events.
+        if (in_array('all', $modules)) {
+            $events = $this->get_site_events('all', $from, $to);
+        } else {
+            // Work through the event array.
+            foreach ($modules as $module) {
+                if ($module == 'all') {
+                    continue;
+                } else {
+                    $events = array_merge($events, $this->get_site_events($module, $from, $to));
+                }
+            }
+        }
+
+        // Iterate through the events, building the frequency array.
+        foreach ($events as $event) {
+            $month = $event->endmonth;
+            $day = $event->endday;
+
+            // Construct the multidimensional array.
+            if (empty($freqarray[$year][$month][$day])) {
+                $freqarray[$year][$month][$day] = array('number' => 1, 'heat' => $this->get_map(1));
+            } else {
+                $freqarray[$year][$month][$day]['number']++;
+                $freqarray[$year][$month][$day]['heat'] = $this->get_map($freqarray[$year][$month][$day]['number']);
+            }
+        }
+
+        return $freqarray;
+    }
+
     private function get_conflicts(int $now) : array {
         global $DB;
         $conflicts = array();

@@ -882,6 +882,23 @@ class frequency_testcase extends advanced_testcase {
          $this->assertCount(12, $data->events);
     }
 
+    /**
+     * Test getting the frequency array.
+     */
+    public function test_get_frequency_array() {
+        $year = 2020;
+        $metric = 'assess'; // Can be assess or students.
+        $modules = array('all');
 
+        $duedate = 0;
+        $frequency = new frequency();
+        $frequency->process_site_events($duedate);
+        $result = $frequency->get_frequency_array($year, $metric, $modules);
+
+        $this->assertEquals(1, $result[2020][3][29]['number']);
+        $this->assertEquals(1, $result[2020][3][28]['number']);
+        $this->assertEquals(0, $result[2020][3][29]['heat']);
+        $this->assertEquals(0, $result[2020][3][28]['heat']);
+    }
 
 }

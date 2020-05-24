@@ -37,36 +37,37 @@ class local_assessfreq_external extends external_api {
 
     /**
      * Returns description of method parameters.
+     *
      * @return void
      */
-    public static function get_assess_by_month_parameters() {
-        return new external_function_parameters(
-            array(
-                'contextid' => new external_value(PARAM_INT, 'Context id', VALUE_REQUIRED, null, NULL_NOT_ALLOWED),
-            )
-        );
+    public static function get_frequency_parameters()
+    {
+        return new external_function_parameters(array(
+            'jsondata' => new external_value(PARAM_RAW, 'The data encoded as a json array')
+        ));
     }
 
     /**
-     * Returns event frequency map.
+     * Returns event frequency map for all users in site.
      *
      */
-    public static function get_assess_by_month($contextid) {
+    public static function get_frequency($jsondata) {
         \core\session\manager::write_close(); // Close session early this is a read op.
 
         // Parameter validation.
         self::validate_parameters(
-            self::get_assess_by_month_parameters(),
-            array('contextid' => $contextid)
+            self::get_frequency_parameters(),
+            array('jsondata' => $jsondata)
             );
 
         // Context validation and permission check.
-        $context = context::instance_by_id($contextid);
+        $context = context_system::instance();
         self::validate_context($context);
         has_capability('moodle/site:config', $context);
 
         // Execute API call.
-
+        $frequency = new \local_assessfreq\frequency();
+        $freqarr = $frequency->get_frequency_array();
 
         return json_encode($freqarr);
     }
@@ -75,8 +76,8 @@ class local_assessfreq_external extends external_api {
      * Returns description of method result value
      * @return external_description
      */
-    public static function get_assess_by_month_returns() {
-        return new external_value(PARAM_RAW, 'Result JSON');
+    public static function get_frequency_returns() {
+        return new external_value(PARAM_RAW, 'Event JSON');
     }
 
 }

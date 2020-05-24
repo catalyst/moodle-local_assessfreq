@@ -21,12 +21,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/str', 'core/notification'], function(Str, Notification) {
+define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notification, Ajax) {
 
     /**
      * Module level variables.
      */
     var Calendar = {};
+    var eventArray = [];
     const stringArr = [
         {key: 'sun', component: 'calendar'},
         {key: 'mon', component: 'calendar'},
@@ -57,6 +58,34 @@ define(['core/str', 'core/notification'], function(Str, Notification) {
      */
     const daysInMonth = (month, year) => {
         return 32 - new Date(year, month, 32).getDate();
+    };
+
+    /**
+     *
+     */
+    const getEvents = (year, metric, modules) => {
+        return new Promise((resolve, reject) => {
+            let args = {
+                    year: year,
+                    metric: metric,
+                    modules: modules
+                };
+            window.console.log(args);
+            let jsonArgs = JSON.stringify(args);
+
+            // Get the events to use in the mapping.
+            Ajax.call([{
+                methodname: 'local_assessfreq_get_frequency',
+                args: {
+                    jsondata: jsonArgs
+                },
+            }])[0].done(function(response) {
+                eventArray = JSON.parse(response);
+                resolve(eventArray);
+            }).fail(function() {
+                reject(new Error('Failed to get events'));
+            });
+        });
     };
 
     /**
@@ -188,7 +217,7 @@ define(['core/str', 'core/notification'], function(Str, Notification) {
      *
      * @param {integer} context The current context id.
      */
-    Calendar.generate = (year, startMonth, endMonth) => {
+    Calendar.generate = (year, startMonth, endMonth, metric, modules) => {
         return new Promise((resolve, reject) => {
             const dateObj = {
                     year : year,
@@ -201,8 +230,14 @@ define(['core/str', 'core/notification'], function(Str, Notification) {
                 return;
             }).then(stringReturn => { // Save string to global to be used later.
                 stringResult = stringReturn;
+                return;
+            })
+            .then(getEvents(year, metric, modules))
+            .then(() => { // Get events for settings
+                window.console.log(eventArray);
                 return dateObj;
-            }).then(createTables) // Create tables for calendar.
+            })
+            .then(createTables) // Create tables for calendar.
             .then(populateCalendar)
             .then((calendarHTML) => { // Return the result of the generate function.
                 if (typeof calendarHTML !== 'undefined') {

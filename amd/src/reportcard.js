@@ -139,7 +139,12 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
     };
 
     const generateHeatmap = () => {
-        Calendar.generate(yearselectheatmap, 0, 11).then(calendar => {
+        let heatmapOptions = JSON.parse(heatmapOptionsJson);
+        let year = parseInt(heatmapOptions.year);
+        let metric = heatmapOptions.metric;
+        let modules = heatmapOptions.modules;
+
+        Calendar.generate(year, 0, 11, metric, modules).then(calendar => {
             let calendarContainer = document.getElementById('local-assessfreq-report-heatmap-months');
             calendarContainer.innerHTML = calendar.innerHTML;
             return;
