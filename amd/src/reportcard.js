@@ -36,7 +36,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
     var modulesJson = '';
     var heatmapOptionsJson = '';
 
-    var cards = [
+    const cards = [
         {cardId: 'local-assessfreq-assess-due-month', call: 'assess_by_month'},
         {cardId: 'local-assessfreq-assess-by-activity', call: 'assess_by_activity'},
         {cardId: 'local-assessfreq-assess-due-month-student', call: 'assess_by_month_student'}
@@ -48,7 +48,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
      * @param {string} type The name of the attribute you're updating
      * @param {string} value The value of the attribute you're updating
      */
-    function updateUserPreferences(type, value) {
+    const updateUserPreferences = (type, value) => {
         var request = {
                 methodname: 'core_user_update_user_preferences',
                 args: {
@@ -62,10 +62,10 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
         };
 
         Ajax.call([request])[0]
-        .fail(function() {
+        .fail(() => {
             Notification.exception(new Error('Failed to update user preference'));
         });
-    }
+    };
 
      /**
       * For each of the cards on the dashbaord get their corresponding chart data.
@@ -73,7 +73,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
       * Chart data is loaded via ajax.
       *
       */
-     function getCardCharts() {
+     const getCardCharts = () => {
          cards.forEach(function(cardData) {
              var cardElement = document.getElementById(cardData.cardId);
              var spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
@@ -87,21 +87,21 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
 
                  var context = { 'withtable' : true, 'chartdata' : response };
                  Templates.render('core/chart', context)
-                 .done(function(html, js) {
+                 .done((html, js) => {
                      spinner.classList.add('hide'); // Hide sinner if not already hidden.
                      // Load card body.
                      Templates.replaceNodeContents(chartbody, html, js);
-                 }).fail(function() {
+                 }).fail(() => {
                      Notification.exception(new Error('Failed to load chart template.'));
                      return;
                  });
                  return;
-             }).fail(function() {
+             }).fail(() => {
                  Notification.exception(new Error('Failed to load card year filter'));
                  return;
              });
          });
-     }
+     };
 
      /**
       * Get and process the selected year from the dropdown,
@@ -109,7 +109,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
       *
       * @param {event} event The triggered event for the element.
       */
-     function yearButtonAction(event) {
+     const yearButtonAction = (event) => {
          var element = event.target;
 
          if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselect) { // Only act on certain elements.
@@ -125,7 +125,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
 
              getCardCharts(); // Process loading for the assessment cards.
          }
-     }
+     };
 
     /**
      * Quick and dirty debounce method for the heatmap settings menu.
@@ -133,27 +133,27 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
      * while the user is still checking options.
      *
      */
-    function updateHeatmapDebounce() {
+    const updateHeatmapDebounce = () => {
         clearTimeout(timeout);
         timeout = setTimeout(updateHeatmap(), 750);
-    }
+    };
 
-    function generateHeatmap() {
+    const generateHeatmap = () => {
         Calendar.generate(yearselectheatmap, 0, 11).then(calendar => {
             let calendarContainer = document.getElementById('local-assessfreq-report-heatmap-months');
             calendarContainer.innerHTML = calendar.innerHTML;
             return;
-        }).catch(function(exc) {
-            Notification.exception(new Error(exc));
+        }).catch(() => {
+            Notification.exception(new Error('Failed to calendar.'));
             return;
         });
-    }
+    };
 
     /**
      * Update the heatmap based on the current filter settings.
      *
      */
-    function updateHeatmap() {
+    const updateHeatmap = () => {
         // Get current state of select menu items.with
         var cardsModulesSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-modules');
         var links = cardsModulesSelectHeatmapElement.getElementsByTagName('a');
@@ -187,7 +187,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
 
             generateHeatmap();
         }
-    }
+    };
 
     /**
      * Get and process the selected year from the dropdown for the heatmap display,
@@ -195,7 +195,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
      *
      * @param {event} event The triggered event for the element.
      */
-    function yearHeatmapButtonAction(event) {
+    const yearHeatmapButtonAction = (event) => {
         event.preventDefault();
         var element = event.target;
 
@@ -212,7 +212,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
 
             updateHeatmapDebounce(); // Call function to update heatmap.
         }
-    }
+    };
 
     /**
      * Get and process the selected assessment metric from the dropdown for the heatmap display,
@@ -220,7 +220,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
      *
      * @param {event} event The triggered event for the element.
      */
-    function metricHeatmapButtonAction(event) {
+    const metricHeatmapButtonAction = (event) => {
         event.preventDefault();
         var element = event.target;
 
@@ -232,14 +232,14 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
 
             updateHeatmapDebounce(); // Call function to update heatmap.
         }
-    }
+    };
 
     /**
      * Add the event listeners to the modules in the module select dropdown.
      *
      * @param {element} element The dropdown HTML element that contains the list of modules as links.
      */
-    function moduleListChildrenEvents(element) {
+    const moduleListChildrenEvents = (element) => {
         var links = element.getElementsByTagName('a');
         var all = links[0];
 
@@ -279,7 +279,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
             }
 
         }
-    }
+    };
 
     /**
      * Initialise method for report card rendering.
