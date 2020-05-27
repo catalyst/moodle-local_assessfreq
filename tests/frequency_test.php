@@ -430,6 +430,33 @@ class frequency_testcase extends advanced_testcase {
     }
 
     /**
+     * Test getting all user events and cache.
+     */
+    public function test_get_user_events_all() {
+        $duedate = 0;
+        $frequency = new frequency();
+        $frequency->process_site_events($duedate);
+        $frequency->process_user_events($duedate);
+
+        $usercache = cache::make('local_assessfreq', 'usereventsall');
+        $cachekey = 'all';
+        $data = $usercache->get($cachekey);
+        $this->assertEmpty($data);
+
+        $result = $frequency->get_user_events_all('all', 0, 0, false);
+        $this->assertCount(4, $result);
+
+        $data = $usercache->get($cachekey);
+        $this->assertCount(4, $data->events);
+
+        $result = $frequency->get_user_events_all('forum', 0, 0, true);
+        $this->assertEmpty($result);
+
+        $data = $usercache->get('forum');
+        $this->assertEmpty($data);
+    }
+
+    /**
      * Test getting conflict data.
      */
     public function test_get_conflicts() {
@@ -893,10 +920,18 @@ class frequency_testcase extends advanced_testcase {
         $duedate = 0;
         $frequency = new frequency();
         $frequency->process_site_events($duedate);
-        $result = $frequency->get_frequency_array($year, $metric, $modules);
+        $frequency->process_user_events($duedate);
 
+        $result = $frequency->get_frequency_array($year, $metric, $modules);
         $this->assertEquals(1, $result[2020][3][29]['number']);
         $this->assertEquals(1, $result[2020][3][28]['number']);
+        $this->assertEquals(0, $result[2020][3][29]['heat']);
+        $this->assertEquals(0, $result[2020][3][28]['heat']);
+
+        $metric = 'students';
+        $result = $frequency->get_frequency_array($year, $metric, $modules);
+        $this->assertEquals(2, $result[2020][3][29]['number']);
+        $this->assertEquals(2, $result[2020][3][28]['number']);
         $this->assertEquals(0, $result[2020][3][29]['heat']);
         $this->assertEquals(0, $result[2020][3][28]['heat']);
     }

@@ -548,6 +548,56 @@ class frequency {
     }
 
     /**
+     * Return events for all users.
+     *
+     * @param string $module The module to get events for or all events.
+     * @param int $from The timestamp to get events from.
+     * @param int $to The timestamp to get events to.
+     * @param bool $cache If false cache won't be used fresh data will be retrieved from DB.
+     * @return array $events An array of site events
+     */
+    public function get_user_events_all(string $module='all', int $from=0, int $to=0, bool $cache=true) : array {
+        global $DB;
+        $events = array();
+        $cachekey = $module;
+
+        // Try to get value from cache.
+        $usercache = cache::make('local_assessfreq', 'usereventsall');
+        $data = $usercache->get($cachekey);
+
+        if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
+            // Only return data for chosen range.
+            $events = $this->filter_event_data($data->events, $from, $to);
+        } else {  // Not valid cache data.
+            $rowkey = $DB->sql_concat('s.id', "'_'", 'u.userid');
+            $sql = "SELECT $rowkey as row, u.userid, s.*
+                      FROM {local_assessfreq_site} s
+                INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id";
+
+            // Get data from database.
+            if ($module == 'all') {
+                $rawevents = $DB->get_records_sql($sql);
+            } else {
+                $sql .= ' WHERE s.module = ?';
+                $rawevents = $DB->get_records_sql($sql, array($module));
+            }
+
+            $events = $this->filter_event_data($rawevents, $from, $to);
+
+            // Update cache.
+            if (!empty($rawevents)) {
+                $expiry = time() + $this->expiryperiod;
+                $data = new \stdClass();
+                $data->expiry = $expiry;
+                $data->events = $rawevents;
+                $usercache->set($cachekey, $data);
+            }
+        }
+
+        return $events;
+    }
+
+    /**
      *
      * @param int $year
      * @param bool $cache$events
@@ -712,18 +762,22 @@ class frequency {
         $from = mktime(0, 0, 0, 1, 1, $year);
         $to = mktime(23, 59, 59, 12, 31, $year);
 
-        // TODO: Handle metrics.
+        if ($metric == 'assess') {
+            $functionname = 'get_site_events';
+        } else if ($metric == 'students') {
+            $functionname = 'get_user_events_all';
+        }
 
         // Get the raw events.
         if (in_array('all', $modules)) {
-            $events = $this->get_site_events('all', $from, $to);
+            $events = $this->$functionname('all', $from, $to);
         } else {
             // Work through the event array.
             foreach ($modules as $module) {
                 if ($module == 'all') {
                     continue;
                 } else {
-                    $events = array_merge($events, $this->get_site_events($module, $from, $to));
+                    $events = array_merge($events, $this->$functionname($module, $from, $to));
                 }
             }
         }

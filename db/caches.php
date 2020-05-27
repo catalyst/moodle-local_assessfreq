@@ -44,6 +44,12 @@ $definitions = [
         'simplekeys' => true,
         'simpledata' => false
     ],
+    'usereventsall' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'simplekeys' => true,
+        'simpledata' => false
+    ],
     'eventsduemonth' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
