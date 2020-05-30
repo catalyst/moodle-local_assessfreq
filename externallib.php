@@ -66,8 +66,9 @@ class local_assessfreq_external extends external_api {
         has_capability('moodle/site:config', $context);
 
         // Execute API call.
+        $data = json_decode($jsondata, true);
         $frequency = new \local_assessfreq\frequency();
-        $freqarr = $frequency->get_frequency_array();
+        $freqarr = $frequency->get_frequency_array($data['year'], $data['metric'], $data['modules']);
 
         return json_encode($freqarr);
     }

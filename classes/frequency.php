@@ -437,7 +437,8 @@ class frequency {
                 $rawevents = $DB->get_records('local_assessfreq_site', array('module' => $module));
             }
 
-            $events = $this->filter_event_data($rawevents, $from, $to);
+
+            $events = $this->filter_event_data($events, $from, $to);
 
             // Update cache.
             if (!empty($rawevents)) {
@@ -448,6 +449,7 @@ class frequency {
                 $sitecache->set($module, $data);
             }
         }
+
         return $events;
     }
 
@@ -569,6 +571,7 @@ class frequency {
             // Only return data for chosen range.
             $events = $this->filter_event_data($data->events, $from, $to);
         } else {  // Not valid cache data.
+
             $rowkey = $DB->sql_concat('s.id', "'_'", 'u.userid');
             $sql = "SELECT $rowkey as row, u.userid, s.*
                       FROM {local_assessfreq_site} s

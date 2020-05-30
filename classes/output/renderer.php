@@ -72,7 +72,7 @@ class renderer extends plugin_renderer_base {
     public function render_report_heatmap(): string {
         $preferenceyear = get_user_preferences('local_assessfreq_heatmap_year_preference', date('Y'));
         $preferencemetric = get_user_preferences('local_assessfreq_heatmap_metric_preference', 'assess');
-        $preferencemodules = json_decode(get_user_preferences('local_assessfreq_heatmap_modules_preference', '[]'), true);
+        $preferencemodules = json_decode(get_user_preferences('local_assessfreq_heatmap_modules_preference', '["all"]'), true);
 
         $frequency = new frequency();
 
@@ -104,7 +104,7 @@ class renderer extends plugin_renderer_base {
 
         // Get modules for filters and load into context.
         $modules = $frequency->get_modules();
-        if (empty($preferencemodules)) {
+        if (empty($preferencemodules) || $preferencemodules === array('all')) {
             $context['modules'][] = array('module' => array('val' => 'all', 'name' => get_string('all'),  'active' => 'true'));
         } else {
             $context['modules'][] = array('module' => array('val' => 'all', 'name' => get_string('all')));

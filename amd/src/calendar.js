@@ -63,14 +63,13 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     /**
      *
      */
-    const getEvents = (year, metric, modules) => {
+    const getEvents = ({year, metric, modules}) => {
         return new Promise((resolve, reject) => {
             let args = {
                     year: year,
                     metric: metric,
                     modules: modules
                 };
-            window.console.log(args);
             let jsonArgs = JSON.stringify(args);
 
             // Get the events to use in the mapping.
@@ -86,6 +85,19 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 reject(new Error('Failed to get events'));
             });
         });
+    };
+
+    /**
+     *
+     */
+    const getMonthEvents = (year, month) => {
+        let monthevents;
+
+        if ((typeof eventArray[year] !== "undefined") && (typeof eventArray[year][month] !== "undefined")) {
+            monthevents = eventArray[year][month];
+        }
+
+        return monthevents;
     };
 
     /**
@@ -153,6 +165,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const populateCalendarDays = (table, year, month) => {
         let firstDay = (new Date(year, month)).getDay();  // Get the starting day of the month.
+        let monthEvents = getMonthEvents(year, (month + 1));  // We add one due to month diferences between PHP and JS.
         let date = 1;  // Creating all cells.
 
         for (let i = 0; i < 6; i++) {
@@ -172,6 +185,10 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 else {
                     cell = document.createElement("td");
                     cellText = document.createTextNode(date);
+                    if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
+                        var heatClass = "local-assessfreq-heat-" + monthEvents[date]['heat'];
+                        cell.classList.add(heatClass);
+                    }
                     if (date === today.getDate()
                             && parseInt(year) === today.getFullYear() && parseInt(month) === today.getMonth()) {
 
@@ -225,16 +242,21 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     endMonth : endMonth
             };
 
+            const eventObj = {
+                    year : year,
+                    metric : metric,
+                    modules : modules
+            };
+
             Str.get_strings(stringArr).catch(() => { // Get required strings.
                 Notification.exception(new Error('Failed to load strings'));
                 return;
             }).then(stringReturn => { // Save string to global to be used later.
                 stringResult = stringReturn;
-                return;
+                return eventObj;
             })
-            .then(getEvents(year, metric, modules))
+            .then(getEvents)
             .then(() => { // Get events for settings
-                window.console.log(eventArray);
                 return dateObj;
             })
             .then(createTables) // Create tables for calendar.
