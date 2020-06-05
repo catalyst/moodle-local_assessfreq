@@ -138,20 +138,74 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
         timeout = setTimeout(updateHeatmap(), 750);
     };
 
+    /**
+     *
+     */
     const generateHeatmap = () => {
         let heatmapOptions = JSON.parse(heatmapOptionsJson);
         let year = parseInt(heatmapOptions.year);
         let metric = heatmapOptions.metric;
         let modules = heatmapOptions.modules;
+        let heatmapContainer = document.getElementById('local-assessfreq-report-heatmap');
+        let spinner = heatmapContainer.getElementsByClassName('overlay-icon-container')[0];
+
+        spinner.classList.remove('hide'); // Show spinner if not already shown.
 
         Calendar.generate(year, 0, 11, metric, modules).then(calendar => {
             let calendarContainer = document.getElementById('local-assessfreq-report-heatmap-months');
             calendarContainer.innerHTML = calendar.innerHTML;
+            spinner.classList.add('hide'); // Hide sinner if not already hidden.
             return;
         }).catch(() => {
             Notification.exception(new Error('Failed to calendar.'));
             return;
         });
+    };
+
+    const updateDownload = ({year, metric, modules}) => {
+        let downloadForm = document.getElementById('local-assessfreq-heatmap-form');
+        let formElements = downloadForm.elements;
+        let toRemove = new Array();
+
+        if (modules.length == 0) {
+            modules = ['all'];
+        }
+
+        for (let i = 0; i < formElements.length; i++) {
+            if (formElements[i] === undefined) {
+                continue;
+            }
+            // Update year field.
+            if((formElements[i].type === 'hidden') && (formElements[i].name === 'year')) {
+                formElements[i].value = year;
+                continue;
+            }
+
+            // Update metric field.
+            if((formElements[i].type === 'hidden') && (formElements[i].name === 'metric')) {
+                formElements[i].value = metric;
+                continue;
+            }
+
+            // Update module fields.
+            if((formElements[i].type === 'hidden') && (formElements[i].name.startsWith('modules'))) {
+                toRemove.push(formElements[i]);
+                continue;
+            }
+        }
+
+        for (const element of toRemove) {
+            element.remove();
+         }
+
+        for (let i = 0; i < modules.length; i++) {
+            let input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'modules[' + modules[i] +']';
+            input.value = modules[i];
+
+            downloadForm.appendChild(input);
+        }
     };
 
     /**
@@ -189,8 +243,10 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
         if(optionsJson !== heatmapOptionsJson) { // Compare to global to see if there are any changes.
             // If list has changed fetch heatmap and update user preference.
             heatmapOptionsJson = optionsJson;
-
             generateHeatmap();
+
+            // Update the download options.
+            updateDownload(optionsObj);
         }
     };
 

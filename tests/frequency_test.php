@@ -358,6 +358,7 @@ class frequency_testcase extends advanced_testcase {
         $this->assertEmpty($data);
 
         $result = $frequency->get_site_events('all', 0, 0, false);
+
         $this->assertCount(2, $result);
 
         $data = $sitecache->get('all');
@@ -936,4 +937,23 @@ class frequency_testcase extends advanced_testcase {
         $this->assertEquals(0, $result[2020][3][28]['heat']);
     }
 
+    /**
+     * Test getting the download data.
+     */
+    public function test_get_download_data() {
+        $year = 2020;
+        $metric = 'assess'; // Can be assess or students.
+        $modules = array('all');
+
+        $duedate = 0;
+        $frequency = new frequency();
+        $frequency->process_site_events($duedate);
+        $frequency->process_user_events($duedate);
+
+        $result = $frequency->get_download_data($year, $metric, $modules);
+
+        $this->assertCount(2, $result);
+        $this->assertStringContainsString('mod/assign/view', $result[0][2]);
+        $this->assertStringContainsString('mod/assign/view', $result[1][2]);
+    }
 }

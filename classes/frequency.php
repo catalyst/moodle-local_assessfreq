@@ -399,6 +399,7 @@ class frequency {
 
         // Filter events.
         foreach ($events as $event) {
+
             if (($event->timeend >= $from) && ($event->timeend < $to)) {
                 $filteredevents[] = $event;
             }
@@ -437,8 +438,7 @@ class frequency {
                 $rawevents = $DB->get_records('local_assessfreq_site', array('module' => $module));
             }
 
-
-            $events = $this->filter_event_data($events, $from, $to);
+            $events = $this->filter_event_data($rawevents, $from, $to);
 
             // Update cache.
             if (!empty($rawevents)) {
@@ -771,6 +771,10 @@ class frequency {
             $functionname = 'get_user_events_all';
         }
 
+        if (empty($modules)) {
+            $modules = array('all');
+        }
+
         // Get the raw events.
         if (in_array('all', $modules)) {
             $events = $this->$functionname('all', $from, $to);
@@ -800,6 +804,51 @@ class frequency {
         }
 
         return $freqarray;
+    }
+
+    public function get_download_data(int $year, string $metric, array $modules) : array {
+        $data = array();
+        $events = array();
+        $from = mktime(0, 0, 0, 1, 1, $year);
+        $to = mktime(23, 59, 59, 12, 31, $year);
+
+        if ($metric == 'assess') {
+            $functionname = 'get_site_events';
+        } else if ($metric == 'students') {
+            $functionname = 'get_user_events_all';
+        }
+
+        if (empty($modules)) {
+            $modules = array('all');
+        }
+
+        // Get the raw events.
+        if (in_array('all', $modules)) {
+            $events = $this->$functionname('all', $from, $to);
+        } else {
+            // Work through the event array.
+            foreach ($modules as $module) {
+                if ($module == 'all') {
+                    continue;
+                } else {
+                    $events = array_merge($events, $this->$functionname($module, $from, $to));
+                }
+            }
+        }
+
+        // Format the data ready for download.
+        foreach ($events as $event) {
+            $row = array();
+            $activity = get_string('modulename', $event->module);
+            $date = userdate($event->timeend, get_string('strftimedatetimeshort', 'langconfig'));
+            $context = \context::instance_by_id($event->contextid);
+            $url = $context->get_url()->out(false);
+
+            $row = array($date, $activity, $url);
+            $data[] = $row;
+        }
+
+        return $data;
     }
 
     private function get_conflicts(int $now) : array {

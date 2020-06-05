@@ -82,6 +82,8 @@ class renderer extends plugin_renderer_base {
             'currentyear' => $preferenceyear,
             'modules' => array(),
             'metrics' => array(),
+            'sesskey' => sesskey(),
+            'downloadmetric' => $preferencemetric
         );
 
         // Get years that have events and load into context.
@@ -94,12 +96,14 @@ class renderer extends plugin_renderer_base {
             foreach ($years as $year) {
                 if ($year == $preferenceyear) {
                     $context['years'][] = array('year' => array('val' => $year, 'active' => 'true'));
+                    $context['downloadyear'] = $year;
                 } else {
                     $context['years'][] = array('year' => array('val' => $year));
                 }
             }
         } else {
             $context['years'][] = array('year' => array('val' => $preferenceyear, 'active' => 'true'));
+            $context['downloadyear'] = $preferenceyear;
         }
 
         // Get modules for filters and load into context.
@@ -132,12 +136,12 @@ class renderer extends plugin_renderer_base {
      * @return string $html the html to display.
      */
     public function render_report(string $baseurl) : string {
-            $html = '';
-            $html .= $this->header();
-            $html .= $this->render_report_cards();
-            $html .= $this->render_report_heatmap();
-            $html .= $this->footer();
+        $html = '';
+        $html .= $this->header();
+        $html .= $this->render_report_cards();
+        $html .= $this->render_report_heatmap();
+        $html .= $this->footer();
 
-            return $html;
+        return $html;
     }
 }
