@@ -5,14 +5,10 @@ notifications:
 
 language: php
 
-dist: trusty
-
 addons:
   apt:
     packages:
       - openjdk-8-jre
-  firefox: latest
-  chrome: stable
   postgresql: "10"
 
 services:
@@ -43,8 +39,8 @@ cache:
 
 before_install:
   - phpenv config-rm xdebug.ini
-  - nvm install 8.9
-  - nvm use 8.9
+  - nvm install 14.0
+  - nvm use 14.0
   - cd ../..
   - composer selfupdate
   - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
@@ -62,4 +58,3 @@ script:
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpdoc
   - moodle-plugin-ci phpunit
- #  - moodle-plugin-ci behat #no behat tests
