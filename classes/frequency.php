@@ -620,7 +620,7 @@ class frequency {
             $events = $data->events;
         } else {  // Not valid cache data.
             $params = array($year);
-            $sql = 'SELECT endmonth, COUNT(id)
+            $sql = 'SELECT endmonth, COUNT(id) as count
                       FROM {local_assessfreq_site}
                      WHERE endyear = ?
                   GROUP BY endmonth
@@ -660,7 +660,7 @@ class frequency {
             $events = $data->events;
         } else {  // Not valid cache data.
             $params = array($year);
-            $sql = 'SELECT s.endmonth, COUNT(u.id)
+            $sql = 'SELECT s.endmonth, COUNT(u.id) as count
                       FROM {local_assessfreq_site} s
                 INNER JOIN {local_assessfreq_user} u ON s.id = u.eventid
                      WHERE s.endyear = ?
@@ -701,7 +701,7 @@ class frequency {
             $events = $data->events;
         } else {  // Not valid cache data.
             $params = array($year);
-            $sql = 'SELECT module, COUNT(id)
+            $sql = 'SELECT module, COUNT(id) as count
                       FROM {local_assessfreq_site}
                      WHERE endyear = ?
                   GROUP BY module
@@ -709,7 +709,7 @@ class frequency {
             $events = $DB->get_records_sql($sql, $params);
         }
 
-        // Update cache.
+        // Update cache.get_events_due_by_activity
         if (!empty($events)) {
             $expiry = time() + $this->expiryperiod;
             $data = new \stdClass();
