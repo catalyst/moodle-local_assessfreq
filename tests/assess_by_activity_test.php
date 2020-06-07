@@ -58,8 +58,8 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord1->instanceid = 1;
         $lasrecord1->courseid = 2;
         $lasrecord1->contextid = 4;
-        $lasrecord1->timestart = 1585728000; // 2020-04-01 @ 8:00:00am GMT.
-        $lasrecord1->timeend = 1585814400; // 2020-04-02 @ 8:00:00am GMT.
+        $lasrecord1->timestart = 1585728000; // Time in readable format 2020-04-01 @ 8:00:00am GMT.
+        $lasrecord1->timeend = 1585814400; // Time in readable format 2020-04-02 @ 8:00:00am GMT.
         $lasrecord1->endyear = 2020;
         $lasrecord1->endmonth = 4;
         $lasrecord1->endday = 2;
@@ -69,8 +69,8 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord2->instanceid = 2;
         $lasrecord2->courseid = 2;
         $lasrecord2->contextid = 5;
-        $lasrecord2->timestart = 1585814401; // 2020-04-02 @ 8:00:01am GMT.
-        $lasrecord2->timeend = 1585900800; // 2020-04-03 @ 8:00:00am GMT.
+        $lasrecord2->timestart = 1585814401; // Time in readable format 2020-04-02 @ 8:00:01am GMT.
+        $lasrecord2->timeend = 1585900800; // Time in readable format 2020-04-03 @ 8:00:00am GMT.
         $lasrecord2->endyear = 2020;
         $lasrecord2->endmonth = 4;
         $lasrecord2->endday = 3;
@@ -80,8 +80,8 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord3->instanceid = 3;
         $lasrecord3->courseid = 2;
         $lasrecord3->contextid = 6;
-        $lasrecord3->timestart = 1585900801; // 2020-04-03 @ 8:00:01am GMT.
-        $lasrecord3->timeend = 1586073600; // 2020-04-05 @ 8:00:00am GMT.
+        $lasrecord3->timestart = 1585900801; // Time in readable format 2020-04-03 @ 8:00:01am GMT.
+        $lasrecord3->timeend = 1586073600; // Time in readable format 2020-04-05 @ 8:00:00am GMT.
         $lasrecord3->endyear = 2020;
         $lasrecord3->endmonth = 4;
         $lasrecord3->endday = 5;
@@ -91,8 +91,8 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord4->instanceid = 4;
         $lasrecord4->courseid = 2;
         $lasrecord4->contextid = 7;
-        $lasrecord4->timestart = 1585987200; // 2020-04-04 @ 8:00:00am GMT.
-        $lasrecord4->timeend = 1586160000; // 2020-04-06 @ 8:00:00am GMT.
+        $lasrecord4->timestart = 1585987200; // Time in readable format 2020-04-04 @ 8:00:00am GMT.
+        $lasrecord4->timeend = 1586160000; // Time in readable format 2020-04-06 @ 8:00:00am GMT.
         $lasrecord4->endyear = 2020;
         $lasrecord4->endmonth = 4;
         $lasrecord4->endday = 6;
@@ -102,8 +102,8 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord5->instanceid = 5;
         $lasrecord5->courseid = 2;
         $lasrecord5->contextid = 8;
-        $lasrecord5->timestart = 1585987200; // 2020-04-04 @ 8:00:00am GMT.
-        $lasrecord5->timeend = 1586160000; // 2020-04-06 @ 8:00:00am GMT.
+        $lasrecord5->timestart = 1585987200; // Time in readable format 2020-04-04 @ 8:00:00am GMT.
+        $lasrecord5->timeend = 1586160000; // Time in readable format 2020-04-06 @ 8:00:00am GMT.
         $lasrecord5->endyear = 2021;
         $lasrecord5->endmonth = 4;
         $lasrecord5->endday = 6;

@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Installation for local_assessfreq.
  *
@@ -24,6 +22,11 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Generate ad-hoc task on install.
+ */
 function xmldb_local_assessfreq_install() {
     // Create an adhoc task that will process all historical event data.
     $task = new \local_assessfreq\task\history_process();

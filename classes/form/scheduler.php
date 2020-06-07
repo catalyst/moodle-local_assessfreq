@@ -20,10 +20,12 @@
  *
  * Contains HTML class for a text type element
  *
- * @package   core_form
- * @copyright 2006 Jamie Pratt <me@jamiep.org>
+ * @package   local_assessfreq
+ * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->libdir . '/form/static.php');
 
@@ -32,24 +34,23 @@ require_once($CFG->libdir . '/form/static.php');
  *
  * HTML class for a text type element
  *
- * @package   core_form
- * @category  form
- * @copyright 2006 Jamie Pratt <me@jamiep.org>
+ * @package   local_assessfreq
+ * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_form_element extends MoodleQuickForm_static implements templatable {
 
     /**
-     * constructor
+     * Form element scheduler.
      *
-     * @param string $elementName (optional) name of the text field
-     * @param string $elementLabel (optional) text field label
-     * @param string $text (optional) Text to put in text field
+     * @param string $elementname (optional) Name of the text field.
+     * @param string $elementlabel (optional) text field label.
+     * @param string $text (optional) Text to put in text field.
      */
-    public function __construct($elementName=null, $elementLabel=null, $text=null) {
+    public function __construct($elementname=null, $elementlabel=null, $text=null) {
         global $OUTPUT;
         $text = $OUTPUT->render_from_template('local_assessfreq/scheduler_form_element', array('foo' => $text));
 
-        parent::__construct($elementName, $elementLabel, $text);
+        parent::__construct($elementname, $elementlabel, $text);
     }
 }

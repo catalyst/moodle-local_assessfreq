@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-/**tool_lp
+/**
  * Inject the competencies elements into all moodle module settings forms.
  *
  * @param moodleform $formwrapper The moodle quickforms wrapper object.
@@ -87,9 +87,10 @@ function local_assessfreq_user_preferences() {
 }
 
 /**
+ * Return the HTML for the given chart.
  *
- * @param string $args
- * @return string
+ * @param string $args JSON from the calling AJAX function.
+ * @return string $chartdata The generated chart.
  */
 function local_assessfreq_output_fragment_get_chart($args): string {
     $allowedcalls = array(

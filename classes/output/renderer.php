@@ -69,6 +69,11 @@ class renderer extends plugin_renderer_base {
         return $this->render_from_template('local_assessfreq/report-cards', $context);
     }
 
+    /**
+     * Return heatmap HTML.
+     *
+     * @return string The heatmap HTML.
+     */
     public function render_report_heatmap(): string {
         $preferenceyear = get_user_preferences('local_assessfreq_heatmap_year_preference', date('Y'));
         $preferencemetric = get_user_preferences('local_assessfreq_heatmap_metric_preference', 'assess');
@@ -76,7 +81,7 @@ class renderer extends plugin_renderer_base {
 
         $frequency = new frequency();
 
-        // Initial context setup
+        // Initial context setup.
         $context = array(
             'years' => array(),
             'currentyear' => $preferenceyear,

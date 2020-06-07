@@ -601,15 +601,16 @@ class frequency {
     }
 
     /**
+     * Get events for a given year, grouped by month.
      *
-     * @param int $year
-     * @param bool $cache$events
-     * @return array $events
+     * @param int $year The year to get the events for.
+     * @param bool $cache Fetch events from cache.
+     * @return array $events The events.
      */
     public function get_events_due_by_month(int $year, bool $cache=true): array {
         global $DB;
         $events = array();
-        $cachekey = (string)$year ;
+        $cachekey = (string)$year;
 
         // Try to get value from cache.
         $usercache = cache::make('local_assessfreq', 'eventsduemonth');
@@ -640,10 +641,11 @@ class frequency {
     }
 
     /**
+     * Get count of users who have an event for a given year grouped by month.
      *
-     * @param int $year
-     * @param bool $cache$events
-     * @return array $events
+     * @param int $year The year to get the events for.
+     * @param bool $cache Fetch events from cache.
+     * @return array $events The events.
      */
     public function get_events_due_monthly_by_user(int $year, bool $cache=true): array {
         global $DB;
@@ -680,10 +682,11 @@ class frequency {
     }
 
     /**
+     * Get count of assessments who have an event for a given year grouped by month.
      *
-     * @param int $year
-     * @param bool $cache$events
-     * @return array $events
+     * @param int $year The year to get the events for.
+     * @param bool $cache Fetch events from cache.
+     * @return array $events The events.
      */
     public function get_events_due_by_activity(int $year, bool $cache=true): array {
         global $DB;
@@ -719,9 +722,10 @@ class frequency {
     }
 
     /**
+     * Get list of years that have events.
      *
-     * @param bool $cache
-     * @return array
+     * @param bool $cache Fetch events from cache.
+     * @return array $years The years with events.
      */
     public function get_years_has_events(bool $cache=true): array {
         global $DB;
@@ -757,6 +761,9 @@ class frequency {
      * The form of the array is:
      * [yyyy][mm][dd]['number'] = number of events that day.
      *
+     * @param int $year The year to get events for.
+     * @param string $metric The metric to get 'students' or 'assess'.
+     * @param array $modules List of modules to get events for.
      * @return array $freqarray The array of even frequencies.
      */
     public function get_frequency_array(int $year, string $metric, array $modules) : array {
@@ -806,6 +813,14 @@ class frequency {
         return $freqarray;
     }
 
+    /**
+     * Get data for file download export.
+     *
+     * @param int $year The year to get the data for.
+     * @param string $metric The type of metric to get 'assess' or 'student'.
+     * @param array $modules The modules to get.
+     * @return array $data The data for the download file.
+     */
     public function get_download_data(int $year, string $metric, array $modules) : array {
         $data = array();
         $events = array();
@@ -851,6 +866,12 @@ class frequency {
         return $data;
     }
 
+    /**
+     * Get assessment conflicts.
+     *
+     * @param int $now The timestamp to get the conflicts for.
+     * @return array $conflicts The conflict data.
+     */
     private function get_conflicts(int $now) : array {
         global $DB;
         $conflicts = array();
@@ -891,17 +912,22 @@ class frequency {
         return $conflicts;
     }
 
+    /**
+     * Process the conflicts.
+     *
+     * @return array $conflicts Conflict data.
+     */
     public function process_conflicts() : array {
 
         // Final result should look like this.
         $conflicts['eventid'] = array(
             array(
                 'conflicteventid' => 123,
-                'effecteduserids' => array(1,2,3)
+                'effecteduserids' => array(1, 2, 3)
             ),
             array(
                 'conflicteventid' => 456,
-                'effecteduserids' => array(4,5,6)
+                'effecteduserids' => array(4, 5, 6)
             ),
         );
 

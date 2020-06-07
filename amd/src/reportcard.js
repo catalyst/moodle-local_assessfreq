@@ -22,7 +22,7 @@
  */
 
 define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'local_assessfreq/calendar'],
-   function(Ajax, Fragment, Templates, Notification, Calendar) {
+function(Ajax, Fragment, Templates, Notification, Calendar) {
 
     /**
      * Module level variables.
@@ -48,17 +48,12 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
      * @param {string} type The name of the attribute you're updating
      * @param {string} value The value of the attribute you're updating
      */
-    const updateUserPreferences = (type, value) => {
+    const updateUserPreferences = function(type, value) {
         var request = {
-                methodname: 'core_user_update_user_preferences',
-                args: {
-                    preferences: [
-                        {
-                            type: type,
-                            value: value
-                        }
-                        ]
-                }
+            methodname: 'core_user_update_user_preferences',
+            args: {
+                preferences: [{type: type, value: value}]
+            }
         };
 
         Ajax.call([request])[0]
@@ -67,65 +62,62 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
         });
     };
 
-     /**
-      * For each of the cards on the dashbaord get their corresponding chart data.
-      * Data is based on the year variable from the corresponding dropdown.
-      * Chart data is loaded via ajax.
-      *
-      */
-     const getCardCharts = () => {
-         cards.forEach(function(cardData) {
-             var cardElement = document.getElementById(cardData.cardId);
-             var spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
-             var chartbody = cardElement.getElementsByClassName('chart-body')[0];
-             var params = {'data': JSON.stringify({'year' : yearselect, 'call': cardData.call})};
+    /**
+     * For each of the cards on the dashbaord get their corresponding chart data.
+     * Data is based on the year variable from the corresponding dropdown.
+     * Chart data is loaded via ajax.
+     *
+     */
+    const getCardCharts = function() {
+        cards.forEach(function(cardData) {
+            var cardElement = document.getElementById(cardData.cardId);
+            var spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
+            var chartbody = cardElement.getElementsByClassName('chart-body')[0];
+            var params = {'data': JSON.stringify({'year' : yearselect, 'call': cardData.call})};
 
-             spinner.classList.remove('hide'); // Show sinner if not already shown.
+            spinner.classList.remove('hide'); // Show sinner if not already shown.
+            Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
+            .done(function(response) {
+                var context = { 'withtable' : true, 'chartdata' : response };
+                Templates.render('core/chart', context).done((html, js) => {
+                    spinner.classList.add('hide'); // Hide sinner if not already hidden.
+                    // Load card body.
+                    Templates.replaceNodeContents(chartbody, html, js);
+                }).fail(() => {
+                    Notification.exception(new Error('Failed to load chart template.'));
+                    return;
+                });
+                return;
+            }).fail(() => {
+                Notification.exception(new Error('Failed to load card year filter'));
+                return;
+            });
+        });
+    };
 
-             Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
-             .done(function(response) {
+    /**
+     * Get and process the selected year from the dropdown,
+     * and update the corresponding user perference.
+     *
+     * @param {event} event The triggered event for the element.
+     */
+    const yearButtonAction = function(event) {
+        var element = event.target;
 
-                 var context = { 'withtable' : true, 'chartdata' : response };
-                 Templates.render('core/chart', context)
-                 .done((html, js) => {
-                     spinner.classList.add('hide'); // Hide sinner if not already hidden.
-                     // Load card body.
-                     Templates.replaceNodeContents(chartbody, html, js);
-                 }).fail(() => {
-                     Notification.exception(new Error('Failed to load chart template.'));
-                     return;
-                 });
-                 return;
-             }).fail(() => {
-                 Notification.exception(new Error('Failed to load card year filter'));
-                 return;
-             });
-         });
-     };
+        if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselect) { // Only act on certain elements.
+            yearselect = element.dataset.year;
 
-     /**
-      * Get and process the selected year from the dropdown,
-      * and update the corresponding user perference.
-      *
-      * @param {event} event The triggered event for the element.
-      */
-     const yearButtonAction = (event) => {
-         var element = event.target;
+            // Save selection as a user preference.
+            updateUserPreferences('local_assessfreq_overview_year_preference', yearselect);
 
-         if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselect) { // Only act on certain elements.
-             yearselect = element.dataset.year;
+            // Update card data based on selected year.
+            var yeartitle = document.getElementById('local-assessfreq-report-overview')
+                .getElementsByClassName('local-assessfreq-year')[0];
+            yeartitle.innerHTML = yearselect;
 
-             // Save selection as a user preference.
-             updateUserPreferences('local_assessfreq_overview_year_preference', yearselect);
-
-             // Update card data based on selected year.
-             var yeartitle = document.getElementById('local-assessfreq-report-overview')
-                 .getElementsByClassName('local-assessfreq-year')[0];
-             yeartitle.innerHTML = yearselect;
-
-             getCardCharts(); // Process loading for the assessment cards.
-         }
-     };
+            getCardCharts(); // Process loading for the assessment cards.
+        }
+    };
 
     /**
      * Quick and dirty debounce method for the heatmap settings menu.
@@ -133,15 +125,16 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
      * while the user is still checking options.
      *
      */
-    const updateHeatmapDebounce = () => {
+    const updateHeatmapDebounce = function() {
         clearTimeout(timeout);
         timeout = setTimeout(updateHeatmap(), 750);
     };
 
     /**
+     * Start heatmap generation.
      *
      */
-    const generateHeatmap = () => {
+    const generateHeatmap = function() {
         let heatmapOptions = JSON.parse(heatmapOptionsJson);
         let year = parseInt(heatmapOptions.year);
         let metric = heatmapOptions.metric;
@@ -196,12 +189,12 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
 
         for (const element of toRemove) {
             element.remove();
-         }
+        }
 
         for (let i = 0; i < modules.length; i++) {
             let input = document.createElement('input');
             input.type = 'hidden';
-            input.name = 'modules[' + modules[i] +']';
+            input.name = 'modules[' + modules[i] + ']';
             input.value = modules[i];
 
             downloadForm.appendChild(input);
@@ -212,8 +205,8 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
      * Update the heatmap based on the current filter settings.
      *
      */
-    const updateHeatmap = () => {
-        // Get current state of select menu items.with
+    const updateHeatmap = function() {
+        // Get current state of select menu items.
         var cardsModulesSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-modules');
         var links = cardsModulesSelectHeatmapElement.getElementsByTagName('a');
         var modules = [];
@@ -233,9 +226,9 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
 
         // Build settings object.
         var optionsObj = {
-                'year' : yearselectheatmap,
-                'metric' : metricselectheatmap,
-                'modules' : modules
+            'year' : yearselectheatmap,
+            'metric' : metricselectheatmap,
+            'modules' : modules
         };
 
         var optionsJson = JSON.stringify(optionsObj);
@@ -256,7 +249,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
      *
      * @param {event} event The triggered event for the element.
      */
-    const yearHeatmapButtonAction = (event) => {
+    const yearHeatmapButtonAction = function(event) {
         event.preventDefault();
         var element = event.target;
 
@@ -281,7 +274,7 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
      *
      * @param {event} event The triggered event for the element.
      */
-    const metricHeatmapButtonAction = (event) => {
+    const metricHeatmapButtonAction = function(event) {
         event.preventDefault();
         var element = event.target;
 
@@ -298,9 +291,9 @@ define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'lo
     /**
      * Add the event listeners to the modules in the module select dropdown.
      *
-     * @param {element} element The dropdown HTML element that contains the list of modules as links.
+     * @param {Object} element The dropdown HTML element that contains the list of modules as links.
      */
-    const moduleListChildrenEvents = (element) => {
+    const moduleListChildrenEvents = function(element) {
         var links = element.getElementsByTagName('a');
         var all = links[0];
 

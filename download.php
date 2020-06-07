@@ -38,7 +38,7 @@ $dataformat = 'csv';
 $fields = array(
     get_string('duedate', 'local_assessfreq'),
     get_string('activity', 'local_assessfreq'),
-    get_string('url', 'local_assessfreq'),);
+    get_string('url', 'local_assessfreq'));
 
 $frequency = new \local_assessfreq\frequency();
 $data = $frequency->get_download_data($year, $metric, $modules);

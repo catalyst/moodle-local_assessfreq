@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Renderable for assessments by activity card.
  *
- * @package    local_assessfreq * Renderable summary for the AWS Elastic Transcode report.
+ * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -60,10 +60,10 @@ class assess_by_activity {
             } else {
                 $seriesdata[] = 0;
             }
-            $labels[] =  get_string('modulename', $module);
+            $labels[] = get_string('modulename', $module);
         }
 
-        // Create chart object
+        // Create chart object.
         $events = new \core\chart_series($charttitle, $seriesdata);
 
         $chart = new \core\chart_bar();

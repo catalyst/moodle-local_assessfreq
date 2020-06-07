@@ -17,7 +17,6 @@
 /**
  * Local assessfreq Web Service.
  *
- * calendarContainer, spinner
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -40,8 +39,7 @@ class local_assessfreq_external extends external_api {
      *
      * @return void
      */
-    public static function get_frequency_parameters()
-    {
+    public static function get_frequency_parameters() {
         return new external_function_parameters(array(
             'jsondata' => new external_value(PARAM_RAW, 'The data encoded as a json array')
         ));
@@ -50,6 +48,8 @@ class local_assessfreq_external extends external_api {
     /**
      * Returns event frequency map for all users in site.
      *
+     * @param string $jsondata JSON data.
+     * @return string JSON response.
      */
     public static function get_frequency($jsondata) {
         \core\session\manager::write_close(); // Close session early this is a read op.

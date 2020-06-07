@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Javascript for report card display and processing.
+ * Javascript for heatmap calendar generation and display.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
@@ -55,21 +55,31 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     /**
      * Check how many days in a month code.
      * from https://dzone.com/articles/determining-number-days-month.
+     *
+     * @method daysInMonth
+     * @param {Number} month The month to get the number of days for.
+     * @param {Number} year The year to get the number of days for.
      */
-    const daysInMonth = (month, year) => {
+    const daysInMonth = function(month, year) {
         return 32 - new Date(year, month, 32).getDate();
     };
 
     /**
+     * Get the events to display in the calendar via ajax call.
      *
+     * @method getEvents
+     * @param {Number} year The year to get the events for.
+     * @param {String} metric The type of metric to get, 'students' or 'assess'.
+     * @param {Array} modules Array of the modules to get.
+     * @return {Promise}
      */
-    const getEvents = ({year, metric, modules}) => {
+    const getEvents = function({year, metric, modules}) {
         return new Promise((resolve, reject) => {
             let args = {
-                    year: year,
-                    metric: metric,
-                    modules: modules
-                };
+                year: year,
+                metric: metric,
+                modules: modules
+            };
             let jsonArgs = JSON.stringify(args);
 
             // Get the events to use in the mapping.
@@ -88,9 +98,13 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     };
 
     /**
+     * Get the events for a particular month and year.
      *
+     * @param {Number} year The year to get the number of days for.
+     * @param {Number} month The month to get the number of days for.
+     * @return {Array} monthevents The events for the supplied month.
      */
-    const getMonthEvents = (year, month) => {
+    const getMonthEvents = function(year, month) {
         let monthevents;
 
         if ((typeof eventArray[year] !== "undefined") && (typeof eventArray[year][month] !== "undefined")) {
@@ -101,9 +115,14 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     };
 
     /**
+     * Create the table structure for the calendar months.
      *
+     * @oaram {Number} year The year to generate the tables for.
+     * @param {Number} startMonth The month to start table generation from.
+     * @param {Number} endMonth The month to generate the tables to.
+     * @return {Promise}
      */
-    const createTables = ({year, startMonth, endMonth}) => {
+    const createTables = function({year, startMonth, endMonth}) {
         return new Promise((resolve, reject) => {
             let calendarContainer = document.createElement('div');
             let month = startMonth;
@@ -151,9 +170,9 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 reject(Error('Failed to create calendar tables.'));
             } else {
                 const resultObj = {
-                        calendarContainer : calendarContainer,
-                        year : year,
-                        startMonth : startMonth
+                    calendarContainer : calendarContainer,
+                    year : year,
+                    startMonth : startMonth
                 };
                 resolve(resultObj);
             }
@@ -162,8 +181,12 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
 
     /**
      * Generate calendar markup for the month.
+     *
+     * @param {Object} table The base table to populate.
+     * @param {Number} year The year to generate calendar for.
+     * @param {Number} month The monthe to generate calendar for.
      */
-    const populateCalendarDays = (table, year, month) => {
+    const populateCalendarDays = function(table, year, month) {
         let firstDay = (new Date(year, month)).getDay();  // Get the starting day of the month.
         let monthEvents = getMonthEvents(year, (month + 1));  // We add one due to month diferences between PHP and JS.
         let date = 1;  // Creating all cells.
@@ -205,9 +228,14 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     };
 
     /**
+     * Controls the population of the calendar in to the base tables.
      *
+     * @param {Object} calendarContainer the container to populate.
+     * @param {Number} year The year to generate calendar for.
+     * @param {Number} startMonth The month to start generation from.
+     * @return {Promise}
      */
-    const populateCalendar = ({calendarContainer, year, startMonth}) => {
+    const populateCalendar = function({calendarContainer, year, startMonth}) {
         return new Promise((resolve, reject) => {
             // Get the table boodies.
             let tables = calendarContainer.getElementsByTagName("tbody");
@@ -220,7 +248,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 month++;
             }
 
-
             if (typeof calendarContainer === 'undefined') {
                 reject(Error('Failed to populate calendar tables.'));
             } else {
@@ -230,22 +257,27 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     };
 
     /**
-     * Initialise method for report card rendering.
+     * Initialise method for report calendar heatmap creation.
      *
-     * @param {integer} context The current context id.
+     * @param {Number} year The year to generate the heatmap for.
+     * @param {Number} startMonth The month to start with for the heatmap calendar.
+     * @param {Number} endMonth The month to end with for the heatmap calendar.
+     * @param {String} metric The type of metric to display, 'students' or 'aseess'.
+     * @param {Array} modules The modules to display in the heatamp.
+     * @return {Promise}
      */
-    Calendar.generate = (year, startMonth, endMonth, metric, modules) => {
+    Calendar.generate = function(year, startMonth, endMonth, metric, modules) {
         return new Promise((resolve, reject) => {
             const dateObj = {
-                    year : year,
-                    startMonth : startMonth,
-                    endMonth : endMonth
+                year : year,
+                startMonth : startMonth,
+                endMonth : endMonth
             };
 
             const eventObj = {
-                    year : year,
-                    metric : metric,
-                    modules : modules
+                year : year,
+                metric : metric,
+                modules : modules
             };
 
             Str.get_strings(stringArr).catch(() => { // Get required strings.
@@ -256,7 +288,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 return eventObj;
             })
             .then(getEvents)
-            .then(() => { // Get events for settings
+            .then(() => { // Get events for settings.
                 return dateObj;
             })
             .then(createTables) // Create tables for calendar.

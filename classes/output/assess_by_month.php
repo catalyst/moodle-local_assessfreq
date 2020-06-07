@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Renderable for assessments due by month card.
  *
- * @package    local_assessfreq * Renderable summary for the AWS Elastic Transcode report.
+ * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -62,7 +62,7 @@ class assess_by_month {
             }
         }
 
-        // Create chart object
+        // Create chart object.
         $events = new \core\chart_series($charttitle, $seriesdata);
         $labels = array(
             get_string('jan', 'local_assessfreq'),

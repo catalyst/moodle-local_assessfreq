@@ -47,7 +47,7 @@ class history_process extends adhoc_task {
         // Throw an error if it is and this task will be retried after a delay.
         // The scheduled task won't start while this job is pending.
         $schedtask = \core\task\manager::get_scheduled_task(\local_assessfreq\task\data_process::class);
-        if ($schedtask->get_lock()){
+        if ($schedtask->get_lock()) {
             throw new \moodle_exception('local_assessfreq_scheduled_task_running');
         }
 
