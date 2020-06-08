@@ -87,7 +87,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord3->endday = 5;
 
         $lasrecord4 = new \stdClass();
-        $lasrecord4->module = 'forum';
+        $lasrecord4->module = 'scorm';
         $lasrecord4->instanceid = 4;
         $lasrecord4->courseid = 2;
         $lasrecord4->contextid = 7;
@@ -98,7 +98,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord4->endday = 6;
 
         $lasrecord5 = new \stdClass();
-        $lasrecord5->module = 'forum';
+        $lasrecord5->module = 'scorm';
         $lasrecord5->instanceid = 5;
         $lasrecord5->courseid = 2;
         $lasrecord5->contextid = 8;
@@ -120,10 +120,10 @@ class assess_by_activity_testcase extends advanced_testcase {
         $this->assertEquals(0, $values[1]);
         $this->assertEquals(0, $values[2]);
         $this->assertEquals(0, $values[3]);
-        $this->assertEquals(1, $values[4]);
+        $this->assertEquals(0, $values[4]);
         $this->assertEquals(0, $values[5]);
         $this->assertEquals(1, $values[6]);
-        $this->assertEquals(0, $values[7]);
+        $this->assertEquals(1, $values[7]);
         $this->assertEquals(0, $values[8]);
     }
 }

@@ -951,8 +951,7 @@ class frequency_testcase extends advanced_testcase {
 
         $result = $frequency->get_download_data($year, $metric, $modules);
 
-        $this->assertCount(2, $result);
-        $this->assertStringContainsString('mod/assign/view', $result[0][2]);
-        $this->assertStringContainsString('mod/assign/view', $result[1][2]);
+        $this->assertRegexp('/mod\/assign\/view/', $result[0][2]);
+        $this->assertRegexp('/mod\/assign\/view/', $result[1][2]);
     }
 }

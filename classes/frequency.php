@@ -719,7 +719,7 @@ class frequency {
             $events = $DB->get_records_sql($sql, $params);
         }
 
-        // Update cache.get_events_due_by_activity
+        // Update cache.
         if (!empty($events)) {
             $expiry = time() + $this->expiryperiod;
             $data = new \stdClass();
