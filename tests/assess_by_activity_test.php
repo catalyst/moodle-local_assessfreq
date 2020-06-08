@@ -116,6 +116,8 @@ class assess_by_activity_testcase extends advanced_testcase {
         $result = $assessbymonth->get_assess_by_activity_chart($year);
         $values = $result->get_series()[0]->get_values();
 
+        error_log(print_r($values, true));
+
         $this->assertEquals(2, $values[0]);
         $this->assertEquals(0, $values[1]);
         $this->assertEquals(0, $values[2]);
