@@ -198,6 +198,11 @@ class provider implements
         }
     }
 
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param approved_userlist $userlist The approved context and user information to delete information for.
+     */
     public static function delete_data_for_users(approved_userlist $userlist) {
         $users = $userlist->get_users();
         foreach ($users as $user) {
