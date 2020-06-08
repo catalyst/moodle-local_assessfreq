@@ -132,8 +132,18 @@ class frequency {
      * @return array $modules The enabled modules.
      */
     public function get_modules() : array {
+        $version = get_config('moodle', 'version');
         // TODO: Get these from plugin config rather than hard code.
-        return array ('assign', 'choice', 'data', 'feedback', 'forum', 'lesson', 'quiz', 'scorm', 'workshop');
+
+        // Different versions of Moodle have different supported modules.
+        // This is an anti pattern, but yeah...
+        if ($version < 2019052000) { // Versions less than 3.7 don't support forum due dates.
+            $modules = array ('assign', 'choice', 'data', 'feedback', 'lesson', 'quiz', 'scorm', 'workshop');
+        } else {
+            $modules = array ('assign', 'choice', 'data', 'feedback', 'forum', 'lesson', 'quiz', 'scorm', 'workshop');
+        }
+
+        return $modules;
     }
 
     /**
@@ -699,7 +709,7 @@ class frequency {
 
         if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
             $events = $data->events;
-        } else {  // Not valid cache data.
+        } else { // Not valid cache data.
             $params = array($year);
             $sql = 'SELECT module, COUNT(id) as count
                       FROM {local_assessfreq_site}
