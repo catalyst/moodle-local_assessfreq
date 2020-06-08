@@ -40,7 +40,7 @@ jobs:
     - php: 7.1
       env: DB=pgsql MOODLE_BRANCH=master
     - php: 7.1
-     q env: DB=mysqli MOODLE_BRANCH=master
+      env: DB=mysqli MOODLE_BRANCH=master
         
 cache:
   directories:
