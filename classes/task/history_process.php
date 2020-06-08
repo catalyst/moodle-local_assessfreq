@@ -66,7 +66,7 @@ class history_process extends adhoc_task {
 
         mtrace('local_assessfreq: Processing site events');
         $actionstart = time();
-        $frequency->process_site_events(0); // Process ALL records.
+        $frequency->process_site_events(1); // Process ALL records.
         $actionduration = time() - $actionstart;
         $event = \local_assessfreq\event\event_processed::create(array(
             'context' => $context,
@@ -77,7 +77,7 @@ class history_process extends adhoc_task {
 
         mtrace('local_assessfreq: Processing user events');
         $actionstart = time();
-        $frequency->process_user_events(0); // Process ALL user events.
+        $frequency->process_user_events(1); // Process ALL user events.
         $actionduration = time() - $actionstart;
         $event = \local_assessfreq\event\event_processed::create(array(
             'context' => $context,
