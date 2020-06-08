@@ -116,16 +116,28 @@ class assess_by_activity_testcase extends advanced_testcase {
         $result = $assessbymonth->get_assess_by_activity_chart($year);
         $values = $result->get_series()[0]->get_values();
 
-        error_log(print_r($values, true));
+        $version = get_config('moodle', 'version');
 
-        $this->assertEquals(2, $values[0]);
-        $this->assertEquals(0, $values[1]);
-        $this->assertEquals(0, $values[2]);
-        $this->assertEquals(0, $values[3]);
-        $this->assertEquals(0, $values[4]);
-        $this->assertEquals(0, $values[5]);
-        $this->assertEquals(1, $values[6]);
-        $this->assertEquals(1, $values[7]);
-        $this->assertEquals(0, $values[8]);
+        if ($version < 2019052000) { // Versions less than 3.7 don't support forum due dates.
+            $this->assertEquals(2, $values[0]);
+            $this->assertEquals(0, $values[1]);
+            $this->assertEquals(0, $values[2]);
+            $this->assertEquals(0, $values[3]);
+            $this->assertEquals(0, $values[4]);
+            $this->assertEquals(1, $values[5]);
+            $this->assertEquals(1, $values[6]);
+            $this->assertEquals(0, $values[7]);
+        } else {
+            $this->assertEquals(2, $values[0]);
+            $this->assertEquals(0, $values[1]);
+            $this->assertEquals(0, $values[2]);
+            $this->assertEquals(0, $values[3]);
+            $this->assertEquals(0, $values[4]);
+            $this->assertEquals(0, $values[5]);
+            $this->assertEquals(1, $values[6]);
+            $this->assertEquals(1, $values[7]);
+            $this->assertEquals(0, $values[8]);
+        }
+
     }
 }
