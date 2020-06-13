@@ -43,21 +43,6 @@ require_once($CFG->dirroot . '/calendar/lib.php');
 class frequency {
 
     /**
-     * Mapp of event count to heat setting.
-     * TODO: Create array from plugin settings.
-     *
-     * @var array
-     */
-    private $map = array (
-        0 => 0,
-        2 => 1,
-        4 => 2,
-        6 => 3,
-        8 => 4,
-        10 => 5
-    );
-
-    /**
      * The due date databse field differs between module types.
      * This map provides the translation.
      *
@@ -106,24 +91,6 @@ class frequency {
      * @var integer $batchsize
      */
     private $batchsize = 100;
-
-    /**
-     * Given a count value get the corresponding heat setting.
-     *
-     * @param int $count The event count.
-     * @return int $result The heat setting that relates to the given count.
-     */
-    private function get_map(int $count) : int {
-        $result = 0;
-
-        foreach ($this->map as $key => $value) {
-            if ($count > $key) {
-                $result = $value;
-            }
-        }
-
-        return $result;
-    }
 
     /**
      * Get the modules to use in data collection.
@@ -781,6 +748,8 @@ class frequency {
         $events = array();
         $from = mktime(0, 0, 0, 1, 1, $year);
         $to = mktime(23, 59, 59, 12, 31, $year);
+        $min = 0;
+        $max = 0;
 
         if ($metric == 'assess') {
             $functionname = 'get_site_events';
@@ -813,11 +782,15 @@ class frequency {
 
             // Construct the multidimensional array.
             if (empty($freqarray[$year][$month][$day])) {
-                $freqarray[$year][$month][$day] = array('number' => 1, 'heat' => $this->get_map(1));
+                $freqarray[$year][$month][$day] = array('number' => 1);
             } else {
                 $freqarray[$year][$month][$day]['number']++;
-                $freqarray[$year][$month][$day]['heat'] = $this->get_map($freqarray[$year][$month][$day]['number']);
             }
+
+            if ($freqarray[$year][$month][$day]['number'] > $max) {
+                $max = $freqarray[$year][$month][$day]['number'];
+            }
+
         }
 
         return $freqarray;

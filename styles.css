@@ -22,26 +22,26 @@
     text-align: center;
 }
 
-.local-assessfreq-heat-0 {
+.local-assessfreq-heat-1 {
     background-color: #fdf9cd;
 }
 
-.local-assessfreq-heat-1 {
+.local-assessfreq-heat-2 {
     background-color: #a2dab5;
 }
 
-.local-assessfreq-heat-2 {
+.local-assessfreq-heat-3 {
     background-color: #41b7c5;
 }
 
 .local-assessfreq-heat-3 {
-    background-color: #2d7fb9;
-}
-
-.local-assessfreq-heat-4 {
-    background-color: #283b94;
+    background-color: #4d7fb9;
 }
 
 .local-assessfreq-heat-5 {
+    background-color: #283b94;
+}
+
+.local-assessfreq-heat-6 {
     background-color: #8c0010;
 }

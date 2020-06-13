@@ -51,6 +51,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     ];
     var stringResult;
     const today = new Date();
+    var heatRangeMax;
+    var heatRangeMin;
 
     /**
      * Check how many days in a month code.
@@ -62,6 +64,61 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const daysInMonth = function(month, year) {
         return 32 - new Date(year, month, 32).getDate();
+    };
+
+    /**
+     * Calculate the min and max values to use in the heatmap.
+     *
+     * @method daysInMonth
+     * @param {Object} eventArray All the event count for the heatmap.
+     * @param {Object} dateObj Date details.
+     */
+    const calcHeatRange = function(eventArray, dateObj) {
+        return new Promise((resolve) => {
+            let eventcount = new Array;
+            let year = eventArray[dateObj.year];
+
+            // Itterate through all the event counts.
+            // This code looks nasty but there is only 366 days in a year.
+            for (let i = 0; i < 12; i++) {
+                if (typeof year[i] !== "undefined") {
+                    let month = year[i];
+                    for (let j = 0; j < 32; j++) {
+                        if (typeof month[j] !== "undefined") {
+                            eventcount.push(month[j].number);
+                        }
+                    }
+                }
+            }
+
+            // Get min and max values to calculate heat spread.
+            heatRangeMax = Math.max(...eventcount);
+            heatRangeMin = Math.min(...eventcount);
+
+            resolve(eventArray);
+        });
+    };
+
+    /**
+     * Translate assessment frequency to a heat value.
+     *
+     * @method getHeat
+     * @param {Number} eventCount The count to get the heat value.
+     * @return {Number} heat The heat value.
+     */
+    const getHeat = function(eventCount) {
+        let scaleMin = 1;
+
+        if (eventCount == heatRangeMin ) {
+            return scaleMin;
+        }
+
+        const scaleRange = 6;  // 0 - 5  steps
+        const localRange = heatRangeMax - heatRangeMin;
+        const localPercent = (eventCount - heatRangeMin) / localRange;
+        const heat = Math.round(localPercent * scaleRange);
+
+        return heat;
     };
 
     /**
@@ -209,7 +266,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     cell = document.createElement("td");
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
-                        var heatClass = "local-assessfreq-heat-" + monthEvents[date]['heat'];
+                        let heat = getHeat(monthEvents[date]['number']);
+                        let heatClass = "local-assessfreq-heat-" + heat;
                         cell.classList.add(heatClass);
                     }
                     if (date === today.getDate()
@@ -288,6 +346,9 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 return eventObj;
             })
             .then(getEvents)
+            .then((eventArray) => {
+                calcHeatRange(eventArray, dateObj);
+            })
             .then(() => { // Get events for settings.
                 return dateObj;
             })
