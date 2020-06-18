@@ -34,4 +34,13 @@ $functions = array(
         'type' => 'read',
         'ajax' => true
     ),
+    'local_assessfreq_get_heat_colors' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_heat_colors',
+        'classpath' => '',
+        'description' => 'Returns event heat map colors.',
+        'type' => 'read',
+        'loginrequired' => false,
+        'ajax' => true
+    ),
 );

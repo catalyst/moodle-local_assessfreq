@@ -100,15 +100,22 @@ class frequency {
      */
     public function get_modules() : array {
         $version = get_config('moodle', 'version');
-        // TODO: Get these from plugin config rather than hard code.
 
-        // Different versions of Moodle have different supported modules.
-        // This is an anti pattern, but yeah...
+        // Start with a hardcoded list of modules. As there is not a good way to get a list of suppoerted modules.
+        // Different versions of Moodle have different supported modules. This is an anti pattern, but yeah...
         if ($version < 2019052000) { // Versions less than 3.7 don't support forum due dates.
-            $modules = array ('assign', 'choice', 'data', 'feedback', 'lesson', 'quiz', 'scorm', 'workshop');
+            $availablemodules = array ('assign', 'choice', 'data', 'feedback', 'lesson', 'quiz', 'scorm', 'workshop');
         } else {
-            $modules = array ('assign', 'choice', 'data', 'feedback', 'forum', 'lesson', 'quiz', 'scorm', 'workshop');
+            $availablemodules = array ('assign', 'choice', 'data', 'feedback', 'forum', 'lesson', 'quiz', 'scorm', 'workshop');
         }
+
+        return $availablemodules;
+    }
+
+    public function get_enabled_modules(): array {
+        global $DB;
+
+        $modules = $DB->get_records_menu('modules', array(), '', 'name, visible');
 
         return $modules;
     }
@@ -847,6 +854,26 @@ class frequency {
         }
 
         return $data;
+    }
+
+    /**
+     * Get heat colors to use id nheatmap display from plugin configuration.
+     *
+     * @return array
+     */
+    public function get_heat_colors(): array {
+        $config = get_config('local_assessfreq');
+
+        $heatcolors = array(
+            1 => $config->heat1,
+            2 => $config->heat2,
+            3 => $config->heat3,
+            4 => $config->heat4,
+            5 => $config->heat5,
+            6 => $config->heat6
+        );
+
+        return $heatcolors;
     }
 
     /**

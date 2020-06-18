@@ -53,6 +53,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     const today = new Date();
     var heatRangeMax;
     var heatRangeMin;
+    var colorArray;
 
     /**
      * Check how many days in a month code.
@@ -64,6 +65,25 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const daysInMonth = function(month, year) {
         return 32 - new Date(year, month, 32).getDate();
+    };
+
+    /**
+     * Get the heat colors to use in the heat map via Ajax.
+     *
+     * @method getHeatColors
+     */
+    const getHeatColors = function() {
+        return new Promise((resolve, reject) => {
+            Ajax.call([{
+                methodname: 'local_assessfreq_get_heat_colors',
+                args: {},
+            }], true, false)[0].done(function(response) {
+                colorArray = JSON.parse(response);
+                resolve(colorArray);
+            }).fail(function() {
+                reject(new Error('Failed to get heat colors'));
+            });
+        });
     };
 
     /**
@@ -267,12 +287,10 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                         let heat = getHeat(monthEvents[date]['number']);
-                        let heatClass = "local-assessfreq-heat-" + heat;
-                        cell.classList.add(heatClass);
+                        cell.style.backgroundColor = colorArray[heat];
                     }
                     if (date === today.getDate()
                             && parseInt(year) === today.getFullYear() && parseInt(month) === today.getMonth()) {
-
                         cell.classList.add("bg-info");
                     } // Color today's date.
                     cell.appendChild(cellText);
@@ -349,6 +367,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
             .then((eventArray) => {
                 calcHeatRange(eventArray, dateObj);
             })
+            .then(getHeatColors)
             .then(() => { // Get events for settings.
                 return dateObj;
             })

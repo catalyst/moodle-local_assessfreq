@@ -81,4 +81,40 @@ class local_assessfreq_external extends external_api {
         return new external_value(PARAM_RAW, 'Event JSON');
     }
 
+    /**
+     * Returns description of method parameters.
+     *
+     * @return void
+     */
+    public static function get_heat_colors_parameters() {
+        return new external_function_parameters(array(
+            // If I had params they'd be here, but I don't, so they're not.
+        ));
+    }
+
+    /**
+     * Returns heat map colors.
+     * This method doesn't require login or user session update.
+     * It also doesn't need any capability check.
+     *
+     * @param string $jsondata JSON data.
+     * @return string JSON response.
+     */
+    public static function get_heat_colors() {
+        \core\session\manager::write_close(); // Close session early this is a read op.
+
+        // Execute API call.
+        $frequency = new \local_assessfreq\frequency();
+        $heatarray = $frequency->get_heat_colors();
+
+        return json_encode($heatarray);
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function get_heat_colors_returns() {
+        return new external_value(PARAM_RAW, 'Event JSON');
+    }
 }

@@ -107,30 +107,6 @@ class frequency_testcase extends advanced_testcase {
     }
 
     /**
-     * Test getting the map.
-     */
-    public function test_get_map() {
-        $frequency = new frequency();
-
-        // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\local_assessfreq\frequency', 'get_map');
-        $method->setAccessible(true); // Allow accessing of private method.
-
-        $result = $method->invoke($frequency, 0);
-        $this->assertEquals(0, $result);
-
-        $result = $method->invoke($frequency, 1);
-        $this->assertEquals(0, $result);
-
-        $result = $method->invoke($frequency, 3);
-        $this->assertEquals(1, $result);
-
-        $result = $method->invoke($frequency, 5);
-        $this->assertEquals(2, $result);
-
-    }
-
-    /**
      * Test getting a modules events.
      */
     public function test_get_module_events() {
@@ -925,15 +901,12 @@ class frequency_testcase extends advanced_testcase {
         $result = $frequency->get_frequency_array($year, $metric, $modules);
         $this->assertEquals(1, $result[2020][3][29]['number']);
         $this->assertEquals(1, $result[2020][3][28]['number']);
-        $this->assertEquals(0, $result[2020][3][29]['heat']);
-        $this->assertEquals(0, $result[2020][3][28]['heat']);
 
         $metric = 'students';
         $result = $frequency->get_frequency_array($year, $metric, $modules);
         $this->assertEquals(2, $result[2020][3][29]['number']);
         $this->assertEquals(2, $result[2020][3][28]['number']);
-        $this->assertEquals(0, $result[2020][3][29]['heat']);
-        $this->assertEquals(0, $result[2020][3][28]['heat']);
+
     }
 
     /**
@@ -953,5 +926,24 @@ class frequency_testcase extends advanced_testcase {
 
         $this->assertRegexp('/mod\/assign\/view/', $result[0][2]);
         $this->assertRegexp('/mod\/assign\/view/', $result[1][2]);
+    }
+
+    /**
+     * Test getting heat colors.
+     */
+    public function test_get_heat_colors() {
+        $frequency = new frequency();
+        $result = $frequency->get_heat_colors();
+
+        $this->assertEquals('#FDF9CD', $result[1]);
+        $this->assertEquals('#A2DAB5', $result[2]);
+        $this->assertEquals('#41B7C5', $result[3]);
+        $this->assertEquals('#4D7FB9', $result[4]);
+        $this->assertEquals('#283B94', $result[5]);
+        $this->assertEquals('#8C0010', $result[6]);
+
+        set_config('heat3', '#FFFFFF', 'local_assessfreq');
+        $result = $frequency->get_heat_colors();
+        $this->assertEquals('#FFFFFF', $result[3]);
     }
 }
