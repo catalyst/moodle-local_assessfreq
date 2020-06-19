@@ -120,6 +120,10 @@ class frequency {
         return $modules;
     }
 
+    private function get_process_modules(): array {
+        $config = get_config('local_assessfreq')
+    }
+
     /**
      * Generate SQL to use to get activity info.
      *
