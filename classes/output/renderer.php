@@ -112,7 +112,7 @@ class renderer extends plugin_renderer_base {
         }
 
         // Get modules for filters and load into context.
-        $modules = $frequency->get_modules();
+        $modules = $frequency->get_process_modules();
         if (empty($preferencemodules) || $preferencemodules === array('all')) {
             $context['modules'][] = array('module' => array('val' => 'all', 'name' => get_string('all'),  'active' => 'true'));
         } else {

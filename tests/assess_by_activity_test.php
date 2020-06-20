@@ -40,6 +40,13 @@ class assess_by_activity_testcase extends advanced_testcase {
      */
     public function setUp() {
         $this->resetAfterTest();
+        $version = get_config('moodle', 'version');
+
+        if ($version < 2019052000) { // Versions less than 3.7 don't support forum due dates.
+            set_config('modules', 'assign,choice,data,feedback,lesson,quiz,scorm,workshop', 'local_assessfreq');
+        } else {
+            set_config('modules', 'assign,choice,data,feedback,forum,lesson,quiz,scorm,workshop', 'local_assessfreq');
+        }
     }
 
     /**

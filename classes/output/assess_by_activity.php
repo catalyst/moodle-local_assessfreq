@@ -48,19 +48,21 @@ class assess_by_activity {
 
         // Get events for the supplied year.
         $frequency = new frequency();
-        $modules = $frequency->get_modules();
+        $modules = $frequency->get_process_modules();
         $activitydata = $frequency->get_events_due_by_activity($year);
         $seriesdata = array();
         $labels = array();
         $charttitle = get_string('assessbyactivity', 'local_assessfreq');
 
-        foreach ($modules as $module) {
-            if (!empty($activitydata[$module])) {
-                $seriesdata[] = $activitydata[$module]->count;
-            } else {
-                $seriesdata[] = 0;
+        if (!empty($modules[0])){
+            foreach ($modules as $module) {
+                if (! empty($activitydata[$module])) {
+                    $seriesdata[] = $activitydata[$module]->count;
+                } else {
+                    $seriesdata[] = 0;
+                }
+                $labels[] = get_string('modulename', $module);
             }
-            $labels[] = get_string('modulename', $module);
         }
 
         // Create chart object.

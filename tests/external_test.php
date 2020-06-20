@@ -103,6 +103,8 @@ class local_assessfreq_external_testcase extends advanced_testcase {
 
         $this->user1 = $user1;
         $this->user2 = $user2;
+
+        set_config('modules', 'quiz,assign,scorm,choice', 'local_assessfreq');
     }
 
     /**
@@ -136,8 +138,6 @@ class local_assessfreq_external_testcase extends advanced_testcase {
 
         $this->assertEquals(1, $eventarr[2020][3][29]['number']);
         $this->assertEquals(1, $eventarr[2020][3][28]['number']);
-        $this->assertEquals(0, $eventarr[2020][3][29]['heat']);
-        $this->assertEquals(0, $eventarr[2020][3][28]['heat']);
 
         $data->metric = 'students';
         $jsondata = json_encode($data);
@@ -147,7 +147,5 @@ class local_assessfreq_external_testcase extends advanced_testcase {
 
         $this->assertEquals(2, $eventarr[2020][3][29]['number']);
         $this->assertEquals(2, $eventarr[2020][3][28]['number']);
-        $this->assertEquals(0, $eventarr[2020][3][29]['heat']);
-        $this->assertEquals(0, $eventarr[2020][3][28]['heat']);
     }
 }

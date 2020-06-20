@@ -120,8 +120,31 @@ class frequency {
         return $modules;
     }
 
-    private function get_process_modules(): array {
-        $config = get_config('local_assessfreq')
+    /**
+     * Return a list of modules to process.
+     *
+     * Get list of enabled courses from config.
+     * If we are including disabled activities just got with the config list.
+     * If we are not including disabled activites, remove the disabled ones from the config list.
+     *
+     * @return array $modules Lis of modules to process.
+     */
+    public function get_process_modules(): array {
+        $config = get_config('local_assessfreq');
+        $modules = explode(',', $config->modules);
+        $disabledmodules = $config->disabledmodules;
+
+        if (!$disabledmodules) {
+            $enabledmodules = $this->get_enabled_modules();
+
+            foreach($modules as $index => $module) {
+                if(empty($enabledmodules[$module])) {
+                    unset($modules[$index]);
+                }
+            }
+        }
+
+        return $modules;
     }
 
     /**
@@ -235,15 +258,18 @@ class frequency {
      */
     public function process_site_events(int $duedate) : int {
         $recordsprocessed = 0;
-        $enabledmods = $this->get_modules(); // Get all enabled modules.
+        $enabledmods = $this->get_process_modules();
 
-        // Itterate through modules.
-        foreach ($enabledmods as $module) {
-            $sql = $this->get_sql_query($module);
-            $params = array($module, CONTEXT_MODULE, $duedate, 1, 1);
-            $moduleevents = $this->get_module_events($sql, $params); // Get all events for module.
-            $recordsprocessed += $this->process_module_events($moduleevents); // Store events.
+        if (!empty($enabledmods[0])){
+            // Itterate through modules.
+            foreach ($enabledmods as $module) {
+                $sql = $this->get_sql_query($module);
+                $params = array($module, CONTEXT_MODULE, $duedate, 1, 1);
+                $moduleevents = $this->get_module_events($sql, $params); // Get all events for module.
+                $recordsprocessed += $this->process_module_events($moduleevents); // Store events.
+            }
         }
+
         return $recordsprocessed;
     }
 
@@ -421,7 +447,12 @@ class frequency {
 
             // Get data from database.
             if ($module == 'all') {
-                $rawevents = $DB->get_records('local_assessfreq_site');
+                $modules = $this->get_process_modules();
+                list($insql, $params) = $DB->get_in_or_equal($modules);
+                $sql = "SELECT *
+                          FROM {local_assessfreq_site}
+                         WHERE module $insql";
+                $rawevents = $DB->get_records_sql($sql, $params);
             } else {
                 $rawevents = $DB->get_records('local_assessfreq_site', array('module' => $module));
             }
@@ -567,7 +598,10 @@ class frequency {
 
             // Get data from database.
             if ($module == 'all') {
-                $rawevents = $DB->get_records_sql($sql);
+                $modules = $this->get_process_modules();
+                list($insql, $params) = $DB->get_in_or_equal($modules);
+                $sql .= " WHERE s.module $insql";
+                $rawevents = $DB->get_records_sql($sql, $params);
             } else {
                 $sql .= ' WHERE s.module = ?';
                 $rawevents = $DB->get_records_sql($sql, array($module));
@@ -607,12 +641,15 @@ class frequency {
         if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
             $events = $data->events;
         } else {  // Not valid cache data.
-            $params = array($year);
-            $sql = 'SELECT endmonth, COUNT(id) as count
+            $modules = $this->get_process_modules();
+            list($insql, $params) = $DB->get_in_or_equal($modules);
+            $params[] = $year;
+            $sql = "SELECT endmonth, COUNT(id) as count
                       FROM {local_assessfreq_site}
-                     WHERE endyear = ?
+                     WHERE module $insql
+                           AND endyear = ?
                   GROUP BY endmonth
-                  ORDER BY endmonth ASC';
+                  ORDER BY endmonth ASC";
             $events = $DB->get_records_sql($sql, $params);
         }
 
@@ -647,13 +684,16 @@ class frequency {
         if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
             $events = $data->events;
         } else {  // Not valid cache data.
-            $params = array($year);
-            $sql = 'SELECT s.endmonth, COUNT(u.id) as count
+            $modules = $this->get_process_modules();
+            list($insql, $params) = $DB->get_in_or_equal($modules);
+            $params[] = $year;
+            $sql = "SELECT s.endmonth, COUNT(u.id) as count
                       FROM {local_assessfreq_site} s
                 INNER JOIN {local_assessfreq_user} u ON s.id = u.eventid
-                     WHERE s.endyear = ?
+                     WHERE s.module $insql
+                           AND s.endyear = ?
                   GROUP BY s.endmonth
-                  ORDER BY s.endmonth ASC';
+                  ORDER BY s.endmonth ASC";
             $events = $DB->get_records_sql($sql, $params);
         }
 
@@ -759,8 +799,6 @@ class frequency {
         $events = array();
         $from = mktime(0, 0, 0, 1, 1, $year);
         $to = mktime(23, 59, 59, 12, 31, $year);
-        $min = 0;
-        $max = 0;
 
         if ($metric == 'assess') {
             $functionname = 'get_site_events';
@@ -796,10 +834,6 @@ class frequency {
                 $freqarray[$year][$month][$day] = array('number' => 1);
             } else {
                 $freqarray[$year][$month][$day]['number']++;
-            }
-
-            if ($freqarray[$year][$month][$day]['number'] > $max) {
-                $max = $freqarray[$year][$month][$day]['number'];
             }
 
         }

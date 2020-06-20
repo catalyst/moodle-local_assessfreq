@@ -104,6 +104,8 @@ class frequency_testcase extends advanced_testcase {
 
         $this->user1 = $user1;
         $this->user2 = $user2;
+
+        set_config('modules', 'quiz,assign,scorm,choice', 'local_assessfreq');
     }
 
     /**
@@ -945,5 +947,34 @@ class frequency_testcase extends advanced_testcase {
         set_config('heat3', '#FFFFFF', 'local_assessfreq');
         $result = $frequency->get_heat_colors();
         $this->assertEquals('#FFFFFF', $result[3]);
+    }
+
+    /**
+     * Test getting modules to process.
+     */
+    public function test_get_process_modules() {
+        global $DB;
+
+        $DB->set_field('modules', 'visible', '0', array('name' => 'scorm'));
+        $DB->set_field('modules', 'visible', '0', array('name' => 'choice'));
+
+        set_config('modules', 'quiz,assign,scorm,choice', 'local_assessfreq');
+        set_config('disabledmodules', '0', 'local_assessfreq');
+
+        $frequency = new frequency();
+        $result = $frequency->get_process_modules();
+
+        $this->assertContains('quiz', $result);
+        $this->assertContains('assign', $result);
+        $this->assertNotContains('scorm', $result);
+        $this->assertNotContains('choice', $result);
+
+        set_config('disabledmodules', '1', 'local_assessfreq');
+        $result = $frequency->get_process_modules();;
+
+        $this->assertContains('quiz', $result);
+        $this->assertContains('assign', $result);
+        $this->assertContains('scorm', $result);
+        $this->assertContains('choice', $result);
     }
 }
