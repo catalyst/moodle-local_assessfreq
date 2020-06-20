@@ -259,12 +259,13 @@ class frequency {
     public function process_site_events(int $duedate) : int {
         $recordsprocessed = 0;
         $enabledmods = $this->get_process_modules();
+        $hiddencourses = get_config('local_assessfreq', 'hiddencourses');
 
         if (!empty($enabledmods[0])){
             // Itterate through modules.
             foreach ($enabledmods as $module) {
                 $sql = $this->get_sql_query($module);
-                $params = array($module, CONTEXT_MODULE, $duedate, 1, 1);
+                $params = array($module, CONTEXT_MODULE, $duedate, 1, (int)$hiddencourses);
                 $moduleevents = $this->get_module_events($sql, $params); // Get all events for module.
                 $recordsprocessed += $this->process_module_events($moduleevents); // Store events.
             }
