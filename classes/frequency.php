@@ -457,18 +457,28 @@ class frequency {
             $events = $this->filter_event_data($data->events, $from, $to);
         } else {  // Not valid cache data.
 
+            $sql = "SELECT s.*
+                          FROM {local_assessfreq_site} s
+                     LEFT JOIN {course} c ON s.courseid = c.id";
+
             // Get data from database.
             if ($module == 'all') {
                 $modules = $this->get_process_modules();
                 list($insql, $params) = $DB->get_in_or_equal($modules);
-                $sql = "SELECT *
-                          FROM {local_assessfreq_site}
-                         WHERE module $insql";
-                $rawevents = $DB->get_records_sql($sql, $params);
+                $sql .= " WHERE s.module $insql";
+
             } else {
-                $rawevents = $DB->get_records('local_assessfreq_site', array('module' => $module));
+                $params = array($module);
+                $sql .= " WHERE s.module = ?";
             }
 
+            $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
+            if (!$includehiddencourses) {
+                $params[] = 1;
+                $sql .= " AND c.visible = ?";
+            }
+
+            $rawevents = $DB->get_records_sql($sql, $params);
             $events = $this->filter_event_data($rawevents, $from, $to);
 
             // Update cache.
@@ -556,15 +566,23 @@ class frequency {
             $sql = 'SELECT s.*
                       FROM {local_assessfreq_site} s
                 INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id
+                INNER JOIN {course} c ON s.courseid = c.id
                      WHERE u.userid = ?';
             // Get data from database.
             if ($module == 'all') {
-                $rawevents = $DB->get_records_sql($sql, array($userid));
+                $params = array($userid);
             } else {
+                $params = array($userid, $module);
                 $sql .= ' AND s.module = ?';
-                $rawevents = $DB->get_records_sql($sql, array($userid, $module));
             }
 
+            $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
+            if (!$includehiddencourses) {
+                $params[] = 1;
+                $sql .= " AND c.visible = ?";
+            }
+
+            $rawevents = $DB->get_records_sql($sql, $params);
             $events = $this->filter_event_data($rawevents, $from, $to);
 
             // Update cache.
@@ -606,19 +624,27 @@ class frequency {
             $rowkey = $DB->sql_concat('s.id', "'_'", 'u.userid');
             $sql = "SELECT $rowkey as row, u.userid, s.*
                       FROM {local_assessfreq_site} s
-                INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id";
+                INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id
+                INNER JOIN {course} c ON s.courseid = c.id";
 
             // Get data from database.
             if ($module == 'all') {
                 $modules = $this->get_process_modules();
                 list($insql, $params) = $DB->get_in_or_equal($modules);
                 $sql .= " WHERE s.module $insql";
-                $rawevents = $DB->get_records_sql($sql, $params);
+
             } else {
+                $params = array($module);
                 $sql .= ' WHERE s.module = ?';
-                $rawevents = $DB->get_records_sql($sql, array($module));
             }
 
+            $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
+            if (!$includehiddencourses) {
+                $params[] = 1;
+                $sql .= " AND c.visible = ?";
+            }
+
+            $rawevents = $DB->get_records_sql($sql, $params);
             $events = $this->filter_event_data($rawevents, $from, $to);
 
             // Update cache.
@@ -656,12 +682,21 @@ class frequency {
             $modules = $this->get_process_modules();
             list($insql, $params) = $DB->get_in_or_equal($modules);
             $params[] = $year;
-            $sql = "SELECT endmonth, COUNT(id) as count
-                      FROM {local_assessfreq_site}
-                     WHERE module $insql
-                           AND endyear = ?
-                  GROUP BY endmonth
-                  ORDER BY endmonth ASC";
+            $sql = "SELECT s.endmonth, COUNT(s.id) as count
+                      FROM {local_assessfreq_site} s
+                 LEFT JOIN {course} c ON s.courseid = c.id
+                     WHERE s.module $insql
+                           AND s.endyear = ?";
+
+            $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
+            if (!$includehiddencourses) {
+                $params[] = 1;
+                $sql .= " AND c.visible = ? ";
+            }
+
+            $sql .= 'GROUP BY s.endmonth
+                     ORDER BY s.endmonth ASC';
+
             $events = $DB->get_records_sql($sql, $params);
         }
 
@@ -702,10 +737,19 @@ class frequency {
             $sql = "SELECT s.endmonth, COUNT(u.id) as count
                       FROM {local_assessfreq_site} s
                 INNER JOIN {local_assessfreq_user} u ON s.id = u.eventid
+                INNER JOIN {course} c ON s.courseid = c.id
                      WHERE s.module $insql
-                           AND s.endyear = ?
-                  GROUP BY s.endmonth
-                  ORDER BY s.endmonth ASC";
+                           AND s.endyear = ?";
+
+            $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
+            if (!$includehiddencourses) {
+                $params[] = 1;
+                $sql .= " AND c.visible = ? ";
+            }
+
+            $sql .= 'GROUP BY s.endmonth
+                     ORDER BY s.endmonth ASC';
+
             $events = $DB->get_records_sql($sql, $params);
         }
 
@@ -741,11 +785,20 @@ class frequency {
             $events = $data->events;
         } else { // Not valid cache data.
             $params = array($year);
-            $sql = 'SELECT module, COUNT(id) as count
-                      FROM {local_assessfreq_site}
-                     WHERE endyear = ?
-                  GROUP BY module
-                  ORDER BY module ASC';
+            $sql = 'SELECT s.module, COUNT(s.id) as count
+                      FROM {local_assessfreq_site} s
+                 LEFT JOIN {course} c ON s.courseid = c.id
+                     WHERE s.endyear = ?';
+
+            $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
+            if (!$includehiddencourses) {
+                 $params[] = 1;
+                 $sql .= " AND c.visible = ? ";
+            }
+
+            $sql .= 'GROUP BY s.module
+                     ORDER BY s.module ASC';
+
             $events = $DB->get_records_sql($sql, $params);
         }
 

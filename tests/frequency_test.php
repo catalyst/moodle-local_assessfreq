@@ -327,6 +327,8 @@ class frequency_testcase extends advanced_testcase {
      * Test getting site events and cache.
      */
     public function test_get_site_events() {
+        global $DB;
+
         $duedate = 0;
         $frequency = new frequency();
         $frequency->process_site_events($duedate);
@@ -347,6 +349,17 @@ class frequency_testcase extends advanced_testcase {
 
         $data = $sitecache->get('forum');
         $this->assertEmpty($data);
+
+        $this->course->visible = 0;
+        $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+
+        $result = $frequency->get_site_events('all', 0, 0, false);
+        $this->assertEmpty($result);
+
+        set_config('hiddencourses', '1', 'local_assessfreq');
+        $result = $frequency->get_site_events('all', 0, 0, false);
+        $this->assertCount(2, $result);
+
     }
 
     /**
@@ -382,6 +395,8 @@ class frequency_testcase extends advanced_testcase {
      * Test getting user events and cache.
      */
     public function test_get_user_events() {
+        global $DB;
+
         $duedate = 0;
         $frequency = new frequency();
         $frequency->process_site_events($duedate);
@@ -406,12 +421,24 @@ class frequency_testcase extends advanced_testcase {
 
         $data = $usercache->get('forum');
         $this->assertEmpty($data);
+
+        $this->course->visible = 0;
+        $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+
+        $result = $frequency->get_user_events($this->user1->id, 'all', 0, 0, false);
+        $this->assertEmpty($result);
+
+        set_config('hiddencourses', '1', 'local_assessfreq');
+        $result = $frequency->get_user_events($this->user1->id, 'all', 0, 0, false);
+        $this->assertCount(2, $result);
     }
 
     /**
      * Test getting all user events and cache.
      */
     public function test_get_user_events_all() {
+        global $DB;
+
         $duedate = 0;
         $frequency = new frequency();
         $frequency->process_site_events($duedate);
@@ -433,6 +460,16 @@ class frequency_testcase extends advanced_testcase {
 
         $data = $usercache->get('forum');
         $this->assertEmpty($data);
+
+        $this->course->visible = 0;
+        $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+
+        $result = $frequency->get_user_events_all('all', 0, 0, false);
+        $this->assertEmpty($result);
+
+        set_config('hiddencourses', '1', 'local_assessfreq');
+        $result = $frequency->get_user_events_all('all', 0, 0, false);
+        $this->assertCount(4, $result);
     }
 
     /**
@@ -527,7 +564,7 @@ class frequency_testcase extends advanced_testcase {
         // Record 6 should not have any conflicts because it is not a quiz.
         // Record 7 should not have any conflicts because it has no users.
 
-        // Insert records in to database.
+        // Insert records in to database.$this->course->id
         $records = array($lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4, $lasrecord5, $lasrecord6, $lasrecord7);
         $userids = array(234, 456, 789);
         $eventarray = array();
@@ -591,7 +628,7 @@ class frequency_testcase extends advanced_testcase {
             $record = new \stdClass();
             $record->module = 'quiz';
             $record->instanceid = $i;
-            $record->courseid = 2;
+            $record->courseid = $this->course->id;
             $record->contextid = $i;
             $record->timestart = 0; // Start can be fake for this test.
             $record->timeend = 0; // End can be fake for this test.
@@ -624,6 +661,16 @@ class frequency_testcase extends advanced_testcase {
 
         $data = $eventduecache->get($cachekey);
         $this->assertCount(12, $data->events);
+
+        $this->course->visible = 0;
+        $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+
+        $result = $frequency->get_events_due_by_month($year, false);
+        $this->assertEmpty($result);
+
+        set_config('hiddencourses', '1', 'local_assessfreq');
+        $result = $frequency->get_events_due_by_month($year, false);
+        $this->assertCount(12, $result);
     }
 
     /**
@@ -758,7 +805,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord1 = new \stdClass();
         $lasrecord1->module = 'quiz';
         $lasrecord1->instanceid = 1;
-        $lasrecord1->courseid = 2;
+        $lasrecord1->courseid = $this->course->id;
         $lasrecord1->contextid = 4;
         $lasrecord1->timestart = 1585728000; // Time in readable format 2020-04-01 @ 8:00:00am GMT.
         $lasrecord1->timeend = 1585814400; // Time in readable format 2020-04-02 @ 8:00:00am GMT.
@@ -769,7 +816,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord2 = new \stdClass();
         $lasrecord2->module = 'assign';
         $lasrecord2->instanceid = 2;
-        $lasrecord2->courseid = 2;
+        $lasrecord2->courseid = $this->course->id;
         $lasrecord2->contextid = 5;
         $lasrecord2->timestart = 1585814401; // Time in readable format 2020-04-02 @ 8:00:01am GMT.
         $lasrecord2->timeend = 1585900800; // Time in readable format 2020-04-03 @ 8:00:00am GMT.
@@ -780,7 +827,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord3 = new \stdClass();
         $lasrecord3->module = 'assign';
         $lasrecord3->instanceid = 3;
-        $lasrecord3->courseid = 2;
+        $lasrecord3->courseid = $this->course->id;
         $lasrecord3->contextid = 6;
         $lasrecord3->timestart = 1585900801; // Time in readable format 2020-04-03 @ 8:00:01am GMT.
         $lasrecord3->timeend = 1586073600; // Time in readable format 2020-04-05 @ 8:00:00am GMT.
@@ -791,7 +838,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord4 = new \stdClass();
         $lasrecord4->module = 'forum';
         $lasrecord4->instanceid = 4;
-        $lasrecord4->courseid = 2;
+        $lasrecord4->courseid = $this->course->id;
         $lasrecord4->contextid = 7;
         $lasrecord4->timestart = 1585987200; // Time in readable format 2020-04-04 @ 8:00:00am GMT.
         $lasrecord4->timeend = 1586160000; // Time in readable format 2020-04-06 @ 8:00:00am GMT.
@@ -802,7 +849,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord5 = new \stdClass();
         $lasrecord5->module = 'forum';
         $lasrecord5->instanceid = 5;
-        $lasrecord5->courseid = 2;
+        $lasrecord5->courseid = $this->course->id;
         $lasrecord5->contextid = 8;
         $lasrecord5->timestart = 1585987200; // Time in readable format 2020-04-04 @ 8:00:00am GMT.
         $lasrecord5->timeend = 1586160000; // Time in readable format 2020-04-06 @ 8:00:00am GMT.
@@ -830,12 +877,22 @@ class frequency_testcase extends advanced_testcase {
 
         $data = $yeareventscache->get($cachekey);
         $this->assertCount(3, $data->events);
+
+        $this->course->visible = 0;
+        $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+
+        $result = $frequency->get_events_due_by_activity($year, false);
+        $this->assertEmpty($result);
+
+        set_config('hiddencourses', '1', 'local_assessfreq');
+        $result = $frequency->get_events_due_by_activity($year, false);
+        $this->assertCount(3, $result);
     }
 
     /**
      * Test getting user events and cache.
      */
-    public function test_events_due_monthly_by_user() {
+    public function test_get_events_due_monthly_by_user() {
         global $DB;
         $year = 2020;
 
@@ -845,7 +902,7 @@ class frequency_testcase extends advanced_testcase {
             $record = new \stdClass();
             $record->module = 'quiz';
             $record->instanceid = $i;
-            $record->courseid = 2;
+            $record->courseid = $this->course->id;
             $record->contextid = $i;
             $record->timestart = 0; // Start can be fake for this test.
             $record->timeend = 0; // End can be fake for this test.
@@ -885,6 +942,16 @@ class frequency_testcase extends advanced_testcase {
 
          $data = $monthlyusercache->get($cachekey);
          $this->assertCount(12, $data->events);
+
+         $this->course->visible = 0;
+         $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+
+         $result = $frequency->get_events_due_monthly_by_user($year, false);
+         $this->assertEmpty($result);
+
+         set_config('hiddencourses', '1', 'local_assessfreq');
+         $result = $frequency->get_events_due_monthly_by_user($year, false);
+         $this->assertCount(12, $result);
     }
 
     /**
