@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class frequency {
 
@@ -892,9 +892,9 @@ class frequency {
 
         // Iterate through the events, building the frequency array.
         foreach ($events as $event) {
-            error_log(print_r($event, true));
             $month = $event->endmonth;
             $day = $event->endday;
+            $module = $event->module;
 
             // Construct the multidimensional array.
             if (empty($freqarray[$year][$month][$day])) {
@@ -904,6 +904,11 @@ class frequency {
             }
 
             // Add the event counts.
+            if (empty($freqarray[$year][$month][$day][$module])) {
+                $freqarray[$year][$month][$day][$module] = 1;
+            } else {
+                $freqarray[$year][$month][$day][$module]++;
+            }
 
         }
 

@@ -49,6 +49,7 @@ $string['duedate'] = 'Due date';
 $string['eventeventprocessed'] = 'event_processed';
 $string['eventeven_processed_desc'] = 'local assessfreq task event processing';
 $string['numberassessments'] = 'By number of assessments';
+$string['numberevents'] = 'Event Count';
 $string['numberstudents'] = 'By number of students with assessments';
 $string['privacy:metadata:local_assessfreq'] = 'Data relating users for the local assessfreq plugin';
 $string['privacy:metadata:local_assessfreq_user'] = 'Data relating users with assessment events';

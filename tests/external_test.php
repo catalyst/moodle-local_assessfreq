@@ -108,7 +108,7 @@ class local_assessfreq_external_testcase extends advanced_testcase {
     }
 
     /**
-     * Test ajax getting of event data..
+     * Test ajax getting of event data.
      */
     public function test_get_frequency() {
         global $DB;
@@ -147,5 +147,17 @@ class local_assessfreq_external_testcase extends advanced_testcase {
 
         $this->assertEquals(2, $eventarr[2020][3][29]['number']);
         $this->assertEquals(2, $eventarr[2020][3][28]['number']);
+    }
+
+    /**
+     * Test ajax getting of event data..
+     */
+    public function test_get_process_modules() {
+
+        $returnvalue = local_assessfreq_external::get_process_modules();
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_process_modules_returns(), $returnvalue);
+        $eventarr = json_decode($returnjson, true);
+
+        error_log(print_r($eventarr, true));
     }
 }

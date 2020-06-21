@@ -19,7 +19,7 @@
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -34,7 +34,7 @@ use local_assessfreq\frequency;
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class frequency_testcase extends advanced_testcase {
 
@@ -970,11 +970,15 @@ class frequency_testcase extends advanced_testcase {
         $result = $frequency->get_frequency_array($year, $metric, $modules);
         $this->assertEquals(1, $result[2020][3][29]['number']);
         $this->assertEquals(1, $result[2020][3][28]['number']);
+        $this->assertEquals(1, $result[2020][3][29]['assign']);
+        $this->assertEquals(1, $result[2020][3][28]['assign']);
 
         $metric = 'students';
         $result = $frequency->get_frequency_array($year, $metric, $modules);
         $this->assertEquals(2, $result[2020][3][29]['number']);
         $this->assertEquals(2, $result[2020][3][28]['number']);
+        $this->assertEquals(2, $result[2020][3][29]['assign']);
+        $this->assertEquals(2, $result[2020][3][28]['assign']);
 
     }
 

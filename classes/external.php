@@ -97,7 +97,6 @@ class local_assessfreq_external extends external_api {
      * This method doesn't require login or user session update.
      * It also doesn't need any capability check.
      *
-     * @param string $jsondata JSON data.
      * @return string JSON response.
      */
     public static function get_heat_colors() {
@@ -115,6 +114,46 @@ class local_assessfreq_external extends external_api {
      * @return external_description
      */
     public static function get_heat_colors_returns() {
+        return new external_value(PARAM_RAW, 'Event JSON');
+    }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return void
+     */
+    public static function get_process_modules_parameters() {
+        return new external_function_parameters(array(
+            // If I had params they'd be here, but I don't, so they're not.
+        ));
+    }
+
+    /**
+     * Returns modules enabled for processing along with their module name string.
+     *
+     * @return string JSON response.
+     */
+    public static function get_process_modules() {
+        \core\session\manager::write_close(); // Close session early this is a read op.
+
+        $modulesandstrings = array('number' => get_string('numberevents', 'local_assessfreq'));
+
+        // Execute API call.
+        $frequency = new \local_assessfreq\frequency();
+        $processmodules = $frequency->get_process_modules();
+
+        foreach ($processmodules as $module) {
+            $modulesandstrings[$module] = get_string('modulename', $module);
+        }
+
+        return json_encode($modulesandstrings);
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function get_process_modules_returns() {
         return new external_value(PARAM_RAW, 'Event JSON');
     }
 }

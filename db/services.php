@@ -43,4 +43,13 @@ $functions = array(
         'loginrequired' => false,
         'ajax' => true
     ),
+    'local_assessfreq_get_process_modules' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_process_modules',
+        'classpath' => '',
+        'description' => 'Returns modules we are processing .',
+        'type' => 'read',
+        'loginrequired' => false,
+        'ajax' => true
+    ),
 );

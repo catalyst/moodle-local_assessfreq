@@ -54,6 +54,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     var heatRangeMax;
     var heatRangeMin;
     var colorArray;
+    var processModules;
 
     /**
      * Check how many days in a month code.
@@ -82,6 +83,25 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 resolve(colorArray);
             }).fail(function() {
                 reject(new Error('Failed to get heat colors'));
+            });
+        });
+    };
+
+    /**
+     * Get the event names that we are processing.
+     *
+     * @method getProcessEvents
+     */
+    const getProcessModules = function() {
+        return new Promise((resolve, reject) => {
+            Ajax.call([{
+                methodname: 'local_assessfreq_get_process_modules',
+                args: {},
+            }], true, false)[0].done(function(response) {
+                processModules = JSON.parse(response);
+                resolve(processModules);
+            }).fail(function() {
+                reject(new Error('Failed to get process events'));
             });
         });
     };
@@ -256,6 +276,16 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         });
     };
 
+    const getTooltip = function(dayArray) {
+        let tipHTML = '';
+
+        for (let [key, value] of Object.entries(dayArray)) {
+            tipHTML += '<strong>' + processModules[key] + ':</strong> ' + value + '<br/>';
+       }
+
+        return tipHTML;
+    };
+
     /**
      * Generate calendar markup for the month.
      *
@@ -291,7 +321,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
 
                         // Add tooltip to cell.
                         cell.dataset.toggle = 'tooltip';
-                        cell.title = 'the tool tip shize';
+                        cell.dataset.html = 'true';
+                        cell.title = getTooltip(monthEvents[date]);
                     }
                     if (date === today.getDate()
                             && parseInt(year) === today.getFullYear() && parseInt(month) === today.getMonth()) {
@@ -372,7 +403,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 calcHeatRange(eventArray, dateObj);
             })
             .then(getHeatColors)
-            .then(() => { // Get events for settings.
+            .then(getProcessModules)
+            .then(() => {
                 return dateObj;
             })
             .then(createTables) // Create tables for calendar.
