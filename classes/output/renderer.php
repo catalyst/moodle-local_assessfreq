@@ -119,12 +119,14 @@ class renderer extends plugin_renderer_base {
             $context['modules'][] = array('module' => array('val' => 'all', 'name' => get_string('all')));
         }
 
-        foreach ($modules as $module) {
-            $modulename = get_string('modulename', $module);
-            if (in_array($module, $preferencemodules)) {
-                $context['modules'][] = array('module' => array('val' => $module, 'name' => $modulename,  'active' => 'true'));
-            } else {
-                $context['modules'][] = array('module' => array('val' => $module, 'name' => $modulename));
+        if (!empty($modules[0])){
+            foreach ($modules as $module) {
+                $modulename = get_string('modulename', $module);
+                if (in_array($module, $preferencemodules)) {
+                    $context['modules'][] = array('module' => array('val' => $module, 'name' => $modulename,  'active' => 'true'));
+                } else {
+                    $context['modules'][] = array('module' => array('val' => $module, 'name' => $modulename));
+                }
             }
         }
 

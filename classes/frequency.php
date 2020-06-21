@@ -154,6 +154,7 @@ class frequency {
      * @return string $sql The generated SQL.
      */
     private function get_sql_query(string $module) : string {
+        $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
 
         $duedate = $this->modulefield[$module];
         $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.' . $duedate . ' AS duedate
@@ -165,8 +166,12 @@ class frequency {
                  WHERE m.name = ?
                        AND c.contextlevel = ?
                        AND a.' . $duedate . ' >= ?
-                       AND cm.visible = ?
-                       AND course.visible = ?';
+                       AND cm.visible = ?';
+
+        if (!$includehiddencourses) {
+            $sql .= ' AND course.visible = ?';
+        }
+
         return $sql;
     }
 
@@ -216,6 +221,7 @@ class frequency {
         $toinsert = array();
 
         foreach ($recordset as $record) {
+
             // Iterate through the records and insert to database in batches.
             $timeelements = $this->format_time($record->duedate);
             $insertrecord = new \stdClass();
@@ -259,13 +265,18 @@ class frequency {
     public function process_site_events(int $duedate) : int {
         $recordsprocessed = 0;
         $enabledmods = $this->get_process_modules();
-        $hiddencourses = get_config('local_assessfreq', 'hiddencourses');
+        $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
 
         if (!empty($enabledmods[0])){
             // Itterate through modules.
             foreach ($enabledmods as $module) {
                 $sql = $this->get_sql_query($module);
-                $params = array($module, CONTEXT_MODULE, $duedate, 1, (int)$hiddencourses);
+                if ($includehiddencourses) {
+                    $params = array($module, CONTEXT_MODULE, $duedate, 1);
+                } else {
+                    $params = array($module, CONTEXT_MODULE, $duedate, 1, 1);
+                }
+
                 $moduleevents = $this->get_module_events($sql, $params); // Get all events for module.
                 $recordsprocessed += $this->process_module_events($moduleevents); // Store events.
             }
@@ -763,6 +774,7 @@ class frequency {
 
         // Try to get value from cache.
         $usercache = cache::make('local_assessfreq', 'yearevents');
+
         $data = $usercache->get($cachekey);
 
         if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
@@ -913,6 +925,27 @@ class frequency {
         );
 
         return $heatcolors;
+    }
+
+    /**
+     * Purge all plugin caches.
+     * This is invoked when a plugin setting is changed.
+     *
+     * @param string $name Name of the setting change that invoked the purge.
+     */
+    static public function purge_caches($name): void {
+        global $CFG;
+
+        // Get plugin cache definitiions/
+        $definitions = array();
+        include($CFG->dirroot . '/local/assessfreq/db/caches.php');
+        $definitionnames = array_keys($definitions);
+
+        // Clear each cache.
+        foreach ($definitionnames as $definitionname) {
+            $cache = cache::make('local_assessfreq', $definitionname);
+            $cache->purge();
+        }
     }
 
     /**

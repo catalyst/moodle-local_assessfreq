@@ -55,23 +55,29 @@ foreach ($modules as $module) {
     }
 }
 
-$sitesettings->add(new admin_setting_configmulticheckbox('local_assessfreq/modules',
+$setting = new admin_setting_configmulticheckbox('local_assessfreq/modules',
     get_string('settings:modules', 'local_assessfreq'),
     get_string('settings:modules_desc', 'local_assessfreq'),
     $modules,
-    $modarray));
+    $modarray);
+$setting->set_updatedcallback('\local_assessfreq\frequency::purge_caches');
+$sitesettings->add($setting);
 
 // Include disabled modules.
-$sitesettings->add(new admin_setting_configcheckbox('local_assessfreq/disabledmodules',
+$setting =new admin_setting_configcheckbox('local_assessfreq/disabledmodules',
     get_string('settings:disabledmodules', 'local_assessfreq'),
     get_string('settings:disabledmodules_desc', 'local_assessfreq'),
-    1));
+    1);
+$setting->set_updatedcallback('\local_assessfreq\frequency::purge_caches');
+$sitesettings->add($setting);
 
 // Include hidden courses.
-$sitesettings->add(new admin_setting_configcheckbox('local_assessfreq/hiddencourses',
+$setting = new admin_setting_configcheckbox('local_assessfreq/hiddencourses',
     get_string('settings:hiddencourses', 'local_assessfreq'),
     get_string('settings:hiddencourses_desc', 'local_assessfreq'),
-    0));
+    0);
+$setting->set_updatedcallback('\local_assessfreq\frequency::purge_caches');
+$sitesettings->add($setting);
 
 // Heat settings.
 $sitesettings->add(new admin_setting_heading('local_assessfreq/heatheading',
