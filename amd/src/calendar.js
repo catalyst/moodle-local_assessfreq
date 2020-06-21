@@ -288,6 +288,10 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                         let heat = getHeat(monthEvents[date]['number']);
                         cell.style.backgroundColor = colorArray[heat];
+
+                        // Add tooltip to cell.
+                        cell.dataset.toggle = 'tooltip';
+                        cell.title = 'the tool tip shize';
                     }
                     if (date === today.getDate()
                             && parseInt(year) === today.getFullYear() && parseInt(month) === today.getMonth()) {

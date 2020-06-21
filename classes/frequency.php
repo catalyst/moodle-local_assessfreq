@@ -892,6 +892,7 @@ class frequency {
 
         // Iterate through the events, building the frequency array.
         foreach ($events as $event) {
+            error_log(print_r($event, true));
             $month = $event->endmonth;
             $day = $event->endday;
 
@@ -901,6 +902,8 @@ class frequency {
             } else {
                 $freqarray[$year][$month][$day]['number']++;
             }
+
+            // Add the event counts.
 
         }
 
