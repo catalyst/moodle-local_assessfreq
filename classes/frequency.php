@@ -68,14 +68,15 @@ class frequency {
      */
     private $capabilitymap = array (
         'assign' => array('mod/assign:submit', 'mod/assign:view'),
-        'choice' => array(),
-        'data' => array(),
-        'feedback' => array(),
-        'forum' => array(),
-        'lesson' => array(),
-        'quiz' => array(),
-        'scorm' => array(),
-        'workshop' => array()
+        'choice' => array('mod/choice:choose', 'mod/choice:view'),
+        'data' => array('mod/data:writeentry', 'mod/data:viewentry', 'mod/data:view'),
+        'feedback' => array('mod/feedback:complete', 'mod/feedback:viewanalysepage', 'mod/feedback:view'),
+        'forum' => array(
+            'mod/forum:startdiscussion', 'mod/forum:createattachment', 'mod/forum:replypost', 'mod/forum:viewdiscussion'),
+        'lesson' => array('mod/lesson:view'),
+        'quiz' => array('mod/quiz:attempt', 'mod/quiz:view'),
+        'scorm' => array('mod/scorm:savetrack', 'mod/scorm:viewscores'),
+        'workshop' => array('mod/workshop:submit', 'mod/workshop:view')
     );
 
     /**
