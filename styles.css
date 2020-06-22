@@ -21,3 +21,30 @@
     height: 36px;
     text-align: center;
 }
+
+#local-assessfreq-report-summary .card-header {
+    display: flex;
+}
+
+#local-assessfreq-report-summary .local-assessfreq-zoom {
+    margin-left: auto;
+}
+
+#local-assessfreq-report-summary .local-assessfreq-zoom .icon {
+    font-size: 24px;
+    color: #6c757d;
+}
+
+#local-assessfreq-report-summary .local-assessfreq-zoom i:hover {
+    color: #111111;
+    cursor: pointer;
+}
+
+.modal-dialog.local-assessfreq-modal-large {
+    max-width: 80%;
+}
+
+.modal-dialog.local-assessfreq-modal-large .modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}

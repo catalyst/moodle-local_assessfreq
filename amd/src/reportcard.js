@@ -21,8 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'local_assessfreq/calendar'],
-function(Ajax, Fragment, Templates, Notification, Calendar) {
+define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'local_assessfreq/calendar', 'core/str',
+    'core/modal_factory', 'local_assessfreq/modal_large'],
+function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, ModalLarge) {
 
     /**
      * Module level variables.
@@ -35,6 +36,10 @@ function(Ajax, Fragment, Templates, Notification, Calendar) {
     var timeout;
     var modulesJson = '';
     var heatmapOptionsJson = '';
+    var modalObj;
+    const spinner = '<p class="text-center">'
+        + '<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>'
+        + '</p>';
 
     const cards = [
         {cardId: 'local-assessfreq-assess-due-month', call: 'assess_by_month'},
@@ -69,15 +74,15 @@ function(Ajax, Fragment, Templates, Notification, Calendar) {
      *
      */
     const getCardCharts = function() {
-        cards.forEach(function(cardData) {
-            var cardElement = document.getElementById(cardData.cardId);
-            var spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
-            var chartbody = cardElement.getElementsByClassName('chart-body')[0];
-            var params = {'data': JSON.stringify({'year' : yearselect, 'call': cardData.call})};
+        cards.forEach((cardData) => {
+            let cardElement = document.getElementById(cardData.cardId);
+            let spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
+            let chartbody = cardElement.getElementsByClassName('chart-body')[0];
+            let params = {'data': JSON.stringify({'year' : yearselect, 'call': cardData.call})};
 
             spinner.classList.remove('hide'); // Show sinner if not already shown.
             Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
-            .done(function(response) {
+            .done((response) => {
                 var context = { 'withtable' : true, 'chartdata' : response };
                 Templates.render('core/chart', context).done((html, js) => {
                     spinner.classList.add('hide'); // Hide sinner if not already hidden.
@@ -301,7 +306,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar) {
             let module = links[i].dataset.module;
 
             if (module.toLowerCase() === 'all') {
-                links[i].addEventListener("click", function(event){
+                links[i].addEventListener('click', function(event){
                     event.preventDefault();
                     // Remove active class from all other links.
                     for (var j = 0; j < links.length; j++) {
@@ -310,7 +315,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar) {
                     updateHeatmapDebounce(); // Call function to update heatmap.
                 });
             } else if (module.toLowerCase() === 'close') {
-                links[i].addEventListener("click", function(event){
+                links[i].addEventListener('click', function(event){
                     event.preventDefault();
                     event.stopPropagation();
 
@@ -321,7 +326,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar) {
                 });
 
             } else {
-                links[i].addEventListener("click", function(event){
+                links[i].addEventListener('click', function(event){
                     event.preventDefault();
                     event.stopPropagation();
 
@@ -336,6 +341,54 @@ function(Ajax, Fragment, Templates, Notification, Calendar) {
     };
 
     /**
+     *
+     */
+    const zoomGraph = function(event) {
+        let title = event.target.parentElement.dataset.title;
+        let call = event.target.parentElement.dataset.call;
+
+        let params = {'data': JSON.stringify({'year' : yearselect, 'call': call})};
+
+        Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
+        .done((response) => {
+            var context = { 'withtable' : true, 'chartdata' : response };
+            modalObj.setTitle(title);
+            modalObj.setBody(Templates.render('core/chart', context));
+            modalObj.show();
+            return;
+        }).fail(() => {
+            Notification.exception(new Error('Failed to load card year filter'));
+            return;
+        });
+
+    };
+
+    /**
+     * Create the modal window for graph zooming.
+     *
+     * @private
+     */
+    const createModal = function() {
+        return new Promise((resolve, reject) => {
+            Str.get_string('loading', 'core').then((title) => {
+                // Create the Modal.
+
+                ModalFactory.create({
+                    type: ModalLarge.TYPE,
+                    title: title,
+                    body: spinner
+                })
+                .done((modal) => {
+                    modalObj = modal;
+                    resolve();
+                });
+            }).catch(() => {
+                reject(new Error('Failed to load string: loading'));
+            });
+        });
+    };
+
+    /**
      * Initialise method for report card rendering.
      *
      * @param {integer} context The current context id.
@@ -344,23 +397,36 @@ function(Ajax, Fragment, Templates, Notification, Calendar) {
         contextid = context;
 
         // Set up event listener and related actions for year dropdown on report cards.
-        var cardsYearSelectElement = document.getElementById('local-assessfreq-cards-year');
+        let cardsYearSelectElement = document.getElementById('local-assessfreq-cards-year');
         yearselect = cardsYearSelectElement.getElementsByClassName('active')[0].dataset.year;
-        cardsYearSelectElement.addEventListener("click", yearButtonAction);
+        cardsYearSelectElement.addEventListener('click', yearButtonAction);
 
         // Set up event listener and related actions for year dropdown on heatmp.
-        var cardsYearSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-year');
+        let cardsYearSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-year');
         yearselectheatmap = cardsYearSelectHeatmapElement.getElementsByClassName('active')[0].dataset.year;
-        cardsYearSelectHeatmapElement.addEventListener("click", yearHeatmapButtonAction);
+        cardsYearSelectHeatmapElement.addEventListener('click', yearHeatmapButtonAction);
 
         // Set up event listener and related actions for metric dropdown on heatmp.
-        var cardsMetricSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-metrics');
+        let cardsMetricSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-metrics');
         metricselectheatmap = cardsMetricSelectHeatmapElement.getElementsByClassName('active')[0].dataset.metric;
-        cardsMetricSelectHeatmapElement.addEventListener("click", metricHeatmapButtonAction);
+        cardsMetricSelectHeatmapElement.addEventListener('click', metricHeatmapButtonAction);
 
         // Set up event listener and related actions for module dropdown on heatmp.
-        var cardsModulesSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-modules');
+        let cardsModulesSelectHeatmapElement = document.getElementById('local-assessfreq-heatmap-modules');
         moduleListChildrenEvents(cardsModulesSelectHeatmapElement);
+
+        // Set up zoom event listeners.
+        let dueMonthZoom = document.getElementById('local-assessfreq-assess-due-month-zoom');
+        dueMonthZoom.addEventListener('click', zoomGraph);
+
+        let dueActivityZoom = document.getElementById('local-assessfreq-assess-by-activity-zoom');
+        dueActivityZoom.addEventListener('click', zoomGraph);
+
+        let dueStudentZoom = document.getElementById('local-assessfreq-assess-due-month-student-zoom');
+        dueStudentZoom.addEventListener('click', zoomGraph);
+
+        // Create the zoom modal.
+        createModal();
 
         // Process loading for the assessment cards.
         getCardCharts();

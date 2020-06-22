@@ -94,6 +94,7 @@ $string['systemdisabled'] = ' (module disabled)';
 $string['task:dataprocess'] = 'Data collection task';
 $string['toggleoverview'] = 'Toggle overview graphs';
 $string['url'] = 'URL';
+$string['zoom'] = 'Zoom in';
 $string['jan'] = 'January';
 $string['feb'] = 'February';
 $string['mar'] = 'March';
