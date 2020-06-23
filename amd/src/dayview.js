@@ -35,7 +35,42 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
 
     const formatData = function(response) {
         return new Promise((resolve) => {
-                resolve(response);
+            let responseArr = JSON.parse(response);
+
+            // We are displaying the event as a bar whose width represents the start and end time of the event.
+            // We need to scale the width of the bar to match the width of the container. Therefore 100% width of the container
+            // equals 24 hours (one day).
+            // There are 1440 mins per day. 1440 mins equals 100%, therefore 1 min = (100/1440)%. 5/72 == 100/1440.
+            let scaler = 5/72;
+
+            for (let i=0; i<responseArr.length; i++) {
+                const year = responseArr[i].endyear;
+                const month = (responseArr[i].endmonth) - 1; // Minus 1 for difference between months in PHP and JS.
+                const day = responseArr[i].endday;
+                const dayStart = (new Date(year, day, month).getTime()) / 1000;
+                let secondsSinceDayStart = responseArr[i].timestart - dayStart;
+                let leftMargin = 0;
+                let width = 0;
+
+                if (secondsSinceDayStart <= 0) {
+                    secondsSinceDayStart = 0;
+                    width = ((responseArr[i].timeend - dayStart) / 60) * scaler;
+                    window.console.log(width);
+                } else {
+                    leftMargin = (secondsSinceDayStart / 60) * scaler;
+                    width = ((responseArr[i].timeend - responseArr[i].timestart) / 60) * scaler;
+                }
+
+                if (leftMargin + width > 100) {
+                    width = 100 - leftMargin;
+                }
+
+                responseArr[i].leftmargin = leftMargin;
+                responseArr[i].width = width;
+                window.console.log(responseArr[i]);
+            }
+
+            resolve(responseArr);
         });
     };
 
@@ -56,14 +91,14 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
             args: {jsondata: jsonArgs},
         }])[0]
         .then(formatData)
-        .then((response) => {
-            window.console.log(JSON.parse(response));
-            let context = {rows: JSON.parse(response)};
+        .then((responseArr) => {
+
+            let context = {rows: responseArr};
             modalObj.setBody(Templates.render('local_assessfreq/dayview', context));
             modalObj.show();
 
         }).fail(() => {
-            Notification.exception(new Error('Failed to get heat colors'));
+            Notification.exception(new Error('Failed to load day view'));
         });
 
         //modalObj.setTitle(title);
