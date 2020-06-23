@@ -90,6 +90,7 @@ $string['settings:moduleheading'] = 'Modules and courses';
 $string['settings:moduleheading_desc'] = 'These settings control how modules and courses are used in processing';
 $string['settings:disabledmodules'] = 'Include disabled modules';
 $string['settings:disabledmodules_desc'] = 'Include modules that have been disabled in calculations';
+$string['students'] = '({$a} Students)';
 $string['systemdisabled'] = ' (module disabled)';
 $string['task:dataprocess'] = 'Data collection task';
 $string['toggleoverview'] = 'Toggle overview graphs';

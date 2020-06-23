@@ -111,7 +111,6 @@ class local_assessfreq_external_testcase extends advanced_testcase {
      * Test ajax getting of event data.
      */
     public function test_get_frequency() {
-        global $DB;
         $this->setAdminUser();
 
         $duedate = 0;
@@ -150,14 +149,62 @@ class local_assessfreq_external_testcase extends advanced_testcase {
     }
 
     /**
-     * Test ajax getting of event data..
+     * Test ajax getting of event data.
      */
     public function test_get_process_modules() {
+        global $DB;
+
+        $DB->set_field('modules', 'visible', '0', array('name' => 'scorm'));
+        $DB->set_field('modules', 'visible', '0', array('name' => 'choice'));
+
+        set_config('modules', 'quiz,assign,scorm,choice', 'local_assessfreq');
+        set_config('disabledmodules', '0', 'local_assessfreq');
 
         $returnvalue = local_assessfreq_external::get_process_modules();
         $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_process_modules_returns(), $returnvalue);
         $eventarr = json_decode($returnjson, true);
 
-        error_log(print_r($eventarr, true));
+        $this->assertArrayHasKey('quiz', $eventarr);
+        $this->assertArrayHasKey('assign', $eventarr);
+        $this->assertArrayNotHasKey('scorm', $eventarr);
+        $this->assertArrayNotHasKey('choice', $eventarr);
+
+        set_config('disabledmodules', '1', 'local_assessfreq');
+        $returnvalue = local_assessfreq_external::get_process_modules();
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_process_modules_returns(), $returnvalue);
+        $eventarr = json_decode($returnjson, true);
+
+        $this->assertArrayHasKey('quiz', $eventarr);
+        $this->assertArrayHasKey('assign', $eventarr);
+        $this->assertArrayHasKey('scorm', $eventarr);
+        $this->assertArrayHasKey('choice', $eventarr);
+
+    }
+
+    /**
+     * Test ajax getting of day event data.
+     */
+    public function test_get_day_events() {
+        $this->setAdminUser();
+
+        $frequency = new frequency();
+        $frequency->process_site_events(0);
+        $frequency->process_user_events(0);
+
+        $data = new \stdClass;
+        $data->date  = '2020-03-28';
+        $data->modules = array('all');
+
+        $jsondata = json_encode($data);
+
+        $returnvalue = local_assessfreq_external::get_day_events($jsondata);
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_day_events_returns(), $returnvalue);
+        $eventarr = json_decode($returnjson, true);
+
+        $this->assertEquals('assign', $eventarr[0]['module']);
+        $this->assertEquals(2, $eventarr[0]['usercount']);
+        $this->assertEquals(2020, $eventarr[0]['endyear']);
+        $this->assertEquals(3, $eventarr[0]['endmonth']);
+        $this->assertEquals(28, $eventarr[0]['endday']);
     }
 }

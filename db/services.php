@@ -52,4 +52,12 @@ $functions = array(
         'loginrequired' => false,
         'ajax' => true
     ),
+    'local_assessfreq_get_day_events' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_day_events',
+        'classpath' => '',
+        'description' => 'Gets day event info for use in heatmap.',
+        'type' => 'read',
+        'ajax' => true
+    ),
 );

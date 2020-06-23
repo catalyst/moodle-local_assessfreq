@@ -50,7 +50,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         {key: 'dec', component: 'local_assessfreq'},
     ];
     var stringResult;
-    const today = new Date();
     var heatRangeMax;
     var heatRangeMin;
     var colorArray;
@@ -185,10 +184,10 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 args: {
                     jsondata: jsonArgs
                 },
-            }])[0].done(function(response) {
+            }])[0].done((response) => {
                 eventArray = JSON.parse(response);
                 resolve(eventArray);
-            }).fail(function() {
+            }).fail(() => {
                 reject(new Error('Failed to get events'));
             });
         });
@@ -276,6 +275,12 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         });
     };
 
+    /**
+     * Generate the tooltip HTML.
+     *
+     * @param {Object} dayArray The details of the events for that day/
+     * @return {String} tipHTML The HTML for the tooltip.
+     */
     const getTooltip = function(dayArray) {
         let tipHTML = '';
 
@@ -306,13 +311,11 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 if (i === 0 && j < firstDay) {
                     var cell = document.createElement("td");
                     var cellText = document.createTextNode("");
-                    cell.appendChild(cellText);
-                    row.appendChild(cell);
-                }
-                else if (date > daysInMonth(month, year)) { // Break if we have generated all the days for this month.
+                    cell.dataset.event = 'false';
+
+                } else if (date > daysInMonth(month, year)) { // Break if we have generated all the days for this month.
                     break;
-                }
-                else {
+                } else {
                     cell = document.createElement("td");
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
@@ -322,17 +325,17 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                         // Add tooltip to cell.
                         cell.dataset.toggle = 'tooltip';
                         cell.dataset.html = 'true';
+                        cell.dataset.event = 'true';
+                        cell.dataset.date = year + '-' + (month +1) + '-' + date;
                         cell.title = getTooltip(monthEvents[date]);
+                        cell.style.cursor = "pointer";
+
                     }
-                    if (date === today.getDate()
-                            && parseInt(year) === today.getFullYear() && parseInt(month) === today.getMonth()) {
-                        cell.classList.add("bg-info");
-                    } // Color today's date.
-                    cell.appendChild(cellText);
-                    row.appendChild(cell);
                     date++;
                 }
 
+                cell.appendChild(cellText);
+                row.appendChild(cell);
             }
             table.appendChild(row); // Appending each row into calendar body.
         }

@@ -156,4 +156,52 @@ class local_assessfreq_external extends external_api {
     public static function get_process_modules_returns() {
         return new external_value(PARAM_RAW, 'Event JSON');
     }
+
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return void
+     */
+    public static function get_day_events_parameters() {
+        return new external_function_parameters(array(
+            'jsondata' => new external_value(PARAM_RAW, 'The data encoded as a json array')
+        ));
+    }
+
+    /**
+     * Returns event frequency map for all users in site.
+     *
+     * @param string $jsondata JSON data.
+     * @return string JSON response.
+     */
+    public static function get_day_events($jsondata) {
+        \core\session\manager::write_close(); // Close session early this is a read op.
+
+        // Parameter validation.
+        self::validate_parameters(
+            self::get_day_events_parameters(),
+            array('jsondata' => $jsondata)
+            );
+
+        // Context validation and permission check.
+        $context = context_system::instance();
+        self::validate_context($context);
+        has_capability('moodle/site:config', $context);
+
+        // Execute API call.
+        $data = json_decode($jsondata, true);
+        $frequency = new \local_assessfreq\frequency();
+        $freqarr = $frequency->get_day_events($data['date'], $data['modules']);
+
+        return json_encode($freqarr);
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function get_day_events_returns() {
+        return new external_value(PARAM_RAW, 'Event JSON');
+    }
 }

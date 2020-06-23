@@ -22,8 +22,8 @@
  */
 
 define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'local_assessfreq/calendar', 'core/str',
-    'core/modal_factory', 'local_assessfreq/modal_large'],
-function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, ModalLarge) {
+    'core/modal_factory', 'local_assessfreq/modal_large', 'local_assessfreq/dayview'],
+function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, ModalLarge, Dayview) {
 
     /**
      * Module level variables.
@@ -136,6 +136,16 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
     };
 
     /**
+     *
+     */
+    const detailView = function(event) {
+        let element = event.target;
+        if (element.tagName.toLowerCase() === 'td' && element.dataset.event == 'true') { // Only act on certain elements.
+            Dayview.display(element.dataset.date);
+        }
+    };
+
+    /**
      * Start heatmap generation.
      *
      */
@@ -152,6 +162,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
         Calendar.generate(year, 0, 11, metric, modules).then(calendar => {
             let calendarContainer = document.getElementById('local-assessfreq-report-heatmap-months');
             calendarContainer.innerHTML = calendar.innerHTML;
+            calendarContainer.addEventListener('click', detailView);
             spinner.classList.add('hide'); // Hide sinner if not already hidden.
             return;
         }).catch(() => {
@@ -427,6 +438,9 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
 
         // Create the zoom modal.
         createModal();
+
+        // Setup the dayview modal.
+        Dayview.init();
 
         // Process loading for the assessment cards.
         getCardCharts();

@@ -1048,4 +1048,24 @@ class frequency_testcase extends advanced_testcase {
         $this->assertContains('scorm', $result);
         $this->assertContains('choice', $result);
     }
+
+    /**
+     * Test getting day event information.
+     */
+    public function test_get_day_events() {
+        $date = '2020-3-28';
+        $modules = array('all');
+
+        $frequency = new frequency();
+        $frequency->process_site_events(0);
+        $frequency->process_user_events(0);
+        $result = $frequency->get_day_events($date, $modules);
+
+        $this->assertEquals('assign', $result[0]->module);
+        $this->assertEquals(2, $result[0]->usercount);
+        $this->assertEquals(2020, $result[0]->endyear);
+        $this->assertEquals(3, $result[0]->endmonth);
+        $this->assertEquals(28, $result[0]->endday);
+
+    }
 }

@@ -495,6 +495,61 @@ class frequency {
         return $events;
     }
 
+
+    /**
+     * Get all events that are ending on a given date.
+     *
+     * @param string $module The module to get events for or all events.
+     * @param string $date The end date for the event.
+     * @return array $events An array of site events
+     */
+    public function get_day_ending_events(string $module='all', string $date): array {
+        global $DB;
+        $events = array();
+
+        // TODO: Think about some caching here.
+        // TODO: Improve unit test coverage for this.
+
+        list($year, $month, $day) = explode('-', $date);
+        $from = 0;
+        $tostart = mktime(0, 0, 0, $month, $day, $year);
+        $toend = mktime(23, 59, 59, $month, $day, $year);
+
+        $sql = "SELECT s.*
+                  FROM {local_assessfreq_site} s
+             LEFT JOIN {course} c ON s.courseid = c.id";
+
+        // Get data from database.
+        if ($module == 'all') {
+            $modules = $this->get_process_modules();
+            list ($insql, $params) = $DB->get_in_or_equal($modules);
+            $sql .= " WHERE s.module $insql";
+        } else {
+            $params = array(
+                $module
+            );
+            $sql .= " WHERE s.module = ?";
+        }
+
+        $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
+        if (! $includehiddencourses) {
+            $params[] = 1;
+            $sql .= " AND c.visible = ?";
+        }
+
+        // Date sorting.
+        $sql .= " AND s.timestart >= ?
+                  AND s.timeend >= ?
+                  AND s.timeend <= ?";
+        $params[] = $from;
+        $params[] = $tostart;
+        $params[] = $toend;
+
+        $events = $DB->get_records_sql($sql, $params);
+
+        return $events;
+    }
+
     /**
      * Return events for a given course.
      *
@@ -849,6 +904,41 @@ class frequency {
         }
 
         return $years;
+    }
+
+
+    public function get_day_events(string $date, array $modules): array {
+        $dayevents = array();
+
+        if (empty($modules)) {
+            $modules = array('all');
+        }
+
+        // Get the raw events.
+        if (in_array('all', $modules)) {
+            $events = $this->get_day_ending_events('all', $date);
+        } else {
+            // Work through the event array.
+            foreach ($modules as $module) {
+                if ($module == 'all') {
+                    continue;
+                } else {
+                    $events = array_merge($events, $this->get_day_ending_events($module, $date));
+                }
+            }
+        }
+
+        // Get additional information and format the event data.
+        foreach ($events as $event) {
+            $context = \context::instance_by_id($event->contextid);
+            $event->name = $context->get_context_name();
+            $event->url = $context->get_url()->out();
+            $event->usercount = count($this->get_event_users($event->contextid, $event->module));
+
+            $dayevents[] = $event;
+        }
+
+        return $dayevents;
     }
 
     /**
