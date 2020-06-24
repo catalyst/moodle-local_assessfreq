@@ -48,7 +48,7 @@ class frequency {
      *
      * @var array $modduefield
      */
-    private $modulefield = array (
+    private $moduleendfield = array (
         'assign' => 'duedate',
         'choice' => 'timeclose',
         'data' => 'timeavailableto',
@@ -59,6 +59,25 @@ class frequency {
         'scorm' => 'timeclose',
         'workshop' => 'submissionend'
     );
+
+    /**
+     * The start date databse field differs between module types.
+     * This map provides the translation.
+     *
+     * @var array $modduefield
+     */
+    private $modulestartfield = array (
+        'assign' => 'allowsubmissionsfromdate',
+        'choice' => 'timeopen',
+        'data' => 'timeavailablefrom',
+        'feedback' => 'timeopen',
+        'forum' => null,
+        'lesson' => 'available',
+        'quiz' => 'timeopen',
+        'scorm' => 'timeopen',
+        'workshop' => 'submissionstart'
+    );
+
 
     /**
      * Map of capabilities that users must have
@@ -157,17 +176,25 @@ class frequency {
     private function get_sql_query(string $module) : string {
         $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
 
-        $duedate = $this->modulefield[$module];
-        $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.' . $duedate . ' AS duedate
-                  FROM {course_modules} cm
-            INNER JOIN {modules} m ON cm.module = m.id
-            INNER JOIN {context} c ON cm.id = c.instanceid
-            INNER JOIN {' . $module . '} a ON cm.instance = a.id
-            INNER JOIN {course} course ON cm.course = course.id
-                 WHERE m.name = ?
-                       AND c.contextlevel = ?
-                       AND a.' . $duedate . ' >= ?
-                       AND cm.visible = ?';
+        $duedate = $this->moduleendfield[$module];
+
+        if (!empty($this->modulestartfield[$module])) {
+            $startdate = $this->modulestartfield[$module];
+            $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.'
+                . $duedate . ' AS duedate, a.' . $startdate . ' AS startdate ';
+        } else {
+            $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.' . $duedate . ' AS duedate ';
+        }
+
+        $sql .= 'FROM {course_modules} cm
+           INNER JOIN {modules} m ON cm.module = m.id
+           INNER JOIN {context} c ON cm.id = c.instanceid
+           INNER JOIN {' . $module . '} a ON cm.instance = a.id
+           INNER JOIN {course} course ON cm.course = course.id
+                WHERE m.name = ?
+                      AND c.contextlevel = ?
+                      AND a.' . $duedate . ' >= ?
+                      AND cm.visible = ?';
 
         if (!$includehiddencourses) {
             $sql .= ' AND course.visible = ?';
@@ -223,6 +250,10 @@ class frequency {
 
         foreach ($recordset as $record) {
 
+            if(empty($record->startdate)) {
+                $record->startdate = 0;
+            }
+
             // Iterate through the records and insert to database in batches.
             $timeelements = $this->format_time($record->duedate);
             $insertrecord = new \stdClass();
@@ -230,6 +261,7 @@ class frequency {
             $insertrecord->instanceid = $record->instance;
             $insertrecord->courseid = $record->course;
             $insertrecord->contextid = $record->contextid;
+            $insertrecord->timestart = $record->startdate;
             $insertrecord->timeend = $record->duedate;
             $insertrecord->endyear = $timeelements['endyear'];
             $insertrecord->endmonth = $timeelements['endmonth'];

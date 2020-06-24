@@ -47,7 +47,7 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
                 const year = responseArr[i].endyear;
                 const month = (responseArr[i].endmonth) - 1; // Minus 1 for difference between months in PHP and JS.
                 const day = responseArr[i].endday;
-                const dayStart = (new Date(year, day, month).getTime()) / 1000;
+                const dayStart = (new Date(year, month, day).getTime()) / 1000;
                 let secondsSinceDayStart = responseArr[i].timestart - dayStart;
                 let leftMargin = 0;
                 let width = 0;
@@ -55,7 +55,6 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
                 if (secondsSinceDayStart <= 0) {
                     secondsSinceDayStart = 0;
                     width = ((responseArr[i].timeend - dayStart) / 60) * scaler;
-                    window.console.log(width);
                 } else {
                     leftMargin = (secondsSinceDayStart / 60) * scaler;
                     width = ((responseArr[i].timeend - responseArr[i].timestart) / 60) * scaler;

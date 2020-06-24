@@ -50,5 +50,21 @@
 }
 
 #local-assessfreq-report-dayview .dayview-firstcol {
-	width: 20%;
+    width: 20%;
 }
+
+#local-assessfreq-report-dayview table tbody tr td {
+    padding: .15rem;
+}
+
+.local-assessfreq-day-period {
+    height: 25px;
+    background-color: #875692;
+}
+
+.local-assessfreq-flex-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+

@@ -169,7 +169,7 @@ class frequency_testcase extends advanced_testcase {
         global $DB;
         $frequency = new frequency();
 
-        $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.duedate
+        $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.duedate, a.allowsubmissionsfromdate AS startdate
                   FROM {course_modules} cm
             INNER JOIN {modules} m ON cm.module = m.id
             INNER JOIN {context} c ON cm.id = c.instanceid
