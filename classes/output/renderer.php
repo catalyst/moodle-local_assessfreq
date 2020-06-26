@@ -152,10 +152,12 @@ class renderer extends plugin_renderer_base {
         return $html;
     }
 
-    private function quiz_select_form(): string {
-        $mform = new \local_assessfreq\output\dashboard_quiz_form(null, null, 'get');
+    private function quiz_select_autocomplete(): string {
+        // TODO: add in initial quiz id.
 
-        echo $mform->render();
+        $context = array();
+        return $this->render_from_template('local_assessfreq/quiz-search', $context);
+
     }
 
     /**
@@ -167,7 +169,7 @@ class renderer extends plugin_renderer_base {
     public function render_dashboard_quiz(string $baseurl) : string {
         $html = '';
         $html .= $this->header();
-        $html .= $this->quiz_select_form();
+        $html .= $this->quiz_select_autocomplete();
         $html .= $this->footer();
 
         return $html;
