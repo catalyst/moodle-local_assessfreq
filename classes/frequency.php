@@ -157,8 +157,8 @@ class frequency {
         if (!$disabledmodules) {
             $enabledmodules = $this->get_enabled_modules();
 
-            foreach($modules as $index => $module) {
-                if(empty($enabledmodules[$module])) {
+            foreach ($modules as $index => $module) {
+                if (empty($enabledmodules[$module])) {
                     unset($modules[$index]);
                 }
             }
@@ -250,7 +250,7 @@ class frequency {
 
         foreach ($recordset as $record) {
 
-            if(empty($record->startdate)) {
+            if (empty($record->startdate)) {
                 $record->startdate = 0;
             }
 
@@ -300,7 +300,7 @@ class frequency {
         $enabledmods = $this->get_process_modules();
         $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
 
-        if (!empty($enabledmods[0])){
+        if (!empty($enabledmods[0])) {
             // Itterate through modules.
             foreach ($enabledmods as $module) {
                 $sql = $this->get_sql_query($module);
@@ -1120,7 +1120,7 @@ class frequency {
     static public function purge_caches($name): void {
         global $CFG;
 
-        // Get plugin cache definitiions/
+        // Get plugin cache definitions.
         $definitions = array();
         include($CFG->dirroot . '/local/assessfreq/db/caches.php');
         $definitionnames = array_keys($definitions);

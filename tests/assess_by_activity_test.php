@@ -36,10 +36,25 @@ use local_assessfreq\output\assess_by_activity;
 class assess_by_activity_testcase extends advanced_testcase {
 
     /**
+     *
+     * @var stdClass $course Test course.
+     */
+    protected $course;
+
+    /**
      * Set up conditions for tests.
      */
     public function setUp() {
         $this->resetAfterTest();
+
+        // Create a course.
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(
+            array('format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1),
+            array('createsections' => true));
+        $this->course = $course;
+
         $version = get_config('moodle', 'version');
 
         if ($version < 2019052000) { // Versions less than 3.7 don't support forum due dates.
@@ -63,7 +78,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord1 = new \stdClass();
         $lasrecord1->module = 'quiz';
         $lasrecord1->instanceid = 1;
-        $lasrecord1->courseid = 2;
+        $lasrecord1->courseid = $this->course->id;
         $lasrecord1->contextid = 4;
         $lasrecord1->timestart = 1585728000; // Time in readable format 2020-04-01 @ 8:00:00am GMT.
         $lasrecord1->timeend = 1585814400; // Time in readable format 2020-04-02 @ 8:00:00am GMT.
@@ -74,7 +89,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord2 = new \stdClass();
         $lasrecord2->module = 'assign';
         $lasrecord2->instanceid = 2;
-        $lasrecord2->courseid = 2;
+        $lasrecord2->courseid = $this->course->id;
         $lasrecord2->contextid = 5;
         $lasrecord2->timestart = 1585814401; // Time in readable format 2020-04-02 @ 8:00:01am GMT.
         $lasrecord2->timeend = 1585900800; // Time in readable format 2020-04-03 @ 8:00:00am GMT.
@@ -85,7 +100,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord3 = new \stdClass();
         $lasrecord3->module = 'assign';
         $lasrecord3->instanceid = 3;
-        $lasrecord3->courseid = 2;
+        $lasrecord3->courseid = $this->course->id;
         $lasrecord3->contextid = 6;
         $lasrecord3->timestart = 1585900801; // Time in readable format 2020-04-03 @ 8:00:01am GMT.
         $lasrecord3->timeend = 1586073600; // Time in readable format 2020-04-05 @ 8:00:00am GMT.
@@ -96,7 +111,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord4 = new \stdClass();
         $lasrecord4->module = 'scorm';
         $lasrecord4->instanceid = 4;
-        $lasrecord4->courseid = 2;
+        $lasrecord4->courseid = $this->course->id;
         $lasrecord4->contextid = 7;
         $lasrecord4->timestart = 1585987200; // Time in readable format 2020-04-04 @ 8:00:00am GMT.
         $lasrecord4->timeend = 1586160000; // Time in readable format 2020-04-06 @ 8:00:00am GMT.
@@ -107,7 +122,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord5 = new \stdClass();
         $lasrecord5->module = 'scorm';
         $lasrecord5->instanceid = 5;
-        $lasrecord5->courseid = 2;
+        $lasrecord5->courseid = $this->course->id;
         $lasrecord5->contextid = 8;
         $lasrecord5->timestart = 1585987200; // Time in readable format 2020-04-04 @ 8:00:00am GMT.
         $lasrecord5->timeend = 1586160000; // Time in readable format 2020-04-06 @ 8:00:00am GMT.

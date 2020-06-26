@@ -54,7 +54,7 @@ class assess_by_activity {
         $labels = array();
         $charttitle = get_string('assessbyactivity', 'local_assessfreq');
 
-        if (!empty($modules[0])){
+        if (!empty($modules[0])) {
             foreach ($modules as $module) {
                 if (! empty($activitydata[$module])) {
                     $seriesdata[] = $activitydata[$module]->count;

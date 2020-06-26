@@ -36,10 +36,25 @@ use local_assessfreq\output\assess_by_month;
 class assess_by_month_testcase extends advanced_testcase {
 
     /**
+     *
+     * @var stdClass $course Test course.
+     */
+    protected $course;
+
+    /**
      * Set up conditions for tests.
      */
     public function setUp() {
         $this->resetAfterTest();
+
+        // Create a course.
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(
+            array('format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1),
+            array('createsections' => true));
+        $this->course = $course;
+
         $version = get_config('moodle', 'version');
 
         if ($version < 2019052000) { // Versions less than 3.7 don't support forum due dates.

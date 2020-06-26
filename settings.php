@@ -64,7 +64,7 @@ $setting->set_updatedcallback('\local_assessfreq\frequency::purge_caches');
 $sitesettings->add($setting);
 
 // Include disabled modules.
-$setting =new admin_setting_configcheckbox('local_assessfreq/disabledmodules',
+$setting = new admin_setting_configcheckbox('local_assessfreq/disabledmodules',
     get_string('settings:disabledmodules', 'local_assessfreq'),
     get_string('settings:disabledmodules_desc', 'local_assessfreq'),
     1);

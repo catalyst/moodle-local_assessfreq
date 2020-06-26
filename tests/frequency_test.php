@@ -564,7 +564,7 @@ class frequency_testcase extends advanced_testcase {
         // Record 6 should not have any conflicts because it is not a quiz.
         // Record 7 should not have any conflicts because it has no users.
 
-        // Insert records in to database.$this->course->id
+        // Insert records in to database.
         $records = array($lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4, $lasrecord5, $lasrecord6, $lasrecord7);
         $userids = array(234, 456, 789);
         $eventarray = array();
