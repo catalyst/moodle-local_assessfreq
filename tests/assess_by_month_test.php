@@ -85,7 +85,7 @@ class assess_by_month_testcase extends advanced_testcase {
             $record = new \stdClass();
             $record->module = 'quiz';
             $record->instanceid = $i;
-            $record->courseid = 2;
+            $record->courseid = $this->course->id;
             $record->contextid = $i;
             $record->timestart = 0; // Start can be fake for this test.
             $record->timeend = 0; // End can be fake for this test.
