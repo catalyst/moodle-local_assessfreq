@@ -32,8 +32,8 @@
   </colgroup>
   <thead>
     <tr>
-      <th scope="col" rowspan="2">Title</th>
-      <th scope="col">Time</th>
+      <th scope="col" rowspan="2">{{# str }} title, local_assessfreq {{/ str }}</th>
+      <th scope="col">{{# str }} time, local_assessfreq {{/ str }}</th>
     </tr>
      <tr>
       <th scope="col" class="local-assessfreq-flex-row">
@@ -51,7 +51,12 @@
       <th scope="row">
         <a href="{{url}}}">{{name}}</a> {{# str }} students, local_assessfreq, {{ usercount }} {{/ str }}
       </th>
-      <td><div class="local-assessfreq-day-period" style="margin-left: {{leftmargin}}%;width: {{width}}%;"></div></td>
+      <td>
+        <div class="local-assessfreq-day-period" style="margin-left: {{leftmargin}}%;width: {{width}}%;">
+        <div>{{start}}</div>
+        <div>{{end}}</div>
+        </div>
+      </td>
     </tr>
     {{/rows}}
 

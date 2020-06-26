@@ -58,8 +58,17 @@
 }
 
 .local-assessfreq-day-period {
-    height: 25px;
+    height: 40px;
     background-color: #875692;
+    display: flex;
+    justify-content: space-between;
+}
+
+.local-assessfreq-day-period div {
+    text-align: center;
+    color: #FFFFFF;
+    font-weight: 600;
+    padding: .5rem;
 }
 
 .local-assessfreq-flex-row {
