@@ -37,6 +37,17 @@ $historysettings = new admin_externalpage(
     get_string('clearhistory', 'local_assessfreq'),
     new moodle_url('/local/assessfreq/history.php'));
 
+// New report category.
+$ADMIN->add('reports', new admin_category('local_assessfreq_reports', get_string('reports', 'local_assessfreq')));
+
+// Assessment dashboard link.
+$ADMIN->add('local_assessfreq_reports', new admin_externalpage('local_assessfreq_assessment',
+    get_string('dashboard:assessment', 'local_assessfreq'), "$CFG->wwwroot/local/assessfreq/dashboard_assessment.php"));
+
+// Quiz dashboard link.
+$ADMIN->add('local_assessfreq_reports', new admin_externalpage('local_assessfreq_quiz',
+    get_string('dashboard:quiz', 'local_assessfreq'), "$CFG->wwwroot/local/assessfreq/dashboard_quiz.php"));
+
 // Module settings.
 $sitesettings->add(new admin_setting_heading('local_assessfreq/moduleheading',
     get_string('settings:moduleheading', 'local_assessfreq'),
@@ -113,7 +124,3 @@ $ADMIN->add('localplugins', new admin_category('local_assessfreq_settings',
     get_string('pluginname', 'local_assessfreq')));
 $ADMIN->add('local_assessfreq_settings', $sitesettings);
 $ADMIN->add('local_assessfreq_settings', $historysettings);
-
-// Report link.
-$ADMIN->add('reports', new admin_externalpage('local_assessfreq_report',
-    get_string('pluginname', 'local_assessfreq'), "$CFG->wwwroot/local/assessfreq/report.php"));

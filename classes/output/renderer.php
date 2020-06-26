@@ -137,16 +137,37 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
-     * Get the html to render the local_smartmedia report.
+     * Get the html to render the assessment dashboard.
      *
      * @param string $baseurl the base url to render this report on.
      * @return string $html the html to display.
      */
-    public function render_report(string $baseurl) : string {
+    public function render_dashboard_assessment(string $baseurl) : string {
         $html = '';
         $html .= $this->header();
         $html .= $this->render_report_cards();
         $html .= $this->render_report_heatmap();
+        $html .= $this->footer();
+
+        return $html;
+    }
+
+    private function quiz_select_form(): string {
+        $mform = new \local_assessfreq\output\dashboard_quiz_form(null, null, 'get');
+
+        echo $mform->render();
+    }
+
+    /**
+     * Get the html to render the quiz dashboard.
+     *
+     * @param string $baseurl the base url to render this report on.
+     * @return string $html the html to display.
+     */
+    public function render_dashboard_quiz(string $baseurl) : string {
+        $html = '';
+        $html .= $this->header();
+        $html .= $this->quiz_select_form();
         $html .= $this->footer();
 
         return $html;

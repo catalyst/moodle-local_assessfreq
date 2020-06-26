@@ -13,8 +13,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * A report to display site level assessment frequency.
+ * Quiz dashboard.
  *
  * @package     local_assessfreq
  * @copyright   2020 Matt Porritt <mattp@catalyst-au.net>
@@ -23,22 +24,22 @@
 require_once('../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-$baseurl = $CFG->wwwroot . "/local/assessfreq/report.php";
+$baseurl = $CFG->wwwroot . "/local/assessfreq/dashboard_quiz.php";
 
 // Calls require_login and performs permissions checks for admin pages.
-admin_externalpage_setup('local_assessfreq_report', '', null, '',
+admin_externalpage_setup('local_assessfreq_quiz', '', null, '',
     array('pagelayout' => 'admin'));
 
-$title = get_string('pluginname', 'local_assessfreq');
+$title = get_string('dashboard:quiz', 'local_assessfreq');
 $url = new moodle_url($baseurl);
 $context = context_system::instance();
 
 $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title($title);
-$PAGE->set_heading($title . ' Dashboard');
-$PAGE->requires->js_call_amd('local_assessfreq/reportcard', 'init', array($context->id));
+$PAGE->set_heading($title);
+$PAGE->requires->js_call_amd('local_assessfreq/dashboard_quiz', 'init', array($context->id));
 
 $output = $PAGE->get_renderer('local_assessfreq');
 
-echo $output->render_report($baseurl);
+echo $output->render_dashboard_quiz($baseurl);

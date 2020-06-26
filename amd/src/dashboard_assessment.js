@@ -28,7 +28,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
     /**
      * Module level variables.
      */
-    var Reportcard = {};
+    var DashboardAssessment = {};
     var contextid;
     var yearselect;
     var yearselectheatmap;
@@ -404,7 +404,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
      *
      * @param {integer} context The current context id.
      */
-    Reportcard.init = function(context) {
+    DashboardAssessment.init = function(context) {
         contextid = context;
 
         // Set up event listener and related actions for year dropdown on report cards.
@@ -450,5 +450,5 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
 
     };
 
-    return Reportcard;
+    return DashboardAssessment;
 });
