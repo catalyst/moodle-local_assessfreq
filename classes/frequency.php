@@ -132,6 +132,11 @@ class frequency {
         return $availablemodules;
     }
 
+    /**
+     * Get currently enabled modules from the Moodle DB.
+     *
+     * @return array $modules The enabled modules.
+     */
     public function get_enabled_modules(): array {
         global $DB;
 
@@ -938,7 +943,13 @@ class frequency {
         return $years;
     }
 
-
+    /**
+     * Get all events on a particular day.
+     *
+     * @param string $date A string representations of the date to get events for.
+     * @param array $modules The modules to get events for.
+     * @return array $dayevents The list of events that day.
+     */
     public function get_day_events(string $date, array $modules): array {
         $dayevents = array();
 
