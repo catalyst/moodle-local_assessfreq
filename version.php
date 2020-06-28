@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_assessfreq';
-$plugin->release = '2020062300';
-$plugin->version = 2020062300;
+$plugin->release = '2020062800';
+$plugin->version = 2020062800;
 $plugin->requires = 2018051712;
 $plugin->maturity = MATURITY_ALPHA;

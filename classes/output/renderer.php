@@ -152,12 +152,19 @@ class renderer extends plugin_renderer_base {
         return $html;
     }
 
-    private function quiz_select_autocomplete(): string {
-        // TODO: add in initial quiz id.
+    /**
+     * Html to add a button for adding a new broadcast.
+     *
+     * @return string html for the button.
+     */
+    private function render_quiz_select_button(): string {
 
-        $context = array();
-        return $this->render_from_template('local_assessfreq/quiz-search', $context);
+        $button = \html_writer::tag(
+            'button',
+            get_string('searchquiz', 'local_assessfreq'),
+            array('class' => 'btn btn-primary mb-3 ', 'id' => 'local-assessfreq-find-quiz'));
 
+        return $button;
     }
 
     /**
@@ -169,7 +176,7 @@ class renderer extends plugin_renderer_base {
     public function render_dashboard_quiz(string $baseurl) : string {
         $html = '';
         $html .= $this->header();
-        $html .= $this->quiz_select_autocomplete();
+        $html .= $this->render_quiz_select_button();;
         $html .= $this->footer();
 
         return $html;

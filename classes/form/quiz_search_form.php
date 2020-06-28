@@ -1,3 +1,4 @@
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,27 +15,43 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Javascript for report card display and processing.
+ * Form to search for quizzes.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['local_assessfreq/form_modal'],
-function(FormModal) {
+namespace local_assessfreq\form;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once("$CFG->libdir/formslib.php");
+
+/**
+ * Form to search for quizzes.
+ *
+ * @package    local_assessfreq
+ * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class quiz_search_form extends \moodleform {
 
     /**
-     * Module level variables.
+     * Build form for the broadcast message.
+     *
+     * {@inheritDoc}
+     * @see \moodleform::definition()
      */
-    var DashboardQuiz = {};
+    public function definition() {
+        $mform = $this->_form;
 
-    /**
-     * Initialise method for quiz dashboard rendering.
-     */
-    DashboardQuiz.init = function(contextid) {
-        FormModal.init(contextid);
-    };
+        // Form heading.
+        $mform->addElement('html',
+            \html_writer::div(get_string('searchquiz', 'local_assessfreq'), 'form-description mb-3'));
 
-    return DashboardQuiz;
-});
+        $btnstring = get_string('searchquiz', 'local_assessfreq');
+        $this->add_action_buttons(true, $btnstring);
+
+    }
+}

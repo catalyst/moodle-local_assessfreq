@@ -70,6 +70,7 @@ class local_assessfreq_external extends external_api {
         $frequency = new \local_assessfreq\frequency();
         $freqarr = $frequency->get_frequency_array($data['year'], $data['metric'], $data['modules']);
 
+
         return json_encode($freqarr);
     }
 
@@ -203,5 +204,59 @@ class local_assessfreq_external extends external_api {
      */
     public static function get_day_events_returns() {
         return new external_value(PARAM_RAW, 'Event JSON');
+    }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return void
+     */
+    public static function get_courses_quizzes_parameters() {
+        return new external_function_parameters(array(
+            'jsondata' => new external_value(PARAM_RAW, 'The data encoded as a json array')
+        ));
+    }
+
+    /**
+     * Returns courses and quizzes in that course that match search data.
+     *
+     * @param string $jsondata JSON data.
+     * @return string JSON response.
+     */
+    public static function get_courses_quizzes($jsondata) {
+        global $DB;
+        \core\session\manager::write_close(); // Close session early this is a read op.
+
+        // Parameter validation.
+        self::validate_parameters(
+            self::get_courses_quizzes_parameters(),
+            array('jsondata' => $jsondata)
+            );
+
+        // Context validation and permission check.
+        $context = context_system::instance();
+        self::validate_context($context);
+        has_capability('moodle/site:config', $context);
+
+        // Execute API call.
+        $data = json_decode($jsondata, true);
+        $sql = 'SELECT id, fullname FROM {course} WHERE ' . $DB->sql_like('fullname', ':fullname');
+        $params = array('fullname' => '%' . $DB->sql_like_escape($data['search']) . '%');
+        $courses = $DB->get_records_sql($sql, $params, 0, 11);
+
+        foreach ($courses as $key => $course) {
+            $quizzes = $DB->get_records('quiz', array('course' => $course->id), 'name ASC', 'id, name');
+            $courses[$key]->quizzes = $quizzes;
+        }
+
+        return json_encode(array_values($courses));
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function get_courses_quizzes_returns() {
+        return new external_value(PARAM_RAW, 'Quiz JSON');
     }
 }

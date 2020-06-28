@@ -78,7 +78,7 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         // Create a course with activity.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
+            array('fullname' => 'blue course', 'format' => 'topics', 'numsections' => 3,
                 'enablecompletion' => 1),
             array('createsections' => true));
         $assignrow1 = $generator->create_module('assign', array(
@@ -206,5 +206,34 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         $this->assertEquals(2020, $eventarr[0]['endyear']);
         $this->assertEquals(3, $eventarr[0]['endmonth']);
         $this->assertEquals(28, $eventarr[0]['endday']);
+    }
+
+    /**
+     * Test ajax getting of quiz names.
+     */
+    public function test_get_courses_quizzes() {
+        $this->setAdminUser();
+
+        // Create a course with activity.
+        $generator = $this->getDataGenerator();
+        $quiz1 = $generator->create_module('quiz', array(
+            'course' => $this->course->id,
+            'name' => 'first quiz'
+        ));
+        $generator->create_module('quiz', array(
+            'course' => $this->course->id,
+            'name' => 'second quiz'
+        ));
+
+        $data = new \stdClass;
+        $data->search  = 'blu';
+
+        $jsondata = json_encode($data);
+
+        $returnvalue = local_assessfreq_external::get_courses_quizzes($jsondata);
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_courses_quizzes_returns(), $returnvalue);
+        $eventarr = json_decode($returnjson, true);
+
+        $this->assertEquals('first quiz', $eventarr[$this->course->id]['quizzes'][$quiz1->id]['name']);
     }
 }

@@ -60,4 +60,12 @@ $functions = array(
         'type' => 'read',
         'ajax' => true
     ),
+    'local_assessfreq_get_courses_quizzes' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_courses_quizzes',
+        'classpath' => '',
+        'description' => 'Gets coures and quizzes names.',
+        'type' => 'read',
+        'ajax' => true
+    ),
 );
