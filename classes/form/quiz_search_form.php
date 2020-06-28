@@ -48,9 +48,17 @@ class quiz_search_form extends \moodleform {
 
         // Form heading.
         $mform->addElement('html',
-            \html_writer::div(get_string('searchquiz', 'local_assessfreq'), 'form-description mb-3'));
+            \html_writer::div(get_string('searchquizform', 'local_assessfreq'), 'form-description mb-3'));
 
-        $btnstring = get_string('searchquiz', 'local_assessfreq');
+        $courseoptions = array(
+            'multiple' => false,
+            'placeholder' => get_string('findcourse', 'local_assessfreq'),
+            'noselectionstring' => get_string('findcourse', 'local_assessfreq'),
+            'ajax' => 'local_assessfreq/course_selector',
+        );
+        $mform->addElement('autocomplete', 'courses', get_string('courses', 'tool_broadcast'), array(), $courseoptions);
+
+        $btnstring = get_string('selectquiz', 'local_assessfreq');
         $this->add_action_buttons(true, $btnstring);
 
     }
