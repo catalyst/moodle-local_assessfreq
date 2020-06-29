@@ -45,7 +45,8 @@ function(Str, ModalFactory, Fragment) {
             ModalFactory.create({
                 type: ModalFactory.types.DEFAULT,
                 title: title,
-                body: spinner
+                body: spinner,
+                large: true
             })
             .done((modal) => {
                 modalObj = modal;

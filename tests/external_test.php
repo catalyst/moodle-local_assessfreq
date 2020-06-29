@@ -211,29 +211,15 @@ class local_assessfreq_external_testcase extends advanced_testcase {
     /**
      * Test ajax getting of quiz names.
      */
-    public function test_get_courses_quizzes() {
+    public function test_get_courses() {
         $this->setAdminUser();
 
-        // Create a course with activity.
-        $generator = $this->getDataGenerator();
-        $quiz1 = $generator->create_module('quiz', array(
-            'course' => $this->course->id,
-            'name' => 'first quiz'
-        ));
-        $generator->create_module('quiz', array(
-            'course' => $this->course->id,
-            'name' => 'second quiz'
-        ));
+        $query = 'blu';
 
-        $data = new \stdClass;
-        $data->search  = 'blu';
-
-        $jsondata = json_encode($data);
-
-        $returnvalue = local_assessfreq_external::get_courses_quizzes($jsondata);
-        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_courses_quizzes_returns(), $returnvalue);
+        $returnvalue = local_assessfreq_external::get_courses($query);
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_courses_returns(), $returnvalue);
         $eventarr = json_decode($returnjson, true);
 
-        $this->assertEquals('first quiz', $eventarr[$this->course->id]['quizzes'][$quiz1->id]['name']);
+        $this->assertEquals('blue course', $eventarr[0]['fullname']);
     }
 }

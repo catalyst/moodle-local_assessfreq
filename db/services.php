@@ -60,9 +60,9 @@ $functions = array(
         'type' => 'read',
         'ajax' => true
     ),
-    'local_assessfreq_get_courses_quizzes' => array(
+    'local_assessfreq_get_courses' => array(
         'classname' => 'local_assessfreq_external',
-        'methodname' => 'get_courses_quizzes',
+        'methodname' => 'get_courses',
         'classpath' => '',
         'description' => 'Gets coures and quizzes names.',
         'type' => 'read',
