@@ -30,9 +30,22 @@ function(Str, ModalFactory, Fragment) {
     var FormModal = {};
     var contextid;
     var modalObj;
-    var spinner = '<p class="text-center">'
+    const spinner = '<p class="text-center">'
         + '<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>'
         + '</p>';
+
+    const observer = new MutationObserver(ObserverCallback);
+    const observerConfig = { attributes: true, childList: false, subtree: true };
+
+    const ObserverCallback = function(mutationsList) {
+        for (let i=0; i<mutationsList.length; i++) {
+            let element = mutationsList[i].target;
+            if(element.tagName.toLowerCase() === 'span' && element) {
+                window.console.log(mutationsList[i]);
+            }
+
+          }
+    };
 
     /**
      * Create the modal window.
@@ -50,6 +63,7 @@ function(Str, ModalFactory, Fragment) {
             })
             .done((modal) => {
                 modalObj = modal;
+
                 // Explicitly handle form click events.
                 modalObj.getRoot().on('click', '#id_submitbutton', processModalForm);
                 modalObj.getRoot().on('click', '#id_cancel', (e) => {
@@ -57,6 +71,7 @@ function(Str, ModalFactory, Fragment) {
                     modalObj.setBody(spinner);
                     modalObj.hide();
                 });
+
             });
             return;
         }).catch(() => {
@@ -82,6 +97,10 @@ function(Str, ModalFactory, Fragment) {
         Str.get_string('searchquiz', 'local_assessfreq').then((title) => {
             modalObj.setTitle(title);
             modalObj.setBody(Fragment.loadFragment('local_assessfreq', 'new_base_form', contextid, params));
+            let modalContainer = document.querySelectorAll(`[data-region*="modal-container"]`)[0];
+            window.console.log(modalContainer);
+            observer.observe(modalContainer, observerConfig);
+
             return;
         }).catch(() => {
             Notification.exception(new Error('Failed to load string: searchquiz'));

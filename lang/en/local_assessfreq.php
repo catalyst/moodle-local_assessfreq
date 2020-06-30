@@ -45,6 +45,7 @@ $string['cachedef_yearevents'] = 'Years that have events';
 $string['clearhistory'] = 'Clear history';
 $string['closeapply'] = 'Close and apply';
 $string['confirmreprocess'] = 'Delete ALL history and reprocess?';
+$string['course'] = 'Course';
 $string['dashboard:assessment'] = 'Assessment dashboard';
 $string['dashboard:quiz'] = 'Quiz dashboard';
 $string['duedate'] = 'Due date';
