@@ -64,7 +64,15 @@ $functions = array(
         'classname' => 'local_assessfreq_external',
         'methodname' => 'get_courses',
         'classpath' => '',
-        'description' => 'Gets coures and quizzes names.',
+        'description' => 'Gets courses.',
+        'type' => 'read',
+        'ajax' => true
+    ),
+    'local_assessfreq_get_quizzes' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_quizzes',
+        'classpath' => '',
+        'description' => 'Gets quizzes.',
         'type' => 'read',
         'ajax' => true
     ),

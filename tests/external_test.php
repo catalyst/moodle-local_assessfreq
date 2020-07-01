@@ -209,7 +209,7 @@ class local_assessfreq_external_testcase extends advanced_testcase {
     }
 
     /**
-     * Test ajax getting of quiz names.
+     * Test ajax getting of course names.
      */
     public function test_get_courses() {
         $this->setAdminUser();
@@ -221,5 +221,28 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         $eventarr = json_decode($returnjson, true);
 
         $this->assertEquals('blue course', $eventarr[0]['fullname']);
+    }
+
+    /**
+     * Test ajax getting of quiz names.
+     */
+    public function test_get_quizzes() {
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $generator->create_module('quiz', array(
+            'course' => $this->course->id
+        ));
+        $generator->create_module('quiz', array(
+            'course' => $this->course->id
+        ));
+
+        $query = $this->course->id;
+
+        $returnvalue = local_assessfreq_external::get_quizzes($query);
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_quizzes_returns(), $returnvalue);
+        $eventarr = json_decode($returnjson, true);
+
+        $this->assertCount(2, $eventarr);
     }
 }

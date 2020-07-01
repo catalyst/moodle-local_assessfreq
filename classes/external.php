@@ -238,8 +238,6 @@ class local_assessfreq_external extends external_api {
         self::validate_context($context);
         has_capability('moodle/site:config', $context);
 
-        get_courses();
-
         // Execute API call.
         $sql = 'SELECT id, fullname FROM {course} WHERE ' . $DB->sql_like('fullname', ':fullname') . ' AND id <> 1';
         $params = array('fullname' => '%' . $DB->sql_like_escape($query) . '%');
@@ -253,6 +251,53 @@ class local_assessfreq_external extends external_api {
      * @return external_description
      */
     public static function get_courses_returns() {
+        return new external_value(PARAM_RAW, 'Course result JSON');
+    }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return void
+     */
+    public static function get_quizzes_parameters() {
+        return new external_function_parameters(array(
+            'query' => new external_value(PARAM_INT, 'The query to find')
+        ));
+    }
+
+    /**
+     * Returns courses and quizzes in that course that match search data.
+     *
+     * @param string $jsondata JSON data.
+     * @return string JSON response.
+     */
+    public static function get_quizzes($query) {
+        global $DB;
+        \core\session\manager::write_close(); // Close session early this is a read op.
+
+        // Parameter validation.
+        self::validate_parameters(
+            self::get_quizzes_parameters(),
+            array('query' => $query)
+            );
+
+        // Context validation and permission check.
+        $context = context_system::instance();
+        self::validate_context($context);
+        has_capability('moodle/site:config', $context);
+
+        // Execute API call.
+        $params = array('course' => $query);
+        $quizzes = $DB->get_records('quiz', $params, 'name ASC', 'id, name');
+
+        return json_encode(array_values($quizzes));
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function get_quizzes_returns() {
         return new external_value(PARAM_RAW, 'Course result JSON');
     }
 }

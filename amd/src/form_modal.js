@@ -40,8 +40,22 @@ function(Str, ModalFactory, Fragment) {
     const ObserverCallback = function(mutationsList) {
         for (let i=0; i<mutationsList.length; i++) {
             let element = mutationsList[i].target;
-            if(element.tagName.toLowerCase() === 'span' && element) {
-                window.console.log(mutationsList[i]);
+            if(element.tagName.toLowerCase() === 'span' && element.classList.contains('badge')) {
+                document.getElementById('id_quiz').value = 2;
+                Ajax.call([{
+                    methodname: 'local_assessfreq_get_quizzes',
+                    args: {
+                        query: mutationsList[i].target.dataset.value
+                    },
+                }])[0].done((response) => {
+                    eventArray = JSON.parse(response);
+                    window.console.log(response);
+                    document.getElementById('id_quiz').removeAttribute('disabled');
+                }).fail(() => {
+                    Notification.exception(new Error('Failed to get quizzes'));
+                });
+
+                break;
             }
 
           }
@@ -98,7 +112,6 @@ function(Str, ModalFactory, Fragment) {
             modalObj.setTitle(title);
             modalObj.setBody(Fragment.loadFragment('local_assessfreq', 'new_base_form', contextid, params));
             let modalContainer = document.querySelectorAll(`[data-region*="modal-container"]`)[0];
-            window.console.log(modalContainer);
             observer.observe(modalContainer, observerConfig);
 
             return;
