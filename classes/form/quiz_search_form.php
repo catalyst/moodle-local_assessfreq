@@ -59,6 +59,7 @@ class quiz_search_form extends \moodleform {
         $mform->addElement('autocomplete', 'courses', get_string('course', 'local_assessfreq'), array(), $courseoptions);
 
         $mform->addElement('hidden', 'coursechoice', '0');
+        $mform->setType('coursechoice', PARAM_INT);
 
         $selectoptions = array(
             1 => get_string('selectcourse', 'local_assessfreq'),

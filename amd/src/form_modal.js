@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/str', 'core/modal_factory', 'core/fragment'],
-function(Str, ModalFactory, Fragment) {
+define(['core/str', 'core/modal_factory', 'core/fragment', 'core/ajax'],
+function(Str, ModalFactory, Fragment, Ajax) {
 
     /**
      * Module level variables.
@@ -30,6 +30,7 @@ function(Str, ModalFactory, Fragment) {
     var FormModal = {};
     var contextid;
     var modalObj;
+
     const spinner = '<p class="text-center">'
         + '<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>'
         + '</p>';
@@ -41,6 +42,8 @@ function(Str, ModalFactory, Fragment) {
         for (let i=0; i<mutationsList.length; i++) {
             let element = mutationsList[i].target;
             if(element.tagName.toLowerCase() === 'span' && element.classList.contains('badge')) {
+                element.addEventListener('click', updateModalBody);
+
                 document.getElementById('id_quiz').value = 2;
                 Ajax.call([{
                     methodname: 'local_assessfreq_get_quizzes',
@@ -48,9 +51,31 @@ function(Str, ModalFactory, Fragment) {
                         query: mutationsList[i].target.dataset.value
                     },
                 }])[0].done((response) => {
-                    eventArray = JSON.parse(response);
-                    window.console.log(response);
-                    document.getElementById('id_quiz').removeAttribute('disabled');
+                    let quizArray = JSON.parse(response);
+                    let selectElement = document.getElementById('id_quiz');
+                    let selectElementLength = selectElement.options.length;
+
+                    // Clear exisitng options.
+                    for (let j=selectElementLength-1; j>=0; j--) {
+                        selectElement.options[i] = null;
+                    }
+
+                    if (quizArray.length > 0) {
+
+                        // Add new options.
+                        for (let k=0; k<quizArray.length; k++) {
+                            let opt = quizArray[i];
+                            let el = document.createElement('option');
+                            el.textContent = opt.name;
+                            el.value = opt.id;
+                            selectElement.appendChild(el);
+                        }
+                        selectElement.removeAttribute('disabled');
+                    } else {
+
+                        document.getElementById('id_quiz').value = 1;
+                    }
+
                 }).fail(() => {
                     Notification.exception(new Error('Failed to get quizzes'));
                 });
