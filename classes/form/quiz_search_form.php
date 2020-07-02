@@ -52,11 +52,23 @@ class quiz_search_form extends \moodleform {
 
         $courseoptions = array(
             'multiple' => false,
-            'placeholder' => get_string('findcourse', 'local_assessfreq'),
-            'noselectionstring' => get_string('findcourse', 'local_assessfreq'),
+            'placeholder' =>  get_string('entercourse', 'local_assessfreq'),
+            'noselectionstring' => get_string('nocourse', 'local_assessfreq'),
             'ajax' => 'local_assessfreq/course_selector',
         );
-        $mform->addElement('autocomplete', 'courses', get_string('courses', 'tool_broadcast'), array(), $courseoptions);
+        $mform->addElement('autocomplete', 'courses', get_string('course', 'local_assessfreq'), array(), $courseoptions);
+
+        $mform->addElement('hidden', 'coursechoice', '0');
+        $mform->setType('coursechoice', PARAM_INT);
+
+        $selectoptions = array(
+            1 => get_string('selectcourse', 'local_assessfreq'),
+            2 => get_string('loadingquiz', 'local_assessfreq'),
+        );
+        $mform->addElement('select', 'quiz',
+            get_string('quiz', 'local_assessfreq'),
+            $selectoptions);
+        $mform->disabledIf('quiz', 'coursechoice', 'eq', '0');
 
         $btnstring = get_string('selectquiz', 'local_assessfreq');
         $this->add_action_buttons(true, $btnstring);

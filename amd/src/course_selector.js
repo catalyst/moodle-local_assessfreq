@@ -37,10 +37,20 @@ var CourseSelector = {};
  * @param {String} query The query string.
  * @param {Function} callback A callback function receiving an array of results.
  * @return {Void}
-*/ 
+*/
 CourseSelector.transport = function(selector, query, callback) {
-    
-}
+    Ajax.call([{
+        methodname: 'local_assessfreq_get_courses',
+        args: {
+            query: query
+        },
+    }])[0].then((response) => {
+        let courseArray = JSON.parse(response);
+        callback(courseArray);
+    }).fail(() => {
+        Notification.exception(new Error('Failed to get events'));
+    });
+};
 
 /**
  * Process the results for auto complete elements.
@@ -50,8 +60,16 @@ CourseSelector.transport = function(selector, query, callback) {
  * @return {Array} New array of results.
  */
 CourseSelector.processResults = function(selector, results) {
-    
-}
+    let options = [];
+    results.forEach((element) => {
+        options.push({
+            value: element.id,
+            label: element.fullname
+        });
+    });
+
+    return options;
+};
 
 return CourseSelector;
 });

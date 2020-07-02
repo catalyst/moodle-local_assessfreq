@@ -60,11 +60,19 @@ $functions = array(
         'type' => 'read',
         'ajax' => true
     ),
-    'local_assessfreq_get_courses_quizzes' => array(
+    'local_assessfreq_get_courses' => array(
         'classname' => 'local_assessfreq_external',
-        'methodname' => 'get_courses_quizzes',
+        'methodname' => 'get_courses',
         'classpath' => '',
-        'description' => 'Gets coures and quizzes names.',
+        'description' => 'Gets courses.',
+        'type' => 'read',
+        'ajax' => true
+    ),
+    'local_assessfreq_get_quizzes' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_quizzes',
+        'classpath' => '',
+        'description' => 'Gets quizzes.',
         'type' => 'read',
         'ajax' => true
     ),

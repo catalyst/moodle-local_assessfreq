@@ -211,9 +211,9 @@ class local_assessfreq_external extends external_api {
      *
      * @return void
      */
-    public static function get_courses_quizzes_parameters() {
+    public static function get_courses_parameters() {
         return new external_function_parameters(array(
-            'jsondata' => new external_value(PARAM_RAW, 'The data encoded as a json array')
+            'query' => new external_value(PARAM_TEXT, 'The query to find')
         ));
     }
 
@@ -223,14 +223,14 @@ class local_assessfreq_external extends external_api {
      * @param string $jsondata JSON data.
      * @return string JSON response.
      */
-    public static function get_courses_quizzes($jsondata) {
+    public static function get_courses($query) {
         global $DB;
         \core\session\manager::write_close(); // Close session early this is a read op.
 
         // Parameter validation.
         self::validate_parameters(
-            self::get_courses_quizzes_parameters(),
-            array('jsondata' => $jsondata)
+            self::get_courses_parameters(),
+            array('query' => $query)
             );
 
         // Context validation and permission check.
@@ -239,15 +239,9 @@ class local_assessfreq_external extends external_api {
         has_capability('moodle/site:config', $context);
 
         // Execute API call.
-        $data = json_decode($jsondata, true);
-        $sql = 'SELECT id, fullname FROM {course} WHERE ' . $DB->sql_like('fullname', ':fullname');
-        $params = array('fullname' => '%' . $DB->sql_like_escape($data['search']) . '%');
+        $sql = 'SELECT id, fullname FROM {course} WHERE ' . $DB->sql_like('fullname', ':fullname') . ' AND id <> 1';
+        $params = array('fullname' => '%' . $DB->sql_like_escape($query) . '%');
         $courses = $DB->get_records_sql($sql, $params, 0, 11);
-
-        foreach ($courses as $key => $course) {
-            $quizzes = $DB->get_records('quiz', array('course' => $course->id), 'name ASC', 'id, name');
-            $courses[$key]->quizzes = $quizzes;
-        }
 
         return json_encode(array_values($courses));
     }
@@ -256,7 +250,54 @@ class local_assessfreq_external extends external_api {
      * Returns description of method result value
      * @return external_description
      */
-    public static function get_courses_quizzes_returns() {
-        return new external_value(PARAM_RAW, 'Quiz JSON');
+    public static function get_courses_returns() {
+        return new external_value(PARAM_RAW, 'Course result JSON');
+    }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return void
+     */
+    public static function get_quizzes_parameters() {
+        return new external_function_parameters(array(
+            'query' => new external_value(PARAM_INT, 'The query to find')
+        ));
+    }
+
+    /**
+     * Returns courses and quizzes in that course that match search data.
+     *
+     * @param string $jsondata JSON data.
+     * @return string JSON response.
+     */
+    public static function get_quizzes($query) {
+        global $DB;
+        \core\session\manager::write_close(); // Close session early this is a read op.
+
+        // Parameter validation.
+        self::validate_parameters(
+            self::get_quizzes_parameters(),
+            array('query' => $query)
+            );
+
+        // Context validation and permission check.
+        $context = context_system::instance();
+        self::validate_context($context);
+        has_capability('moodle/site:config', $context);
+
+        // Execute API call.
+        $params = array('course' => $query);
+        $quizzes = $DB->get_records('quiz', $params, 'name ASC', 'id, name');
+
+        return json_encode(array_values($quizzes));
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function get_quizzes_returns() {
+        return new external_value(PARAM_RAW, 'Course result JSON');
     }
 }
