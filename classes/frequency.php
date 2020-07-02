@@ -926,7 +926,7 @@ class frequency {
         if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
             $years = $data->events;
         } else {  // Not valid cache data.
-            $sql = 'SELECT DISTINCT endyear FROM {local_assessfreq_site}';
+            $sql = 'SELECT DISTINCT endyear FROM {local_assessfreq_site} ORDER BY endyear ASC';
             $yearrecords = $DB->get_records_sql($sql);
             $years = array_keys($yearrecords);
         }
