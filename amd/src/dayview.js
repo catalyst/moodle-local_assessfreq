@@ -21,9 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/str', 'core/notification', 'core/modal_factory', 'local_assessfreq/modal_large', 'core/templates', 'core/ajax',
-    'core/user_date'],
-function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax, UserDate) {
+define(['core/str', 'core/notification', 'core/modal_factory', 'local_assessfreq/modal_large', 'core/templates', 'core/ajax'],
+function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
 
     /**
      * Module level variables.
@@ -34,20 +33,47 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax, UserDate)
         + '<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>'
         + '</p>';
 
+    const stringArr = [
+        {key: 'sun', component: 'calendar'},
+        {key: 'mon', component: 'calendar'},
+        {key: 'tue', component: 'calendar'},
+        {key: 'wed', component: 'calendar'},
+        {key: 'thu', component: 'calendar'},
+        {key: 'fri', component: 'calendar'},
+        {key: 'sat', component: 'calendar'},
+        {key: 'jan', component: 'local_assessfreq'},
+        {key: 'feb', component: 'local_assessfreq'},
+        {key: 'mar', component: 'local_assessfreq'},
+        {key: 'apr', component: 'local_assessfreq'},
+        {key: 'may', component: 'local_assessfreq'},
+        {key: 'jun', component: 'local_assessfreq'},
+        {key: 'jul', component: 'local_assessfreq'},
+        {key: 'aug', component: 'local_assessfreq'},
+        {key: 'sep', component: 'local_assessfreq'},
+        {key: 'oct', component: 'local_assessfreq'},
+        {key: 'nov', component: 'local_assessfreq'},
+        {key: 'dec', component: 'local_assessfreq'},
+    ];
+    var stringResult;
+
     const getUserDate = function (timestamp, format) {
         return new Promise((resolve) => {
-            Str.get_string(format, 'langconfig')
-            .then((dateformat) => {
-                let request = [
-                    {timestamp: timestamp,  format: dateformat}
-                ];
-                UserDate.get(request)
-                .then((userdate) => {
-                    resolve(userdate);
-                });
-            }).catch(() => {
-                Notification.exception(new Error('Failed to load string: date format'));
-            });
+            let date = new Date(timestamp * 1000);
+            const year = date.getFullYear();
+            const month = stringResult[(7 + date.getMonth())];
+            const day = date.getDate();
+            const hours = date.getHours();
+            const minutes = '0' + date.getMinutes();
+
+            const strftimetime = hours + ':' + minutes.substr(-2); // Will display time in 10:30 format.
+            const strftimedatetime = day + ' ' + month + ' ' + year + ', ' + strftimetime;
+
+            if (format === 'strftimetime') {
+                resolve(strftimetime);
+            } else {
+                resolve(strftimedatetime);
+            }
+
         });
     };
 
@@ -86,8 +112,6 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax, UserDate)
             responseArr[i].leftmargin = leftMargin;
             responseArr[i].width = width;
             responseArr[i].end = await getUserDate(responseArr[i].timeend, 'strftimetime');
-
-            window.console.log(responseArr[i]);
         }
 
         return new Promise((resolve) => {
@@ -135,6 +159,13 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax, UserDate)
      * @param {integer} context The current context id.
      */
     Dayview.init = function() {
+        // Load the strings we'll need later.
+        Str.get_strings(stringArr).catch(() => { // Get required strings.
+            Notification.exception(new Error('Failed to load strings'));
+            return;
+        }).then(stringReturn => { // Save string to global to be used later.
+            stringResult = stringReturn;
+        });
 
         Str.get_string('schedule', 'local_assessfreq').then((title) => {
             // Create the Modal.
