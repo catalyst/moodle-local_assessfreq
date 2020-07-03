@@ -45,6 +45,7 @@ class quiz_search_form extends \moodleform {
      */
     public function definition() {
         $mform = $this->_form;
+        $mform->disable_form_change_checker();
 
         // Form heading.
         $mform->addElement('html',
@@ -62,8 +63,8 @@ class quiz_search_form extends \moodleform {
         $mform->setType('coursechoice', PARAM_INT);
 
         $selectoptions = array(
-            1 => get_string('selectcourse', 'local_assessfreq'),
-            2 => get_string('loadingquiz', 'local_assessfreq'),
+            0 => get_string('selectcourse', 'local_assessfreq'),
+            -1 => get_string('loadingquiz', 'local_assessfreq'),
         );
         $mform->addElement('select', 'quiz',
             get_string('quiz', 'local_assessfreq'),
