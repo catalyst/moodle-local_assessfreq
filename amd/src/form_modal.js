@@ -213,7 +213,7 @@ function(Str, ModalFactory, Fragment, Ajax) {
             modalObj.hide(); // Close modal.
             modalObj.setBody(''); // Cleaer form.
             observer.disconnect(); // Remove observer.
-            callback(); // Trigger dashboard update.
+            callback(courseId, quizId); // Trigger dashboard update.
         }
 
     };

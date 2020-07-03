@@ -29,8 +29,9 @@ function(FormModal) {
      */
     var DashboardQuiz = {};
 
-    const processDashboard = function() {
-        window.console.log('display dashbaord');
+    const processDashboard = function(course, quiz) {
+        window.console.log(course);
+        window.console.log(quiz);
     };
 
     /**
