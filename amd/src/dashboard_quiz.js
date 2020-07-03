@@ -29,11 +29,15 @@ function(FormModal) {
      */
     var DashboardQuiz = {};
 
+    const processDashboard = function() {
+        window.console.log('display dashbaord');
+    };
+
     /**
      * Initialise method for quiz dashboard rendering.
      */
     DashboardQuiz.init = function(contextid) {
-        FormModal.init(contextid);
+        FormModal.init(contextid, processDashboard);
     };
 
     return DashboardQuiz;

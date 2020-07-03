@@ -31,6 +31,7 @@ function(Str, ModalFactory, Fragment, Ajax) {
     var contextid;
     var modalObj;
     var resetOptions = [];
+    var callback;
 
     const spinner = '<p class="text-center">'
         + '<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>'
@@ -56,7 +57,9 @@ function(Str, ModalFactory, Fragment, Ajax) {
                     let quizArray = JSON.parse(response);
                     let selectElement = document.getElementById('id_quiz');
                     let selectElementLength = selectElement.options.length;
-
+                    if (document.getElementById('noquizwarning') !== null) {
+                        document.getElementById('noquizwarning').remove();
+                    }
                     // Clear exisitng options.
                     for (let j=selectElementLength-1; j>=0; j--) {
                         selectElement.options[i] = null;
@@ -192,19 +195,25 @@ function(Str, ModalFactory, Fragment, Ajax) {
 
         if (courseId === undefined || quizId < 1) {
             if (document.getElementById('noquizwarning') === null) {
-                let element = document.createElement('div');
-                element.innerHTML = 'oi dickhead';
-                element.id = 'noquizwarning';
-                element.classList.add('alert', 'alert-danger');
-                modalObj.getBody().prepend(element);
-            }
+                Str.get_string('noquizselected', 'local_assessfreq').then((warning) => {
+                    let element = document.createElement('div');
+                    element.innerHTML = warning;
+                    element.id = 'noquizwarning';
+                    element.classList.add('alert', 'alert-danger');
+                    modalObj.getBody().prepend(element);
 
+                    return;
+                }).catch(() => {
+                    Notification.exception(new Error('Failed to load string: searchquiz'));
+                });
+
+            }
 
         } else {
             modalObj.hide(); // Close modal.
             modalObj.setBody(''); // Cleaer form.
             observer.disconnect(); // Remove observer.
-            // Trigger dashboard update.
+            callback(); // Trigger dashboard update.
         }
 
     };
@@ -220,8 +229,9 @@ function(Str, ModalFactory, Fragment, Ajax) {
     /**
      * Initialise method for quiz dashboard rendering.
      */
-    FormModal.init = function(context) {
+    FormModal.init = function(context, processDashboard) {
         contextid = context;
+        callback = processDashboard;
         createModal();
 
         let createBroadcastButton = document.getElementById('local-assessfreq-find-quiz');

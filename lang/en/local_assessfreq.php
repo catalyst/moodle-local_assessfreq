@@ -55,6 +55,7 @@ $string['entercourse'] = 'Enter course name';
 $string['findcourse'] = 'Find course';
 $string['loadingquiz'] = 'Loading quizzes';
 $string['nocourse'] = 'No course selected';
+$string['noquizselected'] = 'No quiz selected. Select quiz or cancel';
 $string['numberassessments'] = 'By number of assessments';
 $string['numberevents'] = 'Event Count';
 $string['numberstudents'] = 'By number of students with assessments';
