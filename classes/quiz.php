@@ -38,8 +38,31 @@ defined('MOODLE_INTERNAL') || die();
 class quiz {
 
     /**
+     * Given a quiz id get the module context.
+     *
+     * @param int $quizid The quiz ID of the context to get.
+     * @return \context_module $context The quiz module context.
+     */
+    private function get_quiz_context(int $quizid): \context_module {
+        global $DB;
+
+        $params = array('module' => 'quiz', 'quiz' => $quizid);
+        $sql = 'SELECT cm.id
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON cm.module = m.id
+            INNER JOIN {quiz} q ON cm.instance = q.id AND cm.course = q.course
+                 WHERE m.name = :module
+                       AND q.id = :quiz';
+        $cmid = $DB->get_field_sql($sql, $params);
+        $context = \context_module::instance($cmid);
+
+        return $context;
+
+    }
+
+    /**
      * Get override info for a paricular quiz.
-     * Data returned is:
+     * Data returned is:get_quiz_context
      * Number of users with overrides in Quiz,
      * Ealiest override start,
      * Latest override end.
@@ -57,7 +80,7 @@ class quiz {
         $start = 0;
         $end = 0;
 
-        $overrides = $DB->get_records('mdl_quiz_overrides', array(), '', 'id, userid, timeopen, timeclose');
+        $overrides = $DB->get_records('quiz_overrides', array(), '', 'id, userid, timeopen, timeclose');
 
         foreach ($overrides as $override) {
 
@@ -80,6 +103,10 @@ class quiz {
 
         $users = count(array_unique($users));
 
+        $overrideinfo->start = $start;
+        $overrideinfo->end = $end;
+        $overrideinfo->users = $users;
+
         return $overrideinfo;
     }
 
@@ -101,18 +128,21 @@ class quiz {
     public function get_quiz_data(int $quizid): \stdClass {
         global $DB;
         $quizdata = new \stdClass();
+        $context = $this->get_quiz_context($quizid);
 
-        $params = array('module' => 'quiz', 'quiz' => $quizid);
-        $sql = 'SELECT cm.id
-                  FROM {course_modules} cm
-            INNER JOIN {modules} m ON cm.module = m.id
-            INNER JOIN {quiz} q ON cm.instance = q.id AND cm.course = q.course
-                 WHERE m.name = :module
-                       AND q.id = :quiz';
-        $cmid = $DB->get_field_sql($sql, $params);
-        $context = \context_module::instance($cmid);
+        $quizrecord = $DB->get_record('quiz', array('id' => $quizid), 'name, timeopen, timeclose, timelimit');
+        $overrideinfo = $this->get_quiz_override_info($quizid, $context);
 
-        error_log(print_r($context, true));
+        $frequency = new frequency();
+
+        $quizdata->name = $quizrecord->name;
+        $quizdata->timeopen = $quizrecord->timeopen;
+        $quizdata->timeclose = $quizrecord->timeclose;
+        $quizdata->timelimit = $quizrecord->timelimit;
+        $quizdata->earlyopen = $overrideinfo->start;
+        $quizdata->lateclose = $overrideinfo->end;
+        $quizdata->participants = count($frequency->get_event_users($context->id, 'quiz'));
+        $quizdata->overrideparticipants = $overrideinfo->users;
 
         return $quizdata;
 
