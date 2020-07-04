@@ -76,4 +76,12 @@ $functions = array(
         'type' => 'read',
         'ajax' => true
     ),
+    'local_assessfreq_get_quiz_data' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_quiz_data',
+        'classpath' => '',
+        'description' => 'Gets quiz data.',
+        'type' => 'read',
+        'ajax' => true
+    ),
 );
