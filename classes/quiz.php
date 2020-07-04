@@ -62,7 +62,7 @@ class quiz {
 
     /**
      * Get override info for a paricular quiz.
-     * Data returned is:get_quiz_context
+     * Data returned is:
      * Number of users with overrides in Quiz,
      * Ealiest override start,
      * Latest override end.
@@ -111,6 +111,44 @@ class quiz {
     }
 
     /**
+     * Get quiz question infromation.
+     * Data returned is:
+     * List of individual question types,
+     * Count of questions in quiz,
+     * Count of question types.
+     *
+     * @param int $quizid The ID of the quiz to get override data for.
+     * @return \stdClass $questions The question data for the quiz.
+     */
+    private function get_quiz_questions(int $quizid): \stdClass {
+        global $DB;
+        $questions = new \stdClass();
+        $types = array();
+        $questioncount = 0;
+
+        $params = array($quizid);
+        $sql = 'SELECT q.id, q.name, q.qtype
+                  FROM {question} q
+            INNER JOIN {quiz_slots} qs ON q.id = qs.questionid
+                 WHERE quizid = ?';
+
+        $questionsrecords = $DB->get_records_sql($sql, $params);
+
+        foreach ($questionsrecords as $questionrecord) {
+            $types[] = $questionrecord->qtype;
+            $questioncount++;
+        }
+
+        $types = array_unique($types);
+
+        $questions->types = $types;
+        $questions->typecount = count($types);
+        $questions->questioncount = $questioncount;
+
+        return $questions;
+    }
+
+    /**
      * Method returns data about a quiz.
      * Data returned is:
      * Quiz name,
@@ -120,7 +158,10 @@ class quiz {
      * Latest participant end time (override),
      * Total participants taking the quiz,
      * Number participants with overrides in quiz,
-     * Quiz link.
+     * Quiz link,
+     * Number of questions,
+     * Number of question types,
+     * List of question types.
      *
      * @param int $quizid ID of the quiz to get data for.
      * @return \stdClass $quizdata The retrieved quiz data.
@@ -132,6 +173,7 @@ class quiz {
 
         $quizrecord = $DB->get_record('quiz', array('id' => $quizid), 'name, timeopen, timeclose, timelimit');
         $overrideinfo = $this->get_quiz_override_info($quizid, $context);
+        $questions = $this->get_quiz_questions($quizid);
 
         $frequency = new frequency();
 
@@ -143,14 +185,12 @@ class quiz {
         $quizdata->lateclose = $overrideinfo->end;
         $quizdata->participants = count($frequency->get_event_users($context->id, 'quiz'));
         $quizdata->overrideparticipants = $overrideinfo->users;
+        $quizdata->url = $context->get_url();
+        $quizdata->types = $questions->types;
+        $quizdata->typecount = $questions->typecount;
+        $quizdata->questioncount = $questions->questioncount;
 
         return $quizdata;
 
-    }
-
-    public function get_quiz_question_types(int $quizid): array {
-        $questiontypes = array();
-
-        return $questiontypes;
     }
 }

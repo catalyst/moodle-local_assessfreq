@@ -87,6 +87,7 @@ class quiz_testcase extends advanced_testcase {
 
         // Create a course with activity.
         $generator = $this->getDataGenerator();
+        $layout = '1,2,0,3,4,0,5,6,0';
         $course = $generator->create_course(
             array('format' => 'topics', 'numsections' => 3,
                 'enablecompletion' => 1),
@@ -95,7 +96,8 @@ class quiz_testcase extends advanced_testcase {
             'course' => $course->id,
             'timeopen' => 1593910800,
             'timeclose' => 1593914400,
-            'timelimit' => 3600
+            'timelimit' => 3600,
+            'layout' => $layout
         ));
         $this->quiz2 =$generator->create_module('quiz', array(
             'course' => $course->id,
@@ -103,6 +105,33 @@ class quiz_testcase extends advanced_testcase {
             'timeclose' => 1594004400,
             'timelimit' => 7200
         ));
+
+        // Add questions to quiz;
+        $quizobj = \quiz::create($this->quiz1->id);
+        $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
+        $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
+
+        $questiongenerator = $generator->get_plugin_generator('core_question');
+        $cat = $questiongenerator->create_question_category();
+
+        $page = 1;
+        foreach (explode(',', $layout) as $slot) {
+            if ($slot == 0) {
+                $page += 1;
+                continue;
+            }
+
+            if ($slot % 2 == 0) {
+                $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
+
+            } else{
+                $question = $questiongenerator->create_question('essay', null, ['category' => $cat->id]);
+            }
+
+            quiz_add_quiz_question($question->id, $this->quiz1, $page);
+        }
+
+
         $this->course = $course;
 
         // Create some users.
@@ -143,7 +172,7 @@ class quiz_testcase extends advanced_testcase {
     }
 
     /**
-     * Test getting quiz data.
+     * Test getting quiz override info.
      */
     public function test_get_quiz_override_info() {
         $quizdata = new quiz();
@@ -162,6 +191,25 @@ class quiz_testcase extends advanced_testcase {
     }
 
     /**
+     * Test getting quiz question information.
+     */
+    public function test_get_quiz_questions() {
+        $quizdata = new quiz();
+
+        // We're testing a private method, so we need to setup reflector magic.
+        $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_quiz_questions');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $result = $method->invoke($quizdata, $this->quiz1->id);
+
+        $this->assertEquals(2, $result->typecount);
+        $this->assertEquals(6, $result->questioncount);
+        $this->assertContains('essay', $result->types);
+        $this->assertContains('shortanswer', $result->types);
+
+    }
+
+    /**
      * Test getting quiz data.
      */
     public function test_get_quiz_data() {
@@ -174,6 +222,11 @@ class quiz_testcase extends advanced_testcase {
         $this->assertEquals(4, $result->participants);
         $this->assertEquals($this->quiz1->name, $result->name);
         $this->assertEquals(2, $result->overrideparticipants);
+        $this->assertEquals(2, $result->typecount);
+        $this->assertEquals(6, $result->questioncount);
+        $this->assertContains('essay', $result->types);
+        $this->assertContains('shortanswer', $result->types);
 
     }
+
 }
