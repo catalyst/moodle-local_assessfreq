@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_assessfreq/report-cards
+    @template local_assessfreq/assess-due-month
 
     Report Summary template.
 
@@ -25,18 +25,24 @@
     }
 }}
 
-<div id="local-assessfreq-quiz-dashboard-cards">
-    <div class="row no-gutters">
-        <div class="col-sm local-assessfreq-quiz-title">
-            <h3 id="local-assessfreq-quiz-title">{{# str }} noquiz, local_assessfreq {{/ str }}</h3>
+<div id="local-assessfreq-quiz-summary-card" class="card">
+	<span id="local-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
+	    <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
+	</span>
+
+    <div class="card-header">
+        <h5>{{# str }} quizdetails, local_assessfreq {{/ str }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="class-desc">
+            <!-- Chart description goes here via ajax -->
+        </div>
+        <div class="chart-body">
+            <!-- Chart goes here via ajax -->
         </div>
     </div>
-    <div id="local-assessfreq-quiz-dashboard-cards-deck" class="card-deck">
-        {{> local_assessfreq/quiz-summary-card}}
-        {{> local_assessfreq/quiz-summary-graph}}
-    </div>
-        <div id="local-assessfreq-quiz-dashboard-participant-trend-deck" class="card-deck">
-        {{> local_assessfreq/quiz-summary-trend-graph}}
+    <div class="footer">
+        <!-- Footer goes here via ajax -->
     </div>
 </div>
 
