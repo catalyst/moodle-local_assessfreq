@@ -185,7 +185,7 @@ class quiz {
         $quizdata->lateclose = $overrideinfo->end;
         $quizdata->participants = count($frequency->get_event_users($context->id, 'quiz'));
         $quizdata->overrideparticipants = $overrideinfo->users;
-        $quizdata->url = $context->get_url();
+        $quizdata->url = $context->get_url()->out(false);
         $quizdata->types = $questions->types;
         $quizdata->typecount = $questions->typecount;
         $quizdata->questioncount = $questions->questioncount;
