@@ -174,15 +174,16 @@ class quiz {
         $quizrecord = $DB->get_record('quiz', array('id' => $quizid), 'name, timeopen, timeclose, timelimit');
         $overrideinfo = $this->get_quiz_override_info($quizid, $context);
         $questions = $this->get_quiz_questions($quizid);
-
         $frequency = new frequency();
+        $timesopen = userdate($quizrecord->timeopen, get_string('strftimedatetime', 'langconfig'));
+        $timeclose = userdate($quizrecord->timeclose, get_string('strftimedatetime', 'langconfig'));
 
         $quizdata->name = $quizrecord->name;
-        $quizdata->timeopen = $quizrecord->timeopen;
-        $quizdata->timeclose = $quizrecord->timeclose;
-        $quizdata->timelimit = $quizrecord->timelimit;
-        $quizdata->earlyopen = $overrideinfo->start;
-        $quizdata->lateclose = $overrideinfo->end;
+        $quizdata->timeopen = $timesopen;
+        $quizdata->timeclose = $timeclose;
+        $quizdata->timelimit = format_time($quizrecord->timelimit);
+        $quizdata->earlyopen = ($overrideinfo->start == 0) ? $timesopen : $overrideinfo->start;
+        $quizdata->lateclose = ($overrideinfo->end == 0) ? $timeclose: $overrideinfo->end;
         $quizdata->participants = count($frequency->get_event_users($context->id, 'quiz'));
         $quizdata->overrideparticipants = $overrideinfo->users;
         $quizdata->url = $context->get_url()->out(false);

@@ -41,14 +41,32 @@ function(FormModal, Ajax, Notification) {
                 quizid: quiz
             },
         }])[0].then((response) => {
+            // TODO: Display quiz loading title while getting ajax data.
+
             let quizArray = JSON.parse(response);
             let titleElement = document.getElementById('local-assessfreq-quiz-title');
             let cardsElement = document.getElementById('local-assessfreq-quiz-dashboard-cards-deck');
             let trendElement = document.getElementById('local-assessfreq-quiz-dashboard-participant-trend-deck');
+            let summaryElement = document.getElementById("local-assessfreq-quiz-summary-card");
+            let summarySpinner = summaryElement.getElementsByClassName('overlay-icon-container')[0];
 
             titleElement.innerHTML = quizArray.name;
+
+            // Populate quiz summary card with details.
+            document.getElementById('quiz-time-open').innerHTML = quizArray.timeopen;
+            document.getElementById('quiz-time-close').innerHTML = quizArray.timeclose;
+            document.getElementById('quiz-time-limit').innerHTML = quizArray.timelimit;
+            document.getElementById('quiz-time-earlyopen').innerHTML = quizArray.earlyopen;
+            document.getElementById('quiz-time-lateclose').innerHTML = quizArray.lateclose;
+            document.getElementById('quiz-participants').innerHTML = quizArray.participants;
+            document.getElementById('quiz-participants-override').innerHTML = quizArray.overrideparticipants;
+            document.getElementById('quiz-question-number').innerHTML = quizArray.questioncount;
+            document.getElementById('quiz-question-types').innerHTML = quizArray.typecount;
+
+            // Show the cards.
             cardsElement.classList.remove('hide');
             trendElement.classList.remove('hide');
+            summarySpinner.classList.add('hide');
 
             window.console.log(quizArray);
             return;
