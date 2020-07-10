@@ -323,6 +323,38 @@ class frequency {
         return $recordsprocessed;
     }
 
+    private function get_enrolled_users(\context $context, array $capabilities): array {
+        global $DB;
+
+        $uid = 'u.id';
+        $joins = array();
+        $wheres = array();
+
+        $enrolledjoin = get_enrolled_join($context, $uid, true);
+        $joins[] = $enrolledjoin->joins;
+        $wheres[] = $enrolledjoin->wheres;
+        $params = $enrolledjoin->params;
+
+        $capjoin = get_with_capability_join($context, $capabilities, $uid);
+        $joins[] = $capjoin->joins;
+        $wheres[] = $capjoin->wheres;
+        $params = array_merge($params, $capjoin->params);
+
+        $joins = implode("\n", $joins);
+        $wheres[] = "u.deleted = 0";
+        $wheres = implode(" AND ", $wheres);
+
+        $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
+
+        $sql = "SELECT DISTINCT u.id
+              FROM {user} u
+            $finaljoin->joins
+             WHERE $finaljoin->wheres";
+            $params = $finaljoin->params;
+
+        return $DB->get_records_sql($sql, $params);
+    }
+
     /**
      * Get all user IDs that a particular event applies to.
      *
@@ -333,12 +365,8 @@ class frequency {
     public function get_event_users(int $contextid, string $module) : array {
         $context = \context::instance_by_id($contextid);
         $capabilities = $this->capabilitymap[$module];
-        $users = array();
 
-        foreach ($capabilities as $capability) {
-            $enrolledusers = get_enrolled_users($context, $capability, 0, 'u.id');
-            $users = array_replace($users, $enrolledusers);
-        }
+        $users = $this->get_enrolled_users($context, $capabilities);
 
         return $users;
     }
