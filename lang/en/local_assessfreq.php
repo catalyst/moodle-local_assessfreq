@@ -54,6 +54,7 @@ $string['eventeven_processed_desc'] = 'local assessfreq task event processing';
 $string['entercourse'] = 'Enter course name';
 $string['findcourse'] = 'Find course';
 $string['loadingquiz'] = 'Loading quizzes';
+$string['loadingquiztitle'] = 'Loading quiz';
 $string['nocourse'] = 'No course selected';
 $string['noquiz'] = 'No quiz selected...';
 $string['noquizselected'] = 'No quiz selected. Select quiz or cancel';

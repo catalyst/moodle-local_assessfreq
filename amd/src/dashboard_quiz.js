@@ -21,19 +21,22 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['local_assessfreq/form_modal', 'core/ajax', 'core/notification'],
-function(FormModal, Ajax, Notification) {
+define(['local_assessfreq/form_modal', 'core/ajax', 'core/notification', 'core/str'],
+function(FormModal, Ajax, Notification, Str) {
 
     /**
      * Module level variables.
      */
     var DashboardQuiz = {};
+    var selectQuizStr = '';
 
     /**
      * Callback function that is called when a quiz is selected from the form.
      * Starts the processing of the dashbaord.
      */
     const processDashboard = function(quiz) {
+        let titleElement = document.getElementById('local-assessfreq-quiz-title');
+        titleElement.innerHTML = selectQuizStr;
         // Get quiz data.
         Ajax.call([{
             methodname: 'local_assessfreq_get_quiz_data',
@@ -41,10 +44,8 @@ function(FormModal, Ajax, Notification) {
                 quizid: quiz
             },
         }])[0].then((response) => {
-            // TODO: Display quiz loading title while getting ajax data.
 
             let quizArray = JSON.parse(response);
-            let titleElement = document.getElementById('local-assessfreq-quiz-title');
             let cardsElement = document.getElementById('local-assessfreq-quiz-dashboard-cards-deck');
             let trendElement = document.getElementById('local-assessfreq-quiz-dashboard-participant-trend-deck');
             let summaryElement = document.getElementById("local-assessfreq-quiz-summary-card");
@@ -80,6 +81,12 @@ function(FormModal, Ajax, Notification) {
      */
     DashboardQuiz.init = function(contextid) {
         FormModal.init(contextid, processDashboard);
+
+        Str.get_string('loadingquiztitle', 'assessfreq').then((str) => {
+            selectQuizStr = str;
+        }).catch(() => {
+            Notification.exception(new Error('Failed to load string: loadingquiz'));
+        });
     };
 
     return DashboardQuiz;
