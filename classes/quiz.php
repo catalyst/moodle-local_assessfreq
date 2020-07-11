@@ -184,7 +184,7 @@ class quiz {
         $quizdata->timelimit = format_time($quizrecord->timelimit);
         $quizdata->earlyopen = ($overrideinfo->start == 0) ? $timesopen : $overrideinfo->start;
         $quizdata->lateclose = ($overrideinfo->end == 0) ? $timeclose: $overrideinfo->end;
-        $quizdata->participants = count($frequency->get_event_users($context->id, 'quiz'));
+        $quizdata->participants = count($frequency->get_event_users_raw($context->id, 'quiz'));
         $quizdata->overrideparticipants = $overrideinfo->users;
         $quizdata->url = $context->get_url()->out(false);
         $quizdata->types = $questions->types;
@@ -192,6 +192,12 @@ class quiz {
         $quizdata->questioncount = $questions->questioncount;
 
         return $quizdata;
+    }
+
+    public function process_quiz_tracking(): int {
+        $quizzes = 0;
+
+        return $quizzes;
 
     }
 }

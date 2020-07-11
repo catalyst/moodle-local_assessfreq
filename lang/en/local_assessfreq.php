@@ -124,6 +124,7 @@ $string['settings:disabledmodules_desc'] = 'Include modules that have been disab
 $string['students'] = 'Students';
 $string['systemdisabled'] = ' (module disabled)';
 $string['task:dataprocess'] = 'Data collection task';
+$string['task:quiztracking'] = 'Quiz tracking task';
 $string['time'] = 'Time';
 $string['timelimit'] = 'Time limit (minutes)';
 $string['title'] = 'Title';

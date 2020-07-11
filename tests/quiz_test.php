@@ -229,4 +229,15 @@ class quiz_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test quiz tracking processing.
+     */
+    public function test_process_quiz_tracking() {
+
+        $quizdata = new quiz();
+        $result = $quizdata->process_quiz_tracking();
+
+        error_log($result);
+    }
+
 }
