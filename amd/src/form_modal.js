@@ -34,7 +34,7 @@ function(Str, ModalFactory, Fragment, Ajax) {
     var callback;
 
     const spinner = '<p class="text-center">'
-        + '<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>'
+        + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
         + '</p>';
 
     const observer = new MutationObserver(ObserverCallback);

@@ -38,7 +38,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
     var heatmapOptionsJson = '';
     var modalObj;
     const spinner = '<p class="text-center">'
-        + '<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>'
+        + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
         + '</p>';
 
     const cards = [

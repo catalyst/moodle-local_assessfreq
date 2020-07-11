@@ -78,6 +78,18 @@ class frequency {
         'workshop' => 'submissionstart'
     );
 
+    /**
+     * The time limit databse field differs between module types and only some support it.
+     * This map provides the translation
+     *
+     * @var array $moduletimelimit
+     */
+    private $moduletimelimit = array (
+        'leesson' => 'timelimit',
+        'quiz' => 'timelimit',
+
+    );
+
 
     /**
      * Map of capabilities that users must have
@@ -182,13 +194,16 @@ class frequency {
         $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
 
         $duedate = $this->moduleendfield[$module];
+        $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.' . $duedate . ' AS duedate ';
 
         if (!empty($this->modulestartfield[$module])) {
             $startdate = $this->modulestartfield[$module];
-            $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.'
-                . $duedate . ' AS duedate, a.' . $startdate . ' AS startdate ';
-        } else {
-            $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.' . $duedate . ' AS duedate ';
+            $sql .= ', a.' . $startdate . ' AS startdate ';
+        }
+
+        if (!empty($this->moduletimelimit[$module])) {
+            $timelimit = $this->moduletimelimit[$module];
+            $sql .= ', a.' . $timelimit . ' AS timelimit ';
         }
 
         $sql .= 'FROM {course_modules} cm
@@ -259,6 +274,10 @@ class frequency {
                 $record->startdate = 0;
             }
 
+            if (empty($record->timelimit)) {
+                $record->timelimit = 0;
+            }
+
             // Iterate through the records and insert to database in batches.
             $timeelements = $this->format_time($record->duedate);
             $insertrecord = new \stdClass();
@@ -268,6 +287,7 @@ class frequency {
             $insertrecord->contextid = $record->contextid;
             $insertrecord->timestart = $record->startdate;
             $insertrecord->timeend = $record->duedate;
+            $insertrecord->timelimit = $record->timelimit;
             $insertrecord->endyear = $timeelements['endyear'];
             $insertrecord->endmonth = $timeelements['endmonth'];
             $insertrecord->endday = $timeelements['endday'];
@@ -1005,6 +1025,7 @@ class frequency {
             $event->name = $context->get_context_name();
             $event->url = $context->get_url()->out();
             $event->usercount = count($this->get_event_users($event->contextid, $event->module));
+            $event->timelimit = ($event->timelimit == 0) ? get_string('na', 'local_assessfreq') : round(($event->timelimit / 60));
 
             $dayevents[] = $event;
         }

@@ -30,7 +30,7 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
     var Dayview = {};
     var modalObj;
     const spinner = '<p class="text-center">'
-        + '<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>'
+        + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
         + '</p>';
 
     const stringArr = [
@@ -125,7 +125,8 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
      *
      */
     Dayview.display = function(date) {
-        let context = {};
+        modalObj.setBody(spinner);
+        modalObj.show();
         let args = {
                 date: date,
                 modules: ['all']
@@ -140,17 +141,10 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
 
             let context = {rows: responseArr};
             modalObj.setBody(Templates.render('local_assessfreq/dayview', context));
-            modalObj.show();
 
         }).fail(() => {
             Notification.exception(new Error('Failed to load day view'));
         });
-
-        //modalObj.setTitle(title);
-        modalObj.setBody(Templates.render('local_assessfreq/dayview', context));
-        modalObj.show();
-
-
     };
 
     /**

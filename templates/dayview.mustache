@@ -28,11 +28,19 @@
 <table class="table table-bordered">
   <colgroup>
     <col class="dayview-firstcol">
+    <col class="dayview-midcol">
+    <col class="dayview-midcol">
     <col>
   </colgroup>
   <thead>
     <tr>
       <th scope="col" rowspan="2">{{# str }} title, local_assessfreq {{/ str }}</th>
+      <th scope="col" rowspan="2" class="text-center">
+        {{#pix}} i/cohort, core, {{#str}} students, local_assessfreq {{/str}} {{/pix}}
+      </th>
+      <th scope="col" rowspan="2" class="text-center">
+        {{#pix}} i/calendareventtime, core, {{#str}} timelimit, local_assessfreq {{/str}} {{/pix}}
+      </th>
       <th scope="col">{{# str }} time, local_assessfreq {{/ str }}</th>
     </tr>
      <tr>
@@ -49,7 +57,13 @@
     {{#rows}}
     <tr>
       <th scope="row">
-        <a href="{{url}}}">{{name}}</a> {{# str }} students, local_assessfreq, {{ usercount }} {{/ str }}
+        <a href="{{url}}}">{{name}}</a>
+      </th>
+      <th scope="row" class="text-center">
+        {{ usercount }}
+      </th>
+       <th scope="row" class="text-center">
+        {{ timelimit }}
       </th>
       <td>
         <div class="local-assessfreq-day-period" style="margin-left: {{leftmargin}}%;width: {{width}}%;">
