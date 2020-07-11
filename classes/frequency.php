@@ -343,6 +343,14 @@ class frequency {
         return $recordsprocessed;
     }
 
+    /**
+     * Our own implementation of get_enrolled_users. Allows us to check multiple capabilities
+     * in less database queries.
+     *
+     * @param \context $context The context to get the enrolled users for.
+     * @param array $capabilities The capabilities that users need to have.
+     * @return array Enrolled user records
+     */
     private function get_enrolled_users(\context $context, array $capabilities): array {
         global $DB;
 
@@ -377,16 +385,63 @@ class frequency {
 
     /**
      * Get all user IDs that a particular event applies to.
+     * This method gets "fresh" records from the Moodle Databsae. Processing for
+     * this can take a long time. Consider using the get_event_users method
+     * if you don't need the most up to date data.
      *
      * @param int $contextid The context ID in a course for the event to check.
      * @param string $module The type of module the event is for.
      * @return array $users An array of user IDs.
      */
-    public function get_event_users(int $contextid, string $module) : array {
+    public function get_event_users_raw(int $contextid, string $module): array {
         $context = \context::instance_by_id($contextid);
         $capabilities = $this->capabilitymap[$module];
 
         $users = $this->get_enrolled_users($context, $capabilities);
+
+        return $users;
+    }
+
+    /**
+     * Get all user IDs that a particular event applies to.
+     * This mehod uses the preprocessed event and user data from the plugin tables.
+     *
+     * @param int $contextid The context ID in a course for the event to check.
+     * @param string $module The type of module the event is for.
+     * @param bool $cache If false cache won't be used fresh data will be retrieved from DB.
+     * @return array $users Array of user ids.
+     */
+    public function get_event_users(int $contextid, string $module, bool $cache=true): array {
+        global $DB;
+        $users = array();
+        $cachekey = (string)$contextid . '_' . $module;
+
+        // Try to get value from cache.
+        $usercache = cache::make('local_assessfreq', 'eventusers');
+        $data = $usercache->get($cachekey);
+
+        if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
+            // Only return data for chosen range.
+            $users = $data->users;
+        } else {  // Not valid cache data.
+            $sql = 'SELECT u.userid as id
+                      FROM {local_assessfreq_user} u
+                INNER JOIN {local_assessfreq_site} s ON u.eventid = s.id
+                     WHERE s.contextid = ?
+                           AND s.module = ?';
+            $params = array($contextid, $module);
+
+            $users = $DB->get_records_sql($sql, $params);
+
+            // Update cache.
+            if (!empty($users)) {
+                $expiry = time() + $this->expiryperiod;
+                $data = new \stdClass();
+                $data->expiry = $expiry;
+                $data->users = $users;
+                $usercache->set($cachekey, $data);
+            }
+        }
 
         return $users;
     }
@@ -449,7 +504,7 @@ class frequency {
         $eventset = $this->get_stored_events($duedate);
         foreach ($eventset as $event) {
             // For each site event get list of users that the event aplies to.
-            $users = $this->get_event_users($event->contextid, $event->module);
+            $users = $this->get_event_users_raw($event->contextid, $event->module);
             $userrecords = $this->prepare_user_event_records($users, $event->id);
 
             // Store result in database in a many-to-many table.

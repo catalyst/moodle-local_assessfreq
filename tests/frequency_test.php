@@ -256,15 +256,42 @@ class frequency_testcase extends advanced_testcase {
     }
 
     /**
-     * Test process getting events for users.
+     * Test process getting raw users for an event.
+     */
+    public function test_get_event_users_raw() {
+        $frequency = new frequency();
+
+        $result = $frequency->get_event_users_raw($this->assign1->get_context()->id, 'assign');
+
+        $this->assertEquals($this->user1->id, $result[$this->user1->id]->id);
+        $this->assertEquals($this->user2->id, $result[$this->user2->id]->id);
+
+    }
+
+    /**
+     * Test process getting users for an event.
      */
     public function test_get_event_users() {
+        $duedate = 0;
         $frequency = new frequency();
+        $frequency->process_site_events($duedate);
+        $frequency->process_user_events($duedate);
+        $contextid = $this->assign1->get_context()->id;
+        $module = 'assign';
+
+        // Cache should be initially empty.
+        $eventuserscache = cache::make('local_assessfreq', 'eventusers');
+        $cachekey = (string)$contextid . '_' . $module;
+        $data = $eventuserscache->get($cachekey);
+        $this->assertEmpty($data);
 
         $result = $frequency->get_event_users($this->assign1->get_context()->id, 'assign');
 
         $this->assertEquals($this->user1->id, $result[$this->user1->id]->id);
         $this->assertEquals($this->user2->id, $result[$this->user2->id]->id);
+
+        $data = $eventuserscache->get($cachekey);
+        $this->assertCount(2, $data->users);
 
     }
 
@@ -534,7 +561,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord6->module = 'assign';
         $lasrecord6->instanceid = 6;
         $lasrecord6->courseid = 2;
-        $lasrecord6->contextid = 7;
+        $lasrecord6->contextid = 9;
         $lasrecord6->timestart = 1586084400; // Time in readable format 2020-04-05 @ 11:00:00am GMT.
         $lasrecord6->timeend = 1586160000; // Time in readable format 2020-04-06 @ 8:00:00am GMT.
         $lasrecord6->endyear = 2020;
@@ -545,7 +572,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord7->module = 'quiz';
         $lasrecord7->instanceid = 7;
         $lasrecord7->courseid = 2;
-        $lasrecord7->contextid = 7;
+        $lasrecord7->contextid = 10;
         $lasrecord7->timestart = 1586073601; // Time in readable format 2020-04-05 @ 8:00:01am GMT.
         $lasrecord7->timeend = 1586246400; // Time in readable format 2020-04-07 @ 8:00:00am GMT.
         $lasrecord7->endyear = 2020;

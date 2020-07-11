@@ -62,7 +62,7 @@ class data_process extends scheduled_task {
             return;
         }
 
-        // Due dates may have changed since we last ran report. So delete all events in DB later than today and replace them.
+        // Due dates may have changed since we last ran report. So delete all events in DB later than now and replace them.
         mtrace('local_assessfreq: Deleting old event data');
         $actionstart = time();
         $frequency->delete_events($now); // Delete event records greaer than now.

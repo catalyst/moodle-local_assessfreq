@@ -74,5 +74,11 @@ $definitions = [
         'simplekeys' => true,
         'simpledata' => false
     ],
+    'eventusers' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'simplekeys' => true,
+        'simpledata' => false
+    ],
 ];
 

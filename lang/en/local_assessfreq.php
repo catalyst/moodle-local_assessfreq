@@ -36,6 +36,7 @@ $string['assessheatmap'] = 'Assessment heatmap for year:';
 $string['assessoverview'] = 'Assessment overviews for year:';
 $string['cachedef_eventsdueactivity'] = 'Events due by activity cache';
 $string['cachedef_eventsduemonth'] = 'Events due by month cache';
+$string['cachedef_eventusers'] = 'Users for month cache';
 $string['cachedef_monthlyuser'] = 'User events due by month cache';
 $string['cachedef_courseevents'] = 'Assessment frequency course event cache';
 $string['cachedef_siteevents'] = 'Assessment frequency site event cache';

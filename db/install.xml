@@ -23,6 +23,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="modid" UNIQUE="true" FIELDS="module, instanceid" COMMENT="Index of module and instance id"/>
+        <INDEX NAME="contextmod" UNIQUE="true" FIELDS="contextid, module" COMMENT="Index of context id and module"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_assessfreq_user" COMMENT="Stores relationship between users and events">
