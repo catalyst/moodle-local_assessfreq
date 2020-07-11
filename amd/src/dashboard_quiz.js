@@ -82,7 +82,7 @@ function(FormModal, Ajax, Notification, Str) {
     DashboardQuiz.init = function(contextid) {
         FormModal.init(contextid, processDashboard);
 
-        Str.get_string('loadingquiztitle', 'assessfreq').then((str) => {
+        Str.get_string('loadingquiztitle', 'local_assessfreq').then((str) => {
             selectQuizStr = str;
         }).catch(() => {
             Notification.exception(new Error('Failed to load string: loadingquiz'));
