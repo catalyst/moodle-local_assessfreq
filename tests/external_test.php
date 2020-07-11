@@ -37,6 +37,7 @@ use local_assessfreq\frequency;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  */
 class local_assessfreq_external_testcase extends advanced_testcase {
+
     /**
      *
      * @var stdClass $course Test course.
@@ -57,6 +58,18 @@ class local_assessfreq_external_testcase extends advanced_testcase {
 
     /**
      *
+     * @var stdClass First test quiz.
+     */
+    protected $quiz1;
+
+    /**
+     *
+     * @var stdClass Second test quiz.
+     */
+    protected $quiz2;
+
+    /**
+     *
      * @var stdClass First test user.
      */
     protected $user1;
@@ -68,15 +81,28 @@ class local_assessfreq_external_testcase extends advanced_testcase {
     protected $user2;
 
     /**
+     *
+     * @var stdClass Second test user.
+     */
+    protected $user3;
+
+    /**
+     *
+     * @var stdClass Second test user.
+     */
+    protected $user4;
+
+    /**
      * Set up conditions for tests.
      */
     public function setUp() {
         $this->resetAfterTest();
 
-        global $CFG;
+        global $CFG, $DB;
 
         // Create a course with activity.
         $generator = $this->getDataGenerator();
+        $layout = '1,2,0,3,4,0,5,6,0';
         $course = $generator->create_course(
             array('fullname' => 'blue course', 'format' => 'topics', 'numsections' => 3,
                 'enablecompletion' => 1),
@@ -93,19 +119,83 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         $this->assign2 = new assign(context_module::instance($assignrow2->cmid), false, false);
         $this->course = $course;
 
+        $this->quiz1 = $generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => 1593910800,
+            'timeclose' => 1593914400,
+            'timelimit' => 3600,
+            'layout' => $layout
+        ));
+        $this->quiz2 =$generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => 1593997200,
+            'timeclose' => 1594004400,
+            'timelimit' => 7200
+        ));
+
         // Create some users.
         $user1 = $generator->create_user();
         $user2 = $generator->create_user();
+        $user3 = $generator->create_user();
+        $user4 = $generator->create_user();
 
         // Enrol users into the course.
         $generator->enrol_user($user1->id, $course->id, 'student');
         $generator->enrol_user($user2->id, $course->id, 'student');
+        $generator->enrol_user($user3->id, $course->id, 'student');
+        $generator->enrol_user($user4->id, $course->id, 'student');
+
+        // Add questions to quiz;
+        $quizobj = \quiz::create($this->quiz1->id);
+        $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
+        $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
+
+        $questiongenerator = $generator->get_plugin_generator('core_question');
+        $cat = $questiongenerator->create_question_category();
+
+        $page = 1;
+        foreach (explode(',', $layout) as $slot) {
+            if ($slot == 0) {
+                $page += 1;
+                continue;
+            }
+
+            if ($slot % 2 == 0) {
+                $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
+
+            } else{
+                $question = $questiongenerator->create_question('essay', null, ['category' => $cat->id]);
+            }
+
+            quiz_add_quiz_question($question->id, $this->quiz1, $page);
+        }
+
+        // Set up a couple of overrides.
+        $override1 = new \stdClass();
+        $override1->quiz = $this->quiz1->id;
+        $override1->userid = $user3->id;
+        $override1->timeopen = 1593996000; // Open early.
+        $override1->timeclose = 1594004400;
+        $override1->timelimit = 7200;
+
+        $override2 = new \stdClass();
+        $override2->quiz = $this->quiz1->id;
+        $override2->userid = $user4->id;
+        $override2->timeopen = 1593997200;
+        $override2->timeclose = 1594005000;  // End late.
+        $override2->timelimit = 7200;
+
+        $overriderecords = array($override1, $override2);
+        $DB->insert_records('quiz_overrides', $overriderecords);
 
         $this->user1 = $user1;
         $this->user2 = $user2;
+        $this->user3 = $user3;
+        $this->user3 = $user4;
 
         set_config('modules', 'quiz,assign,scorm,choice', 'local_assessfreq');
     }
+
 
     /**
      * Test ajax getting of event data.
@@ -144,8 +234,8 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_frequency_returns(), $returnvalue);
         $eventarr = json_decode($returnjson, true);
 
-        $this->assertEquals(2, $eventarr[2020][3][29]['number']);
-        $this->assertEquals(2, $eventarr[2020][3][28]['number']);
+        $this->assertEquals(4, $eventarr[2020][3][29]['number']);
+        $this->assertEquals(4, $eventarr[2020][3][28]['number']);
     }
 
     /**
@@ -202,7 +292,7 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         $eventarr = json_decode($returnjson, true);
 
         $this->assertEquals('assign', $eventarr[0]['module']);
-        $this->assertEquals(2, $eventarr[0]['usercount']);
+        $this->assertEquals(4, $eventarr[0]['usercount']);
         $this->assertEquals(2020, $eventarr[0]['endyear']);
         $this->assertEquals(3, $eventarr[0]['endmonth']);
         $this->assertEquals(28, $eventarr[0]['endday']);
@@ -243,6 +333,29 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_quizzes_returns(), $returnvalue);
         $eventarr = json_decode($returnjson, true);
 
-        $this->assertCount(2, $eventarr);
+        $this->assertCount(4, $eventarr);
+    }
+
+    /**
+     * Test ajax getting of quiz names.
+     */
+    public function test_get_quiz_data() {
+        $this->setAdminUser();
+
+        $quizid = $this->quiz1->id;
+
+        $returnvalue = local_assessfreq_external::get_quiz_data($quizid);
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_quiz_data_returns(), $returnvalue);
+        $eventarr = json_decode($returnjson, true);
+
+        $this->assertEquals(1593996000, $eventarr['earlyopen']);
+        $this->assertEquals(1594005000, $eventarr['lateclose']);
+        $this->assertEquals(4, $eventarr['participants']);
+        $this->assertEquals($this->quiz1->name, $eventarr['name']);
+        $this->assertEquals(2, $eventarr['overrideparticipants']);
+        $this->assertEquals(2, $eventarr['typecount']);
+        $this->assertEquals(6, $eventarr['questioncount']);
+        $this->assertContains('essay', $eventarr['types']);
+        $this->assertContains('shortanswer', $eventarr['types']);
     }
 }

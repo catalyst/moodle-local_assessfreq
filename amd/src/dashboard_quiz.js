@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['local_assessfreq/form_modal'],
-function(FormModal) {
+define(['local_assessfreq/form_modal', 'core/ajax', 'core/notification'],
+function(FormModal, Ajax, Notification) {
 
     /**
      * Module level variables.
@@ -30,10 +30,56 @@ function(FormModal) {
     var DashboardQuiz = {};
 
     /**
+     * Callback function that is called when a quiz is selected from the form.
+     * Starts the processing of the dashbaord.
+     */
+    const processDashboard = function(quiz) {
+        // Get quiz data.
+        Ajax.call([{
+            methodname: 'local_assessfreq_get_quiz_data',
+            args: {
+                quizid: quiz
+            },
+        }])[0].then((response) => {
+            // TODO: Display quiz loading title while getting ajax data.
+
+            let quizArray = JSON.parse(response);
+            let titleElement = document.getElementById('local-assessfreq-quiz-title');
+            let cardsElement = document.getElementById('local-assessfreq-quiz-dashboard-cards-deck');
+            let trendElement = document.getElementById('local-assessfreq-quiz-dashboard-participant-trend-deck');
+            let summaryElement = document.getElementById("local-assessfreq-quiz-summary-card");
+            let summarySpinner = summaryElement.getElementsByClassName('overlay-icon-container')[0];
+
+            titleElement.innerHTML = quizArray.name;
+
+            // Populate quiz summary card with details.
+            document.getElementById('quiz-time-open').innerHTML = quizArray.timeopen;
+            document.getElementById('quiz-time-close').innerHTML = quizArray.timeclose;
+            document.getElementById('quiz-time-limit').innerHTML = quizArray.timelimit;
+            document.getElementById('quiz-time-earlyopen').innerHTML = quizArray.earlyopen;
+            document.getElementById('quiz-time-lateclose').innerHTML = quizArray.lateclose;
+            document.getElementById('quiz-participants').innerHTML = quizArray.participants;
+            document.getElementById('quiz-participants-override').innerHTML = quizArray.overrideparticipants;
+            document.getElementById('quiz-question-number').innerHTML = quizArray.questioncount;
+            document.getElementById('quiz-question-types').innerHTML = quizArray.typecount;
+
+            // Show the cards.
+            cardsElement.classList.remove('hide');
+            trendElement.classList.remove('hide');
+            summarySpinner.classList.add('hide');
+
+            window.console.log(quizArray);
+            return;
+        }).fail(() => {
+            Notification.exception(new Error('Failed to get quiz data'));
+        });
+    };
+
+    /**
      * Initialise method for quiz dashboard rendering.
      */
     DashboardQuiz.init = function(contextid) {
-        FormModal.init(contextid);
+        FormModal.init(contextid, processDashboard);
     };
 
     return DashboardQuiz;

@@ -30,6 +30,8 @@ function(Str, ModalFactory, Fragment, Ajax) {
     var FormModal = {};
     var contextid;
     var modalObj;
+    var resetOptions = [];
+    var callback;
 
     const spinner = '<p class="text-center">'
         + '<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>'
@@ -43,8 +45,9 @@ function(Str, ModalFactory, Fragment, Ajax) {
             let element = mutationsList[i].target;
             if(element.tagName.toLowerCase() === 'span' && element.classList.contains('badge')) {
                 element.addEventListener('click', updateModalBody);
+                document.getElementById('id_courses').dataset.course = element.dataset.value;
 
-                document.getElementById('id_quiz').value = 2;
+                document.getElementById('id_quiz').value = -1;
                 Ajax.call([{
                     methodname: 'local_assessfreq_get_quizzes',
                     args: {
@@ -54,7 +57,9 @@ function(Str, ModalFactory, Fragment, Ajax) {
                     let quizArray = JSON.parse(response);
                     let selectElement = document.getElementById('id_quiz');
                     let selectElementLength = selectElement.options.length;
-
+                    if (document.getElementById('noquizwarning') !== null) {
+                        document.getElementById('noquizwarning').remove();
+                    }
                     // Clear exisitng options.
                     for (let j=selectElementLength-1; j>=0; j--) {
                         selectElement.options[i] = null;
@@ -71,9 +76,15 @@ function(Str, ModalFactory, Fragment, Ajax) {
                             selectElement.appendChild(el);
                         }
                         selectElement.removeAttribute('disabled');
+                        if (document.getElementById('noquizwarning') !== null) {
+                            document.getElementById('noquizwarning').remove();
+                        }
                     } else {
-
-                        document.getElementById('id_quiz').value = 1;
+                        resetOptions.forEach((option) => {
+                            selectElement.appendChild(option);
+                        });
+                        document.getElementById('id_quiz').value = 0;
+                        selectElement.disabled = true;
                     }
 
                 }).fail(() => {
@@ -110,11 +121,32 @@ function(Str, ModalFactory, Fragment, Ajax) {
                     modalObj.setBody(spinner);
                     modalObj.hide();
                 });
-
             });
             return;
         }).catch(() => {
             Notification.exception(new Error('Failed to load string: loading'));
+        });
+    };
+
+    const getOptionPlaceholders = function() {
+        return new Promise((resolve, reject) => {
+            const stringArr = [
+                {key: 'selectcourse', component: 'local_assessfreq'},
+                {key: 'loadingquiz', component: 'local_assessfreq'},
+            ];
+
+            Str.get_strings(stringArr).catch(() => { // Get required strings.
+                reject(new Error('Failed to load strings'));
+                return;
+            }).then(stringReturn => { // Save string to global to be used later.
+                for (let i=0; i<stringReturn.length; i++) {
+                    let el = document.createElement('option');
+                    el.textContent = stringReturn[i];
+                    el.value = 0 - i;
+                    resetOptions.push(el);
+                }
+                resolve();
+            });
         });
     };
 
@@ -133,15 +165,18 @@ function(Str, ModalFactory, Fragment, Ajax) {
             'jsonformdata': JSON.stringify(formdata)
         };
 
-        Str.get_string('searchquiz', 'local_assessfreq').then((title) => {
-            modalObj.setTitle(title);
-            modalObj.setBody(Fragment.loadFragment('local_assessfreq', 'new_base_form', contextid, params));
-            let modalContainer = document.querySelectorAll(`[data-region*="modal-container"]`)[0];
-            observer.observe(modalContainer, observerConfig);
+        getOptionPlaceholders()
+        .then(() => {
+            Str.get_string('searchquiz', 'local_assessfreq').then((title) => {
+                modalObj.setTitle(title);
+                modalObj.setBody(Fragment.loadFragment('local_assessfreq', 'new_base_form', contextid, params));
+                let modalContainer = document.querySelectorAll(`[data-region*="modal-container"]`)[0];
+                observer.observe(modalContainer, observerConfig);
 
-            return;
-        }).catch(() => {
-            Notification.exception(new Error('Failed to load string: searchquiz'));
+                return;
+            }).catch(() => {
+                Notification.exception(new Error('Failed to load string: searchquiz'));
+            });
         });
     };
 
@@ -154,9 +189,33 @@ function(Str, ModalFactory, Fragment, Ajax) {
     const processModalForm = function(e) {
         e.preventDefault(); // Stop modal from closing.
 
-        let formData = modalObj.getRoot().find('form'); // Form data.
+        let quizElement = document.getElementById('id_quiz');
+        let quizId = quizElement.options[quizElement.selectedIndex].value;
+        let courseId = document.getElementById('id_courses').dataset.course;
 
-        window.console.log(formData);
+        if (courseId === undefined || quizId < 1) {
+            if (document.getElementById('noquizwarning') === null) {
+                Str.get_string('noquizselected', 'local_assessfreq').then((warning) => {
+                    let element = document.createElement('div');
+                    element.innerHTML = warning;
+                    element.id = 'noquizwarning';
+                    element.classList.add('alert', 'alert-danger');
+                    modalObj.getBody().prepend(element);
+
+                    return;
+                }).catch(() => {
+                    Notification.exception(new Error('Failed to load string: searchquiz'));
+                });
+
+            }
+
+        } else {
+            modalObj.hide(); // Close modal.
+            modalObj.setBody(''); // Cleaer form.
+            observer.disconnect(); // Remove observer.
+            callback(quizId, courseId); // Trigger dashboard update.
+        }
+
     };
 
     /**
@@ -170,8 +229,9 @@ function(Str, ModalFactory, Fragment, Ajax) {
     /**
      * Initialise method for quiz dashboard rendering.
      */
-    FormModal.init = function(context) {
+    FormModal.init = function(context, processDashboard) {
         contextid = context;
+        callback = processDashboard;
         createModal();
 
         let createBroadcastButton = document.getElementById('local-assessfreq-find-quiz');

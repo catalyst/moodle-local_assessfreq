@@ -167,6 +167,12 @@ class renderer extends plugin_renderer_base {
         return $button;
     }
 
+    private function render_quiz_dashboard_cards(): string {
+        $context = array();
+
+        return $this->render_from_template('local_assessfreq/quiz-dashboard-cards', $context);
+    }
+
     /**
      * Get the html to render the quiz dashboard.
      *
@@ -176,7 +182,8 @@ class renderer extends plugin_renderer_base {
     public function render_dashboard_quiz(string $baseurl) : string {
         $html = '';
         $html .= $this->header();
-        $html .= $this->render_quiz_select_button();;
+        $html .= $this->render_quiz_select_button();
+        $html .= $this->render_quiz_dashboard_cards();
         $html .= $this->footer();
 
         return $html;

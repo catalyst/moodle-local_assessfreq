@@ -261,11 +261,7 @@ class frequency_testcase extends advanced_testcase {
     public function test_get_event_users() {
         $frequency = new frequency();
 
-        // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\local_assessfreq\frequency', 'get_event_users');
-        $method->setAccessible(true); // Allow accessing of private method.
-
-        $result = $method->invoke($frequency, $this->assign1->get_context()->id, 'assign');
+        $result = $frequency->get_event_users($this->assign1->get_context()->id, 'assign');
 
         $this->assertEquals($this->user1->id, $result[$this->user1->id]->id);
         $this->assertEquals($this->user2->id, $result[$this->user2->id]->id);

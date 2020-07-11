@@ -298,6 +298,52 @@ class local_assessfreq_external extends external_api {
      * @return external_description
      */
     public static function get_quizzes_returns() {
-        return new external_value(PARAM_RAW, 'Course result JSON');
+        return new external_value(PARAM_RAW, 'Quiz result JSON');
+    }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return void
+     */
+    public static function get_quiz_data_parameters() {
+        return new external_function_parameters(array(
+            'quizid' => new external_value(PARAM_INT, 'The quiz id to get data for')
+        ));
+    }
+
+    /**
+     * Returns quiz data.
+     *
+     * @param string $jsondata JSON data.
+     * @return string JSON response.
+     */
+    public static function get_quiz_data($quizid) {
+        \core\session\manager::write_close(); // Close session early this is a read op.
+
+        // Parameter validation.
+        self::validate_parameters(
+            self::get_quiz_data_parameters(),
+            array('quizid' => $quizid)
+            );
+
+        // Context validation and permission check.
+        $context = context_system::instance();
+        self::validate_context($context);
+        has_capability('moodle/site:config', $context);
+
+        // Execute API call.
+        $quiz = new \local_assessfreq\quiz();
+        $quizdata = $quiz->get_quiz_data($quizid);
+
+        return json_encode($quizdata);
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function get_quiz_data_returns() {
+        return new external_value(PARAM_RAW, 'Quiz data result JSON');
     }
 }

@@ -362,7 +362,7 @@ class frequency {
      * @param string $module The type of module the event is for.
      * @return array $users An array of user IDs.
      */
-    private function get_event_users(int $contextid, string $module) : array {
+    public function get_event_users(int $contextid, string $module) : array {
         $context = \context::instance_by_id($contextid);
         $capabilities = $this->capabilitymap[$module];
 
