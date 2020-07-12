@@ -66,5 +66,22 @@
         <INDEX NAME="userid_conflictid" UNIQUE="true" FIELDS="userid, conflictid" COMMENT="index of user and conflictid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_assessfreq_trend" COMMENT="Table hold data about user trends during an assessment">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="assessid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The ID of the assessment the trend data is for"/>
+        <FIELD NAME="notloggedin" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Count of users who are able to do the assessment but who are not logged into the system"/>
+        <FIELD NAME="loggedin" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Count of users who can do the assessment who are logged into the system"/>
+        <FIELD NAME="inprogress" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Count of students who are in progress"/>
+        <FIELD NAME="finished" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Count of students who have finished the assessment"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The time the record was created"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="assessid" UNIQUE="false" FIELDS="assessid"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
