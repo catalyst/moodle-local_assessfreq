@@ -468,7 +468,7 @@ class frequency_testcase extends advanced_testcase {
         $frequency->process_user_events($duedate);
 
         $usercache = cache::make('local_assessfreq', 'usereventsall');
-        $cachekey = 'all';
+        $cachekey = 'all_0_0';
         $data = $usercache->get($cachekey);
         $this->assertEmpty($data);
 

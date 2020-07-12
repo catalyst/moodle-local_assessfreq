@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/assessfreq/db" VERSION="20200712" COMMENT="XMLDB file for Moodle local/assessfreq"
+<XMLDB PATH="local/assessfreq/db" VERSION="20200713" COMMENT="XMLDB file for Moodle local/assessfreq"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -37,6 +37,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="userevent" UNIQUE="false" FIELDS="userid, eventid"/>
+        <INDEX NAME="eventid" UNIQUE="false" FIELDS="eventid" COMMENT="Index on event id"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_assessfreq_conflict" COMMENT="Table to store event conflict data.">

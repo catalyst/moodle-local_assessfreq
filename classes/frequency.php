@@ -556,7 +556,7 @@ class frequency {
      * @param int $to Timestamp to fiter to.
      * @return array $filteredevents The list of filtered events.
      */
-    private function filter_event_data(array $events, int $from, int $to=0) : array {
+    private function filter_event_data($events, int $from, int $to=0) : array {
         $filteredevents = array();
 
         // If an explicit to date was not defined default to a year from now.
@@ -806,7 +806,7 @@ class frequency {
     public function get_user_events_all(string $module='all', int $from=0, int $to=0, bool $cache=true) : array {
         global $DB;
         $events = array();
-        $cachekey = $module;
+        $cachekey = $module . '_' . (string)$from . '_' . (string)$to;
 
         // Try to get value from cache.
         $usercache = cache::make('local_assessfreq', 'usereventsall');
@@ -814,7 +814,7 @@ class frequency {
 
         if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
             // Only return data for chosen range.
-            $events = $this->filter_event_data($data->events, $from, $to);
+            $events = $data->events;
         } else {  // Not valid cache data.
 
             $rowkey = $DB->sql_concat('s.id', "'_'", 'u.userid');
@@ -840,15 +840,16 @@ class frequency {
                 $sql .= " AND c.visible = ?";
             }
 
-            $rawevents = $DB->get_records_sql($sql, $params);
+            $rawevents = $DB->get_recordset_sql($sql, $params);
             $events = $this->filter_event_data($rawevents, $from, $to);
+            $rawevents->close();
 
             // Update cache.
-            if (!empty($rawevents)) {
+            if (!empty($events)) {
                 $expiry = time() + $this->expiryperiod;
                 $data = new \stdClass();
                 $data->expiry = $expiry;
-                $data->events = $rawevents;
+                $data->events = $events;
                 $usercache->set($cachekey, $data);
             }
         }
