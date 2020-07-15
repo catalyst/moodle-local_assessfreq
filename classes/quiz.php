@@ -194,8 +194,88 @@ class quiz {
         return $quizdata;
     }
 
+    /**
+     * Get a list of all quiz overrides that have a start date less than now + 1 hour
+     * AND end date is in the future OR end date is less then 1 hour in the past.
+     * And startdate != 0.
+     *
+     * @param int $now Timestamp to use for reference for time.
+     * @return array $quizzes The quizzes with applicable overrides.
+     */
+    private function get_tracked_overrides(int $now): array {
+        global $DB;
+
+        $starttime = $now + HOURSECS;
+        $endtime = $now - HOURSECS;
+
+        $sql = 'SELECT id, quiz, timeopen, timeclose
+                  FROM {quiz_overrides}
+                 WHERE (timeopen > 0 AND timeopen < :starttime)
+                       AND (timeclose > :endtime OR timeclose > :now)';
+        $params = array(
+            'starttime' => $starttime,
+            'endtime' => $endtime,
+            'now' => $now
+        );
+
+        $quizzes = $DB->get_records_sql($sql, $params);
+
+        return $quizzes;
+    }
+
+    /**
+     * Get a list of all quizzes that have a start date less than now + 1 hour
+     * AND end date is in the future OR end date is less then 1 hour in the past.
+     * Including overrides. And startdate != 0.
+     *
+     * @return array
+     */
+    private function get_tracked_quizzes(int $now=0): array {
+        $quizzes = array();
+        $now = time();
+        $starttime = $now + HOURSECS;
+        $endtime = $now - HOURSECS;
+
+        $sql = 'SELECT id, quiz, timeopen, timeclose
+                  FROM {quiz_overrides}
+                 WHERE (timeopen > 0 AND timeopen < :starttime)
+                       AND (endate > :endtime OR endate > :now)';
+        $params = array(
+            'starttime' => $starttime,
+            'endtime' => $endtime,
+            'now' => $now
+        );
+
+        $quizzes = $DB->get_records_sql($sql, $params);
+        $overrides = $this->get_tracked_overrides($now);
+
+
+
+
+        // Might have to do this using two db queries.
+        // First to get exams with overrides in the next hour.
+        // Second to get actual exams.
+        // Then parse the data.
+
+        // Need to think how we track the quizzes.
+        // We want to start tracking the quiz an hour before the first student starts until an hour after last student finishes.
+
+
+        return $quizzes;
+    }
+
     public function process_quiz_tracking(): int {
         $quizzes = 0;
+
+
+
+        // For each quiz get the list of users who are elligble to do the quiz.
+
+        // Get a count of:
+        // Users who are not logged in.
+        // Users who are logged in.
+        // Users with attempts in porgress in quiz.
+        // Users with finished attempts for quiz.
 
         return $quizzes;
 
