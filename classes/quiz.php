@@ -226,20 +226,21 @@ class quiz {
     /**
      * Get a list of all quizzes that have a start date less than now + 1 hour
      * AND end date is in the future OR end date is less then 1 hour in the past.
-     * Including overrides. And startdate != 0.
+     * And startdate != 0.
      *
-     * @return array
+     * @param int $now Timestamp to use for reference for time.
+     * @return array $quizzes The quizzes.
      */
-    private function get_tracked_quizzes(int $now=0): array {
-        $quizzes = array();
-        $now = time();
+    private function get_tracked_quizzes(int $now): array {
+        global $DB;
+
         $starttime = $now + HOURSECS;
         $endtime = $now - HOURSECS;
 
-        $sql = 'SELECT id, quiz, timeopen, timeclose
-                  FROM {quiz_overrides}
+        $sql = 'SELECT id, timeopen, timeclose
+                  FROM {quiz}
                  WHERE (timeopen > 0 AND timeopen < :starttime)
-                       AND (endate > :endtime OR endate > :now)';
+                       AND (timeclose > :endtime OR timeclose > :now)';
         $params = array(
             'starttime' => $starttime,
             'endtime' => $endtime,
@@ -247,25 +248,39 @@ class quiz {
         );
 
         $quizzes = $DB->get_records_sql($sql, $params);
-        $overrides = $this->get_tracked_overrides($now);
-
-
-
-
-        // Might have to do this using two db queries.
-        // First to get exams with overrides in the next hour.
-        // Second to get actual exams.
-        // Then parse the data.
-
-        // Need to think how we track the quizzes.
-        // We want to start tracking the quiz an hour before the first student starts until an hour after last student finishes.
-
 
         return $quizzes;
     }
 
-    public function process_quiz_tracking(): int {
+    private function get_tracked_quizzes_with_overrides(int $now): array {
+        $quizzes = $this->get_tracked_quizzes($now);
+        $overrides = $this->get_tracked_overrides($now);
+        $quizoverides = array();
+
+        // Find which quizzes have overrides and adjust start and end times accodingly.
+        foreach ($quizzes as $quiz) {
+            // Nested for each is bad, but number of overrides should always be small.
+            foreach ($overrides as $override) {
+                if ($override->quiz == $quiz->id && $override->timeopen < $quiz->timeopen) {
+                    $quiz->timeopen = $override->timeopen;
+                }
+
+                if ($override->quiz == $quiz->id && $override->timeclose > $quiz->timeclose) {
+                    $quiz->timeclose = $override->timeclose;
+                }
+            }
+
+            $quizoverides[$quiz->id] = $quiz;
+        }
+
+        return $quizoverides;
+
+    }
+
+    public function process_quiz_tracking(int $now): int {
         $quizzes = 0;
+
+        $quizzes = $this->get_tracked_quizzes_with_overrides($now);
 
 
 

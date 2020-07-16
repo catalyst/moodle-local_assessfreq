@@ -55,6 +55,48 @@ class quiz_testcase extends advanced_testcase {
 
     /**
      *
+     * @var stdClass Second test quiz.
+     */
+    protected $quiz3;
+
+    /**
+     *
+     * @var stdClass Second test quiz.
+     */
+    protected $quiz4;
+
+    /**
+     *
+     * @var stdClass Second test quiz.
+     */
+    protected $quiz5;
+
+    /**
+     *
+     * @var stdClass Second test quiz.
+     */
+    protected $quiz6;
+
+    /**
+     *
+     * @var stdClass Second test quiz.
+     */
+    protected $quiz7;
+
+    /**
+     *
+     * @var stdClass Second test quiz.
+     */
+    protected $quiz8;
+
+    /**
+     *
+     * @var stdClass Second test quiz.
+     */
+    protected $quiz9;
+
+    /**
+     *
      * @var stdClass First test user.
      */
     protected $user1;
@@ -83,7 +125,8 @@ class quiz_testcase extends advanced_testcase {
     public function setUp() {
         $this->resetAfterTest();
 
-        global $CFG, $DB;
+        global $DB;
+        $now = 1594788000;
 
         // Create a course with activity.
         $generator = $this->getDataGenerator();
@@ -104,6 +147,62 @@ class quiz_testcase extends advanced_testcase {
             'timeopen' => 1593997200,
             'timeclose' => 1594004400,
             'timelimit' => 7200
+        ));
+
+        // Start is more than one hour in the past, but end is in the future. (Should return).
+        $this->quiz3 =$generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => ($now - (3600 * 2)),
+            'timeclose' => ($now + (3600 * 0.5)),
+            'timelimit' =>3600
+        ));
+
+        // Start is less than one hour in the past, but end is in the future. (Should return).
+        $this->quiz4 =$generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => ($now - (3600 * 0.5)),
+            'timeclose' => ($now + (3600 * 0.5)),
+            'timelimit' => 3600
+        ));
+
+        // Start is less than one hour in the future, end is more than one hour in the future. (Should return).
+        $this->quiz5 =$generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => ($now + (3600 * 0.5)),
+            'timeclose' => ($now + (3600 * 2)),
+            'timelimit' =>3600
+        ));
+
+        // Start is less than one hour in the future, end is less that one hour in the future. (Should return).
+        $this->quiz6 =$generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => ($now + (3600 * 0.25)),
+            'timeclose' => ($now + (3600 * 0.75)),
+            'timelimit' => 1800
+        ));
+
+        // Start is more than one hour in the future, end is more than one hour in the future. (Should not return).
+        $this->quiz7 =$generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => ($now + (3600 * 2)),
+            'timeclose' => ($now + (3600 * 3)),
+            'timelimit' => 3600
+        ));
+
+        // Start and end date of override is more than one hour in the past. (Should not be returned).
+        $this->quiz8 =$generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => ($now - (3600 * 3)),
+            'timeclose' => ($now - (3600 * 2)),
+            'timelimit' => 3600
+        ));
+
+        // Start is more than one hour in the past, but end is less than one hour in the past. (Should return).
+        $this->quiz9 =$generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => ($now - (3600 * 2)),
+            'timeclose' => ($now - (3600 * 0.5)),
+            'timelimit' => 3600
         ));
 
         // Add questions to quiz;
@@ -161,7 +260,66 @@ class quiz_testcase extends advanced_testcase {
         $override2->timeclose = 1594005000;  // End late.
         $override2->timelimit = 7200;
 
-        $overriderecords = array($override1, $override2);
+        // Start is more than one hour in the past, but end is in the future. (Should return).
+        $override3 = new \stdClass();
+        $override3->quiz = 3; // OK to use fake id for this.
+        $override3->userid = 5; // OK to use fake id for this.
+        $override3->timeopen = ($now - (3600 * 2)) ;
+        $override3->timeclose = ($now + (3600 * 0.5));
+        $override3->timelimit = 3600;
+
+        // Start is less than one hour in the past, but end is in the future. (Should return).
+        $override4 = new \stdClass();
+        $override4->quiz = 4; // OK to use fake id for this.
+        $override4->userid = 6; // OK to use fake id for this.
+        $override4->timeopen = ($now - (3600 * 0.5)) ;
+        $override4->timeclose = ($now + (3600 * 0.5));
+        $override4->timelimit = 3600;
+
+        // Start is less than one hour in the future, end is more than one hour in the future. (Should return).
+        $override5 = new \stdClass();
+        $override5->quiz = 5; // OK to use fake id for this.
+        $override5->userid = 7; // OK to use fake id for this.
+        $override5->timeopen = ($now + (3600 * 0.5)) ;
+        $override5->timeclose = ($now + (3600 * 2));
+        $override5->timelimit = 3600;
+
+        // Start is less than one hour in the future, end is less that one hour in the future. (Should return).
+        $override6 = new \stdClass();
+        $override6->quiz = 6; // OK to use fake id for this.
+        $override6->userid = 8; // OK to use fake id for this.
+        $override6->timeopen = ($now + (3600 * 0.25)) ;
+        $override6->timeclose = ($now + (3600 * 0.75));
+        $override6->timelimit = 1800;
+
+        // Start is more than one hour in the future, end is more than one hour in the future. (Should not return).
+        $override7 = new \stdClass();
+        $override7->quiz = 7; // OK to use fake id for this.
+        $override7->userid = 9; // OK to use fake id for this.
+        $override7->timeopen = ($now + (3600 * 2)) ;
+        $override7->timeclose = ($now + (3600 * 3));
+        $override7->timelimit = 3600;
+
+        // Start and end date of override is more than one hour in the past. (Should not be returned).
+        $override8 = new \stdClass();
+        $override8->quiz = 1; // OK to use fake id for this.
+        $override8->userid = 3; // OK to use fake id for this.
+        $override8->timeopen = ($now - (3600 * 3)) ;
+        $override8->timeclose = ($now - (3600 * 2));
+        $override8->timelimit = 3600;
+
+        // Start is more than one hour in the past, but end is less than one hour in the past. (Should return).
+        $override9 = new \stdClass();
+        $override9->quiz = 2; // OK to use fake id for this.
+        $override9->userid = 4; // OK to use fake id for this.
+        $override9->timeopen = ($now - (3600 * 2)) ;
+        $override9->timeclose = ($now - (3600 * 0.5));
+        $override9->timelimit = 3600;
+
+        $overriderecords = array(
+            $override1, $override2, $override3, $override4, $override5, $override6, $override7, $override8, $override9
+        );
+
         $DB->insert_records('quiz_overrides', $overriderecords);
 
         $this->user1 = $user1;
@@ -230,78 +388,14 @@ class quiz_testcase extends advanced_testcase {
     }
 
     /**
-     * Test quiz tracking processing.
+     * Test quiz override tracking.
      */
     public function test_get_tracked_overrides() {
-        global $DB;
-        $now = 1594788000;
-
-        // Set up overrides for testing.
-        $DB->delete_records('quiz_overrides');
-
-        // Start and end date of override is more than one hour in the past. (Should not be returned).
-        $override1 = new \stdClass();
-        $override1->quiz = 1; // OK to use fake id for this.
-        $override1->userid = 3; // OK to use fake id for this.
-        $override1->timeopen = ($now - (3600 * 3)) ;
-        $override1->timeclose = ($now - (3600 * 2));
-        $override1->timelimit = 3600;
-
-        // Start is more than one hour in the past, but end is less than one hour in the past. (Should return).
-        $override2 = new \stdClass();
-        $override2->quiz = 2; // OK to use fake id for this.
-        $override2->userid = 4; // OK to use fake id for this.
-        $override2->timeopen = ($now - (3600 * 2)) ;
-        $override2->timeclose = ($now - (3600 * 0.5));
-        $override2->timelimit = 3600;
-
-        // Start is more than one hour in the past, but end is in the future. (Should return).
-        $override3 = new \stdClass();
-        $override3->quiz = 3; // OK to use fake id for this.
-        $override3->userid = 5; // OK to use fake id for this.
-        $override3->timeopen = ($now - (3600 * 2)) ;
-        $override3->timeclose = ($now + (3600 * 0.5));
-        $override3->timelimit = 3600;
-
-        // Start is less than one hour in the past, but end is in the future. (Should return).
-        $override4 = new \stdClass();
-        $override4->quiz = 4; // OK to use fake id for this.
-        $override4->userid = 6; // OK to use fake id for this.
-        $override4->timeopen = ($now - (3600 * 0.5)) ;
-        $override4->timeclose = ($now + (3600 * 0.5));
-        $override4->timelimit = 3600;
-
-        // Start is less than one hour in the future, end is more than one hour in the future. (Should return).
-        $override5 = new \stdClass();
-        $override5->quiz = 5; // OK to use fake id for this.
-        $override5->userid = 7; // OK to use fake id for this.
-        $override5->timeopen = ($now + (3600 * 0.5)) ;
-        $override5->timeclose = ($now + (3600 * 2));
-        $override5->timelimit = 3600;
-
-        // Start is less than one hour in the future, end is less that one hour in the future. (Should return).
-        $override6 = new \stdClass();
-        $override6->quiz = 6; // OK to use fake id for this.
-        $override6->userid = 8; // OK to use fake id for this.
-        $override6->timeopen = ($now + (3600 * 0.25)) ;
-        $override6->timeclose = ($now + (3600 * 0.75));
-        $override6->timelimit = 1800;
-
-        // Start is more than one hour in the future, end is more than one hour in the future. (Should not return).
-        $override7 = new \stdClass();
-        $override7->quiz = 7; // OK to use fake id for this.
-        $override7->userid = 9; // OK to use fake id for this.
-        $override7->timeopen = ($now + (3600 * 2)) ;
-        $override7->timeclose = ($now + (3600 * 3));
-        $override7->timelimit = 3600;
-
-        $overriderecords = array($override1, $override2, $override3, $override4, $override5, $override6, $override7);
-        $DB->insert_records('quiz_overrides', $overriderecords);
-
         $quizdata = new quiz();
         $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_tracked_overrides');
         $method->setAccessible(true); // Allow accessing of private method.
 
+        $now = 1594788000;
         $result = $method->invoke($quizdata, $now);
 
         $this->assertCount(5, $result);
@@ -310,6 +404,57 @@ class quiz_testcase extends advanced_testcase {
             $this->assertNotEquals(1, $override->quiz);
             $this->assertNotEquals(7, $override->quiz);
         }
+    }
+
+    /**
+     * Test quiz tracking.
+     */
+    public function test_get_tracked_quizzes() {
+        $quizdata = new quiz();
+        $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_tracked_quizzes');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $now = 1594788000;
+        $result = $method->invoke($quizdata, $now);
+
+        $this->assertCount(5, $result);
+
+        foreach ($result as $override) {
+            $this->assertNotEquals($this->quiz7->id, $override->id);
+            $this->assertNotEquals($this->quiz8->id, $override->id);
+        }
+    }
+
+    /**
+     * Test quiz tracking with overrides.
+     */
+    public function test_get_tracked_quizzes_with_overrides() {
+        global $DB;
+        $now = 1594788000;
+
+        // Add an extra override for this test.
+        // Start is less than one hour in the past, but end is in the future. (Should return).
+        $override = new \stdClass();
+        $override->quiz = $this->quiz4->id; // OK to use fake id for this.
+        $override->userid = 7; // OK to use fake id for this.
+        $override->timeopen = ($now - (3600 * 0.75)) ;
+        $override->timeclose = ($now + (3600 * 0.25));
+        $override->timelimit = 3600;
+
+        $DB->insert_record('quiz_overrides', $override);
+
+        $quizdata = new quiz();
+        $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_tracked_quizzes_with_overrides');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $result = $method->invoke($quizdata, $now);
+
+        // Time open should match earlier time in override but time close should be the same as original quiz.
+        $this->assertEquals(($now - (3600 * 0.75)), $result[$this->quiz4->id]->timeopen);
+        $this->assertEquals(($now + (3600 * 0.5)), $result[$this->quiz4->id]->timeclose);
+
+        $this->assertCount(5, $result);
+
     }
 
 }
