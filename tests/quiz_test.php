@@ -325,7 +325,7 @@ class quiz_testcase extends advanced_testcase {
         $this->user1 = $user1;
         $this->user2 = $user2;
         $this->user3 = $user3;
-        $this->user3 = $user4;
+        $this->user4 = $user4;
 
     }
 
@@ -455,6 +455,76 @@ class quiz_testcase extends advanced_testcase {
 
         $this->assertCount(5, $result);
 
+    }
+
+    /**
+     * Test getting logged in users.
+     */
+    public function test_get_loggedin_users() {
+        global $CFG, $DB;
+        $this->resetAfterTest();
+
+        $CFG->sessiontimeout = 60*10;  // Short time out for test.
+
+        $record1 = new \stdClass();
+        $record1->state = 0;
+        $record1->sid = md5('sid1');
+        $record1->sessdata = null;
+        $record1->userid = $this->user1->id;
+        $record1->timecreated = time() - 60*60;
+        $record1->timemodified = time() - 30;
+        $record1->firstip = '10.0.0.1';
+        $record1->lastip = '10.0.0.1';
+
+        $record2 = new \stdClass();
+        $record2->state = 0;
+        $record2->sid = md5('sid2');
+        $record2->sessdata = null;
+        $record2->userid = $this->user2->id;
+        $record2->timecreated = time() - 60*60;
+        $record2->timemodified = time() - 30;
+        $record2->firstip = '10.0.0.1';
+        $record2->lastip = '10.0.0.1';
+
+        $record3 = new \stdClass();
+        $record3->state = 0;
+        $record3->sid = md5('sid3');
+        $record3->sessdata = null;
+        $record3->userid = $this->user3->id;
+        $record3->timecreated = time() - 60*60;
+        $record3->timemodified = time() - 30;
+        $record3->firstip = '10.0.0.1';
+        $record3->lastip = '10.0.0.1';
+
+        $record4 = new \stdClass();
+        $record4->state = 0;
+        $record4->sid = md5('sid4');
+        $record4->sessdata = null;
+        $record4->userid = $this->user4->id;
+        $record4->timecreated = time() - 60*60;
+        $record4->timemodified = time() - 60*60;
+        $record4->firstip = '10.0.0.1';
+        $record4->lastip = '10.0.0.1';
+
+        $sessionrecords = array($record1, $record2, $record3, $record4);
+        $DB->insert_records('sessions', $sessionrecords);
+
+        $userids = array(
+            $this->user1->id,
+            $this->user2->id,
+            $this->user3->id,
+            $this->user4->id,
+            ($this->user4->id + 123),
+        );
+
+        $quizdata = new quiz();
+        $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_loggedin_users');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $result = $method->invoke($quizdata, $userids);
+
+        $this->assertEquals(3, $result->loggedin);
+        $this->assertEquals(2, $result->loggedout);
     }
 
 }

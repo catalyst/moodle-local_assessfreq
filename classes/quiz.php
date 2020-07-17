@@ -252,6 +252,14 @@ class quiz {
         return $quizzes;
     }
 
+    /**
+     * Get a list of all quizzes that have a start date less than now + 1 hour
+     * AND end date is in the future OR end date is less then 1 hour in the past.
+     * And startdate != 0. With quiz start and end times adjusted to take into account users with overrides.
+     *
+     * @param int $now Timestamp to use for reference for time.
+     * @return array $quizzes The quizzes.
+     */
     private function get_tracked_quizzes_with_overrides(int $now): array {
         $quizzes = $this->get_tracked_quizzes($now);
         $overrides = $this->get_tracked_overrides($now);
@@ -277,14 +285,54 @@ class quiz {
 
     }
 
+    private function get_loggedin_users(array $userids): \stdClass {
+        global $CFG, $DB;
+
+        $maxlifetime = $CFG->sessiontimeout;
+        $timedout = time() - $maxlifetime;
+        $userchunks = array_chunk($userids, 250); // Break list of users into chunks so we don't exceed DB IN limits.
+
+        $loggedin = 0; // Count of logged in users.
+        $loggedout = 0; // Count of not loggedin users.
+        $loggedinusers = array();
+        $loggedoutusers = array();
+
+        foreach ($userchunks as $userchunk){
+            list($insql, $inparams) = $DB->get_in_or_equal($userchunk);
+            $inparams[] = $timedout;
+
+            $sql = "SELECT DISTINCT(userid)
+                      FROM {sessions}
+                     WHERE userid $insql
+                           AND timemodified >= ?";
+            $users = $DB->get_fieldset_sql($sql, $inparams);
+            $loggedinusers = array_merge($loggedinusers, $users);
+        }
+
+        $loggedoutusers = array_diff($userids, $loggedinusers);
+
+        $loggedin = count($loggedinusers);
+        $loggedout = count($loggedoutusers);
+
+        $usercounts = new \stdClass();
+        $usercounts->loggedin = $loggedin;
+        $usercounts->loggedout = $loggedout;
+
+        return $usercounts;
+
+    }
+
     public function process_quiz_tracking(int $now): int {
-        $quizzes = 0;
+        $frequency = new frequency();
 
         $quizzes = $this->get_tracked_quizzes_with_overrides($now);
 
-
-
         // For each quiz get the list of users who are elligble to do the quiz.
+        foreach ($quizzes as $quiz) {
+            $context = $this->get_quiz_context($quiz->id);
+            $quizusers = $frequency->get_event_users_raw($context->id, 'quiz');
+
+        }
 
         // Get a count of:
         // Users who are not logged in.
@@ -292,7 +340,7 @@ class quiz {
         // Users with attempts in porgress in quiz.
         // Users with finished attempts for quiz.
 
-        return $quizzes;
+        return 0;
 
     }
 }
