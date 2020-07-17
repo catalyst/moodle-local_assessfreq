@@ -527,4 +527,56 @@ class quiz_testcase extends advanced_testcase {
         $this->assertEquals(2, $result->loggedout);
     }
 
+    /**
+     * Test quiz tracking with overrides.
+     */
+    public function test_get_quiz_attempts() {
+        global $DB;
+
+        $fakeattempt = new stdClass();
+        $fakeattempt->userid = 123;
+        $fakeattempt->quiz = 456;
+        $fakeattempt->layout = '1,2,0,3,4,0,5';
+        $fakeattempt->state = quiz_attempt::FINISHED;
+
+        $fakeattempt->attempt = 3;
+        $fakeattempt->sumgrades = 50;
+        $fakeattempt->uniqueid = 13;
+        $fakeattempt->state = quiz_attempt::FINISHED;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->attempt = 2;
+        $fakeattempt->sumgrades = 50;
+        $fakeattempt->uniqueid = 26;
+        $fakeattempt->state = quiz_attempt::IN_PROGRESS;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->attempt = 4;
+        $fakeattempt->sumgrades = null;
+        $fakeattempt->uniqueid = 39;
+        $fakeattempt->state = quiz_attempt::IN_PROGRESS;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->attempt = 1;
+        $fakeattempt->sumgrades = 30;
+        $fakeattempt->uniqueid = 52;
+        $fakeattempt->state = quiz_attempt::ABANDONED;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->attempt = 1;
+        $fakeattempt->userid = 1;
+        $fakeattempt->sumgrades = 100;
+        $fakeattempt->uniqueid = 65;
+        $fakeattempt->state = quiz_attempt::OVERDUE;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $quizdata = new quiz();
+        $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_quiz_attempts');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $result = $method->invoke($quizdata, 456);
+
+
+    }
+
 }

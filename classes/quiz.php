@@ -285,6 +285,13 @@ class quiz {
 
     }
 
+    /**
+     * Given a list of user ids, check if the user is logged in our not
+     * and return summary counts of logged in and not logged in users.
+     *
+     * @param array $userids User ids to get logged in status.
+     * @return \stdClass $usercounts Object with coutns of users logged in and not logged in.
+     */
     private function get_loggedin_users(array $userids): \stdClass {
         global $CFG, $DB;
 
@@ -322,6 +329,24 @@ class quiz {
 
     }
 
+    private function get_quiz_attempts(int $quizid): \stdClass {
+        global $DB;
+
+        $sql = 'SELECT state, COUNT(id) AS count
+                  FROM {quiz_attempts}
+                 WHERE preview = 0
+                       AND quiz = ?
+              GROUP BY state';
+        $params = array($quizid);
+
+        $attemptcounts = $DB->get_records_sql_menu($sql, $params);
+
+        error_log(print_r($attemptcounts, true));
+
+        return new \stdClass();
+
+    }
+
     public function process_quiz_tracking(int $now): int {
         $frequency = new frequency();
 
@@ -331,13 +356,14 @@ class quiz {
         foreach ($quizzes as $quiz) {
             $context = $this->get_quiz_context($quiz->id);
             $quizusers = $frequency->get_event_users_raw($context->id, 'quiz');
+            $loggedincounts = $this->get_loggedin_users($quizusers);
 
         }
 
         // Get a count of:
         // Users who are not logged in.
         // Users who are logged in.
-        // Users with attempts in porgress in quiz.
+        // Users with attempts in progress in quiz.
         // Users with finished attempts for quiz.
 
         return 0;
