@@ -329,6 +329,12 @@ class quiz {
 
     }
 
+    /**
+     * Get count of in porgress and finished attempts for a quiz.
+     *
+     * @param int $quizid The id of the quiz to get the counts for.
+     * @return \stdClass $attemptcounts The found counts.
+     */
     private function get_quiz_attempts(int $quizid): \stdClass {
         global $DB;
 
@@ -339,34 +345,49 @@ class quiz {
               GROUP BY state';
         $params = array($quizid);
 
-        $attemptcounts = $DB->get_records_sql_menu($sql, $params);
+        $attempts = $DB->get_records_sql_menu($sql, $params);
 
-        error_log(print_r($attemptcounts, true));
+        $attemptcounts = new \stdClass();
+        $attemptcounts->inprogress = $attempts['inprogress'] + $attempts['overdue'];
+        $attemptcounts->finished = $attempts['finished'] + $attempts['abandoned'];
 
-        return new \stdClass();
+        return $attemptcounts;
 
     }
 
+    /**
+     * Process and store user tracking information for a quiz.
+     *
+     * @param int $now Timestamp to use for reference for time.
+     * @return int $count Count of processed quizzes
+     */
     public function process_quiz_tracking(int $now): int {
-        $frequency = new frequency();
+        global $DB;
 
+        $frequency = new frequency();
         $quizzes = $this->get_tracked_quizzes_with_overrides($now);
+        $count = 0;
 
         // For each quiz get the list of users who are elligble to do the quiz.
         foreach ($quizzes as $quiz) {
             $context = $this->get_quiz_context($quiz->id);
-            $quizusers = $frequency->get_event_users_raw($context->id, 'quiz');
+            $quizusers = array_keys($frequency->get_event_users_raw($context->id, 'quiz'));
             $loggedincounts = $this->get_loggedin_users($quizusers);
+            $attemptcounts = $this->get_quiz_attempts($quiz->id);
+
+            $record = new \stdClass();
+            $record->assessid = $quiz->id;
+            $record->notloggedin = $loggedincounts->loggedout;
+            $record->loggedin = $loggedincounts->loggedin;
+            $record->inprogress = $attemptcounts->inprogress;
+            $record->finished = $attemptcounts->finished;
+            $record->timecreated = time();
+
+            $DB->insert_record('local_assessfreq_trend', $record);
+            $count++;
 
         }
 
-        // Get a count of:
-        // Users who are not logged in.
-        // Users who are logged in.
-        // Users with attempts in progress in quiz.
-        // Users with finished attempts for quiz.
-
-        return 0;
-
+        return $count;
     }
 }

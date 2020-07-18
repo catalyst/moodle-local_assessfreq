@@ -125,7 +125,7 @@ class quiz_testcase extends advanced_testcase {
     public function setUp() {
         $this->resetAfterTest();
 
-        global $DB;
+        global $DB, $CFG;
         $now = 1594788000;
 
         // Create a course with activity.
@@ -327,6 +327,88 @@ class quiz_testcase extends advanced_testcase {
         $this->user3 = $user3;
         $this->user4 = $user4;
 
+        $CFG->sessiontimeout = 60*10;  // Short time out for test.
+
+        $record1 = new \stdClass();
+        $record1->state = 0;
+        $record1->sid = md5('sid1');
+        $record1->sessdata = null;
+        $record1->userid = $this->user1->id;
+        $record1->timecreated = time() - 60*60;
+        $record1->timemodified = time() - 30;
+        $record1->firstip = '10.0.0.1';
+        $record1->lastip = '10.0.0.1';
+
+        $record2 = new \stdClass();
+        $record2->state = 0;
+        $record2->sid = md5('sid2');
+        $record2->sessdata = null;
+        $record2->userid = $this->user2->id;
+        $record2->timecreated = time() - 60*60;
+        $record2->timemodified = time() - 30;
+        $record2->firstip = '10.0.0.1';
+        $record2->lastip = '10.0.0.1';
+
+        $record3 = new \stdClass();
+        $record3->state = 0;
+        $record3->sid = md5('sid3');
+        $record3->sessdata = null;
+        $record3->userid = $this->user3->id;
+        $record3->timecreated = time() - 60*60;
+        $record3->timemodified = time() - 30;
+        $record3->firstip = '10.0.0.1';
+        $record3->lastip = '10.0.0.1';
+
+        $record4 = new \stdClass();
+        $record4->state = 0;
+        $record4->sid = md5('sid4');
+        $record4->sessdata = null;
+        $record4->userid = $this->user4->id;
+        $record4->timecreated = time() - 60*60;
+        $record4->timemodified = time() - 60*60;
+        $record4->firstip = '10.0.0.1';
+        $record4->lastip = '10.0.0.1';
+
+        $sessionrecords = array($record1, $record2, $record3, $record4);
+        $DB->insert_records('sessions', $sessionrecords);
+
+        $fakeattempt = new stdClass();
+        $fakeattempt->userid = 123;
+        $fakeattempt->quiz = 456;
+        $fakeattempt->layout = '1,2,0,3,4,0,5';
+        $fakeattempt->state = quiz_attempt::FINISHED;
+
+        $fakeattempt->attempt = 3;
+        $fakeattempt->sumgrades = 50;
+        $fakeattempt->uniqueid = 13;
+        $fakeattempt->state = quiz_attempt::FINISHED;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->attempt = 2;
+        $fakeattempt->sumgrades = 50;
+        $fakeattempt->uniqueid = 26;
+        $fakeattempt->state = quiz_attempt::IN_PROGRESS;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->attempt = 4;
+        $fakeattempt->sumgrades = null;
+        $fakeattempt->uniqueid = 39;
+        $fakeattempt->state = quiz_attempt::IN_PROGRESS;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->attempt = 1;
+        $fakeattempt->sumgrades = 30;
+        $fakeattempt->uniqueid = 52;
+        $fakeattempt->state = quiz_attempt::ABANDONED;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->attempt = 1;
+        $fakeattempt->userid = 1;
+        $fakeattempt->sumgrades = 100;
+        $fakeattempt->uniqueid = 65;
+        $fakeattempt->state = quiz_attempt::OVERDUE;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
     }
 
     /**
@@ -461,54 +543,6 @@ class quiz_testcase extends advanced_testcase {
      * Test getting logged in users.
      */
     public function test_get_loggedin_users() {
-        global $CFG, $DB;
-        $this->resetAfterTest();
-
-        $CFG->sessiontimeout = 60*10;  // Short time out for test.
-
-        $record1 = new \stdClass();
-        $record1->state = 0;
-        $record1->sid = md5('sid1');
-        $record1->sessdata = null;
-        $record1->userid = $this->user1->id;
-        $record1->timecreated = time() - 60*60;
-        $record1->timemodified = time() - 30;
-        $record1->firstip = '10.0.0.1';
-        $record1->lastip = '10.0.0.1';
-
-        $record2 = new \stdClass();
-        $record2->state = 0;
-        $record2->sid = md5('sid2');
-        $record2->sessdata = null;
-        $record2->userid = $this->user2->id;
-        $record2->timecreated = time() - 60*60;
-        $record2->timemodified = time() - 30;
-        $record2->firstip = '10.0.0.1';
-        $record2->lastip = '10.0.0.1';
-
-        $record3 = new \stdClass();
-        $record3->state = 0;
-        $record3->sid = md5('sid3');
-        $record3->sessdata = null;
-        $record3->userid = $this->user3->id;
-        $record3->timecreated = time() - 60*60;
-        $record3->timemodified = time() - 30;
-        $record3->firstip = '10.0.0.1';
-        $record3->lastip = '10.0.0.1';
-
-        $record4 = new \stdClass();
-        $record4->state = 0;
-        $record4->sid = md5('sid4');
-        $record4->sessdata = null;
-        $record4->userid = $this->user4->id;
-        $record4->timecreated = time() - 60*60;
-        $record4->timemodified = time() - 60*60;
-        $record4->firstip = '10.0.0.1';
-        $record4->lastip = '10.0.0.1';
-
-        $sessionrecords = array($record1, $record2, $record3, $record4);
-        $DB->insert_records('sessions', $sessionrecords);
-
         $userids = array(
             $this->user1->id,
             $this->user2->id,
@@ -531,44 +565,6 @@ class quiz_testcase extends advanced_testcase {
      * Test quiz tracking with overrides.
      */
     public function test_get_quiz_attempts() {
-        global $DB;
-
-        $fakeattempt = new stdClass();
-        $fakeattempt->userid = 123;
-        $fakeattempt->quiz = 456;
-        $fakeattempt->layout = '1,2,0,3,4,0,5';
-        $fakeattempt->state = quiz_attempt::FINISHED;
-
-        $fakeattempt->attempt = 3;
-        $fakeattempt->sumgrades = 50;
-        $fakeattempt->uniqueid = 13;
-        $fakeattempt->state = quiz_attempt::FINISHED;
-        $DB->insert_record('quiz_attempts', $fakeattempt);
-
-        $fakeattempt->attempt = 2;
-        $fakeattempt->sumgrades = 50;
-        $fakeattempt->uniqueid = 26;
-        $fakeattempt->state = quiz_attempt::IN_PROGRESS;
-        $DB->insert_record('quiz_attempts', $fakeattempt);
-
-        $fakeattempt->attempt = 4;
-        $fakeattempt->sumgrades = null;
-        $fakeattempt->uniqueid = 39;
-        $fakeattempt->state = quiz_attempt::IN_PROGRESS;
-        $DB->insert_record('quiz_attempts', $fakeattempt);
-
-        $fakeattempt->attempt = 1;
-        $fakeattempt->sumgrades = 30;
-        $fakeattempt->uniqueid = 52;
-        $fakeattempt->state = quiz_attempt::ABANDONED;
-        $DB->insert_record('quiz_attempts', $fakeattempt);
-
-        $fakeattempt->attempt = 1;
-        $fakeattempt->userid = 1;
-        $fakeattempt->sumgrades = 100;
-        $fakeattempt->uniqueid = 65;
-        $fakeattempt->state = quiz_attempt::OVERDUE;
-        $DB->insert_record('quiz_attempts', $fakeattempt);
 
         $quizdata = new quiz();
         $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_quiz_attempts');
@@ -576,7 +572,30 @@ class quiz_testcase extends advanced_testcase {
 
         $result = $method->invoke($quizdata, 456);
 
+        $this->assertEquals(3, $result->inprogress);
+        $this->assertEquals(2, $result->finished);
+    }
+
+    /**
+     * Test processing quiz tracking .
+     */
+    public function test_process_quiz_tracking() {
+        global $DB;
+        $now = 1594788000;
+
+        $quizdata = new quiz();
+        $method = new \ReflectionMethod('\local_assessfreq\quiz', 'process_quiz_tracking');
+        $method->setAccessible(true); // Allow accessing of private method.
+
+        $result = $method->invoke($quizdata, $now);
+
+        error_log($result);
+
+        $trendrecords = $DB->get_records('local_assessfreq_trend');
+
+        error_log(print_r($trendrecords, true));
 
     }
+
 
 }
