@@ -347,6 +347,22 @@ class quiz {
 
         $attempts = $DB->get_records_sql_menu($sql, $params);
 
+        if (empty($attempts['inprogress'])) {
+            $attempts['inprogress'] = 0;
+        }
+
+        if (empty($attempts['overdue'])) {
+            $attempts['overdue'] = 0;
+        }
+
+        if (empty($attempts['finished'])) {
+            $attempts['finished'] = 0;
+        }
+
+        if (empty($attempts['abandoned'])) {
+            $attempts['abandoned'] = 0;
+        }
+
         $attemptcounts = new \stdClass();
         $attemptcounts->inprogress = $attempts['inprogress'] + $attempts['overdue'];
         $attemptcounts->finished = $attempts['finished'] + $attempts['abandoned'];
