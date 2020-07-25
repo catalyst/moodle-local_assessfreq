@@ -412,4 +412,18 @@ class quiz {
 
         return $count;
     }
+
+    /**
+     * Given a quiz ID get its tracking information.
+     *
+     * @param int $quizid The ID of the quiz.
+     * @return array $tracking Tracking reocrds for the quiz.
+     */
+    public function get_quiz_tracking(int $quizid): array {
+        global $DB;
+
+        $tracking = $DB->get_records('local_assessfreq_trend', array('assessid' => $quizid), 'timecreated ASC');
+
+        return $tracking;
+    }
 }
