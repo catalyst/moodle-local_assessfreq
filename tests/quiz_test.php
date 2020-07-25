@@ -457,8 +457,8 @@ class quiz_testcase extends advanced_testcase {
         $quizdata = new quiz();
         $result = $quizdata->get_quiz_data($this->quiz1->id);
 
-        $this->assertEquals(1593996000, $result->earlyopen);
-        $this->assertEquals(1594005000, $result->lateclose);
+        $this->assertEquals('6 July 2020, 8:40 AM', $result->earlyopen);
+        $this->assertEquals('6 July 2020, 11:10 AM', $result->lateclose);
         $this->assertEquals(4, $result->participants);
         $this->assertEquals($this->quiz1->name, $result->name);
         $this->assertEquals(2, $result->overrideparticipants);

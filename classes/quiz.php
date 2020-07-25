@@ -80,7 +80,11 @@ class quiz {
         $start = 0;
         $end = 0;
 
-        $overrides = $DB->get_records('quiz_overrides', array(), '', 'id, userid, timeopen, timeclose');
+        $sql = 'SELECT id, userid, COALESCE(timeopen, 0) AS timeopen, COALESCE(timeclose, 0) AS timeclose
+                  FROM {quiz_overrides}
+                 WHERE  quiz = ?';
+        $params = array($quizid);
+        $overrides = $DB->get_records_sql($sql, $params);
 
         foreach ($overrides as $override) {
 
@@ -177,13 +181,15 @@ class quiz {
         $frequency = new frequency();
         $timesopen = userdate($quizrecord->timeopen, get_string('strftimedatetime', 'langconfig'));
         $timeclose = userdate($quizrecord->timeclose, get_string('strftimedatetime', 'langconfig'));
+        $overrideinfostart = userdate($overrideinfo->start, get_string('strftimedatetime', 'langconfig'));
+        $overrideinfoend = userdate($overrideinfo->end, get_string('strftimedatetime', 'langconfig'));
 
         $quizdata->name = $quizrecord->name;
         $quizdata->timeopen = $timesopen;
         $quizdata->timeclose = $timeclose;
         $quizdata->timelimit = format_time($quizrecord->timelimit);
-        $quizdata->earlyopen = ($overrideinfo->start == 0) ? $timesopen : $overrideinfo->start;
-        $quizdata->lateclose = ($overrideinfo->end == 0) ? $timeclose: $overrideinfo->end;
+        $quizdata->earlyopen = ($overrideinfo->start == 0) ? $timesopen : $overrideinfostart;
+        $quizdata->lateclose = ($overrideinfo->end == 0) ? $timeclose: $overrideinfoend;
         $quizdata->participants = count($frequency->get_event_users_raw($context->id, 'quiz'));
         $quizdata->overrideparticipants = $overrideinfo->users;
         $quizdata->url = $context->get_url()->out(false);
