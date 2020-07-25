@@ -374,7 +374,7 @@ class quiz_testcase extends advanced_testcase {
 
         $fakeattempt = new stdClass();
         $fakeattempt->userid = 123;
-        $fakeattempt->quiz = 456;
+        $fakeattempt->quiz = $this->quiz3->id;
         $fakeattempt->layout = '1,2,0,3,4,0,5';
         $fakeattempt->state = quiz_attempt::FINISHED;
 
@@ -570,7 +570,7 @@ class quiz_testcase extends advanced_testcase {
         $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_quiz_attempts');
         $method->setAccessible(true); // Allow accessing of private method.
 
-        $result = $method->invoke($quizdata, 456);
+        $result = $method->invoke($quizdata, $this->quiz3->id);
 
         $this->assertEquals(3, $result->inprogress);
         $this->assertEquals(2, $result->finished);
@@ -589,13 +589,17 @@ class quiz_testcase extends advanced_testcase {
 
         $result = $method->invoke($quizdata, $now);
 
-        error_log($result);
+        $this->assertEquals(5, $result);
 
         $trendrecords = $DB->get_records('local_assessfreq_trend');
-
-        error_log(print_r($trendrecords, true));
-
+        foreach ($trendrecords as $trendrecord) {
+            if ($trendrecord->assessid == $this->quiz3->id) {
+                $this->assertEquals(3, $trendrecord->inprogress);
+                $this->assertEquals(3, $trendrecord->loggedin);
+                $this->assertEquals(2, $trendrecord->finished);
+                $this->assertEquals(1, $trendrecord->notloggedin);
+            }
+        }
     }
-
 
 }
