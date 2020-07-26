@@ -649,7 +649,8 @@ class quiz_testcase extends advanced_testcase {
         $track5->finished = 1;
         $track5->timecreated = $now + (60 * 5);
 
-        $trackrecords = array($track1, $track2, $track3, $track4, $track5);
+        // Insert out of order.
+        $trackrecords = array($track1, $track5, $track3, $track2, $track4);
 
         $DB->insert_records('local_assessfreq_trend', $trackrecords);
 
