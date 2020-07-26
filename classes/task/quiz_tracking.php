@@ -54,7 +54,7 @@ class quiz_tracking extends scheduled_task {
         $quiz = new \local_assessfreq\quiz();
 
         $actionstart = time();
-        $quiz->process_quiz_tracking(); // Process user events.
+        $quiz->process_quiz_tracking($actionstart); // Process user events.
         $actionduration = time() - $actionstart;
 
         mtrace('local_assessfreq: Processing quiz tracking finished in: ' . $actionduration . ' seconds');
