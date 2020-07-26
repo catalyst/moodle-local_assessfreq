@@ -50,8 +50,6 @@ class participant_summary {
         $allparticipantdata = $quizdata->get_quiz_tracking($quizid);
         $participantdata = array_pop($allparticipantdata);
 
-        error_log(print_r($participantdata, true));
-
         $seriesdata = array(
             $participantdata->notloggedin,
             $participantdata->loggedin,

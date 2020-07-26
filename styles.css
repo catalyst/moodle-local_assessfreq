@@ -22,20 +22,25 @@
     text-align: center;
 }
 
-#local-assessfreq-report-summary .card-header {
+#local-assessfreq-report-summary .card-header,
+#local-assessfreq-quiz-dashboard-cards-deck .card-header
+ {
     display: flex;
 }
 
-#local-assessfreq-report-summary .local-assessfreq-zoom {
+#local-assessfreq-report-summary .local-assessfreq-zoom,
+#local-assessfreq-quiz-dashboard-cards-deck .local-assessfreq-zoom {
     margin-left: auto;
 }
 
-#local-assessfreq-report-summary .local-assessfreq-zoom .icon {
+#local-assessfreq-report-summary .local-assessfreq-zoom .icon,
+#local-assessfreq-quiz-dashboard-cards-deck .local-assessfreq-zoom .icon {
     font-size: 24px;
     color: #6c757d;
 }
 
-#local-assessfreq-report-summary .local-assessfreq-zoom i:hover {
+#local-assessfreq-report-summary .local-assessfreq-zoom i:hover,
+#local-assessfreq-quiz-dashboard-cards-deck .local-assessfreq-zoom i:hover {
     color: #111111;
     cursor: pointer;
 }

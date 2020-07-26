@@ -21,20 +21,60 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['local_assessfreq/form_modal', 'core/ajax', 'core/notification', 'core/str'],
-function(FormModal, Ajax, Notification, Str) {
+define(['local_assessfreq/form_modal', 'core/ajax', 'core/notification', 'core/str', 'core/fragment', 'core/templates'],
+function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
 
     /**
      * Module level variables.
      */
     var DashboardQuiz = {};
     var selectQuizStr = '';
+    var contextid;
+    var quizId = 0;
+
+    const cards = [
+        {cardId: 'local-assessfreq-quiz-summary-graph', call: 'participant_summary'}
+    ];
+
+    /**
+     * For each of the cards on the dashbaord get their corresponding chart data.
+     * Data is based on the year variable from the corresponding dropdown.
+     * Chart data is loaded via ajax.
+     *
+     */
+    const getCardCharts = function() {
+        cards.forEach((cardData) => {
+            let cardElement = document.getElementById(cardData.cardId);
+            let spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
+            let chartbody = cardElement.getElementsByClassName('chart-body')[0];
+            let params = {'data': JSON.stringify({'quiz' : quizId, 'call': cardData.call})};
+
+            spinner.classList.remove('hide'); // Show sinner if not already shown.
+            Fragment.loadFragment('local_assessfreq', 'get_quiz_chart', contextid, params)
+            .done((response) => {
+                var context = { 'withtable' : true, 'chartdata' : response };
+                Templates.render('core/chart', context).done((html, js) => {
+                    spinner.classList.add('hide'); // Hide sinner if not already hidden.
+                    // Load card body.
+                    Templates.replaceNodeContents(chartbody, html, js);
+                }).fail(() => {
+                    Notification.exception(new Error('Failed to load chart template.'));
+                    return;
+                });
+                return;
+            }).fail(() => {
+                Notification.exception(new Error('Failed to load card.'));
+                return;
+            });
+        });
+    };
 
     /**
      * Callback function that is called when a quiz is selected from the form.
      * Starts the processing of the dashbaord.
      */
     const processDashboard = function(quiz) {
+        quizId = quiz;
         let titleElement = document.getElementById('local-assessfreq-quiz-title');
         titleElement.innerHTML = selectQuizStr;
         // Get quiz data.
@@ -68,6 +108,9 @@ function(FormModal, Ajax, Notification, Str) {
             cardsElement.classList.remove('hide');
             trendElement.classList.remove('hide');
             summarySpinner.classList.add('hide');
+            getCardCharts();
+            // TODO: Set up auto refresh of cards.
+            // TODO: Cancel autorefresh of cards while quiz in changing.
 
             window.console.log(quizArray);
             return;
@@ -79,8 +122,9 @@ function(FormModal, Ajax, Notification, Str) {
     /**
      * Initialise method for quiz dashboard rendering.
      */
-    DashboardQuiz.init = function(contextid) {
-        FormModal.init(contextid, processDashboard);
+    DashboardQuiz.init = function(context) {
+        contextid = context;
+        FormModal.init(context, processDashboard);
 
         Str.get_string('loadingquiztitle', 'local_assessfreq').then((str) => {
             selectQuizStr = str;

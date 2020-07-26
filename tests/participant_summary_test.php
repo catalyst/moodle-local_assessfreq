@@ -106,8 +106,16 @@ class participant_summary_testcase extends advanced_testcase {
         $result = $participantsumamry->get_participant_summary_chart(123);
 
         $values = $result->get_series()[0]->get_values();
+        $labels = $result->get_labels();
 
-        error_log(print_r($values, true));
+        $this->assertEquals(1, $values[0]);
+        $this->assertEquals(4, $values[1]);
+        $this->assertEquals(3, $values[2]);
+        $this->assertEquals(1, $values[3]);
+        $this->assertEquals('Not logged in', $labels[0]);
+        $this->assertEquals('Logged in', $labels[1]);
+        $this->assertEquals('In progress', $labels[2]);
+        $this->assertEquals('Finished', $labels[3]);
 
     }
 }
