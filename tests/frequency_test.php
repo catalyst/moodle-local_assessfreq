@@ -189,10 +189,10 @@ class frequency_testcase extends advanced_testcase {
         $recordset = $method->invoke($frequency, $sql, $params);
 
         // We're testing a private method, so we need to setup reflector magic.
-        $method = new ReflectionMethod('\local_assessfreq\frequency', 'process_module_events');
-        $method->setAccessible(true); // Allow accessing of private method.
+        $method2 = new ReflectionMethod('\local_assessfreq\frequency', 'process_module_events');
+        $method2->setAccessible(true); // Allow accessing of private method.
 
-        $result = $method->invoke($frequency, $recordset);
+        $result = $method2->invoke($frequency, $recordset);
         $this->assertEquals(2, $result); // Check the expected number of records inserted.
 
         // Check actual records in the DB.
@@ -201,6 +201,13 @@ class frequency_testcase extends advanced_testcase {
 
         $this->assertEquals(28, $record1->endday);
         $this->assertEquals(29, $record2->endday);
+
+        // Call process method again.
+        // This is to simulate where an old event has it's dates changed from far in the past to in the future.
+        // In this case the cleanup task won't have deleted the records so we need to test it at process/update time.
+        $recordset = $method->invoke($frequency, $sql, $params);
+        $result = $method2->invoke($frequency, $recordset);
+
     }
 
     /**

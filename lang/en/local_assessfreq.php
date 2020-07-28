@@ -56,6 +56,7 @@ $string['entercourse'] = 'Enter course name';
 $string['findcourse'] = 'Find course';
 $string['finished'] = 'Finished';
 $string['inprogress'] = 'In progress';
+$string['loading'] = 'Loading';
 $string['loadingquiz'] = 'Loading quizzes';
 $string['loadingquiztitle'] = 'Loading quiz';
 $string['loggedin'] = 'Logged in';

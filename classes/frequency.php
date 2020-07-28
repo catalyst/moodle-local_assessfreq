@@ -257,6 +257,26 @@ class frequency {
     }
 
     /**
+     * Remove existing data related to event from database.
+     * The event date may have been changed from in the past to in the future. In this case it may
+     * not have been picked up by the delete records process. This method removes it a processing time.
+     *
+     * @param \stdClass $record The record to process.
+     */
+    private function cleanup_record(\stdClass $record): void {
+        global $DB;
+
+        $params = array('module' => $record->module, 'instanceid' => $record->instanceid);
+        $id = $DB->get_field('local_assessfreq_site', 'id', $params);
+
+        if ($id) {
+            $DB->delete_records('local_assessfreq_site', array('id' => $id));
+            $DB->delete_records('local_assessfreq_user', array('eventid' => $id));
+        }
+
+    }
+
+    /**
      * Take a recordest of events process
      * and store in correct database table.
      *
@@ -293,6 +313,8 @@ class frequency {
             $insertrecord->endday = $timeelements['endday'];
 
             $toinsert[] = $insertrecord;
+
+            $this->cleanup_record($insertrecord);
 
             if (count($toinsert) == $this->batchsize) {
                 // Insert in database.
