@@ -33,7 +33,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     var quizId = 0;
 
     const cards = [
-        {cardId: 'local-assessfreq-quiz-summary-graph', call: 'participant_summary'}
+        {cardId: 'local-assessfreq-quiz-summary-graph', call: 'participant_summary'},
+        {cardId: 'local-assessfreq-quiz-summary-trend', call: 'participant_trend'}
     ];
 
     /**
@@ -54,7 +55,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             .done((response) => {
                 var context = { 'withtable' : true, 'chartdata' : response };
                 Templates.render('core/chart', context).done((html, js) => {
-                    spinner.classList.add('hide'); // Hide sinner if not already hidden.
+                    spinner.classList.add('hide'); // Hide spinner if not already hidden.
                     // Load card body.
                     Templates.replaceNodeContents(chartbody, html, js);
                 }).fail(() => {
