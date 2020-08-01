@@ -51,18 +51,14 @@ class participant_trend {
         $notloggedin = array();
         $inprogress = array();
         $finished = array();
+        $labels = array();
 
         foreach ($allparticipantdata as $participantdata){
             $notloggedin[] = $participantdata->notloggedin;
             $inprogress[] = $participantdata->inprogress;
             $finished[] = $participantdata->finished;
+            $labels[] = userdate($participantdata->timecreated, get_string('trenddatetime', 'local_assessfreq'));
         }
-
-        $labels = array(
-            get_string('notloggedin', 'local_assessfreq'),
-            get_string('inprogress', 'local_assessfreq'),
-            get_string('finished', 'local_assessfreq')
-        );
 
         $charttitle = get_string('participantsummary', 'local_assessfreq');
 
@@ -72,6 +68,8 @@ class participant_trend {
         $finishedseries = new \core\chart_series(get_string('finished', 'local_assessfreq'), $finished);
 
         $chart = new \core\chart_line();
+        $yaxis = $chart->get_yaxis(0, true);
+        $yaxis->set_stepsize(1); // Set step size for y axis to 1, can't have half a user.
         $chart->set_smooth(true);
         $chart->set_title($charttitle);
         $chart->add_series($notloggedinseries);

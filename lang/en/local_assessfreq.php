@@ -134,6 +134,7 @@ $string['time'] = 'Time';
 $string['timelimit'] = 'Time limit (minutes)';
 $string['title'] = 'Title';
 $string['toggleoverview'] = 'Toggle overview graphs';
+$string['trenddatetime'] = '%H:%M, %d-%m-%y';
 $string['url'] = 'URL';
 $string['zoom'] = 'Zoom in';
 $string['jan'] = 'January';

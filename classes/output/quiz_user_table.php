@@ -31,7 +31,6 @@ require_once($CFG->libdir . '/tablelib.php');
 use \table_sql;
 use \renderable;
 
-
 /**
  * Renderable table for quiz dashboard users.
  *
@@ -42,9 +41,9 @@ use \renderable;
 class quiz_user_table extends table_sql implements renderable {
 
     /**
-     * @var integer $broadcastid The ID of the braodcast to get the acknowledgements for.
+     * @var integer $quizid The ID of the braodcast to get the acknowledgements for.
      */
-    private $broadcastid;
+    private $quizid;
 
     /**
      *
@@ -57,32 +56,25 @@ class quiz_user_table extends table_sql implements renderable {
      */
     protected $extrafields;
 
-    /** @var moodle_url $baseurl The base URL for the report. */
-    public $baseurl;
-
-
     /**
      * report_table constructor.
      *
      * @param string $uniqueid Unique id of table.
-     * @param int $broadcastid The boradcast id to display acks for.
+     * @param int $quizid The boradcast id to display acks for.
      * @param int $contextid The context id.
-     * @param string $baseurl the base url to render this report on.
      * @param int $page the page number for pagination.
      *
      * @throws \coding_exception
      */
-    public function __construct(string $uniqueid, int $broadcastid, int $contextid, string $baseurl, int $page = 0) {
+    public function __construct(string $uniqueid, int $quizid, int $contextid, int $page = 0) {
         parent::__construct($uniqueid);
 
-        $this->broadcastid = $broadcastid;
+        $this->broadcastid = $quizid;
         $this->contextid = $contextid;
         $this->set_attribute('id', 'local_assessfreq_ackreport_table');
         $this->set_attribute('class', 'generaltable generalbox');
         $this->downloadable = false;
 
-        $url = new \moodle_url($baseurl, array('broadcastid' => $broadcastid));
-        $this->define_baseurl($url);
 
         $context = \context::instance_by_id($contextid);
 
