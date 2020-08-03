@@ -145,6 +145,17 @@ class frequency {
     }
 
     /**
+     * Given a modle shortname get capabilities that users must have
+     * before that activity event applies to them.
+     *
+     * @param string $module The module to get the capability for.
+     * @return array Capabilities relating to the module.
+     */
+    public function get_module_capabilities(string $module): array {
+        return $this->capabilitymap[$module];
+    }
+
+    /**
      * Get currently enabled modules from the Moodle DB.
      *
      * @return array $modules The enabled modules.
@@ -409,7 +420,7 @@ class frequency {
     private function get_enrolled_users(\context $context, array $capabilities): array {
         global $DB;
 
-        list($joins, $wheres, $params) = $this->generate_enrolled_sql_wheres_params($context, $capabilities);
+        list($joins, $wheres, $params) = $this->generate_enrolled_wheres_joins_params($context, $capabilities);
 
         $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
 
@@ -434,7 +445,7 @@ class frequency {
      */
     public function get_event_users_raw(int $contextid, string $module): array {
         $context = \context::instance_by_id($contextid);
-        $capabilities = $this->capabilitymap[$module];
+        $capabilities = $this->get_module_capabilities($module);
 
         $users = $this->get_enrolled_users($context, $capabilities);
 
