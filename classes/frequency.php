@@ -366,16 +366,15 @@ class frequency {
     }
 
     /**
-     * Our own implementation of get_enrolled_users. Allows us to check multiple capabilities
-     * in less database queries.
+     * Generate the where sql fragments, join clauses and params arrray to
+     * get the enrolled users with given capabilities for a given context.
+     * Used to generte SQL for getting users in assessments.
      *
      * @param \context $context The context to get the enrolled users for.
      * @param array $capabilities The capabilities that users need to have.
-     * @return array Enrolled user records
+     * @return array
      */
-    private function get_enrolled_users(\context $context, array $capabilities): array {
-        global $DB;
-
+    public function generate_enrolled_wheres_joins_params(\context $context, array $capabilities): array {
         $uid = 'u.id';
         $joins = array();
         $wheres = array();
@@ -394,13 +393,31 @@ class frequency {
         $wheres[] = "u.deleted = 0";
         $wheres = implode(" AND ", $wheres);
 
+        $wherejoin = array($joins, $wheres, $params);
+
+        return $wherejoin;
+    }
+
+    /**
+     * Our own implementation of get_enrolled_users. Allows us to check multiple capabilities
+     * in less database queries.
+     *
+     * @param \context $context The context to get the enrolled users for.
+     * @param array $capabilities The capabilities that users need to have.
+     * @return array Enrolled user records
+     */
+    private function get_enrolled_users(\context $context, array $capabilities): array {
+        global $DB;
+
+        list($joins, $wheres, $params) = $this->generate_enrolled_sql_wheres_params($context, $capabilities);
+
         $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
 
         $sql = "SELECT DISTINCT u.id
               FROM {user} u
             $finaljoin->joins
              WHERE $finaljoin->wheres";
-            $params = $finaljoin->params;
+        $params = $finaljoin->params;
 
         return $DB->get_records_sql($sql, $params);
     }
