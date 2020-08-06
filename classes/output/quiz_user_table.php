@@ -69,7 +69,7 @@ class quiz_user_table extends table_sql implements renderable {
     public function __construct(string $uniqueid, int $quizid, int $contextid, int $page = 0) {
         parent::__construct($uniqueid);
 
-        $this->broadcastid = $quizid;
+        $this->quizid = $quizid;
         $this->contextid = $contextid;
         $this->set_attribute('id', 'local_assessfreq_ackreport_table');
         $this->set_attribute('class', 'generaltable generalbox');
@@ -91,11 +91,7 @@ class quiz_user_table extends table_sql implements renderable {
             $columns[] = $field;
         }
 
-        $headers[] = get_string('report:location', 'local_assessfreq');
-        $columns[] = 'contextid';
-
-        $headers[] = get_string('report:acktime', 'local_assessfreq');
-        $columns[] = 'acktime';
+        // TODO: Add extra columns, related to the report.
 
         $this->define_columns($columns);
         $this->define_headers($headers);
@@ -181,47 +177,39 @@ class quiz_user_table extends table_sql implements renderable {
     public function query_db($pagesize, $useinitialsbar = true) {
         global $DB;
 
-        if ($this->broadcastid == 0) { // Don't even try to get data if there is no broadcast defined.
-            $this->rawdata = [];
-        } else {
-            $params = array('broadcastid' => $this->broadcastid);
-            list($wsql, $wparams) = $this->get_sql_where();
-            $sort = $this->get_sql_sort();
-
-            $countsql = "SELECT COUNT(1)
-                           FROM {user} u
-                      LEFT JOIN {local_assessfreq_users} bu ON u.id = bu.userid
-                          WHERE bu.broadcastid = :broadcastid";
-
-            $sql = "SELECT u.*, bu.contextid, bu.acktime
-                      FROM {user} u
-                 LEFT JOIN {local_assessfreq_users} bu ON u.id = bu.userid
-                     WHERE bu.broadcastid = :broadcastid";
-
-            if (!empty($wsql)) {
-                $sql .= " AND " .$wsql;
-                $countsql .= " AND " .$wsql;
-                $params = array_merge($params, $wparams);
-            }
-
-            if (!empty($sort)) {
-                $sql .= " ORDER BY $sort";
-            }
-
-            $total = $DB->count_records_sql($countsql, $params);
-            $this->pagesize($pagesize, $total);
-
-            $records = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
-
-            foreach ($records as $record) {
-                $this->rawdata[$record->id] = $record;
-            }
-
-        }
-
         // Set initial bars.
         if ($useinitialsbar) {
             $this->initialbars(true);
         }
+
+        $frequency = new \local_assessfreq\frequency();
+        $capabilities = $frequency->get_module_capabilities('quiz');
+        $context = \context::instance_by_id($this->contextid);
+        $quizrecord = $DB->get_record('quiz', array('id' => $this->quizid), 'timeopen, timeclose, timelimit');
+
+        list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
+        $joins .= ' LEFT JOIN {quiz_overrides} qo ON u.id = qo.userid';
+        //$wheres .= ' AND qo.quiz = :qoquiz';
+        //$params['qoquiz'] = $this->quizid;
+
+        $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
+
+        $sql = "SELECT DISTINCT u.id, u.username,
+                                 COALESCE(qo.timeopen, 0) AS timeopen,
+                                 COALESCE(qo.timeclose, 0) AS timeclose,
+                                 COALESCE(qo.timelimit, 0) AS timelimit
+                           FROM {user} u
+                           $finaljoin->joins
+                          WHERE $finaljoin->wheres";
+
+        $params = $finaljoin->params;
+
+        $records = $DB->get_records_sql($sql, $params);
+
+        foreach ($records as $record) {
+            $this->rawdata[$record->id] = $record;
+        }
+
+
     }
 }
