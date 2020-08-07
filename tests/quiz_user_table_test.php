@@ -51,6 +51,12 @@ class quiz_user_table_testcase extends advanced_testcase {
 
     /**
      *
+     * @var stdClass Second test quiz.
+     */
+    protected $quiz2;
+
+    /**
+     *
      * @var stdClass First test user.
      */
     protected $user1;
@@ -89,12 +95,19 @@ class quiz_user_table_testcase extends advanced_testcase {
             array('format' => 'topics', 'numsections' => 3,
                 'enablecompletion' => 1),
             array('createsections' => true));
+
         $this->quiz1 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => 1593910800,
             'timeclose' => 1593914400,
             'timelimit' => 3600,
             'layout' => $layout
+        ));
+        $this->quiz2 =$generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => 1593997200,
+            'timeclose' => 1594004400,
+            'timelimit' => 7200
         ));
 
 

@@ -189,22 +189,23 @@ class quiz_user_table extends table_sql implements renderable {
 
         list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
         $joins .= ' LEFT JOIN {quiz_overrides} qo ON u.id = qo.userid';
-        //$wheres .= ' AND qo.quiz = :qoquiz';
-        //$params['qoquiz'] = $this->quizid;
 
         $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
 
-        $sql = "SELECT DISTINCT u.id, u.username,
-                                 COALESCE(qo.timeopen, 0) AS timeopen,
-                                 COALESCE(qo.timeclose, 0) AS timeclose,
-                                 COALESCE(qo.timelimit, 0) AS timelimit
-                           FROM {user} u
-                           $finaljoin->joins
-                          WHERE $finaljoin->wheres";
+        $sql = "SELECT u.id, u.username,
+                       COALESCE(qo.timeopen, $quizrecord->timeopen) AS timeopen,
+                       COALESCE(qo.timeclose, $quizrecord->timeclose) AS timeclose,
+                       COALESCE(qo.timelimit, $quizrecord->timelimit) AS timelimit
+                  FROM {user} u
+                       $finaljoin->joins
+                 WHERE $finaljoin->wheres";
 
         $params = $finaljoin->params;
 
-        $records = $DB->get_records_sql($sql, $params);
+        // TODO: Add count.
+        // TODO: Add sort
+
+        $records = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
 
         foreach ($records as $record) {
             $this->rawdata[$record->id] = $record;
