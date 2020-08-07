@@ -204,6 +204,7 @@ class quiz_user_table extends table_sql implements renderable {
 
         // TODO: Add count.
         // TODO: Add sort
+        // TODO: Get User attempt status
 
         $records = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
 
