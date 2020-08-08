@@ -164,6 +164,38 @@ class quiz_user_table_testcase extends advanced_testcase {
         $sessionrecords = array($record1);
         $DB->insert_records('sessions', $sessionrecords);
 
+        $fakeattempt = new stdClass();
+        $fakeattempt->userid = $user1->id;
+        $fakeattempt->timestart = time();
+        $fakeattempt->quiz = $this->quiz1->id;
+        $fakeattempt->layout = '1,2,0,3,4,0,5';
+        $fakeattempt->attempt = 1;
+        $fakeattempt->sumgrades = 50;
+        $fakeattempt->uniqueid = 13;
+        $fakeattempt->state = quiz_attempt::FINISHED;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->timestart = time() + 30;
+        $fakeattempt->attempt = 2;
+        $fakeattempt->sumgrades = 50;
+        $fakeattempt->uniqueid = 26;
+        $fakeattempt->state = quiz_attempt::IN_PROGRESS;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->userid = $user2->id;
+        $fakeattempt->attempt = 1;
+        $fakeattempt->sumgrades = null;
+        $fakeattempt->uniqueid = 39;
+        $fakeattempt->state = quiz_attempt::FINISHED;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
+        $fakeattempt->userid = $user3->id;
+        $fakeattempt->attempt = 1;
+        $fakeattempt->sumgrades = 30;
+        $fakeattempt->uniqueid = 52;
+        $fakeattempt->state = quiz_attempt::ABANDONED;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
     }
 
     /**

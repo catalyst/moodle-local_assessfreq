@@ -190,12 +190,25 @@ class quiz_user_table extends table_sql implements renderable {
         list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
         $joins .= ' LEFT JOIN {quiz_overrides} qo ON u.id = qo.userid';
 
+        $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz
+                         FROM {quiz_attempts} qa_a
+                   INNER JOIN (SELECT userid, MAX(timestart) as timestart
+                                 FROM {quiz_attempts}
+                             GROUP BY userid) qa_b ON qa_a.userid = qa_b.userid
+                                              AND qa_a.timestart = qa_b.timestart
+                        WHERE qa_a.quiz = :qaquiz';
+
+        $joins .= " LEFT JOIN ($attemptsql) qa ON u.id = qa.userid";
+
+        $params['qaquiz'] = $this->quizid;
+
         $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
 
         $sql = "SELECT u.id, u.username,
                        COALESCE(qo.timeopen, $quizrecord->timeopen) AS timeopen,
                        COALESCE(qo.timeclose, $quizrecord->timeclose) AS timeclose,
-                       COALESCE(qo.timelimit, $quizrecord->timelimit) AS timelimit
+                       COALESCE(qo.timelimit, $quizrecord->timelimit) AS timelimit,
+                       COALESCE(qa.state, 'noattempt') AS state
                   FROM {user} u
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
@@ -203,8 +216,7 @@ class quiz_user_table extends table_sql implements renderable {
         $params = $finaljoin->params;
 
         // TODO: Add count.
-        // TODO: Add sort
-        // TODO: Get User attempt status
+        // TODO: Add sort.
 
         $records = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
 
