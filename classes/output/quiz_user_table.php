@@ -224,9 +224,16 @@ class quiz_user_table extends table_sql implements renderable {
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
 
+        $countsql = "SELECT COUNT(1)
+                  FROM {user} u
+                       $finaljoin->joins
+                 WHERE $finaljoin->wheres";
+
         $params = $finaljoin->params;
 
-        // TODO: Add count.
+        $total = $DB->count_records_sql($countsql, $params);
+        $this->pagesize($pagesize, $total);
+
         // TODO: Add sort.
 
         $records = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());

@@ -204,6 +204,7 @@ class quiz_user_table_testcase extends advanced_testcase {
         $rawdata = $quizusertable->rawdata;
 
         $this->assertCount(4, $rawdata);
+        $this->assertEquals(4, $quizusertable->totalrows);
 
         $this->assertEquals($this->quiz1->timeopen, $rawdata[$this->user1->id]->timeopen);
         $this->assertEquals($this->quiz1->timeclose, $rawdata[$this->user1->id]->timeclose);
