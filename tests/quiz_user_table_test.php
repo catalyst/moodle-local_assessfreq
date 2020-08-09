@@ -151,17 +151,17 @@ class quiz_user_table_testcase extends advanced_testcase {
 
         $CFG->sessiontimeout = 60*10;  // Short time out for test.
 
-        $record1 = new \stdClass();
-        $record1->state = 0;
-        $record1->sid = md5('sid1');
-        $record1->sessdata = null;
-        $record1->userid = $this->user1->id;
-        $record1->timecreated = time() - 60*60;
-        $record1->timemodified = time() - 30;
-        $record1->firstip = '10.0.0.1';
-        $record1->lastip = '10.0.0.1';
+        $record4 = new \stdClass();
+        $record4->state = 0;
+        $record4->sid = md5('sid4');
+        $record4->sessdata = null;
+        $record4->userid = $this->user4->id;
+        $record4->timecreated = time() - 60*60;
+        $record4->timemodified = time() - 30;
+        $record4->firstip = '10.0.0.1';
+        $record4->lastip = '10.0.0.1';
 
-        $sessionrecords = array($record1);
+        $sessionrecords = array($record4);
         $DB->insert_records('sessions', $sessionrecords);
 
         $fakeattempt = new stdClass();
@@ -189,13 +189,6 @@ class quiz_user_table_testcase extends advanced_testcase {
         $fakeattempt->state = quiz_attempt::FINISHED;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
-        $fakeattempt->userid = $user3->id;
-        $fakeattempt->attempt = 1;
-        $fakeattempt->sumgrades = 30;
-        $fakeattempt->uniqueid = 52;
-        $fakeattempt->state = quiz_attempt::ABANDONED;
-        $DB->insert_record('quiz_attempts', $fakeattempt);
-
     }
 
     /**
@@ -206,7 +199,31 @@ class quiz_user_table_testcase extends advanced_testcase {
         $context = \context_module::instance($this->quiz1->cmid);
         $quizusertable = new quiz_user_table('testtable', $this->quiz1->id, $context->id);
 
+        // Query data.
         $quizusertable->query_db(20, false);
+        $rawdata = $quizusertable->rawdata;
+
+        $this->assertCount(4, $rawdata);
+
+        $this->assertEquals($this->quiz1->timeopen, $rawdata[$this->user1->id]->timeopen);
+        $this->assertEquals($this->quiz1->timeclose, $rawdata[$this->user1->id]->timeclose);
+        $this->assertEquals($this->quiz1->timelimit, $rawdata[$this->user1->id]->timelimit);
+        $this->assertEquals('inprogress', $rawdata[$this->user1->id]->state);
+
+        $this->assertEquals($this->quiz1->timeopen, $rawdata[$this->user2->id]->timeopen);
+        $this->assertEquals($this->quiz1->timeclose, $rawdata[$this->user2->id]->timeclose);
+        $this->assertEquals($this->quiz1->timelimit, $rawdata[$this->user2->id]->timelimit);
+        $this->assertEquals('finished', $rawdata[$this->user2->id]->state);
+
+        $this->assertEquals(1593996000, $rawdata[$this->user3->id]->timeopen);
+        $this->assertEquals(1594004400, $rawdata[$this->user3->id]->timeclose);
+        $this->assertEquals(7200, $rawdata[$this->user3->id]->timelimit);
+        $this->assertEquals('notloggedin', $rawdata[$this->user3->id]->state);
+
+        $this->assertEquals(1593997200, $rawdata[$this->user4->id]->timeopen);
+        $this->assertEquals(1594005000, $rawdata[$this->user4->id]->timeclose);
+        $this->assertEquals(7200, $rawdata[$this->user4->id]->timelimit);
+        $this->assertEquals('loggedin', $rawdata[$this->user4->id]->state);
 
         error_log(print_r($quizusertable->rawdata, true));
     }

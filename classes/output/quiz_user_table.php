@@ -175,7 +175,10 @@ class quiz_user_table extends table_sql implements renderable {
      * @param bool $useinitialsbar do you want to use the initials bar.
      */
     public function query_db($pagesize, $useinitialsbar = true) {
-        global $DB;
+        global $CFG, $DB;
+
+        $maxlifetime = $CFG->sessiontimeout;
+        $timedout = time() - $maxlifetime;
 
         // Set initial bars.
         if ($useinitialsbar) {
@@ -188,8 +191,6 @@ class quiz_user_table extends table_sql implements renderable {
         $quizrecord = $DB->get_record('quiz', array('id' => $this->quizid), 'timeopen, timeclose, timelimit');
 
         list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
-        $joins .= ' LEFT JOIN {quiz_overrides} qo ON u.id = qo.userid';
-
         $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz
                          FROM {quiz_attempts} qa_a
                    INNER JOIN (SELECT userid, MAX(timestart) as timestart
@@ -198,17 +199,27 @@ class quiz_user_table extends table_sql implements renderable {
                                               AND qa_a.timestart = qa_b.timestart
                         WHERE qa_a.quiz = :qaquiz';
 
+        $sessionsql = 'SELECT DISTINCT (userid)
+                         FROM {sessions}
+                        WHERE timemodified >= :stm';
+
+        $joins .= ' LEFT JOIN {quiz_overrides} qo ON u.id = qo.userid';
         $joins .= " LEFT JOIN ($attemptsql) qa ON u.id = qa.userid";
+        $joins .= " LEFT JOIN ($sessionsql) us ON u.id = us.userid";
 
         $params['qaquiz'] = $this->quizid;
+        $params['stm'] = $timedout;
 
         $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
 
-        $sql = "SELECT u.id, u.username,
+        $sql = "SELECT u.*,
                        COALESCE(qo.timeopen, $quizrecord->timeopen) AS timeopen,
                        COALESCE(qo.timeclose, $quizrecord->timeclose) AS timeclose,
                        COALESCE(qo.timelimit, $quizrecord->timelimit) AS timelimit,
-                       COALESCE(qa.state, 'noattempt') AS state
+                       COALESCE(qa.state, (CASE
+                                              WHEN us.userid > 0 THEN 'loggedin'
+                                              ELSE 'notloggedin'
+                                           END)) AS state
                   FROM {user} u
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
