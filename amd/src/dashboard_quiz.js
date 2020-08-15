@@ -94,6 +94,11 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
 
             titleElement.innerHTML = quizArray.name;
 
+            // Update page URL with quiz ID, without reloading page so that page navigation and bookmarking works.
+            const currentdUrl = new URL(window.location.href);
+            const newUrl = currentdUrl.origin + currentdUrl.pathname + '?id=' + quizId;
+            history.pushState({}, '', newUrl);
+
             // Populate quiz summary card with details.
             document.getElementById('quiz-time-open').innerHTML = quizArray.timeopen;
             document.getElementById('quiz-time-close').innerHTML = quizArray.timeclose;
