@@ -127,6 +127,7 @@ $string['settings:moduleheading_desc'] = 'These settings control how modules and
 $string['settings:disabledmodules'] = 'Include disabled modules';
 $string['settings:disabledmodules_desc'] = 'Include modules that have been disabled in calculations';
 $string['students'] = 'Students';
+$string['studenttable'] = 'Student attempt status';
 $string['systemdisabled'] = ' (module disabled)';
 $string['task:dataprocess'] = 'Data collection task';
 $string['task:quiztracking'] = 'Quiz tracking task';

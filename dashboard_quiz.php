@@ -24,6 +24,8 @@
 require_once('../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
+$quizid = optional_param('id', 0, PARAM_INT);
+
 $baseurl = $CFG->wwwroot . "/local/assessfreq/dashboard_quiz.php";
 
 // Calls require_login and performs permissions checks for admin pages.
@@ -38,7 +40,7 @@ $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
-$PAGE->requires->js_call_amd('local_assessfreq/dashboard_quiz', 'init', array($context->id));
+$PAGE->requires->js_call_amd('local_assessfreq/dashboard_quiz', 'init', array($context->id, $quizid));
 
 $output = $PAGE->get_renderer('local_assessfreq');
 

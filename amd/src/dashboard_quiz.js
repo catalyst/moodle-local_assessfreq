@@ -71,6 +71,34 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     };
 
     /**
+     * Display the table that contains all the students in the exam as well as their attempts.
+     */
+    const getStudentTable = function() {
+        let tableElement = document.getElementById('local-assessfreq-quiz-table');
+        let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
+        let tableBody = cardElement.getElementsByClassName('table-body')[0];
+        let params = {'data': JSON.stringify({'quiz' : quizId})};
+
+        spinner.classList.remove('hide'); // Show sinner if not already shown.
+        Fragment.loadFragment('local_assessfreq', 'get_student_table', contextid, params)
+        .done((response) => {
+            var context = { 'withtable' : true, 'chartdata' : response };
+            Templates.render('core/chart', context).done((html, js) => {
+                spinner.classList.add('hide'); // Hide spinner if not already hidden.
+                // Load card body.
+                Templates.replaceNodeContents(chartbody, html, js);
+            }).fail(() => {
+                Notification.exception(new Error('Failed to load chart template.'));
+                return;
+            });
+            return;
+        }).fail(() => {
+            Notification.exception(new Error('Failed to load card.'));
+            return;
+        });
+    };
+
+    /**
      * Callback function that is called when a quiz is selected from the form.
      * Starts the processing of the dashbaord.
      */
@@ -89,8 +117,9 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             let quizArray = JSON.parse(response);
             let cardsElement = document.getElementById('local-assessfreq-quiz-dashboard-cards-deck');
             let trendElement = document.getElementById('local-assessfreq-quiz-dashboard-participant-trend-deck');
-            let summaryElement = document.getElementById("local-assessfreq-quiz-summary-card");
+            let summaryElement = document.getElementById('local-assessfreq-quiz-summary-card');
             let summarySpinner = summaryElement.getElementsByClassName('overlay-icon-container')[0];
+            let tableElement = document.getElementById('local-assessfreq-quiz-table');
 
             titleElement.innerHTML = quizArray.name;
 
@@ -113,8 +142,10 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             // Show the cards.
             cardsElement.classList.remove('hide');
             trendElement.classList.remove('hide');
+            tableElement.classList.remove('hide');
             summarySpinner.classList.add('hide');
             getCardCharts();
+            getStudentTable();
             // TODO: Set up auto refresh of cards.
             // TODO: Cancel autorefresh of cards while quiz in changing.
 
@@ -128,7 +159,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     /**
      * Initialise method for quiz dashboard rendering.
      */
-    DashboardQuiz.init = function(context) {
+    DashboardQuiz.init = function(context, quiz) {
         contextid = context;
         FormModal.init(context, processDashboard);
 
@@ -136,6 +167,11 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             selectQuizStr = str;
         }).catch(() => {
             Notification.exception(new Error('Failed to load string: loadingquiz'));
+        }).then(() => {
+            if (quiz > 0) {
+                quizId = quiz;
+                processDashboard(quiz);
+            }
         });
     };
 
