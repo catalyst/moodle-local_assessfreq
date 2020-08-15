@@ -66,7 +66,7 @@ class quiz_user_table extends table_sql implements renderable {
      *
      * @throws \coding_exception
      */
-    public function __construct(string $uniqueid, int $quizid, int $contextid, int $page = 0) {
+    public function __construct(string $uniqueid, string $baseurl, int $quizid, int $contextid, int $page = 0) {
         parent::__construct($uniqueid);
 
         $this->quizid = $quizid;
@@ -74,6 +74,7 @@ class quiz_user_table extends table_sql implements renderable {
         $this->set_attribute('id', 'local_assessfreq_ackreport_table');
         $this->set_attribute('class', 'generaltable generalbox');
         $this->downloadable = false;
+        $this->define_baseurl($baseurl);
 
 
         $context = \context::instance_by_id($contextid);
@@ -179,6 +180,7 @@ class quiz_user_table extends table_sql implements renderable {
 
         $maxlifetime = $CFG->sessiontimeout;
         $timedout = time() - $maxlifetime;
+        $sort = $this->get_sql_sort();
 
         // Set initial bars.
         if ($useinitialsbar) {
@@ -234,7 +236,11 @@ class quiz_user_table extends table_sql implements renderable {
         $total = $DB->count_records_sql($countsql, $params);
         $this->pagesize($pagesize, $total);
 
-        // TODO: Add sort.
+        if (!empty($sort)) {
+            $sql .= " ORDER BY $sort";
+        }
+
+        // TODO: Add search.
 
         $records = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
 

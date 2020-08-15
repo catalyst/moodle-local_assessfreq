@@ -195,9 +195,15 @@ class quiz_user_table_testcase extends advanced_testcase {
      * Test getting quiz override info.
      */
     public function test_get_quiz_override_info() {
+        global $CFG;
 
+        $baseurl = $CFG->wwwroot . '/local/assessfreq/dashboard_quiz.php';
         $context = \context_module::instance($this->quiz1->cmid);
-        $quizusertable = new quiz_user_table('testtable', $this->quiz1->id, $context->id);
+        $quizusertable = new quiz_user_table('testtable', $baseurl, $this->quiz1->id, $context->id);
+
+        // Fake getting table.
+        $this->expectOutputRegex("/table/");
+        $quizusertable->out(1, false);
 
         // Query data.
         $quizusertable->query_db(20, false);
@@ -226,7 +232,6 @@ class quiz_user_table_testcase extends advanced_testcase {
         $this->assertEquals(7200, $rawdata[$this->user4->id]->timelimit);
         $this->assertEquals('loggedin', $rawdata[$this->user4->id]->state);
 
-        error_log(print_r($quizusertable->rawdata, true));
     }
 
 }
