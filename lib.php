@@ -156,7 +156,7 @@ function local_assessfreq_output_fragment_get_quiz_chart($args): string {
 function local_assessfreq_output_fragment_new_base_form($args): string {
 
     $context = $args['context'];
-    // TODO: Check some kinda capability.
+    has_capability('moodle/site:config', $context);
 
     $mform = new \local_assessfreq\form\quiz_search_form(null, null, 'post', '', array('class' => 'ignoredirty'));
 
@@ -164,6 +164,28 @@ function local_assessfreq_output_fragment_new_base_form($args): string {
     $mform->display();
     $o = ob_get_contents();
     ob_end_clean();
+
+    return $o;
+}
+
+/**
+ * Renders the student table on the quiz dashboard screen.
+ * We update the table via ajax.
+ *
+ * @param array $args
+ * @return string $o Form HTML.
+ */
+function local_assessfreq_output_fragment_get_student_table($args): string {
+    global $CFG, $PAGE;
+
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+    $data = json_decode($args['data']);
+
+    $baseurl = $CFG->wwwroot . '/local/assessfreq/dashboard_quiz.php';
+    $output = $PAGE->get_renderer('local_assessfreq');
+
+    $o = $output->render_student_table($baseurl, $data->quiz, $context);
 
     return $o;
 }

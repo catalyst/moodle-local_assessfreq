@@ -79,22 +79,15 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
         let tableBody = cardElement.getElementsByClassName('table-body')[0];
         let params = {'data': JSON.stringify({'quiz' : quizId})};
 
-        spinner.classList.remove('hide'); // Show sinner if not already shown.
+        spinner.classList.remove('hide'); // Show spinner if not already shown.
         Fragment.loadFragment('local_assessfreq', 'get_student_table', contextid, params)
         .done((response) => {
-            var context = { 'withtable' : true, 'chartdata' : response };
-            Templates.render('core/chart', context).done((html, js) => {
-                spinner.classList.add('hide'); // Hide spinner if not already hidden.
-                // Load card body.
-                Templates.replaceNodeContents(chartbody, html, js);
-            }).fail(() => {
-                Notification.exception(new Error('Failed to load chart template.'));
-                return;
-            });
-            return;
+            tableElement.innerHTML = response;
+            loader.classList.add('hide');
+            //tableEventListeners(); // Re-add table event listeners.
+
         }).fail(() => {
-            Notification.exception(new Error('Failed to load card.'));
-            return;
+            Notification.exception(new Error('Failed to update table.'));
         });
     };
 
