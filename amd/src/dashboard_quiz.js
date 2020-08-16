@@ -71,6 +71,67 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     };
 
     /**
+     * Process the sort click events from the student table.
+     */
+    const tableSort = function(event) {
+        event.preventDefault();
+        const sortBy = event.target.dataset.sortby;
+        const sortOrder = event.target.dataset.sortorder;
+
+        window.console.log(sortBy);
+        window.console.log(sortOrder);
+
+        // Set option via session.
+
+    };
+
+    /**
+     * Process the sort click events from the student table.
+     */
+    const tableHide = function(event) {
+        event.preventDefault();
+
+        let hideArray = [];
+        const tableElement = document.getElementById('local-assessfreq-quiz-table');
+        const targetAction = event.target.closest('a').dataset.action;
+        const targetColumn = event.target.closest('a').dataset.column;
+
+        const hideLinks = tableElement.querySelectorAll('[data-action]');
+        for (let i = 0; i < hideLinks.length; i++) {
+            let action = hideLinks[i].dataset.action;
+            let column = hideLinks[i].dataset.column;
+
+            hideArray[column] = (action === 'hide') ? 0 : 1;
+        }
+
+        hideArray[targetColumn] = (targetAction === 'hide') ? 1 : 0; // We want to flip the clicked column.
+
+        window.console.log(hideArray);
+
+        // Set option via session.
+        
+        // Reload the table.
+
+    };
+
+    /**
+     * Re-add event listeners when the student table is updated.
+     */
+    const tableEventListeners = function() {
+        const tableElement = document.getElementById('local-assessfreq-quiz-table');
+        const sortLinks = tableElement.querySelectorAll(`[data-sortable="1"]`);
+        const hideLinks = tableElement.querySelectorAll('[data-action]');
+
+        for (let i = 0; i < sortLinks.length; i++) {
+            sortLinks[i].addEventListener('click', tableSort);
+        }
+
+        for (let i = 0; i < hideLinks.length; i++) {
+            hideLinks[i].addEventListener('click', tableHide);
+        }
+    };
+
+    /**
      * Display the table that contains all the students in the exam as well as their attempts.
      */
     const getStudentTable = function() {
@@ -84,7 +145,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
         .done((response) => {
             tableBody.innerHTML = response;
             spinner.classList.add('hide');
-            //tableEventListeners(); // Re-add table event listeners.
+            tableEventListeners(); // Re-add table event listeners.
 
         }).fail(() => {
             Notification.exception(new Error('Failed to update table.'));

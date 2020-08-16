@@ -80,7 +80,7 @@ class renderer extends plugin_renderer_base {
      * @return string $output HTML for the table.
      */
     public function render_student_table(string $baseurl, int $quizid, int $contextid, int $page = 0): string {
-        $renderable = new quiz_user_table('local_assessfreq_student_table', $baseurl, $quizid, $contextid, $page);
+        $renderable = new quiz_user_table($baseurl, $quizid, $contextid, $page);
         $perpage = 50;
         ob_start();
         $renderable->out($perpage, true);

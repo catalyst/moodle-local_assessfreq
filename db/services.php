@@ -84,4 +84,12 @@ $functions = array(
         'type' => 'read',
         'ajax' => true
     ),
+    'local_assessfreq_set_table_preference' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'set_table_preference',
+        'classpath' => '',
+        'description' => 'Sets a table preference.',
+        'type' => 'write',
+        'ajax' => true
+    ),
 );

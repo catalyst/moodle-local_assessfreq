@@ -346,4 +346,51 @@ class local_assessfreq_external extends external_api {
     public static function get_quiz_data_returns() {
         return new external_value(PARAM_RAW, 'Quiz data result JSON');
     }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return void
+     */
+    public static function set_table_preference_parameters() {
+        return new external_function_parameters(array(
+            'tableid' => new external_value(PARAM_ALPHANUMEXT, 'The table id to set the preference for'),
+            'preference' => new external_value(PARAM_ALPHAEXT, 'The table preference to set'),
+            'values' => new external_value(PARAM_RAW, 'The values to set as JSON'),
+        ));
+    }
+
+    /**
+     * Returns quiz data.
+     *
+     * @param string $jsondata JSON data.
+     * @return string JSON response.
+     */
+    public static function set_table_preference($tableid, $preference, $values) {
+        global $SESSION;
+
+        // Parameter validation.
+        self::validate_parameters(
+            self::set_table_preference_parameters(),
+            array('tableid' => $tableid, 'preference' => $preference, 'values' => $values)
+            );
+
+        // Context validation and permission check.
+        $context = context_system::instance();
+        self::validate_context($context);
+        has_capability('moodle/site:config', $context);
+
+        // Execute.
+        $SESSION->flextable[$tableid][$preference] = json_decode($values, true);
+
+        return $preference;
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function set_table_preference_returns() {
+        return new external_value(PARAM_ALPHAEXT, 'Name of the updated preference');
+    }
 }

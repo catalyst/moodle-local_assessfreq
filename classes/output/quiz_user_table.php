@@ -66,8 +66,8 @@ class quiz_user_table extends table_sql implements renderable {
      *
      * @throws \coding_exception
      */
-    public function __construct(string $uniqueid, string $baseurl, int $quizid, int $contextid, int $page = 0) {
-        parent::__construct($uniqueid);
+    public function __construct(string $baseurl, int $quizid, int $contextid, int $page = 0) {
+        parent::__construct('local_assessfreq_student_table');
 
         $this->quizid = $quizid;
         $this->contextid = $contextid;
