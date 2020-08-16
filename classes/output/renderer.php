@@ -70,6 +70,27 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
+     * Render the HTML for the student quiz table.
+     *
+     * @param string $baseurl the base url to render the table on.
+     * @param int $quizid the id of the quiz in the quiz table.
+     * @param int $contextid the id of the context the table is being called in.
+     * @param int $page the page number for pagination.
+     *
+     * @return string $output HTML for the table.
+     */
+    public function render_student_table(string $baseurl, int $quizid, int $contextid, int $page = 0): string {
+        $renderable = new quiz_user_table('local_assessfreq_student_table', $baseurl, $quizid, $contextid, $page);
+        $perpage = 50;
+        ob_start();
+        $renderable->out($perpage, true);
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        return $output;
+    }
+
+    /**
      * Return heatmap HTML.
      *
      * @return string The heatmap HTML.

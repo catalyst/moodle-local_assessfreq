@@ -192,13 +192,13 @@ class quiz_user_table_testcase extends advanced_testcase {
     }
 
     /**
-     * Test getting quiz override info.
+     * Test getting table data.
      */
-    public function test_get_quiz_override_info() {
+    public function test_get_table_data() {
         global $CFG;
 
         $baseurl = $CFG->wwwroot . '/local/assessfreq/dashboard_quiz.php';
-        $context = \context_module::instance($this->quiz1->cmid);
+        $context = context_system::instance();
         $quizusertable = new quiz_user_table('testtable', $baseurl, $this->quiz1->id, $context->id);
 
         // Fake getting table.

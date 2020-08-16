@@ -60,8 +60,8 @@ class quiz_user_table extends table_sql implements renderable {
      * report_table constructor.
      *
      * @param string $uniqueid Unique id of table.
-     * @param int $quizid The boradcast id to display acks for.
-     * @param int $contextid The context id.
+     * @param int $quizid The id from the quiz table to get data for.
+     * @param int $contextid The context id for the context the table is being displayed in.
      * @param int $page the page number for pagination.
      *
      * @throws \coding_exception
@@ -175,21 +175,20 @@ class quiz_user_table extends table_sql implements renderable {
      * @param int $pagesize size of page for paginated displayed table.
      * @param bool $useinitialsbar do you want to use the initials bar.
      */
-    public function query_db($pagesize, $useinitialsbar = true) {
+    public function query_db($pagesize, $useinitialsbar = false) {
         global $CFG, $DB;
 
         $maxlifetime = $CFG->sessiontimeout;
         $timedout = time() - $maxlifetime;
         $sort = $this->get_sql_sort();
 
-        // Set initial bars.
-        if ($useinitialsbar) {
-            $this->initialbars(true);
-        }
+        // We never want initial bars. We are using a custom search.
+        $this->initialbars(false);
 
         $frequency = new \local_assessfreq\frequency();
+        $quiz = new \local_assessfreq\quiz();
         $capabilities = $frequency->get_module_capabilities('quiz');
-        $context = \context::instance_by_id($this->contextid);
+        $context = $quiz->get_quiz_context($this->quizid);
         $quizrecord = $DB->get_record('quiz', array('id' => $this->quizid), 'timeopen, timeclose, timelimit');
 
         list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);

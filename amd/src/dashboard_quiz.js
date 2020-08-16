@@ -76,14 +76,14 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     const getStudentTable = function() {
         let tableElement = document.getElementById('local-assessfreq-quiz-table');
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
-        let tableBody = cardElement.getElementsByClassName('table-body')[0];
+        let tableBody = tableElement.getElementsByClassName('table-body')[0];
         let params = {'data': JSON.stringify({'quiz' : quizId})};
 
         spinner.classList.remove('hide'); // Show spinner if not already shown.
         Fragment.loadFragment('local_assessfreq', 'get_student_table', contextid, params)
         .done((response) => {
-            tableElement.innerHTML = response;
-            loader.classList.add('hide');
+            tableBody.innerHTML = response;
+            spinner.classList.add('hide');
             //tableEventListeners(); // Re-add table event listeners.
 
         }).fail(() => {

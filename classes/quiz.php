@@ -43,7 +43,7 @@ class quiz {
      * @param int $quizid The quiz ID of the context to get.
      * @return \context_module $context The quiz module context.
      */
-    private function get_quiz_context(int $quizid): \context_module {
+    public function get_quiz_context(int $quizid): \context_module {
         global $DB;
 
         $params = array('module' => 'quiz', 'quiz' => $quizid);
