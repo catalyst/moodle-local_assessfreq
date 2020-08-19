@@ -75,13 +75,29 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
      */
     const tableSort = function(event) {
         event.preventDefault();
-        const sortBy = event.target.dataset.sortby;
-        const sortOrder = event.target.dataset.sortorder;
 
-        window.console.log(sortBy);
-        window.console.log(sortOrder);
+        let sortArray = {};
+        const targetSortBy = event.target.dataset.sortby;
+        let targetSortOrder = event.target.dataset.sortorder;
 
-        // Set option via session.
+        // We want to flip the clicked column.
+        if (targetSortOrder === '') {
+            targetSortOrder = "4";
+        }
+
+        sortArray[targetSortBy] = targetSortOrder;
+
+        // Set option via ajax.
+        Ajax.call([{
+            methodname: 'local_assessfreq_set_table_preference',
+            args: {
+                tableid: 'local_assessfreq_student_table',
+                preference: 'sortby',
+                values: JSON.stringify(sortArray)
+            },
+        }])[0].then(() => {
+            getStudentTable(); // Reload the table.
+        });
 
     };
 
@@ -91,7 +107,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     const tableHide = function(event) {
         event.preventDefault();
 
-        let hideArray = [];
+        let hideArray = {};
         const tableElement = document.getElementById('local-assessfreq-quiz-table');
         const targetAction = event.target.closest('a').dataset.action;
         const targetColumn = event.target.closest('a').dataset.column;
@@ -106,11 +122,37 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
 
         hideArray[targetColumn] = (targetAction === 'hide') ? 1 : 0; // We want to flip the clicked column.
 
-        window.console.log(hideArray);
+        // Set option via ajax.
+        Ajax.call([{
+            methodname: 'local_assessfreq_set_table_preference',
+            args: {
+                tableid: 'local_assessfreq_student_table',
+                preference: 'collapse',
+                values: JSON.stringify(hideArray)
+            },
+        }])[0].then(() => {
+            getStudentTable(); // Reload the table.
+        });
 
-        // Set option via session.
-        
-        // Reload the table.
+    };
+
+    /**
+     * Process the reset click event from the student table.
+     */
+    const tableReset = function(event) {
+        event.preventDefault();
+
+        // Set option via ajax.
+        Ajax.call([{
+            methodname: 'local_assessfreq_set_table_preference',
+            args: {
+                tableid: 'local_assessfreq_student_table',
+                preference: 'reset',
+                values: JSON.stringify({})
+            },
+        }])[0].then(() => {
+            getStudentTable(); // Reload the table.
+        });
 
     };
 
@@ -121,6 +163,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
         const tableElement = document.getElementById('local-assessfreq-quiz-table');
         const sortLinks = tableElement.querySelectorAll(`[data-sortable="1"]`);
         const hideLinks = tableElement.querySelectorAll('[data-action]');
+        const resetlink = tableElement.getElementsByClassName('resettable')[0];
 
         for (let i = 0; i < sortLinks.length; i++) {
             sortLinks[i].addEventListener('click', tableSort);
@@ -129,6 +172,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
         for (let i = 0; i < hideLinks.length; i++) {
             hideLinks[i].addEventListener('click', tableHide);
         }
+
+        resetlink.addEventListener('click', tableReset);
     };
 
     /**
@@ -203,7 +248,6 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             // TODO: Set up auto refresh of cards.
             // TODO: Cancel autorefresh of cards while quiz in changing.
 
-            window.console.log(quizArray);
             return;
         }).fail(() => {
             Notification.exception(new Error('Failed to get quiz data'));

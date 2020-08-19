@@ -380,8 +380,34 @@ class local_assessfreq_external extends external_api {
         self::validate_context($context);
         has_capability('moodle/site:config', $context);
 
-        // Execute.
-        $SESSION->flextable[$tableid][$preference] = json_decode($values, true);
+
+        // Set up the initial preference template.
+        if (isset($SESSION->flextable[$tableid])) {
+            $prefs = $SESSION->flextable[$tableid];
+        } else {
+            $prefs = array(
+                'collapse' => array(),
+                'sortby'   => array(),
+                'i_first'  => '',
+                'i_last'   => '',
+                'textsort' => array(),
+            );
+        }
+
+        // Set or reset the preferences.
+        if ($preference == 'reset') {
+            $prefs = array(
+                'collapse' => array(),
+                'sortby'   => array(),
+                'i_first'  => '',
+                'i_last'   => '',
+                'textsort' => array(),
+            );
+        } else {
+            $prefs[$preference] = json_decode($values, true);
+        }
+
+        $SESSION->flextable[$tableid] = $prefs;
 
         return $preference;
     }

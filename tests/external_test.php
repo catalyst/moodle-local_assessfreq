@@ -348,8 +348,8 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_quiz_data_returns(), $returnvalue);
         $eventarr = json_decode($returnjson, true);
 
-        $this->assertEquals(1593996000, $eventarr['earlyopen']);
-        $this->assertEquals(1594005000, $eventarr['lateclose']);
+        $this->assertEquals('6 July 2020, 8:40 AM', $eventarr['earlyopen']);
+        $this->assertEquals('6 July 2020, 11:10 AM', $eventarr['lateclose']);
         $this->assertEquals(4, $eventarr['participants']);
         $this->assertEquals($this->quiz1->name, $eventarr['name']);
         $this->assertEquals(2, $eventarr['overrideparticipants']);
@@ -357,5 +357,27 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         $this->assertEquals(6, $eventarr['questioncount']);
         $this->assertContains('essay', $eventarr['types']);
         $this->assertContains('shortanswer', $eventarr['types']);
+    }
+
+    /**
+     * Test setting table preferences.
+     */
+    public function test_set_table_preference() {
+        global $SESSION;
+        $this->setAdminUser();
+
+        $tableid = 'test_table';
+        $preference = 'collapse';
+        $values = '{"fullname":0,"username":1,"idnumber":0,"email":0}';
+
+        $returnvalue = local_assessfreq_external::set_table_preference($tableid, $preference, $values);
+        $return = external_api::clean_returnvalue(local_assessfreq_external::set_table_preference_returns(), $returnvalue);
+
+        $this->assertEquals('collapse', $return);
+        $this->assertEquals(0, $SESSION->flextable[$tableid]['collapse']['fullname']);
+        $this->assertEquals(1, $SESSION->flextable[$tableid]['collapse']['username']);
+        $this->assertEquals(0, $SESSION->flextable[$tableid]['collapse']['idnumber']);
+        $this->assertEquals(0, $SESSION->flextable[$tableid]['collapse']['email']);
+
     }
 }
