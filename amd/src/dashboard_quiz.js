@@ -54,7 +54,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             Fragment.loadFragment('local_assessfreq', 'get_quiz_chart', contextid, params)
             .done((response) => {
                 var context = { 'withtable' : true, 'chartdata' : response };
-                Templates.render('core/chart', context).done((html, js) => {
+                Templates.render('local_assessfreq/chart', context).done((html, js) => {
                     spinner.classList.add('hide'); // Hide spinner if not already hidden.
                     // Load card body.
                     Templates.replaceNodeContents(chartbody, html, js);

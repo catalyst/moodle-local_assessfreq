@@ -103,7 +103,5 @@
 }
 
 #local-assessfreq-quiz-summary-trend .card-body  {
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
+    max-height: 400px;
 }
