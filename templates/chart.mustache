@@ -27,7 +27,9 @@
 }}
 
 <div class="chart-area" id="chart-area-{{uniqid}}">
-    <div class="chart-image" role="presentation" aria-describedby="chart-table-data-{{uniqid}}"></div>
+    <div class="chart-image" role="presentation" aria-describedby="chart-table-data-{{uniqid}}"
+         data-aspect="{{#aspect}}true{{/aspect}}{{^aspect}}false{{/aspect}}">
+    </div>
     <div class="chart-table {{^withtable}}accesshide{{/withtable}}">
         <p class="chart-table-expand">
             <a href="#" aria-controls="chart-table-data-{{uniqid}}" role="button">
@@ -50,9 +52,10 @@ require([
         chartArea = $('#chart-area-' + uniqid),
         chartImage = chartArea.find('.chart-image'),
         chartTable = chartArea.find('.chart-table-data'),
-        chartLink = chartArea.find('.chart-table-expand a');
+        chartLink = chartArea.find('.chart-table-expand a'),
+        aspect = (chartImage.attr('data-aspect') === 'true');
     Builder.make(data).then(function(ChartInst) {
-        new Output(chartImage, ChartInst);
+        new Output.init(chartImage, ChartInst, aspect);
         new OutputTable(chartTable, ChartInst);
     });
 

@@ -33,8 +33,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     var quizId = 0;
 
     const cards = [
-        {cardId: 'local-assessfreq-quiz-summary-graph', call: 'participant_summary'},
-        {cardId: 'local-assessfreq-quiz-summary-trend', call: 'participant_trend'}
+        {cardId: 'local-assessfreq-quiz-summary-graph', call: 'participant_summary', aspect: true},
+        {cardId: 'local-assessfreq-quiz-summary-trend', call: 'participant_trend', aspect: false}
     ];
 
     /**
@@ -53,7 +53,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             spinner.classList.remove('hide'); // Show sinner if not already shown.
             Fragment.loadFragment('local_assessfreq', 'get_quiz_chart', contextid, params)
             .done((response) => {
-                var context = { 'withtable' : true, 'chartdata' : response };
+                var context = { 'withtable' : true, 'chartdata' : response, 'aspect' :  cardData.aspect};
                 Templates.render('local_assessfreq/chart', context).done((html, js) => {
                     spinner.classList.add('hide'); // Hide spinner if not already hidden.
                     // Load card body.

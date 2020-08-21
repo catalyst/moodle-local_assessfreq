@@ -102,6 +102,6 @@
 }
 }
 
-#local-assessfreq-quiz-summary-trend .card-body  {
-    max-height: 400px;
+#local-assessfreq-quiz-summary-trend .card-body .chartjs-render-monitor {
+    min-height: 400px;
 }
