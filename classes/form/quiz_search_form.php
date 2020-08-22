@@ -56,6 +56,7 @@ class quiz_search_form extends \moodleform {
             'placeholder' =>  get_string('entercourse', 'local_assessfreq'),
             'noselectionstring' => get_string('nocourse', 'local_assessfreq'),
             'ajax' => 'local_assessfreq/course_selector',
+            'casesensitive' => false
         );
         $mform->addElement('autocomplete', 'courses', get_string('course', 'local_assessfreq'), array(), $courseoptions);
 

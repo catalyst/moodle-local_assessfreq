@@ -1,0 +1,51 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_assessfreq/quiz-dashboard-controls
+
+    Report Summary template.
+
+    Example context (json):
+    {
+
+    }
+}}
+<div id="local-assessfreq-quiz-dashboard-controls" class="mb-3">
+    <div class="row no-gutters">
+	    <div class="col-sm d-flex justify-content-start">
+	        <button  id="local-assessfreq-find-quiz" class="btn btn-primary" type="button">
+	            {{# str }} searchquiz, local_assessfreq {{/ str }}
+	        </button>
+	    </div>
+	    <div class="local-assessfreq-period-container">
+		    <div class="col-sm d-flex justify-content-end">
+		        <button  id="local-assessfreq-refresh-quiz-dashboard" class="btn btn-secondary border-right" type="button">
+		            {{#pix}} i/reload {{/pix}}
+		        </button>
+	            <button type="button" class="btn btn-secondary dropdown-toggle"
+	                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+	                aria-label="{{strselect}}" aria-controls="menudayfilter">
+	                {{# str }} period, local_assessfreq {{/ str }}
+	            </button>
+		    </div>
+		    <div class="progress local-assessfreq-period-progress"  style="height: 3px;">
+               <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25"
+                   aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+	    </div>
+    </div>
+</div>

@@ -179,15 +179,15 @@ class renderer extends plugin_renderer_base {
      * @return string html for the button.
      */
     private function render_quiz_select_button(): string {
+        $context = array();
 
-        $button = \html_writer::tag(
-            'button',
-            get_string('searchquiz', 'local_assessfreq'),
-            array('class' => 'btn btn-primary mb-3 ', 'id' => 'local-assessfreq-find-quiz'));
-
-        return $button;
+        return $this->render_from_template('local_assessfreq/quiz-dashboard-controls', $context);
     }
 
+    /**
+     *
+     * @return string
+     */
     private function render_quiz_dashboard_cards(): string {
         $context = array();
 

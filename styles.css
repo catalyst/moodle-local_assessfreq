@@ -108,3 +108,8 @@
 #local-assessfreq-quiz-summary-trend .card-body .chartjs-render-monitor {
     min-height: 400px;
 }
+
+.local-assessfreq-period-progress {
+    margin-right: 15px;
+    margin-left: 15px;
+}

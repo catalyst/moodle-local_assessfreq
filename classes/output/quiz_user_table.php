@@ -92,7 +92,20 @@ class quiz_user_table extends table_sql implements renderable {
             $columns[] = $field;
         }
 
-        // TODO: Add extra columns, related to the report.
+        $headers[] = get_string('quiztimeopen', 'local_assessfreq');
+        $columns[] = 'timeopen';
+
+        $headers[] = get_string('quiztimeclose', 'local_assessfreq');
+        $columns[] = 'timeclose';
+
+        $headers[] = get_string('quiztimelimit', 'local_assessfreq');
+        $columns[] = 'timelimit';
+
+        $headers[] = get_string('status', 'local_assessfreq');
+        $columns[] = 'state';
+
+        $headers[] = get_string('actions', 'local_assessfreq');
+        $columns[] = 'actions';
 
         $this->define_columns($columns);
         $this->define_headers($headers);
@@ -101,6 +114,7 @@ class quiz_user_table extends table_sql implements renderable {
         // Setup pagination.
         $this->currpage = $page;
         $this->sortable(true);
+        $this->column_nosort = array('actions');
 
     }
 
@@ -138,36 +152,82 @@ class quiz_user_table extends table_sql implements renderable {
     }
 
     /**
-     * Get content for format column.
-     * Requires `metadata` field.
+     * Get content for time open column.
+     * Displays when the user attempt opens.
      *
      * @param \stdClass $row
-     * @return string html used to display the type field.
+     * @return string html used to display the field.
      */
-    public function col_contextid($row) {
+    public function col_timeopen($row) {
+        $datetime = userdate($row->timeopen, get_string('trenddatetime', 'local_assessfreq'));
 
-        $context = \context::instance_by_id($row->contextid);
-        $name = $context->get_context_name();
-        $url = $context->get_url();
-
-        $link = \html_writer::link($url, $name);
-
-        return $this->format_text($link);
+        return $datetime;
     }
-
 
     /**
-     * Get content for created column.
-     * Displays when the conversion was started
+     * Get content for time close column.
+     * Displays when the user attempt closes.
      *
      * @param \stdClass $row
-     *
-     * @return string html used to display the column field.
+     * @return string html used to display the field.
      */
-    public function col_acktime($row) {
-        $date = userdate($row->acktime, get_string('strftimedatetime', 'langconfig'));
-        return $this->format_text($date);
+    public function col_timeclose($row) {
+        $datetime = userdate($row->timeclose, get_string('trenddatetime', 'local_assessfreq'));
+
+        return $datetime;
     }
+
+    /**
+     * Get content for time limit column.
+     * Displays the time the user has to finsih the quiz.
+     *
+     * @param \stdClass $row
+     * @return string html used to display the field.
+     */
+    public function col_timelimit($row) {
+        $timelimit = format_time($row->timelimit);
+
+        return $timelimit;
+    }
+
+    /**
+     * Get content for state column.
+     * Displays the users state in the quiz.
+     *
+     * @param \stdClass $row
+     * @return string html used to display the field.
+     */
+    public function col_state($row) {
+
+        return get_string($row->state, 'local_assessfreq');
+    }
+
+    /**
+     * Get content for actions column.
+     * Displays the actions for the user.
+     *
+     * @param \stdClass $row
+     * @return string html used to display the field.
+     */
+    public function col_actions($row) {
+        global $OUTPUT;
+
+        $manage = '';
+
+        $icon = $OUTPUT->render(new \pix_icon('i/duration', get_string('useroverride', 'local_assessfreq')));
+        $manage .= \html_writer::link('#', $icon, array('class' => 'action-icon', 'id' => 'tool-assessfreq-override-' . $row->id));
+
+        $icon = $OUTPUT->render(new \pix_icon('i/search', get_string('userattempt', 'local_assessfreq')));
+        $manage .= \html_writer::link('#', $icon, array('class' => 'action-icon', 'id' => 'tool-assessfreq-attempt-' . $row->id));
+
+        $profileurl = new \moodle_url('/user/profile.php', array('id' => $row->id));
+        $icon = $OUTPUT->render(new \pix_icon('i/completion_self', get_string('userprofile', 'local_assessfreq')));
+        $manage .= \html_writer::link($profileurl, $icon,
+            array('class' => 'action-icon', 'id' => 'tool-assessfreq-profile-' . $row->id));
+
+        return $manage;
+    }
+
 
     /**
      * Query the database for results to display in the table.
