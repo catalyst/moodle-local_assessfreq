@@ -219,6 +219,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             let summaryElement = document.getElementById('local-assessfreq-quiz-summary-card');
             let summarySpinner = summaryElement.getElementsByClassName('overlay-icon-container')[0];
             let tableElement = document.getElementById('local-assessfreq-quiz-table');
+            let periodElement = document.getElementById('local-assessfreq-period-container');
 
             titleElement.innerHTML = quizArray.name;
 
@@ -242,6 +243,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             cardsElement.classList.remove('hide');
             trendElement.classList.remove('hide');
             tableElement.classList.remove('hide');
+            periodElement.classList.remove('hide');
             summarySpinner.classList.add('hide');
             getCardCharts();
             getStudentTable();

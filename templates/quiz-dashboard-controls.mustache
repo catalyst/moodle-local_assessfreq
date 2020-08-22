@@ -31,7 +31,7 @@
 	            {{# str }} searchquiz, local_assessfreq {{/ str }}
 	        </button>
 	    </div>
-	    <div class="local-assessfreq-period-container">
+	    <div class="local-assessfreq-period-container hide" id="local-assessfreq-period-container">
 		    <div class="col-sm d-flex justify-content-end">
 		        <button  id="local-assessfreq-refresh-quiz-dashboard" class="btn btn-secondary border-right" type="button">
 		            {{#pix}} i/reload {{/pix}}
@@ -41,6 +41,28 @@
 	                aria-label="{{strselect}}" aria-controls="menudayfilter">
 	                {{# str }} period, local_assessfreq {{/ str }}
 	            </button>
+	            <div id="menudayfilter" role="menu" class="dropdown-menu" data-show-active-item>
+	                <a class="dropdown-item active" href="#"
+	                   data-period="60"
+	                   aria-label="{{# str }} minuteone, local_assessfreq {{/ str }}"
+	                   role="menuitem">{{# str }} minuteone, local_assessfreq {{/ str }}
+	                </a>
+	                <a class="dropdown-item" href="#"
+                       data-period="120"
+                       aria-label="{{# str }} minutetwo, local_assessfreq {{/ str }}"
+                       role="menuitem">{{# str }} minutetwo, local_assessfreq {{/ str }}
+                    </a>
+                    <a class="dropdown-item" href="#"
+                       data-period="300"
+                       aria-label="{{# str }} minutefive, local_assessfreq {{/ str }}"
+                       role="menuitem">{{# str }} minutefive, local_assessfreq {{/ str }}
+                    </a>
+                    <a class="dropdown-item" href="#"
+                       data-period="600"
+                       aria-label="{{# str }} minuteten, local_assessfreq {{/ str }}"
+                       role="menuitem">{{# str }} minuteten, local_assessfreq {{/ str }}
+                    </a>
+                </div>
 		    </div>
 		    <div class="progress local-assessfreq-period-progress"  style="height: 3px;">
                <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25"
