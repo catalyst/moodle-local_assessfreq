@@ -362,9 +362,9 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
 
         Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
         .done((response) => {
-            var context = { 'withtable' : true, 'chartdata' : response };
+            var context = { 'withtable' : false, 'chartdata' : response, aspect: false};
             modalObj.setTitle(title);
-            modalObj.setBody(Templates.render('core/chart', context));
+            modalObj.setBody(Templates.render('local_assessfreq/chart', context));
             modalObj.show();
             return;
         }).fail(() => {
