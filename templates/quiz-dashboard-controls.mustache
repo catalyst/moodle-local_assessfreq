@@ -39,7 +39,7 @@
 	            <button type="button" class="btn btn-secondary dropdown-toggle"
 	                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
 	                aria-label="{{strselect}}" aria-controls="menudayfilter">
-	                {{# str }} period, local_assessfreq {{/ str }}
+	                {{# str }} minuteone, local_assessfreq {{/ str }}
 	            </button>
 	            <div id="menudayfilter" role="menu" class="dropdown-menu" data-show-active-item>
 	                <a class="dropdown-item active" href="#"
@@ -65,8 +65,8 @@
                 </div>
 		    </div>
 		    <div class="progress local-assessfreq-period-progress"  style="height: 3px;">
-               <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25"
-                   aria-valuemin="0" aria-valuemax="100"></div>
+               <div id="local-assessfreq-period-progress" class="progress-bar" role="progressbar" style="width: 100%"
+                   aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
 	    </div>
     </div>

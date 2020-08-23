@@ -31,11 +31,36 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     var selectQuizStr = '';
     var contextid;
     var quizId = 0;
+    var refreshPeriod = 60;
+    var counterid;
 
     const cards = [
         {cardId: 'local-assessfreq-quiz-summary-graph', call: 'participant_summary', aspect: true},
         {cardId: 'local-assessfreq-quiz-summary-trend', call: 'participant_trend', aspect: false}
     ];
+
+    /**
+     *
+     */
+    const refreshCounter = function() {
+        window.console.log(counterid);
+        counterid = setInterval(() => {
+            let progressElement = document.getElementById('local-assessfreq-period-progress');
+            let progressWidth = progressElement.getAttribute('width');
+            let progressWidthAria = progressElement.getAttribute('aria-valuenow');
+            const progressStep = 100 / refreshPeriod;
+
+            if ((progressWidth - progressStep) > 0) {
+                progressElement.setAttribute('width', (progressWidth - progressStep));
+                progressElement.setAttribute('aria-valuenow', (progressWidthAria - progressStep));
+            } else {
+                clearInterval(counterid);
+                progressElement.setAttribute('width', 100);
+                progressElement.setAttribute('aria-valuenow', 100);
+                refreshCounter();
+            }
+        }, (1000));
+    };
 
     /**
      * For each of the cards on the dashbaord get their corresponding chart data.
@@ -247,7 +272,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             summarySpinner.classList.add('hide');
             getCardCharts();
             getStudentTable();
-            // TODO: Set up auto refresh of cards.
+            refreshCounter();
             // TODO: Cancel autorefresh of cards while quiz in changing.
 
             return;
@@ -272,6 +297,12 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
                 quizId = quiz;
                 processDashboard(quiz);
             }
+        });
+
+        // Event handling for refresh button.
+        let refreshElement = document.getElementById('local-assessfreq-refresh-quiz-dashboard');
+        refreshElement.addEventListener('click', () => {
+            processDashboard(quizId);
         });
     };
 
