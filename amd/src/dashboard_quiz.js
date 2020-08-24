@@ -42,21 +42,35 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     /**
      *
      */
-    const refreshCounter = function() {
-        window.console.log(counterid);
+    const refreshCounter = function(reset) {
+        let progressElement = document.getElementById('local-assessfreq-period-progress');
+
+        // Reset the current count process.
+        if (reset == true) {
+            clearInterval(counterid);
+            counterid = null;
+            progressElement.setAttribute('style', 'width: 100%');
+            progressElement.setAttribute('aria-valuenow', 100);
+        }
+
+        // Exit early if there is already a counter running.
+        if (counterid) {
+            return;
+        }
+
         counterid = setInterval(() => {
-            let progressElement = document.getElementById('local-assessfreq-period-progress');
-            let progressWidth = progressElement.getAttribute('width');
             let progressWidthAria = progressElement.getAttribute('aria-valuenow');
             const progressStep = 100 / refreshPeriod;
 
-            if ((progressWidth - progressStep) > 0) {
-                progressElement.setAttribute('width', (progressWidth - progressStep));
+            if ((progressWidthAria - progressStep) > 0) {
+                progressElement.setAttribute('style', 'width: ' + (progressWidthAria - progressStep) + '%');
                 progressElement.setAttribute('aria-valuenow', (progressWidthAria - progressStep));
             } else {
                 clearInterval(counterid);
-                progressElement.setAttribute('width', 100);
+                counterid = null;
+                progressElement.setAttribute('style', 'width: 100%');
                 progressElement.setAttribute('aria-valuenow', 100);
+                processDashboard(quizId);
                 refreshCounter();
             }
         }, (1000));
@@ -282,6 +296,22 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     };
 
     /**
+     * Handle processing of refresh and period button actions.
+     */
+    const refreshAction = function(event) {
+        event.preventDefault();
+        var element = event.target;
+
+        if (element.closest('button') !== null && element.closest('button').id == 'local-assessfreq-refresh-quiz-dashboard') {
+          refreshCounter(true);
+          processDashboard(quizId);
+        } else if (element.tagName.toLowerCase() === 'a') {
+            refreshPeriod = element.dataset.period;
+            refreshCounter(true);
+        }
+    };
+
+    /**
      * Initialise method for quiz dashboard rendering.
      */
     DashboardQuiz.init = function(context, quiz) {
@@ -299,11 +329,10 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             }
         });
 
-        // Event handling for refresh button.
-        let refreshElement = document.getElementById('local-assessfreq-refresh-quiz-dashboard');
-        refreshElement.addEventListener('click', () => {
-            processDashboard(quizId);
-        });
+        // Event handling for refresh and period buttons.
+        let refreshElement = document.getElementById('local-assessfreq-period-container');
+        refreshElement.addEventListener('click', refreshAction);
+
     };
 
     return DashboardQuiz;
