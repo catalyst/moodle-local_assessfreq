@@ -352,9 +352,9 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
     };
 
     /**
-     *
+     * Provides zoom functionality for card graphs.
      */
-    const zoomGraph = function(event) {
+    DashboardAssessment.zoomGraph = function(event) {
         let title = event.target.parentElement.dataset.title;
         let call = event.target.parentElement.dataset.call;
 
@@ -368,7 +368,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
             modalObj.show();
             return;
         }).fail(() => {
-            Notification.exception(new Error('Failed to load card year filter'));
+            Notification.exception(new Error('Failed to load zoomed graph'));
             return;
         });
 
@@ -428,13 +428,13 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
 
         // Set up zoom event listeners.
         let dueMonthZoom = document.getElementById('local-assessfreq-assess-due-month-zoom');
-        dueMonthZoom.addEventListener('click', zoomGraph);
+        dueMonthZoom.addEventListener('click', DashboardAssessment.zoomGraph);
 
         let dueActivityZoom = document.getElementById('local-assessfreq-assess-by-activity-zoom');
-        dueActivityZoom.addEventListener('click', zoomGraph);
+        dueActivityZoom.addEventListener('click', DashboardAssessment.zoomGraph);
 
         let dueStudentZoom = document.getElementById('local-assessfreq-assess-due-month-student-zoom');
-        dueStudentZoom.addEventListener('click', zoomGraph);
+        dueStudentZoom.addEventListener('click', DashboardAssessment.zoomGraph);
 
         // Create the zoom modal.
         createModal();
