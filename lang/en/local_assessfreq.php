@@ -75,6 +75,7 @@ $string['numberevents'] = 'Event Count';
 $string['numberstudents'] = 'By number of students with assessments';
 $string['participantsummary'] = 'Participant summary';
 $string['participanttrend'] = 'Participant trend';
+$string['participants'] = 'Participants';
 $string['period'] = 'Period';
 $string['privacy:metadata:local_assessfreq'] = 'Data relating users for the local assessfreq plugin';
 $string['privacy:metadata:local_assessfreq_user'] = 'Data relating users with assessment events';

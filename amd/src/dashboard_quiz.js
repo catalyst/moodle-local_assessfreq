@@ -21,8 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['local_assessfreq/form_modal', 'core/ajax', 'core/notification', 'core/str', 'core/fragment', 'core/templates'],
-function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
+define(['local_assessfreq/form_modal', 'core/ajax', 'core/notification', 'core/str', 'core/fragment', 'core/templates',
+    'core/modal_factory', 'local_assessfreq/modal_large'],
+function(FormModal, Ajax, Notification, Str, Fragment, Templates, ModalFactory, ModalLarge) {
 
     /**
      * Module level variables.
@@ -33,6 +34,9 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     var quizId = 0;
     var refreshPeriod = 60;
     var counterid;
+    const spinner = '<p class="text-center">'
+        + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
+        + '</p>';
 
     const cards = [
         {cardId: 'local-assessfreq-quiz-summary-graph', call: 'participant_summary', aspect: true},
@@ -316,6 +320,53 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
     };
 
     /**
+     * Provides zoom functionality for card graphs.
+     */
+    const zoomGraph = function(event) {
+        let title = event.target.parentElement.dataset.title;
+        let call = event.target.parentElement.dataset.call;
+
+        let params = {'data': JSON.stringify({'year' : yearselect, 'call': call})};
+
+        Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
+        .done((response) => {
+            var context = { 'withtable' : false, 'chartdata' : response, aspect: false};
+            modalObj.setTitle(title);
+            modalObj.setBody(Templates.render('local_assessfreq/chart', context));
+            modalObj.show();
+            return;
+        }).fail(() => {
+            Notification.exception(new Error('Failed to load zoomed graph'));
+            return;
+        });
+
+    };
+
+    /**
+     * Create the modal window for graph zooming.
+     *
+     * @private
+     */
+    const createModal = function() {
+        return new Promise((resolve, reject) => {
+            Str.get_string('loading', 'core').then((title) => {
+                // Create the Modal.
+                ModalFactory.create({
+                    type: ModalLarge.TYPE,
+                    title: title,
+                    body: spinner
+                })
+                .done((modal) => {
+                    modalObj = modal;
+                    resolve();
+                });
+            }).catch(() => {
+                reject(new Error('Failed to load string: loading'));
+            });
+        });
+    };
+
+    /**
      * Initialise method for quiz dashboard rendering.
      */
     DashboardQuiz.init = function(context, quiz) {
@@ -336,6 +387,13 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
         // Event handling for refresh and period buttons.
         let refreshElement = document.getElementById('local-assessfreq-period-container');
         refreshElement.addEventListener('click', refreshAction);
+
+        // Set up zoom event listeners.
+        let summaryZoom = document.getElementById('local-assessfreq-quiz-summary-graph-zoom');
+        summaryZoom.addEventListener('click', DashboardAssessment.zoomGraph);
+
+        let trendZoom = document.getElementById('local-assessfreq-quiz-summary-trend-zoom');
+        trendZoom.addEventListener('click', DashboardAssessment.zoomGraph);
 
     };
 

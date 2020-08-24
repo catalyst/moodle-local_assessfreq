@@ -64,13 +64,10 @@ class participant_summary {
             get_string('finished', 'local_assessfreq')
         );
 
-        $charttitle = get_string('participantsummary', 'local_assessfreq');
-
         // Create chart object.
-        $participants = new \core\chart_series($charttitle, $seriesdata);
-
         $chart = new \core\chart_pie();
         $chart->set_doughnut(true);
+        $participants = new \core\chart_series(get_string('participants', 'local_assessfreq'), $seriesdata);
         $chart->add_series($participants);
         $chart->set_labels($labels);
 

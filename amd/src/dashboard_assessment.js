@@ -354,7 +354,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
     /**
      * Provides zoom functionality for card graphs.
      */
-    DashboardAssessment.zoomGraph = function(event) {
+    const zoomGraph = function(event) {
         let title = event.target.parentElement.dataset.title;
         let call = event.target.parentElement.dataset.call;
 
@@ -428,13 +428,13 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
 
         // Set up zoom event listeners.
         let dueMonthZoom = document.getElementById('local-assessfreq-assess-due-month-zoom');
-        dueMonthZoom.addEventListener('click', DashboardAssessment.zoomGraph);
+        dueMonthZoom.addEventListener('click', zoomGraph);
 
         let dueActivityZoom = document.getElementById('local-assessfreq-assess-by-activity-zoom');
-        dueActivityZoom.addEventListener('click', DashboardAssessment.zoomGraph);
+        dueActivityZoom.addEventListener('click', zoomGraph);
 
         let dueStudentZoom = document.getElementById('local-assessfreq-assess-due-month-student-zoom');
-        dueStudentZoom.addEventListener('click', DashboardAssessment.zoomGraph);
+        dueStudentZoom.addEventListener('click', zoomGraph);
 
         // Create the zoom modal.
         createModal();
