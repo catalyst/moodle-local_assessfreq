@@ -260,7 +260,11 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates) {
             let tableElement = document.getElementById('local-assessfreq-quiz-table');
             let periodElement = document.getElementById('local-assessfreq-period-container');
 
-            titleElement.innerHTML = quizArray.name;
+            let quizLink = document.createElement('a');
+            quizLink.href = quizArray.url;
+            quizLink.innerHTML = '<i class="fa fa-link fa-flip-vertical fa-fw"></i>';
+            titleElement.innerHTML = quizArray.name + '&nbsp;';
+            titleElement.appendChild(quizLink);
 
             // Update page URL with quiz ID, without reloading page so that page navigation and bookmarking works.
             const currentdUrl = new URL(window.location.href);
