@@ -22,8 +22,8 @@
  */
 
 define(['local_assessfreq/form_modal', 'core/ajax', 'core/notification', 'core/str', 'core/fragment', 'core/templates',
-    'core/modal_factory', 'local_assessfreq/modal_large'],
-function(FormModal, Ajax, Notification, Str, Fragment, Templates, ModalFactory, ModalLarge) {
+    'local_assessfreq/zoom_modal'],
+function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal) {
 
     /**
      * Module level variables.
@@ -34,10 +34,6 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ModalFactory, 
     var quizId = 0;
     var refreshPeriod = 60;
     var counterid;
-    var modalObj;
-    const spinner = '<p class="text-center">'
-        + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
-        + '</p>';
 
     const cards = [
         {cardId: 'local-assessfreq-quiz-summary-graph', call: 'participant_summary', aspect: true},
@@ -321,49 +317,14 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ModalFactory, 
     };
 
     /**
-     * Provides zoom functionality for card graphs.
+     * Thin wrapper to add extra data to click event.
      */
-    const zoomGraph = function(event) {
-        let title = event.target.parentElement.dataset.title;
+    const triggerZoomGraph = function(event) {
         let call = event.target.parentElement.dataset.call;
         let params = {'data': JSON.stringify({'quiz' : quizId, 'call': call})};
+        let method = 'get_quiz_chart';
 
-        Fragment.loadFragment('local_assessfreq', 'get_quiz_chart', contextid, params)
-        .done((response) => {
-            var context = { 'withtable' : false, 'chartdata' : response, aspect: false};
-            modalObj.setTitle(title);
-            modalObj.setBody(Templates.render('local_assessfreq/chart', context));
-            modalObj.show();
-            return;
-        }).fail(() => {
-            Notification.exception(new Error('Failed to load zoomed graph'));
-            return;
-        });
-
-    };
-
-    /**
-     * Create the modal window for graph zooming.
-     *
-     * @private
-     */
-    const createModal = function() {
-        return new Promise((resolve, reject) => {
-            Str.get_string('loading', 'core').then((title) => {
-                // Create the Modal.
-                ModalFactory.create({
-                    type: ModalLarge.TYPE,
-                    title: title,
-                    body: spinner
-                })
-                .done((modal) => {
-                    modalObj = modal;
-                    resolve();
-                });
-            }).catch(() => {
-                reject(new Error('Failed to load string: loading'));
-            });
-        });
+        ZoomModal.zoomGraph(event, params, method);
     };
 
     /**
@@ -371,7 +332,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ModalFactory, 
      */
     DashboardQuiz.init = function(context, quiz) {
         contextid = context;
-        FormModal.init(context, processDashboard);
+        FormModal.init(context, processDashboard); // Create modal for quiz selection modal.
+        ZoomModal.init(context); // Create the zoom modal.
 
         Str.get_string('loadingquiztitle', 'local_assessfreq').then((str) => {
             selectQuizStr = str;
@@ -390,13 +352,10 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ModalFactory, 
 
         // Set up zoom event listeners.
         let summaryZoom = document.getElementById('local-assessfreq-quiz-summary-graph-zoom');
-        summaryZoom.addEventListener('click', zoomGraph);
+        summaryZoom.addEventListener('click', triggerZoomGraph);
 
         let trendZoom = document.getElementById('local-assessfreq-quiz-summary-trend-zoom');
-        trendZoom.addEventListener('click', zoomGraph);
-
-        // Create the zoom modal.
-        createModal();
+        trendZoom.addEventListener('click', triggerZoomGraph);
 
     };
 

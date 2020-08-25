@@ -22,8 +22,8 @@
  */
 
 define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'local_assessfreq/calendar', 'core/str',
-    'core/modal_factory', 'local_assessfreq/modal_large', 'local_assessfreq/dayview'],
-function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, ModalLarge, Dayview) {
+    'local_assessfreq/zoom_modal', 'local_assessfreq/dayview'],
+function(Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, Dayview) {
 
     /**
      * Module level variables.
@@ -36,10 +36,6 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
     var timeout;
     var modulesJson = '';
     var heatmapOptionsJson = '';
-    var modalObj;
-    const spinner = '<p class="text-center">'
-        + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
-        + '</p>';
 
     const cards = [
         {cardId: 'local-assessfreq-assess-due-month', call: 'assess_by_month'},
@@ -352,51 +348,14 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
     };
 
     /**
-     * Provides zoom functionality for card graphs.
+     * Thin wrapper to add extra data to click event.
      */
-    const zoomGraph = function(event) {
-        let title = event.target.parentElement.dataset.title;
+    const triggerZoomGraph = function(event) {
         let call = event.target.parentElement.dataset.call;
-
         let params = {'data': JSON.stringify({'year' : yearselect, 'call': call})};
+        let method = 'get_chart';
 
-        Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
-        .done((response) => {
-            var context = { 'withtable' : false, 'chartdata' : response, aspect: false};
-            modalObj.setTitle(title);
-            modalObj.setBody(Templates.render('local_assessfreq/chart', context));
-            modalObj.show();
-            return;
-        }).fail(() => {
-            Notification.exception(new Error('Failed to load zoomed graph'));
-            return;
-        });
-
-    };
-
-    /**
-     * Create the modal window for graph zooming.
-     *
-     * @private
-     */
-    const createModal = function() {
-        return new Promise((resolve, reject) => {
-            Str.get_string('loading', 'core').then((title) => {
-                // Create the Modal.
-
-                ModalFactory.create({
-                    type: ModalLarge.TYPE,
-                    title: title,
-                    body: spinner
-                })
-                .done((modal) => {
-                    modalObj = modal;
-                    resolve();
-                });
-            }).catch(() => {
-                reject(new Error('Failed to load string: loading'));
-            });
-        });
+        ZoomModal.zoomGraph(event, params, method);
     };
 
     /**
@@ -428,16 +387,16 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ModalFactory, M
 
         // Set up zoom event listeners.
         let dueMonthZoom = document.getElementById('local-assessfreq-assess-due-month-zoom');
-        dueMonthZoom.addEventListener('click', zoomGraph);
+        dueMonthZoom.addEventListener('click', triggerZoomGraph);
 
         let dueActivityZoom = document.getElementById('local-assessfreq-assess-by-activity-zoom');
-        dueActivityZoom.addEventListener('click', zoomGraph);
+        dueActivityZoom.addEventListener('click', triggerZoomGraph);
 
         let dueStudentZoom = document.getElementById('local-assessfreq-assess-due-month-student-zoom');
-        dueStudentZoom.addEventListener('click', zoomGraph);
+        dueStudentZoom.addEventListener('click', triggerZoomGraph);
 
         // Create the zoom modal.
-        createModal();
+        ZoomModal.init(context);
 
         // Setup the dayview modal.
         Dayview.init();
