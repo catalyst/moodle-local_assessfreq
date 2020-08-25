@@ -189,3 +189,25 @@ function local_assessfreq_output_fragment_get_student_table($args): string {
 
     return $o;
 }
+
+/**
+ * Renders the quiz user override form for the modal on the quiz dashboard.
+ *
+ * @param array $args
+ * @return string $o Form HTML.
+ */
+function local_assessfreq_output_fragment_new_override_form($args): string {
+
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+
+    $mform = new \local_assessfreq\form\quiz_search_form(null, null, 'post', '', array('class' => 'ignoredirty'));
+
+
+    ob_start();
+    $mform->display();
+    $o = ob_get_contents();
+    ob_end_clean();
+
+    return $o;
+}

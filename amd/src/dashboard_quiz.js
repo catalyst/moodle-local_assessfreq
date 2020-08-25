@@ -203,7 +203,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal) {
         const tableElement = document.getElementById('local-assessfreq-quiz-table');
         const sortLinks = tableElement.querySelectorAll(`[data-sortable="1"]`);
         const hideLinks = tableElement.querySelectorAll('[data-action]');
-        const resetlink = tableElement.getElementsByClassName('resettable')[0];
+        const resetlink = tableElement.getElementsByClassName('resettable');
+        const overrideLinks = tableElement.getElementsByClassName('action-icon override');
 
         for (let i = 0; i < sortLinks.length; i++) {
             sortLinks[i].addEventListener('click', tableSort);
@@ -213,7 +214,13 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal) {
             hideLinks[i].addEventListener('click', tableHide);
         }
 
-        resetlink.addEventListener('click', tableReset);
+        if (resetlink.length > 0) {
+            resetlink[0].addEventListener('click', tableReset);
+        }
+
+        for (let i = 0; i < overrideLinks.length; i++) {
+            overrideLinks[i].addEventListener('click', triggerOverrideModal);
+        }
     };
 
     /**
@@ -317,7 +324,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal) {
     };
 
     /**
-     * Thin wrapper to add extra data to click event.
+     * Trigger the zoom graph. Thin wrapper to add extra data to click event.
      */
     const triggerZoomGraph = function(event) {
         let call = event.target.parentElement.dataset.call;
@@ -325,6 +332,16 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal) {
         let method = 'get_quiz_chart';
 
         ZoomModal.zoomGraph(event, params, method);
+    };
+
+    /**
+     * Trigger the override modal form. Thin wrapper to add extra data to click event.
+     */
+    const triggerOverrideModal = function(event) {
+        event.preventDefault();
+        const userid = event.target.closest('a').id.substring(25);
+
+        window.console.log(userid);
     };
 
     /**

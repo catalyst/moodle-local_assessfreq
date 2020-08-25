@@ -215,7 +215,7 @@ class quiz_user_table extends table_sql implements renderable {
         $manage = '';
 
         $icon = $OUTPUT->render(new \pix_icon('i/duration', get_string('useroverride', 'local_assessfreq')));
-        $manage .= \html_writer::link('#', $icon, array('class' => 'action-icon', 'id' => 'tool-assessfreq-override-' . $row->id));
+        $manage .= \html_writer::link('#', $icon, array('class' => 'action-icon override', 'id' => 'tool-assessfreq-override-' . $row->id));
 
         $icon = $OUTPUT->render(new \pix_icon('i/search', get_string('userattempt', 'local_assessfreq')));
         $manage .= \html_writer::link('#', $icon, array('class' => 'action-icon', 'id' => 'tool-assessfreq-attempt-' . $row->id));
