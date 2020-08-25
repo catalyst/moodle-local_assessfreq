@@ -34,6 +34,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ModalFactory, 
     var quizId = 0;
     var refreshPeriod = 60;
     var counterid;
+    var modalObj;
     const spinner = '<p class="text-center">'
         + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
         + '</p>';
@@ -325,10 +326,9 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ModalFactory, 
     const zoomGraph = function(event) {
         let title = event.target.parentElement.dataset.title;
         let call = event.target.parentElement.dataset.call;
+        let params = {'data': JSON.stringify({'quiz' : quizId, 'call': call})};
 
-        let params = {'data': JSON.stringify({'year' : yearselect, 'call': call})};
-
-        Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
+        Fragment.loadFragment('local_assessfreq', 'get_quiz_chart', contextid, params)
         .done((response) => {
             var context = { 'withtable' : false, 'chartdata' : response, aspect: false};
             modalObj.setTitle(title);
@@ -390,10 +390,13 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ModalFactory, 
 
         // Set up zoom event listeners.
         let summaryZoom = document.getElementById('local-assessfreq-quiz-summary-graph-zoom');
-        summaryZoom.addEventListener('click', DashboardAssessment.zoomGraph);
+        summaryZoom.addEventListener('click', zoomGraph);
 
         let trendZoom = document.getElementById('local-assessfreq-quiz-summary-trend-zoom');
-        trendZoom.addEventListener('click', DashboardAssessment.zoomGraph);
+        trendZoom.addEventListener('click', zoomGraph);
+
+        // Create the zoom modal.
+        createModal();
 
     };
 
