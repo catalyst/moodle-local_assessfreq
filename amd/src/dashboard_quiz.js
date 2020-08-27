@@ -22,8 +22,8 @@
  */
 
 define(['local_assessfreq/form_modal', 'core/ajax', 'core/notification', 'core/str', 'core/fragment', 'core/templates',
-    'local_assessfreq/zoom_modal'],
-function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal) {
+    'local_assessfreq/zoom_modal', 'local_assessfreq/override_modal'],
+function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, OverrideModal) {
 
     /**
      * Module level variables.
@@ -341,7 +341,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal) {
         event.preventDefault();
         const userid = event.target.closest('a').id.substring(25);
 
-        window.console.log(userid);
+        OverrideModal.displayModalForm(quizId, userid);
     };
 
     /**
@@ -351,6 +351,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal) {
         contextid = context;
         FormModal.init(context, processDashboard); // Create modal for quiz selection modal.
         ZoomModal.init(context); // Create the zoom modal.
+        OverrideModal.init(context, processDashboard);
 
         Str.get_string('loadingquiztitle', 'local_assessfreq').then((str) => {
             selectQuizStr = str;

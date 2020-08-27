@@ -197,12 +197,31 @@ function local_assessfreq_output_fragment_get_student_table($args): string {
  * @return string $o Form HTML.
  */
 function local_assessfreq_output_fragment_new_override_form($args): string {
+    global $DB;
 
     $context = $args['context'];
     has_capability('moodle/site:config', $context);
 
-    $mform = new \local_assessfreq\form\quiz_search_form(null, null, 'post', '', array('class' => 'ignoredirty'));
+    // Get some data needed to generate the form.
+    $quizid = $args['quizid'];
+    $quiz = new \local_assessfreq\quiz();
+    $quizcontext = $quiz->get_quiz_context($quizid);
+    $quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
 
+    $cm = get_course_and_cm_from_cmid($quizcontext->instanceid, 'quiz')[1];
+
+
+    // Check if we have an existing override for this user.
+    $override =$DB->get_record('quiz_overrides', array('quiz' => $quiz->id, 'userid' => $args['userid']));
+
+    if ($override) {
+        $data = clone $override;
+    } else {
+        $data = new stdClass();
+    }
+
+    $mform = new \local_assessfreq\form\quiz_override_form($cm, $quiz, $quizcontext, $override);
+    $mform->set_data($data);
 
     ob_start();
     $mform->display();

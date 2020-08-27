@@ -21,16 +21,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/str', 'core/modal_factory', 'core/fragment', 'core/ajax'],
-function(Str, ModalFactory, Fragment, Ajax) {
+define(['core/str', 'core/modal_factory', 'core/fragment'],
+function(Str, ModalFactory, Fragment) {
 
     /**
      * Module level variables.
      */
-    var FormModal = {};
+    var OverrideModal = {};
     var contextid;
     var modalObj;
-    var resetOptions = [];
     var callback;
 
     const spinner = '<p class="text-center">'
@@ -62,21 +61,21 @@ function(Str, ModalFactory, Fragment, Ajax) {
         });
     };
 
-
-
     /**
      * Updates the body of the modal window.
      *
      * @param {Object} formdata
      * @private
      */
-    const updateModalBody = function(formdata) {
+    const updateModalBody = function(quiz, userid, formdata) {
         if (typeof formdata === "undefined") {
             formdata = {};
         }
 
         let params = {
-            'jsonformdata': JSON.stringify(formdata)
+            'jsonformdata': JSON.stringify(formdata),
+            'quizid': quiz,
+            'userid': userid
         };
 
         modalObj.setBody(spinner);
@@ -85,65 +84,28 @@ function(Str, ModalFactory, Fragment, Ajax) {
             modalObj.setBody(Fragment.loadFragment('local_assessfreq', 'new_override_form', contextid, params));
             return;
         }).catch(() => {
-            Notification.exception(new Error('Failed to load string: searchquiz'));
+            Notification.exception(new Error('Failed to load string: useroverride'));
         });
-    };
-
-    /**
-     * Updates Moodle form with selected information.
-     *
-     * @param {Object} e
-     * @private
-     */
-    const processModalForm = function(e) {
-        e.preventDefault(); // Stop modal from closing.
-
-        let quizElement = document.getElementById('id_quiz');
-        let quizId = quizElement.options[quizElement.selectedIndex].value;
-        let courseId = document.getElementById('id_courses').dataset.course;
-
-        if (courseId === undefined || quizId < 1) {
-            if (document.getElementById('noquizwarning') === null) {
-                Str.get_string('noquizselected', 'local_assessfreq').then((warning) => {
-                    let element = document.createElement('div');
-                    element.innerHTML = warning;
-                    element.id = 'noquizwarning';
-                    element.classList.add('alert', 'alert-danger');
-                    modalObj.getBody().prepend(element);
-
-                    return;
-                }).catch(() => {
-                    Notification.exception(new Error('Failed to load string: searchquiz'));
-                });
-
-            }
-
-        } else {
-            modalObj.hide(); // Close modal.
-            modalObj.setBody(''); // Cleaer form.
-            observer.disconnect(); // Remove observer.
-            callback(quizId, courseId); // Trigger dashboard update.
-        }
-
     };
 
     /**
      * Display the Modal form.
      */
-    const displayModalForm = function() {
-        updateModalBody();
+    OverrideModal.displayModalForm = function(quiz, userid) {
+        updateModalBody(quiz, userid);
         modalObj.show();
     };
 
     /**
      * Initialise method for quiz dashboard rendering.
      */
-    FormModal.init = function(context, callbackFunction) {
+    OverrideModal.init = function(context, callbackFunction) {
         contextid = context;
         callback = callbackFunction;
         createModal();
+        window.console.log(callback);
 
     };
 
-    return FormModal;
+    return OverrideModal;
 });

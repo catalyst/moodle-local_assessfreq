@@ -40,20 +40,18 @@ class quiz_override_form extends \quiz_override_form {
 
     /**
      * Constructor.
-     * @param moodle_url $submiturl the form action URL.
      * @param object course module object.
      * @param object the quiz settings object.
      * @param context the quiz context.
-     * @param bool editing group override (true) or user override (false).
      * @param object $override the override being edited, if it already exists.
      */
-    public function __construct($submiturl, $cm, $quiz, $context, $groupmode, $override) {
+    public function __construct($cm, $quiz, $context, $override) {
 
         $this->cm = $cm;
         $this->quiz = $quiz;
         $this->context = $context;
-        $this->groupmode = $groupmode;
-        $this->groupid = empty($override->groupid) ? 0 : $override->groupid;
+        $this->groupmode = false;
+        $this->groupid = 0;
         $this->userid = empty($override->userid) ? 0 : $override->userid;
 
         \moodleform::__construct(null, null, 'post');
