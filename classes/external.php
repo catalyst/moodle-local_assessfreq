@@ -419,4 +419,74 @@ class local_assessfreq_external extends external_api {
     public static function set_table_preference_returns() {
         return new external_value(PARAM_ALPHAEXT, 'Name of the updated preference');
     }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function process_override_form_parameters() {
+        return new external_function_parameters(
+            array(
+                'jsonformdata' => new external_value(PARAM_RAW, 'The data from the create copy form, encoded as a json array')
+            )
+            );
+    }
+
+    /**
+     * Submit the quiz override form.
+     *
+     * @param string $jsonformdata The data from the form, encoded as a json array.
+     * @return int new group id.
+     */
+    public static function process_override_form($jsonformdata) {
+
+        // Release session lock.
+        \core\session\manager::write_close();
+
+        // We always must pass webservice params through validate_parameters.
+        $params = self::validate_parameters(
+            self::process_override_form_parameters(),
+            array('jsonformdata' => $jsonformdata)
+            );
+
+        $formdata = json_decode($params['jsonformdata']);
+
+        $data = array();
+        parse_str($formdata, $data);
+
+        error_log(print_r($data, true));
+
+        $context = context_course::instance($data['courseid']);
+        self::validate_context($context);
+
+        require_all_capabilities($copycaps, $context);
+
+        // Submit the form data.
+        $course = get_course($data['courseid']);
+        $mform = new \core_backup\output\copy_form(
+            null,
+            array('course' => $course, 'returnto' => '', 'returnurl' => ''),
+            'post', '', ['class' => 'ignoredirty'], true, $data);
+            $mdata = $mform->get_data();
+
+            if ($mdata) {
+                // Create the copy task.
+                $backupcopy = new \core_backup\copy\copy($mdata);
+                $copyids = $backupcopy->create_copy();
+            } else {
+                throw new moodle_exception('copyformfail', 'backup');
+            }
+
+            return json_encode($copyids);
+    }
+
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_description
+     */
+    public static function process_override_form_returns() {
+        return new external_value(PARAM_RAW, 'JSON response.');
+    }
 }

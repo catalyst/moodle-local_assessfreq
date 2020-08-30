@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/str', 'core/modal_factory', 'core/fragment'],
-function(Str, ModalFactory, Fragment) {
+define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/fragment', 'core/ajax'],
+function($,Str, ModalFactory, ModalEvents, Fragment, Ajax) {
 
     /**
      * Module level variables.
@@ -31,6 +31,8 @@ function(Str, ModalFactory, Fragment) {
     var contextid;
     var modalObj;
     var callback;
+    var quizid;
+    var userid;
 
     const spinner = '<p class="text-center">'
         + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
@@ -52,8 +54,13 @@ function(Str, ModalFactory, Fragment) {
             })
             .done((modal) => {
                 modalObj = modal;
-
-                // TODO: Explicitly handle form click events.
+                // Explicitly handle form click events.
+                modalObj.getRoot().on('click', '#id_submitbutton', processModalForm);
+                modalObj.getRoot().on('click', '#id_cancel', function(e) {
+                    e.preventDefault();
+                    modalObj.setBody(spinner);
+                    modalObj.hide();
+                });
             });
             return;
         }).catch(() => {
@@ -67,7 +74,7 @@ function(Str, ModalFactory, Fragment) {
      * @param {Object} formdata
      * @private
      */
-    const updateModalBody = function(quiz, userid, formdata) {
+    const updateModalBody = function(quiz, user, formdata) {
         if (typeof formdata === "undefined") {
             formdata = {};
         }
@@ -75,7 +82,7 @@ function(Str, ModalFactory, Fragment) {
         let params = {
             'jsonformdata': JSON.stringify(formdata),
             'quizid': quiz,
-            'userid': userid
+            'userid': user
         };
 
         modalObj.setBody(spinner);
@@ -89,10 +96,54 @@ function(Str, ModalFactory, Fragment) {
     };
 
     /**
+     * Updates Moodle form with selected information.
+     *
+     * @param {Object} e
+     * @private
+     */
+    function processModalForm(e) {
+        e.preventDefault(); // Stop modal from closing.
+
+        // Form data.
+        let overrideform = modalObj.getRoot().find('form').serialize();
+        let formjson = JSON.stringify(overrideform);
+
+        // Handle invalid form fields for better UX.
+        // I hate that I had to use JQuery for this.
+        var invalid = $.merge(
+                modalObj.getRoot().find('[aria-invalid="true"]'),
+                modalObj.getRoot().find('.error')
+        );
+
+        if (invalid.length) {
+            invalid.first().focus();
+            return;
+        }
+
+        // Submit form via ajax.
+        Ajax.call([{
+            methodname: 'local_assessfreq_process_override_form',
+            args: {
+                jsonformdata: formjson
+            },
+        }])[0].done(() => {
+            // For submission succeeded.
+            modalObj.setBody(spinner);
+            modalObj.hide();
+            callback(quizid);
+        }).fail(() => {
+            // Form submission failed server side, redisplay with errors.
+            updateModalBody(quizid, userid, overrideform);
+        });
+    }
+
+    /**
      * Display the Modal form.
      */
-    OverrideModal.displayModalForm = function(quiz, userid) {
-        updateModalBody(quiz, userid);
+    OverrideModal.displayModalForm = function(quiz, user) {
+        quizid = quiz;
+        userid = user;
+        updateModalBody(quiz, user);
         modalObj.show();
     };
 
@@ -103,8 +154,6 @@ function(Str, ModalFactory, Fragment) {
         contextid = context;
         callback = callbackFunction;
         createModal();
-        window.console.log(callback);
-
     };
 
     return OverrideModal;

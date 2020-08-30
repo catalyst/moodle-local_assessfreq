@@ -210,14 +210,14 @@ function local_assessfreq_output_fragment_new_override_form($args): string {
 
     $cm = get_course_and_cm_from_cmid($quizcontext->instanceid, 'quiz')[1];
 
-
     // Check if we have an existing override for this user.
     $override =$DB->get_record('quiz_overrides', array('quiz' => $quiz->id, 'userid' => $args['userid']));
 
     if ($override) {
         $data = clone $override;
     } else {
-        $data = new stdClass();
+        $data = new \stdClass();
+        $data->userid = $args['userid'];
     }
 
     $mform = new \local_assessfreq\form\quiz_override_form($cm, $quiz, $quizcontext, $override);

@@ -58,4 +58,12 @@ class quiz_override_form extends \quiz_override_form {
 
     }
 
+    protected function definition() {
+        parent::definition();
+        $mform = $this->_form;
+        $mform->removeElement('resetbutton');
+        $mform->removeElement('buttonbar');
+        $this->add_action_buttons();
+    }
+
 }

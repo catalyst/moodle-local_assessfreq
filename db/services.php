@@ -92,4 +92,12 @@ $functions = array(
         'type' => 'write',
         'ajax' => true
     ),
+    'local_assessfreq_process_override_form' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'process_override_form',
+        'classpath' => '',
+        'description' => 'Process the override form.',
+        'type' => 'write',
+        'ajax' => true
+    ),
 );
