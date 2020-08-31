@@ -45,7 +45,7 @@ class quiz_override_form extends \quiz_override_form {
      * @param context the quiz context.
      * @param object $override the override being edited, if it already exists.
      */
-    public function __construct($cm, $quiz, $context, $override) {
+    public function __construct($cm, $quiz, $context, $override, $submitteddata=null) {
 
         $this->cm = $cm;
         $this->quiz = $quiz;
@@ -54,13 +54,19 @@ class quiz_override_form extends \quiz_override_form {
         $this->groupid = 0;
         $this->userid = empty($override->userid) ? 0 : $override->userid;
 
-        \moodleform::__construct(null, null, 'post');
+        \moodleform::__construct(null, null, 'post', '', ['class' => 'ignoredirty'], true, $submitteddata);
 
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see quiz_override_form::definition()
+     */
     protected function definition() {
         parent::definition();
         $mform = $this->_form;
+        $mform->freeze('userid');
         $mform->removeElement('resetbutton');
         $mform->removeElement('buttonbar');
         $this->add_action_buttons();

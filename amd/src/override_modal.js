@@ -124,7 +124,8 @@ function($,Str, ModalFactory, ModalEvents, Fragment, Ajax) {
         Ajax.call([{
             methodname: 'local_assessfreq_process_override_form',
             args: {
-                jsonformdata: formjson
+                'jsonformdata': formjson,
+                'quizid': quizid
             },
         }])[0].done(() => {
             // For submission succeeded.

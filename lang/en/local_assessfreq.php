@@ -136,6 +136,7 @@ $string['settings:disabledmodules_desc'] = 'Include modules that have been disab
 $string['status'] = 'Status';
 $string['students'] = 'Students';
 $string['studenttable'] = 'Student attempt status';
+$string['submitoverridefail'] = 'Ajax override form submission failed';
 $string['systemdisabled'] = ' (module disabled)';
 $string['task:dataprocess'] = 'Data collection task';
 $string['task:quiztracking'] = 'Quiz tracking task';

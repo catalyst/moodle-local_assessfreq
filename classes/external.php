@@ -428,7 +428,8 @@ class local_assessfreq_external extends external_api {
     public static function process_override_form_parameters() {
         return new external_function_parameters(
             array(
-                'jsonformdata' => new external_value(PARAM_RAW, 'The data from the create copy form, encoded as a json array')
+                'jsonformdata' => new external_value(PARAM_RAW, 'The data from the create copy form, encoded as a json array'),
+                'quizid' => new external_value(PARAM_INT, 'The quiz id to processs the override for')
             )
             );
     }
@@ -437,9 +438,12 @@ class local_assessfreq_external extends external_api {
      * Submit the quiz override form.
      *
      * @param string $jsonformdata The data from the form, encoded as a json array.
-     * @return int new group id.
+     * @param int $quizid The quiz id to add an override for.
+     * @throws moodle_exception
+     * @return string
      */
-    public static function process_override_form($jsonformdata) {
+    public static function process_override_form($jsonformdata, $quizid) {
+        global $DB;
 
         // Release session lock.
         \core\session\manager::write_close();
@@ -447,38 +451,65 @@ class local_assessfreq_external extends external_api {
         // We always must pass webservice params through validate_parameters.
         $params = self::validate_parameters(
             self::process_override_form_parameters(),
-            array('jsonformdata' => $jsonformdata)
+            array('jsonformdata' => $jsonformdata, 'quizid' => $quizid)
             );
 
         $formdata = json_decode($params['jsonformdata']);
 
-        $data = array();
-        parse_str($formdata, $data);
+        $submitteddata = array();
+        parse_str($formdata, $submitteddata);
 
-        error_log(print_r($data, true));
-
-        $context = context_course::instance($data['courseid']);
+        // Check access.
+        $quizdata = new \local_assessfreq\quiz();
+        $context = $quizdata->get_quiz_context($quizid);
         self::validate_context($context);
+        has_capability('mod/quiz:manageoverrides', $context);
 
-        require_all_capabilities($copycaps, $context);
+        // Check if we have an existing override for this user.
+        $override =$DB->get_record('quiz_overrides', array('quiz' => $quizid, 'userid' => $submitteddata['userid']));
 
         // Submit the form data.
-        $course = get_course($data['courseid']);
-        $mform = new \core_backup\output\copy_form(
-            null,
-            array('course' => $course, 'returnto' => '', 'returnurl' => ''),
-            'post', '', ['class' => 'ignoredirty'], true, $data);
-            $mdata = $mform->get_data();
+        $quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
+        $cm = get_course_and_cm_from_cmid($context->instanceid, 'quiz')[1];
+        $mform = new \local_assessfreq\form\quiz_override_form($cm, $quiz, $context, $override, $submitteddata);
 
-            if ($mdata) {
-                // Create the copy task.
-                $backupcopy = new \core_backup\copy\copy($mdata);
-                $copyids = $backupcopy->create_copy();
+        $mdata = $mform->get_data();
+
+        if ($mdata) {
+            $params = array(
+                'context' => $context,
+                'other' => array(
+                    'quizid' => $quizid
+                ),
+                'relateduserid' => $mdata->userid
+            );
+            $mdata->quiz = $quizid;
+
+            if (!empty($override->id)) {
+                $mdata->id = $override->id;
+                $DB->update_record('quiz_overrides', $mdata);
+
+                // Determine which override updated event to fire.
+                $params['objectid'] = $override->id;
+                $event = \mod_quiz\event\user_override_updated::create($params);
+                // Trigger the override updated event.
+                $event->trigger();
             } else {
-                throw new moodle_exception('copyformfail', 'backup');
+                unset($mdata->id);
+                $mdata->id = $DB->insert_record('quiz_overrides', $mdata);
+
+                // Determine which override created event to fire.
+                $params['objectid'] = $mdata->id;
+                $event = \mod_quiz\event\user_override_created::create($params);
+                // Trigger the override created event.
+                $event->trigger();
             }
 
-            return json_encode($copyids);
+        } else {
+            throw new moodle_exception('submitoverridefail', 'local_assessfreq');
+        }
+
+        return json_encode(array('overrideid' => $mdata->id));
     }
 
     /**

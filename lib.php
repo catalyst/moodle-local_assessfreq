@@ -200,12 +200,20 @@ function local_assessfreq_output_fragment_new_override_form($args): string {
     global $DB;
 
     $context = $args['context'];
-    has_capability('moodle/site:config', $context);
+    has_capability('mod/quiz:manageoverrides', $context);
+
+    $serialiseddata = json_decode($args['jsonformdata'], true);
+
+    if (!empty($serialiseddata)) {
+        $formdata = array();
+        parse_str($serialiseddata, $formdata);
+    }
+
 
     // Get some data needed to generate the form.
     $quizid = $args['quizid'];
-    $quiz = new \local_assessfreq\quiz();
-    $quizcontext = $quiz->get_quiz_context($quizid);
+    $quizdata = new \local_assessfreq\quiz();
+    $quizcontext = $quizdata->get_quiz_context($quizid);
     $quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
 
     $cm = get_course_and_cm_from_cmid($quizcontext->instanceid, 'quiz')[1];
@@ -220,8 +228,13 @@ function local_assessfreq_output_fragment_new_override_form($args): string {
         $data->userid = $args['userid'];
     }
 
-    $mform = new \local_assessfreq\form\quiz_override_form($cm, $quiz, $quizcontext, $override);
+    $mform = new \local_assessfreq\form\quiz_override_form($cm, $quiz, $quizcontext, $override, $formdata);
     $mform->set_data($data);
+
+    if (!empty($serialiseddata)) {
+        // If we were passed non-empty form data we want the mform to call validation functions and show errors.
+        $mform->is_validated();
+    }
 
     ob_start();
     $mform->display();
