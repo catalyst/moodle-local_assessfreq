@@ -199,6 +199,20 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
     };
 
     /**
+     * Process the search events from the student table.
+     */
+    const tableSearch = function(event) {
+        window.condole.log(event.target);
+    };
+
+    /**
+     * Process the search reset click event from the student table.
+     */
+    const tableSearchReset = function(event) {
+        window.condole.log(event.target);
+    };
+
+    /**
      * Re-add event listeners when the student table is updated.
      */
     const tableEventListeners = function() {
@@ -276,6 +290,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             let summarySpinner = summaryElement.getElementsByClassName('overlay-icon-container')[0];
             let tableElement = document.getElementById('local-assessfreq-quiz-table');
             let periodElement = document.getElementById('local-assessfreq-period-container');
+            let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-student-table-search');
+            let tableSearchResetElement = document.getElementById('local-assessfreq-quiz-student-table-search-reset');
 
             let quizLink = document.createElement('a');
             quizLink.href = quizArray.url;
@@ -308,6 +324,10 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             getCardCharts();
             getStudentTable();
             refreshCounter();
+
+            tableSearchInputElement.addEventListener('keyup', tableSearch);
+            tableSearchInputElement.addEventListener('paste', tableSearch);
+            tableSearchResetElement.addEventListener('click', tableSearchReset);
             // TODO: Cancel autorefresh of cards while quiz in changing.
 
             return;

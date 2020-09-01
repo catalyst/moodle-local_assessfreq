@@ -26,19 +26,28 @@
 }}
 
 <div id="local-assessfreq-quiz-student-table" class="card">
-	<span id="local-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
-	    <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
-	</span>
-
     <div class="card-header">
         <h5>{{# str }} studenttable, local_assessfreq {{/ str }}</h5>
     </div>
     <div class="card-body">
-        <div class="class-desc">
-            <!-- Chart description goes here via ajax -->
+        <div class="table-search col-6">
+            <div class="input-group mb-2">
+                <input id="local-assessfreq-quiz-student-table-search" type="text" class="form-control"
+                       placeholder="{{# str }} entersearch, local_assessfreq {{/ str }}"
+                       aria-label="{{# str }} entersearch, local_assessfreq {{/ str }}" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button id="local-assessfreq-quiz-student-table-search-reset"
+                            class="btn btn-outline-secondary" type="button">{{# str }} reset, local_assessfreq {{/ str }}</button>
+                </div>
+            </div>
         </div>
-        <div class="table-body">
-            <!-- Chart goes here via ajax -->
+        <div class="table-container">
+            <span id="local-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
+                <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
+            </span>
+            <div class="table-body">
+                <!--Table goes here via ajax -->
+            </div>
         </div>
     </div>
     <div class="footer">
