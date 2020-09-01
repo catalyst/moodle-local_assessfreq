@@ -219,7 +219,7 @@ class quiz_user_table extends table_sql implements renderable {
 
         if ($row->state == 'finished' || $row->state == 'inprogress') {
             $classes = 'action-icon';
-            $attempturl = new \moodle_url('/mod/quiz/review.php', array('attempt' => $row->id));;
+            $attempturl = new \moodle_url('/mod/quiz/review.php', array('attempt' => $row->attemptid));;
         } else {
             $classes = 'action-icon disabled';
             $attempturl = '#';
@@ -259,7 +259,7 @@ class quiz_user_table extends table_sql implements renderable {
         $quizrecord = $DB->get_record('quiz', array('id' => $this->quizid), 'timeopen, timeclose, timelimit');
 
         list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
-        $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz
+        $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid
                          FROM {quiz_attempts} qa_a
                    INNER JOIN (SELECT userid, MAX(timestart) as timestart
                                  FROM {quiz_attempts}
@@ -287,7 +287,8 @@ class quiz_user_table extends table_sql implements renderable {
                        COALESCE(qa.state, (CASE
                                               WHEN us.userid > 0 THEN 'loggedin'
                                               ELSE 'notloggedin'
-                                           END)) AS state
+                                           END)) AS state,
+                       qa.attemptid
                   FROM {user} u
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";

@@ -205,6 +205,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
         const hideLinks = tableElement.querySelectorAll('[data-action]');
         const resetlink = tableElement.getElementsByClassName('resettable');
         const overrideLinks = tableElement.getElementsByClassName('action-icon override');
+        const disabledLinks = tableElement.getElementsByClassName('action-icon disabled');
 
         for (let i = 0; i < sortLinks.length; i++) {
             sortLinks[i].addEventListener('click', tableSort);
@@ -220,6 +221,12 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
 
         for (let i = 0; i < overrideLinks.length; i++) {
             overrideLinks[i].addEventListener('click', triggerOverrideModal);
+        }
+
+        for (let i = 0; i < disabledLinks.length; i++) {
+            disabledLinks[i].addEventListener('click', (event) => {
+                event.preventDefault();
+            });
         }
     };
 
