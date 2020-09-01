@@ -202,14 +202,18 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
      * Process the search events from the student table.
      */
     const tableSearch = function(event) {
-        window.condole.log(event.target);
+         if (event.target.value.length > 2) {
+            window.console.log(event.target.value);
+        }
     };
 
     /**
      * Process the search reset click event from the student table.
      */
-    const tableSearchReset = function(event) {
-        window.condole.log(event.target);
+    const tableSearchReset = function() {
+        let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-student-table-search');
+        tableSearchInputElement.value = '';
+        tableSearchInputElement.focus();
     };
 
     /**
