@@ -157,7 +157,9 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             let action = hideLinks[i].dataset.action;
             let column = hideLinks[i].dataset.column;
 
-            hideArray[column] = (action === 'hide') ? 0 : 1;
+            if (action === 'show') {
+                hideArray[column] = 1;
+            }
         }
 
         hideArray[targetColumn] = (targetAction === 'hide') ? 1 : 0; // We want to flip the clicked column.
