@@ -52,6 +52,12 @@ class quiz_user_table extends table_sql implements renderable {
     private $contextid;
 
     /**
+     *
+     * @var string $search The string to search for in the table data.
+     */
+    private $search;
+
+    /**
      * @var string[] Extra fields to display.
      */
     protected $extrafields;
@@ -66,11 +72,12 @@ class quiz_user_table extends table_sql implements renderable {
      *
      * @throws \coding_exception
      */
-    public function __construct(string $baseurl, int $quizid, int $contextid, int $page = 0) {
+    public function __construct(string $baseurl, int $quizid, int $contextid, string $search, int $page = 0) {
         parent::__construct('local_assessfreq_student_table');
 
         $this->quizid = $quizid;
         $this->contextid = $contextid;
+        $this->search = $search;
         $this->set_attribute('id', 'local_assessfreq_ackreport_table');
         $this->set_attribute('class', 'generaltable generalbox');
         $this->downloadable = false;
@@ -293,6 +300,10 @@ class quiz_user_table extends table_sql implements renderable {
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
 
+         if ($this->search != '') {
+
+         }
+
         $countsql = "SELECT COUNT(1)
                   FROM {user} u
                        $finaljoin->joins
@@ -306,8 +317,6 @@ class quiz_user_table extends table_sql implements renderable {
         if (!empty($sort)) {
             $sql .= " ORDER BY $sort";
         }
-
-        // TODO: Add search.
 
         $records = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
 

@@ -253,11 +253,15 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
     /**
      * Display the table that contains all the students in the exam as well as their attempts.
      */
-    const getStudentTable = function() {
+    const getStudentTable = function(search) {
+        if (typeof search === "undefined") {
+            search = '';
+        }
+
         let tableElement = document.getElementById('local-assessfreq-quiz-table');
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
-        let params = {'data': JSON.stringify({'quiz' : quizId})};
+        let params = {'data': JSON.stringify({'quiz' : quizId, 'search': search})};
 
         spinner.classList.remove('hide'); // Show spinner if not already shown.
         Fragment.loadFragment('local_assessfreq', 'get_student_table', contextid, params)

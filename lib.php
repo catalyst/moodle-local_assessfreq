@@ -185,7 +185,7 @@ function local_assessfreq_output_fragment_get_student_table($args): string {
     $baseurl = $CFG->wwwroot . '/local/assessfreq/dashboard_quiz.php';
     $output = $PAGE->get_renderer('local_assessfreq');
 
-    $o = $output->render_student_table($baseurl, $data->quiz, $context->id);
+    $o = $output->render_student_table($baseurl, $data->quiz, $context->id, $data->search);
 
     return $o;
 }
