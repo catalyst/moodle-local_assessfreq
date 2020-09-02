@@ -199,7 +199,7 @@ class quiz_user_table_testcase extends advanced_testcase {
 
         $baseurl = $CFG->wwwroot . '/local/assessfreq/dashboard_quiz.php';
         $context = context_system::instance();
-        $quizusertable = new quiz_user_table($baseurl, $this->quiz1->id, $context->id);
+        $quizusertable = new quiz_user_table($baseurl, $this->quiz1->id, $context->id, '');
 
         // Fake getting table.
         $this->expectOutputRegex("/table/");

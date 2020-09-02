@@ -203,8 +203,12 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
      */
     const tableSearch = function(event) {
          if (event.target.value.length > 2) {
-            window.console.log(event.target.value);
-        }
+            getStudentTable(event.target.value);
+         }
+
+         if (event.target.value.length == 0) {
+             getStudentTable();
+          }
     };
 
     /**
@@ -214,6 +218,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
         let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-student-table-search');
         tableSearchInputElement.value = '';
         tableSearchInputElement.focus();
+        getStudentTable();
     };
 
     /**

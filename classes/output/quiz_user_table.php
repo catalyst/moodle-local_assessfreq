@@ -250,7 +250,19 @@ class quiz_user_table extends table_sql implements renderable {
      * @param bool $useinitialsbar do you want to use the initials bar.
      */
     public function query_db($pagesize, $useinitialsbar = false) {
-        global $CFG, $DB;
+        global $CFG, $DB, $SESSION;
+
+        if (!empty($SESSION->flextable)) {
+            $prefs = $SESSION->flextable['local_assessfreq_student_table'];
+        } else {
+            $prefs = array(
+                'collapse' => array(),
+                'sortby'   => array(),
+                'i_first'  => '',
+                'i_last'   => '',
+                'textsort' => array(),
+            );
+        }
 
         $maxlifetime = $CFG->sessiontimeout;
         $timedout = time() - $maxlifetime;
@@ -286,6 +298,7 @@ class quiz_user_table extends table_sql implements renderable {
         $params['stm'] = $timedout;
 
         $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
+        $params = $finaljoin->params;
 
         $sql = "SELECT u.*,
                        COALESCE(qo.timeopen, $quizrecord->timeopen) AS timeopen,
@@ -300,16 +313,10 @@ class quiz_user_table extends table_sql implements renderable {
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
 
-         if ($this->search != '') {
-
-         }
-
         $countsql = "SELECT COUNT(1)
                   FROM {user} u
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
-
-        $params = $finaljoin->params;
 
         $total = $DB->count_records_sql($countsql, $params);
         $this->pagesize($pagesize, $total);
@@ -321,9 +328,24 @@ class quiz_user_table extends table_sql implements renderable {
         $records = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
 
         foreach ($records as $record) {
-            $this->rawdata[$record->id] = $record;
+            $searchcount = 0;
+            if ($this->search != '') {
+                // Because we are using COALESE and CASE for state we can't use SQL WHERE so we need to filter in PHP land.
+                // Also because we need to do some filtering in PHP land, we'll do it all here.
+                $searchcount = -1;
+                $searchfields = array_merge($this->extrafields, array('firstname', 'lastname', 'state'));
+
+                foreach ($searchfields as $searchfield) {
+                    if (stripos($record->{$searchfield}, $this->search) !== false) {
+                        $searchcount++;
+                    }
+                }
+
+            }
+
+            if ($searchcount > -1) {
+                $this->rawdata[$record->id] = $record;
+            }
         }
-
-
     }
 }
