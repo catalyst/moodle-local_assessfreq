@@ -37,7 +37,6 @@ function(Str, ModalFactory, Fragment, Ajax) {
         + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
         + '</p>';
 
-    const observer = new MutationObserver(ObserverCallback);
     const observerConfig = { attributes: true, childList: false, subtree: true };
 
     const ObserverCallback = function(mutationsList) {
@@ -96,6 +95,8 @@ function(Str, ModalFactory, Fragment, Ajax) {
 
           }
     };
+
+    const observer = new MutationObserver(ObserverCallback);
 
     /**
      * Create the modal window.
