@@ -46,8 +46,9 @@ function(Str, ModalFactory, Fragment, Ajax) {
                     && (element.getAttribute('aria-selected') == 'true')) {
                 element.addEventListener('click', updateModalBody);
                 document.getElementById('id_courses').dataset.course = element.dataset.value;
+                let selectElement = document.getElementById('id_quiz');
 
-                document.getElementById('id_quiz').value = -1;
+                selectElement.value = -1;
                 Ajax.call([{
                     methodname: 'local_assessfreq_get_quizzes',
                     args: {
@@ -55,7 +56,6 @@ function(Str, ModalFactory, Fragment, Ajax) {
                     },
                 }])[0].done((response) => {
                     let quizArray = JSON.parse(response);
-                    let selectElement = document.getElementById('id_quiz');
                     let selectElementLength = selectElement.options.length;
                     if (document.getElementById('noquizwarning') !== null) {
                         document.getElementById('noquizwarning').remove();
