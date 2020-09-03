@@ -42,8 +42,8 @@ function(Str, ModalFactory, Fragment, Ajax) {
     const ObserverCallback = function(mutationsList) {
         for (let i=0; i<mutationsList.length; i++) {
             let element = mutationsList[i].target;
-            window.console.log(element);
-            if(element.tagName.toLowerCase() === 'span' && element.classList.contains('tag')) {
+            if((element.tagName.toLowerCase() === 'li') && (element.getAttribute('role') == 'option')
+                    && (element.getAttribute('aria-selected') == 'true')) {
                 element.addEventListener('click', updateModalBody);
                 document.getElementById('id_courses').dataset.course = element.dataset.value;
 
