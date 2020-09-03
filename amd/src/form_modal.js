@@ -42,7 +42,7 @@ function(Str, ModalFactory, Fragment, Ajax) {
     const ObserverCallback = function(mutationsList) {
         for (let i=0; i<mutationsList.length; i++) {
             let element = mutationsList[i].target;
-            if((element.tagName.toLowerCase() === 'span') && (element.getAttribute('role') == 'listitem')
+            if((element.tagName.toLowerCase() === 'li') && (element.getAttribute('role') == 'option')
                     && (element.getAttribute('aria-selected') == 'true')) {
                 element.addEventListener('click', updateModalBody);
                 document.getElementById('id_courses').dataset.course = element.dataset.value;
@@ -62,14 +62,14 @@ function(Str, ModalFactory, Fragment, Ajax) {
                     }
                     // Clear exisitng options.
                     for (let j=selectElementLength-1; j>=0; j--) {
-                        selectElement.options[i] = null;
+                        selectElement.options[j] = null;
                     }
 
                     if (quizArray.length > 0) {
 
                         // Add new options.
                         for (let k=0; k<quizArray.length; k++) {
-                            let opt = quizArray[i];
+                            let opt = quizArray[k];
                             let el = document.createElement('option');
                             el.textContent = opt.name;
                             el.value = opt.id;
