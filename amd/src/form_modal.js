@@ -62,14 +62,14 @@ function(Str, ModalFactory, Fragment, Ajax) {
                     }
                     // Clear exisitng options.
                     for (let j=selectElementLength-1; j>=0; j--) {
-                        selectElement.options[i] = null;
+                        selectElement.options[j] = null;
                     }
 
                     if (quizArray.length > 0) {
 
                         // Add new options.
                         for (let k=0; k<quizArray.length; k++) {
-                            let opt = quizArray[i];
+                            let opt = quizArray[k];
                             let el = document.createElement('option');
                             el.textContent = opt.name;
                             el.value = opt.id;
