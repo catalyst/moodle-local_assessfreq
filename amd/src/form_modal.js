@@ -44,7 +44,7 @@ function(Str, ModalFactory, Fragment, Ajax) {
             let element = mutationsList[i].target;
             if((element.tagName.toLowerCase() === 'li') && (element.getAttribute('role') == 'option')
                     && (element.getAttribute('aria-selected') == 'true')) {
-                element.addEventListener('click', updateModalBody);
+                //element.addEventListener('click', updateModalBody);
                 document.getElementById('id_courses').dataset.course = element.dataset.value;
                 let selectElement = document.getElementById('id_quiz');
 
