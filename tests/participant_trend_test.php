@@ -105,12 +105,13 @@ class participant_trend_testcase extends advanced_testcase {
         $participantsumamry = new participant_trend();
         $result = $participantsumamry->get_participant_trend_chart(123);
 
-        $series = $result->get_series();
-        $labels = $result->get_labels();
+        $series = $result['chart']->get_series();
+        $labels = $result['chart']->get_labels();
 
-        $this->assertEquals('Not logged in', $labels[0]);
-        $this->assertEquals('In progress', $labels[1]);
-        $this->assertEquals('Finished', $labels[2]);
+        $this->assertTrue($result['hasdata']);
+        $this->assertEquals('12:41, 15-07-20', $labels[0]);
+        $this->assertEquals('12:42, 15-07-20', $labels[1]);
+        $this->assertEquals('12:43, 15-07-20', $labels[2]);
 
         $this->assertEquals(3, $series[0]->get_values()[2]);
         $this->assertEquals(3, $series[1]->get_values()[3]);

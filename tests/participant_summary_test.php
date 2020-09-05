@@ -105,9 +105,10 @@ class participant_summary_testcase extends advanced_testcase {
         $participantsumamry = new participant_summary();
         $result = $participantsumamry->get_participant_summary_chart(123);
 
-        $values = $result->get_series()[0]->get_values();
-        $labels = $result->get_labels();
+        $values = $result['chart']->get_series()[0]->get_values();
+        $labels = $result['chart']->get_labels();
 
+        $this->assertTrue($result['hasdata']);
         $this->assertEquals(1, $values[0]);
         $this->assertEquals(4, $values[1]);
         $this->assertEquals(3, $values[2]);

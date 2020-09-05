@@ -93,16 +93,29 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             spinner.classList.remove('hide'); // Show sinner if not already shown.
             Fragment.loadFragment('local_assessfreq', 'get_quiz_chart', contextid, params)
             .done((response) => {
-                var context = { 'withtable' : true, 'chartdata' : response, 'aspect' :  cardData.aspect};
-                Templates.render('local_assessfreq/chart', context).done((html, js) => {
-                    spinner.classList.add('hide'); // Hide spinner if not already hidden.
-                    // Load card body.
-                    Templates.replaceNodeContents(chartbody, html, js);
-                }).fail(() => {
-                    Notification.exception(new Error('Failed to load chart template.'));
+                let resObj = JSON.parse(response);
+                if (resObj.hasdata == true) {
+                    let context = { 'withtable' : true, 'chartdata' : JSON.stringify(resObj.chart), 'aspect' :  cardData.aspect};
+                    Templates.render('local_assessfreq/chart', context).done((html, js) => {
+                        spinner.classList.add('hide'); // Hide spinner if not already hidden.
+                        // Load card body.
+                        Templates.replaceNodeContents(chartbody, html, js);
+                    }).fail(() => {
+                        Notification.exception(new Error('Failed to load chart template.'));
+                        return;
+                    });
                     return;
-                });
-                return;
+                } else {
+                    Str.get_string('nodata', 'local_assessfreq').then((str) => {
+                        const noDatastr = document.createElement('h3');
+                        noDatastr.innerHTML = str;
+                        chartbody.innerHTML = noDatastr.outerHTML;
+                        spinner.classList.add('hide'); // Hide spinner if not already hidden.
+                        return;
+                    }).catch(() => {
+                        Notification.exception(new Error('Failed to load string: nodata'));
+                    });
+                }
             }).fail(() => {
                 Notification.exception(new Error('Failed to load card.'));
                 return;

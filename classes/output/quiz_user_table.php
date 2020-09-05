@@ -250,19 +250,7 @@ class quiz_user_table extends table_sql implements renderable {
      * @param bool $useinitialsbar do you want to use the initials bar.
      */
     public function query_db($pagesize, $useinitialsbar = false) {
-        global $CFG, $DB, $SESSION;
-
-        if (!empty($SESSION->flextable)) {
-            $prefs = $SESSION->flextable['local_assessfreq_student_table'];
-        } else {
-            $prefs = array(
-                'collapse' => array(),
-                'sortby'   => array(),
-                'i_first'  => '',
-                'i_last'   => '',
-                'textsort' => array(),
-            );
-        }
+        global $CFG, $DB;
 
         $maxlifetime = $CFG->sessiontimeout;
         $timedout = time() - $maxlifetime;

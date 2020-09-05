@@ -42,9 +42,9 @@ class participant_trend {
      * used in the quiz dashboard.
      *
      * @param int $quizid Quiz id to get chart data for.
-     * @return \core\chart_base $chart Generated chart object.
+     * @return array With Generated chart object and chart data status.
      */
-    public function get_participant_trend_chart(int $quizid): \core\chart_base {
+    public function get_participant_trend_chart(int $quizid): array {
 
         $quizdata = new quiz();
         $allparticipantdata = $quizdata->get_quiz_tracking($quizid);
@@ -52,31 +52,40 @@ class participant_trend {
         $inprogress = array();
         $finished = array();
         $labels = array();
+        $result = array();
 
-        foreach ($allparticipantdata as $participantdata){
-            $notloggedin[] = $participantdata->notloggedin;
-            $inprogress[] = $participantdata->inprogress;
-            $finished[] = $participantdata->finished;
-            $labels[] = userdate($participantdata->timecreated, get_string('trenddatetime', 'local_assessfreq'));
+        if (empty($allparticipantdata)) {
+            $result['hasdata'] = false;
+            $result['chart'] = false;
+        } else {
+            $result['hasdata'] = true;
+            foreach ($allparticipantdata as $participantdata){
+                $notloggedin[] = $participantdata->notloggedin;
+                $inprogress[] = $participantdata->inprogress;
+                $finished[] = $participantdata->finished;
+                $labels[] = userdate($participantdata->timecreated, get_string('trenddatetime', 'local_assessfreq'));
+            }
+
+            $charttitle = get_string('participantsummary', 'local_assessfreq');
+
+            // Create chart object.
+            $notloggedinseries = new \core\chart_series(get_string('notloggedin', 'local_assessfreq'), $notloggedin);
+            $inprogressseries = new \core\chart_series(get_string('inprogress', 'local_assessfreq'), $inprogress);
+            $finishedseries = new \core\chart_series(get_string('finished', 'local_assessfreq'), $finished);
+
+            $chart = new \core\chart_line();
+            $yaxis = $chart->get_yaxis(0, true);
+            $yaxis->set_stepsize(1); // Set step size for y axis to 1, can't have half a user.
+            $chart->set_smooth(true);
+            $chart->set_title($charttitle);
+            $chart->add_series($notloggedinseries);
+            $chart->add_series($inprogressseries);
+            $chart->add_series($finishedseries);
+            $chart->set_labels($labels);
+
+            $result['chart'] = $chart;
         }
 
-        $charttitle = get_string('participantsummary', 'local_assessfreq');
-
-        // Create chart object.
-        $notloggedinseries = new \core\chart_series(get_string('notloggedin', 'local_assessfreq'), $notloggedin);
-        $inprogressseries = new \core\chart_series(get_string('inprogress', 'local_assessfreq'), $inprogress);
-        $finishedseries = new \core\chart_series(get_string('finished', 'local_assessfreq'), $finished);
-
-        $chart = new \core\chart_line();
-        $yaxis = $chart->get_yaxis(0, true);
-        $yaxis->set_stepsize(1); // Set step size for y axis to 1, can't have half a user.
-        $chart->set_smooth(true);
-        $chart->set_title($charttitle);
-        $chart->add_series($notloggedinseries);
-        $chart->add_series($inprogressseries);
-        $chart->add_series($finishedseries);
-        $chart->set_labels($labels);
-
-        return $chart;
+        return $result;
     }
 }
