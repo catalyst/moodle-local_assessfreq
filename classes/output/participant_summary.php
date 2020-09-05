@@ -42,35 +42,44 @@ class participant_summary {
      * used in the quiz dashboard.
      *
      * @param int $quizid Quiz id to get chart data for.
-     * @return \core\chart_base $chart Generated chart object.
+     * @return array With Generated chart object and chart data status.
      */
-    public function get_participant_summary_chart(int $quizid): \core\chart_base {
+    public function get_participant_summary_chart(int $quizid): array {
 
         $quizdata = new quiz();
         $allparticipantdata = $quizdata->get_quiz_tracking($quizid);
         $participantdata = array_pop($allparticipantdata);
+        $result = array();
 
-        $seriesdata = array(
-            $participantdata->notloggedin,
-            $participantdata->loggedin,
-            $participantdata->inprogress,
-            $participantdata->finished
-        );
+        if (empty($participantdata)) {
+            $result['hasdata'] = false;
+            $result['chart'] = false;
+        } else {
+            $result['hasdata'] = true;
+            $seriesdata = array(
+                $participantdata->notloggedin,
+                $participantdata->loggedin,
+                $participantdata->inprogress,
+                $participantdata->finished
+            );
 
-        $labels = array(
-            get_string('notloggedin', 'local_assessfreq'),
-            get_string('loggedin', 'local_assessfreq'),
-            get_string('inprogress', 'local_assessfreq'),
-            get_string('finished', 'local_assessfreq')
-        );
+            $labels = array(
+                get_string('notloggedin', 'local_assessfreq'),
+                get_string('loggedin', 'local_assessfreq'),
+                get_string('inprogress', 'local_assessfreq'),
+                get_string('finished', 'local_assessfreq')
+            );
 
-        // Create chart object.
-        $chart = new \core\chart_pie();
-        $chart->set_doughnut(true);
-        $participants = new \core\chart_series(get_string('participants', 'local_assessfreq'), $seriesdata);
-        $chart->add_series($participants);
-        $chart->set_labels($labels);
+            // Create chart object.
+            $chart = new \core\chart_pie();
+            $chart->set_doughnut(true);
+            $participants = new \core\chart_series(get_string('participants', 'local_assessfreq'), $seriesdata);
+            $chart->add_series($participants);
+            $chart->set_labels($labels);
 
-        return $chart;
+            $result['chart'] = $chart;
+        }
+
+        return $result;
     }
 }

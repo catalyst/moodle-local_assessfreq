@@ -68,6 +68,7 @@ $string['minutetwo'] = '2 Minutes';
 $string['minutefive'] = '5 Minutes';
 $string['minuteten'] = '10 Minutes';
 $string['nocourse'] = 'No course selected';
+$string['nodata'] = 'No data found';
 $string['noquiz'] = 'No quiz selected...';
 $string['noquizselected'] = 'No quiz selected. Select quiz or cancel';
 $string['notloggedin'] = 'Not logged in';
