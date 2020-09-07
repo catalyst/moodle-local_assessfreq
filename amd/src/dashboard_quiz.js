@@ -130,8 +130,9 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
         event.preventDefault();
 
         let sortArray = {};
-        const targetSortBy = event.target.dataset.sortby;
-        let targetSortOrder = event.target.dataset.sortorder;
+        const linkUrl = new URL(event.target.closest('a').href);
+        const targetSortBy = linkUrl.searchParams.get('tsort');
+        let targetSortOrder = linkUrl.searchParams.get('tdir');
 
         // We want to flip the clicked column.
         if (targetSortOrder === '') {
@@ -161,18 +162,36 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
         event.preventDefault();
 
         let hideArray = {};
+        const linkUrl = new URL(event.target.closest('a').href);
         const tableElement = document.getElementById('local-assessfreq-quiz-table');
-        const targetAction = event.target.closest('a').dataset.action;
-        const targetColumn = event.target.closest('a').dataset.column;
+        const links = tableElement.querySelectorAll('a');
+        let targetAction;
+        let targetColumn;
+        let action;
+        let column;
 
-        const hideLinks = tableElement.querySelectorAll('[data-action]');
-        for (let i = 0; i < hideLinks.length; i++) {
-            let action = hideLinks[i].dataset.action;
-            let column = hideLinks[i].dataset.column;
+        if (linkUrl.search.indexOf('thide') !== -1) {
+            targetAction = 'hide';
+            targetColumn = linkUrl.searchParams.get('thide');
+        } else {
+            targetAction = 'show';
+            targetColumn = linkUrl.searchParams.get('tshow');
+        }
+
+        for (let i = 0; i < links.length; i++) {
+            let hideLinkUrl = new URL(links[i].href);
+            if (hideLinkUrl.search.indexOf('thide') !== -1) {
+                action = 'hide';
+                column = hideLinkUrl.searchParams.get('thide');
+            } else {
+                action = 'show';
+                column = hideLinkUrl.searchParams.get('tshow');
+            }
 
             if (action === 'show') {
                 hideArray[column] = 1;
             }
+
         }
 
         hideArray[targetColumn] = (targetAction === 'hide') ? 1 : 0; // We want to flip the clicked column.
@@ -239,18 +258,19 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
      */
     const tableEventListeners = function() {
         const tableElement = document.getElementById('local-assessfreq-quiz-table');
-        const sortLinks = tableElement.querySelectorAll(`[data-sortable="1"]`);
-        const hideLinks = tableElement.querySelectorAll('[data-action]');
+        const links = tableElement.querySelectorAll('a');
         const resetlink = tableElement.getElementsByClassName('resettable');
         const overrideLinks = tableElement.getElementsByClassName('action-icon override');
         const disabledLinks = tableElement.getElementsByClassName('action-icon disabled');
 
-        for (let i = 0; i < sortLinks.length; i++) {
-            sortLinks[i].addEventListener('click', tableSort);
-        }
+        for (let i = 0; i < links.length; i++) {
+            let linkUrl = new URL(links[i].href);
+            if (linkUrl.search.indexOf('thide') !== -1 || linkUrl.search.indexOf('tshow') !== -1) {
+                links[i].addEventListener('click', tableHide);
+            } else if (linkUrl.search.indexOf('tsort') !== -1) {
+                links[i].addEventListener('click', tableSort);
+            }
 
-        for (let i = 0; i < hideLinks.length; i++) {
-            hideLinks[i].addEventListener('click', tableHide);
         }
 
         if (resetlink.length > 0) {
