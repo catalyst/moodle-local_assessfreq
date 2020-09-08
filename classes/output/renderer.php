@@ -179,7 +179,19 @@ class renderer extends plugin_renderer_base {
      * @return string html for the button.
      */
     private function render_quiz_select_button(): string {
-        $context = array();
+        $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
+        $refreshminutes = array(
+            60 => 'minuteone',
+            120 => 'minutetwo',
+            300 => 'minutefive',
+            600 => 'minuteten',
+        );
+
+        $context = array(
+            'refreshinitial' => get_string($refreshminutes[$preferencerefresh],'local_assessfreq'),
+            'refresh' => array($refreshminutes[$preferencerefresh] => 'true'),
+        );
+
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-controls', $context);
     }
@@ -189,7 +201,16 @@ class renderer extends plugin_renderer_base {
      * @return string
      */
     private function render_quiz_dashboard_cards(): string {
-        $context = array();
+        $preferencerows = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
+        $rows = array(
+            20 => 'rows20',
+            50 => 'rows50',
+            100 => 'rows100',
+        );
+
+        $context = array(
+            'rows' => array($rows[$preferencerows] => 'true'),
+        );
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-cards', $context);
     }

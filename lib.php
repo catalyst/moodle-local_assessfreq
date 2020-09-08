@@ -83,6 +83,18 @@ function local_assessfreq_user_preferences() {
         'type' => PARAM_RAW
     );
 
+    $preferences['local_assessfreq_quiz_refresh_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 60,
+        'type' => PARAM_INT
+    );
+
+    $preferences['local_assessfreq_quiz_table_rows_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 20,
+        'type' => PARAM_INT
+    );
+
     return $preferences;
 }
 
@@ -185,7 +197,7 @@ function local_assessfreq_output_fragment_get_student_table($args): string {
     $baseurl = $CFG->wwwroot . '/local/assessfreq/dashboard_quiz.php';
     $output = $PAGE->get_renderer('local_assessfreq');
 
-    $o = $output->render_student_table($baseurl, $data->quiz, $context->id, $data->search);
+    $o = $output->render_student_table($baseurl, $data->quiz, $context->id, $data->search, $data->page);
 
     return $o;
 }
