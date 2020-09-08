@@ -39,25 +39,25 @@
 	            <button type="button" class="btn btn-secondary dropdown-toggle"
 	                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
 	                aria-label="{{strselect}}" aria-controls="menudayfilter">
-	                {{# str }} minuteone, local_assessfreq {{/ str }}
+	                {{{refreshinitial}}}
 	            </button>
 	            <div id="menudayfilter" role="menu" class="dropdown-menu" data-show-active-item>
-	                <a class="dropdown-item active" href="#"
+	                <a class="dropdown-item {{#refresh}}{{#minuteone}}active{{/minuteone}}{{/refresh}}" href="#"
 	                   data-period="60"
 	                   aria-label="{{# str }} minuteone, local_assessfreq {{/ str }}"
 	                   role="menuitem">{{# str }} minuteone, local_assessfreq {{/ str }}
 	                </a>
-	                <a class="dropdown-item" href="#"
+	                <a class="dropdown-item {{#refresh}}{{#minutetwo}}active{{/minutetwo}}{{/refresh}}" href="#"
                        data-period="120"
                        aria-label="{{# str }} minutetwo, local_assessfreq {{/ str }}"
                        role="menuitem">{{# str }} minutetwo, local_assessfreq {{/ str }}
                     </a>
-                    <a class="dropdown-item" href="#"
+                    <a class="dropdown-item {{#refresh}}{{#minutefive}}active{{/minutefive}}{{/refresh}}" href="#"
                        data-period="300"
                        aria-label="{{# str }} minutefive, local_assessfreq {{/ str }}"
                        role="menuitem">{{# str }} minutefive, local_assessfreq {{/ str }}
                     </a>
-                    <a class="dropdown-item" href="#"
+                    <a class="dropdown-item {{#refresh}}{{#minuteten}}active{{/minuteten}}{{/refresh}}" href="#"
                        data-period="600"
                        aria-label="{{# str }} minuteten, local_assessfreq {{/ str }}"
                        role="menuitem">{{# str }} minuteten, local_assessfreq {{/ str }}

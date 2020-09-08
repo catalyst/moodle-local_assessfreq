@@ -61,12 +61,12 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
     };
 
     /**
-     * Generic handler to get user preferences.
+     * Generic handler to get user preference.
      *
      * @param {string} name The name of the attribute you're getting.
      * @return {object} jQuery promise
      */
-    const getUserPreferences = function(name) {
+    const getUserPreference = function(name) {
         var request = {
             methodname: 'core_user_get_user_preferences',
             args: {
@@ -475,6 +475,15 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
                 quizId = quiz;
                 processDashboard(quiz);
             }
+        });
+
+        getUserPreference('local_assessfreq_quiz_refresh_preference')
+        .then((preferences) => {
+            window.console.log(preferences);
+            refreshPeriod = preferences.local_assessfreq_quiz_refresh_preference;
+        })
+        .fail(() => {
+            Notification.exception(new Error('Failed to get use preference: refresh'));
         });
 
         // Event handling for refresh and period buttons.

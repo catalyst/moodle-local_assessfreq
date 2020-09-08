@@ -179,7 +179,19 @@ class renderer extends plugin_renderer_base {
      * @return string html for the button.
      */
     private function render_quiz_select_button(): string {
-        $context = array();
+        $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
+        $refreshminutes = array(
+            60 => 'minuteone',
+            120 => 'minutetwo',
+            300 => 'minutefive',
+            600 => 'minuteten',
+        );
+
+        $context = array(
+            'refreshinitial' => get_string($refreshminutes[$preferencerefresh],'local_assessfreq'),
+            'refresh' => array($refreshminutes[$preferencerefresh] => 'true'),
+        );
+
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-controls', $context);
     }
