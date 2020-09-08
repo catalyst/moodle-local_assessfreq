@@ -41,6 +41,44 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
     ];
 
     /**
+     * Generic handler to persist user preferences.
+     *
+     * @param {string} type The name of the attribute you're updating
+     * @param {string} value The value of the attribute you're updating
+     */
+    const updateUserPreferences = function(type, value) {
+        var request = {
+            methodname: 'core_user_update_user_preferences',
+            args: {
+                preferences: [{type: type, value: value}]
+            }
+        };
+
+        Ajax.call([request])[0]
+        .fail(() => {
+            Notification.exception(new Error('Failed to update user preference'));
+        });
+    };
+
+    /**
+     * Generic handler to get user preferences.
+     *
+     * @param {string} name The name of the attribute you're getting.
+     * @return {object} jQuery promise
+     */
+    const getUserPreferences = function(name) {
+        var request = {
+            methodname: 'core_user_get_user_preferences',
+            args: {
+                'name': name
+            }
+        };
+
+        return Ajax.call([request])[0];
+    };
+
+
+    /**
      *
      */
     const refreshCounter = function(reset) {

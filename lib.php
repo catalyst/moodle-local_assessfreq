@@ -83,6 +83,18 @@ function local_assessfreq_user_preferences() {
         'type' => PARAM_RAW
     );
 
+    $preferences['local_assessfreq_quiz_refresh_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 60,
+        'type' => PARAM_INT
+    );
+
+    $preferences['local_assessfreq_quiz_table_rows_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 20,
+        'type' => PARAM_INT
+    );
+
     return $preferences;
 }
 
