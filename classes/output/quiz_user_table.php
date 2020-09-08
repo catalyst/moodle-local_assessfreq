@@ -301,19 +301,17 @@ class quiz_user_table extends table_sql implements renderable {
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
 
-        $countsql = "SELECT COUNT(1)
-                  FROM {user} u
-                       $finaljoin->joins
-                 WHERE $finaljoin->wheres";
-
-        $total = $DB->count_records_sql($countsql, $params);
-        $this->pagesize($pagesize, $total);
+        $pagesize = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
 
         if (!empty($sort)) {
             $sql .= " ORDER BY $sort";
         }
 
-        $records = $DB->get_records_sql($sql, $params, $this->get_page_start(), $this->get_page_size());
+        $records = $DB->get_recordset_sql($sql, $params);
+        $data = array();
+        $offset = $this->currpage * $pagesize;
+        $offsetcount = 0;
+        $recordcount = 0;
 
         foreach ($records as $record) {
             $searchcount = 0;
@@ -331,9 +329,23 @@ class quiz_user_table extends table_sql implements renderable {
 
             }
 
-            if ($searchcount > -1) {
-                $this->rawdata[$record->id] = $record;
+            if ($searchcount > -1 && $offsetcount >= $offset && $recordcount < $pagesize) {
+                $data[$record->id] = $record;
             }
+
+            if ($searchcount > -1 && $offsetcount >= $offset) {
+                $recordcount++;
+            }
+
+            if ($searchcount > -1) {
+                $offsetcount ++;
+            }
+
         }
+
+        $records->close();
+
+        $this->pagesize($pagesize, $offsetcount);
+        $this->rawdata = $data;
     }
 }

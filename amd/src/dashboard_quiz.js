@@ -41,6 +41,42 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
     ];
 
     /**
+     * Generic handler to persist user preferences.
+     *
+     * @param {string} type The name of the attribute you're updating
+     * @param {string} value The value of the attribute you're updating
+     * @return {object} jQuery promise
+     */
+    const setUserPreference = function(type, value) {
+        var request = {
+            methodname: 'core_user_update_user_preferences',
+            args: {
+                preferences: [{type: type, value: value}]
+            }
+        };
+
+        return Ajax.call([request])[0];
+    };
+
+    /**
+     * Generic handler to get user preference.
+     *
+     * @param {string} name The name of the attribute you're getting.
+     * @return {object} jQuery promise
+     */
+    const getUserPreference = function(name) {
+        var request = {
+            methodname: 'core_user_get_user_preferences',
+            args: {
+                'name': name
+            }
+        };
+
+        return Ajax.call([request])[0];
+    };
+
+
+    /**
      *
      */
     const refreshCounter = function(reset) {
@@ -235,7 +271,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
      */
     const tableSearch = function(event) {
          if (event.target.value.length > 2) {
-            getStudentTable(event.target.value);
+            getStudentTable();
          }
 
          if (event.target.value.length == 0) {
@@ -254,14 +290,47 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
     };
 
     /**
+     * Process the row set event from the student table.
+     */
+    const tableSearchRowSet = function(event) {
+        event.preventDefault();
+        if (event.target.tagName.toLowerCase() === 'a') {
+            let rows = event.target.dataset.metric;
+            setUserPreference('local_assessfreq_quiz_table_rows_preference', rows)
+            .then(() => {
+                getStudentTable(); // Reload the table.
+            })
+            .fail(() => {
+                Notification.exception(new Error('Failed to update user preference: rows'));
+            });
+        }
+    };
+
+    /**
+     * Process the nav event from the student table.
+     */
+    const tableNav = function(event) {
+        event.preventDefault();
+
+        const linkUrl = new URL(event.target.closest('a').href);
+        const page = linkUrl.searchParams.get('page');
+
+        if (page) {
+            getStudentTable(page);
+        }
+    };
+
+    /**
      * Re-add event listeners when the student table is updated.
      */
     const tableEventListeners = function() {
         const tableElement = document.getElementById('local-assessfreq-quiz-table');
+        const tableCardElement = document.getElementById('local-assessfreq-quiz-student-table');
         const links = tableElement.querySelectorAll('a');
         const resetlink = tableElement.getElementsByClassName('resettable');
         const overrideLinks = tableElement.getElementsByClassName('action-icon override');
         const disabledLinks = tableElement.getElementsByClassName('action-icon disabled');
+        const tableNavElement = tableCardElement.querySelectorAll('nav'); // There are two nav paging elements per table.
 
         for (let i = 0; i < links.length; i++) {
             let linkUrl = new URL(links[i].href);
@@ -286,20 +355,25 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
                 event.preventDefault();
             });
         }
+
+        tableNavElement.forEach((navElement) => {
+            navElement.addEventListener('click', tableNav);
+        });
     };
 
     /**
      * Display the table that contains all the students in the exam as well as their attempts.
      */
-    const getStudentTable = function(search) {
-        if (typeof search === "undefined") {
-            search = '';
+    const getStudentTable = function(page) {
+        if (typeof page === "undefined") {
+            page = 0;
         }
 
+        let search = document.getElementById('local-assessfreq-quiz-student-table-search').value;
         let tableElement = document.getElementById('local-assessfreq-quiz-table');
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
-        let params = {'data': JSON.stringify({'quiz' : quizId, 'search': search})};
+        let params = {'data': JSON.stringify({'quiz' : quizId, 'search': search, 'page': page})};
 
         spinner.classList.remove('hide'); // Show spinner if not already shown.
         Fragment.loadFragment('local_assessfreq', 'get_student_table', contextid, params)
@@ -338,6 +412,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             let periodElement = document.getElementById('local-assessfreq-period-container');
             let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-student-table-search');
             let tableSearchResetElement = document.getElementById('local-assessfreq-quiz-student-table-search-reset');
+            let tableSearchRowsElement = document.getElementById('local-assessfreq-quiz-student-table-rows');
 
             let quizLink = document.createElement('a');
             quizLink.href = quizArray.url;
@@ -374,6 +449,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             tableSearchInputElement.addEventListener('keyup', tableSearch);
             tableSearchInputElement.addEventListener('paste', tableSearch);
             tableSearchResetElement.addEventListener('click', tableSearchReset);
+            tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
+
             // TODO: Cancel autorefresh of cards while quiz in changing.
 
             return;
@@ -395,6 +472,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
         } else if (element.tagName.toLowerCase() === 'a') {
             refreshPeriod = element.dataset.period;
             refreshCounter(true);
+            setUserPreference('local_assessfreq_quiz_refresh_preference', refreshPeriod);
         }
     };
 
@@ -437,6 +515,15 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
                 quizId = quiz;
                 processDashboard(quiz);
             }
+        });
+
+        getUserPreference('local_assessfreq_quiz_refresh_preference')
+        .then((response) => {
+            window.console.log(response.preferences[0].value);
+            refreshPeriod =response.preferences[0].value ? response.preferences[0].value : 60;
+        })
+        .fail(() => {
+            Notification.exception(new Error('Failed to get use preference: refresh'));
         });
 
         // Event handling for refresh and period buttons.
