@@ -307,6 +307,15 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
     };
 
     /**
+     * Process the nav event from the student table.
+     */
+    const tableNav = function(event) {
+        event.preventDefault();
+
+        window.console.log(event.target);
+    };
+
+    /**
      * Re-add event listeners when the student table is updated.
      */
     const tableEventListeners = function() {
@@ -392,6 +401,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-student-table-search');
             let tableSearchResetElement = document.getElementById('local-assessfreq-quiz-student-table-search-reset');
             let tableSearchRowsElement = document.getElementById('local-assessfreq-quiz-student-table-rows');
+            let tableNavElement = trendElement.querySelectorAll('nav'); // There are two nav paging elements per table.
+            window.console.log(tableNavElement);
 
             let quizLink = document.createElement('a');
             quizLink.href = quizArray.url;
@@ -429,6 +440,12 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             tableSearchInputElement.addEventListener('paste', tableSearch);
             tableSearchResetElement.addEventListener('click', tableSearchReset);
             tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
+
+            tableNavElement.forEach((navElement) => {
+                window.console.log(navElement);
+                navElement.addEventListener('click', tableNav);
+            });
+
             // TODO: Cancel autorefresh of cards while quiz in changing.
 
             return;
