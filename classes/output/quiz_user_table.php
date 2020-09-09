@@ -307,6 +307,8 @@ class quiz_user_table extends table_sql implements renderable {
                  WHERE $finaljoin->wheres";
 
         $total = $DB->count_records_sql($countsql, $params);
+
+        $pagesize = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
         $this->pagesize($pagesize, $total);
 
         if (!empty($sort)) {

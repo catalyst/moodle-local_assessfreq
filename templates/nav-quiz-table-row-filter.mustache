@@ -36,7 +36,7 @@
     <div id="rowsfilter" role="menu" class="dropdown-menu" data-show-active-item>
         <h6 class="dropdown-header">{{# str }} showrows, local_assessfreq {{/ str }}</h6>
         <a
-            class="dropdown-item {{#metrics}}{{#assess}}active{{/assess}}{{/metrics}}"
+            class="dropdown-item {{#rows}}{{#rows20}}active{{/rows20}}{{/rows}}"
             href="#"
             data-metric="20"
             aria-label="{{# str }} rows20, local_assessfreq {{/ str }}"
@@ -45,7 +45,7 @@
             {{# str }} rows20, local_assessfreq {{/ str }}
         </a>
         <a
-            class="dropdown-item {{#metrics}}{{#students}}active{{/students}}{{/metrics}}"
+            class="dropdown-item {{#rows}}{{#rows50}}active{{/rows50}}{{/rows}}"
             href="#"
             data-metric="50"
             aria-label="{{# str }} rows50, local_assessfreq {{/ str }}"
@@ -54,10 +54,10 @@
             {{# str }} rows50, local_assessfreq {{/ str }}
         </a>
         <a
-            class="dropdown-item {{#metrics}}{{#students}}active{{/students}}{{/metrics}}"
+            class="dropdown-item {{#rows}}{{#rows100}}active{{/rows100}}{{/rows}}"
             href="#"
             data-metric="100"
-            aria-label="{{# str }} rows50, local_assessfreq {{/ str }}"
+            aria-label="{{# str }} rows100, local_assessfreq {{/ str }}"
             role="menuitem"
         >
             {{# str }} rows100, local_assessfreq {{/ str }}

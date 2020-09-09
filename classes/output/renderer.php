@@ -201,7 +201,16 @@ class renderer extends plugin_renderer_base {
      * @return string
      */
     private function render_quiz_dashboard_cards(): string {
-        $context = array();
+        $preferencerows = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
+        $rows = array(
+            20 => 'rows20',
+            50 => 'rows50',
+            100 => 'rows100',
+        );
+
+        $context = array(
+            'rows' => array($rows[$preferencerows] => 'true'),
+        );
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-cards', $context);
     }
