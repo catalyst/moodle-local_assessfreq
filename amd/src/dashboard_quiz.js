@@ -271,7 +271,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
      */
     const tableSearch = function(event) {
          if (event.target.value.length > 2) {
-            getStudentTable(event.target.value);
+            getStudentTable();
          }
 
          if (event.target.value.length == 0) {
@@ -312,7 +312,12 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
     const tableNav = function(event) {
         event.preventDefault();
 
-        window.console.log(event.target);
+        const linkUrl = new URL(event.target.closest('a').href);
+        const page = linkUrl.searchParams.get('page');
+
+        if (page) {
+            getStudentTable(page);
+        }
     };
 
     /**
@@ -320,10 +325,12 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
      */
     const tableEventListeners = function() {
         const tableElement = document.getElementById('local-assessfreq-quiz-table');
+        const tableCardElement = document.getElementById('local-assessfreq-quiz-student-table');
         const links = tableElement.querySelectorAll('a');
         const resetlink = tableElement.getElementsByClassName('resettable');
         const overrideLinks = tableElement.getElementsByClassName('action-icon override');
         const disabledLinks = tableElement.getElementsByClassName('action-icon disabled');
+        const tableNavElement = tableCardElement.querySelectorAll('nav'); // There are two nav paging elements per table.
 
         for (let i = 0; i < links.length; i++) {
             let linkUrl = new URL(links[i].href);
@@ -348,20 +355,25 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
                 event.preventDefault();
             });
         }
+
+        tableNavElement.forEach((navElement) => {
+            navElement.addEventListener('click', tableNav);
+        });
     };
 
     /**
      * Display the table that contains all the students in the exam as well as their attempts.
      */
-    const getStudentTable = function(search) {
-        if (typeof search === "undefined") {
-            search = '';
+    const getStudentTable = function(page) {
+        if (typeof page === "undefined") {
+            page = 0;
         }
 
+        let search = document.getElementById('local-assessfreq-quiz-student-table-search').value;
         let tableElement = document.getElementById('local-assessfreq-quiz-table');
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
-        let params = {'data': JSON.stringify({'quiz' : quizId, 'search': search})};
+        let params = {'data': JSON.stringify({'quiz' : quizId, 'search': search, 'page': page})};
 
         spinner.classList.remove('hide'); // Show spinner if not already shown.
         Fragment.loadFragment('local_assessfreq', 'get_student_table', contextid, params)
@@ -401,8 +413,6 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-student-table-search');
             let tableSearchResetElement = document.getElementById('local-assessfreq-quiz-student-table-search-reset');
             let tableSearchRowsElement = document.getElementById('local-assessfreq-quiz-student-table-rows');
-            let tableNavElement = trendElement.querySelectorAll('nav'); // There are two nav paging elements per table.
-            window.console.log(tableNavElement);
 
             let quizLink = document.createElement('a');
             quizLink.href = quizArray.url;
@@ -440,11 +450,6 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             tableSearchInputElement.addEventListener('paste', tableSearch);
             tableSearchResetElement.addEventListener('click', tableSearchReset);
             tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
-
-            tableNavElement.forEach((navElement) => {
-                window.console.log(navElement);
-                navElement.addEventListener('click', tableNav);
-            });
 
             // TODO: Cancel autorefresh of cards while quiz in changing.
 
