@@ -470,6 +470,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
           refreshCounter(true);
           processDashboard(quizId);
         } else if (element.tagName.toLowerCase() === 'a') {
+            let actionButton = document.getElementById('local-assessfreq-refresh-desc-quiz-dashboard');
+            actionButton.textContent = element.innerHTML;
             refreshPeriod = element.dataset.period;
             refreshCounter(true);
             setUserPreference('local_assessfreq_quiz_refresh_preference', refreshPeriod);
