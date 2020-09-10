@@ -42,9 +42,9 @@ class assess_by_activity {
      * used in the smart media dashboard.
      *
      * @param int $year Year to get chart data for.
-     * @return \core\chart_base $chart Generated chart object.
+     * @return array With Generated chart object and chart data status.
      */
-    public function get_assess_by_activity_chart(int $year): \core\chart_base {
+    public function get_assess_by_activity_chart(int $year): array {
 
         // Get events for the supplied year.
         $frequency = new frequency();
@@ -53,8 +53,14 @@ class assess_by_activity {
         $seriesdata = array();
         $labels = array();
         $charttitle = get_string('assessbyactivity', 'local_assessfreq');
+        $result = array();
 
-        if (!empty($modules[0])) {
+        if (empty($modules[0])) {
+            $result['hasdata'] = false;
+            $result['chart'] = false;
+        } else {
+            $result['hasdata'] = true;
+
             foreach ($modules as $module) {
                 if (! empty($activitydata[$module])) {
                     $seriesdata[] = $activitydata[$module]->count;
@@ -63,16 +69,17 @@ class assess_by_activity {
                 }
                 $labels[] = get_string('modulename', $module);
             }
+
+            // Create chart object.
+            $events = new \core\chart_series($charttitle, $seriesdata);
+
+            $chart = new \core\chart_bar();
+            $chart->set_horizontal(true);
+            $chart->add_series($events);
+            $chart->set_labels($labels);
+            $result['chart'] = $chart;
         }
 
-        // Create chart object.
-        $events = new \core\chart_series($charttitle, $seriesdata);
-
-        $chart = new \core\chart_bar();
-        $chart->set_horizontal(true);
-        $chart->add_series($events);
-        $chart->set_labels($labels);
-
-        return $chart;
+        return $result;
     }
 }

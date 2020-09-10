@@ -519,7 +519,6 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
 
         getUserPreference('local_assessfreq_quiz_refresh_preference')
         .then((response) => {
-            window.console.log(response.preferences[0].value);
             refreshPeriod =response.preferences[0].value ? response.preferences[0].value : 60;
         })
         .fail(() => {
