@@ -120,6 +120,7 @@ class quiz_user_table extends table_sql implements renderable {
 
         // Setup pagination.
         $this->currpage = $page;
+        $this->ajaxpage = $page;
         $this->sortable(true);
         $this->column_nosort = array('actions');
 
@@ -309,9 +310,10 @@ class quiz_user_table extends table_sql implements renderable {
 
         $records = $DB->get_recordset_sql($sql, $params);
         $data = array();
-        $offset = $this->currpage * $pagesize;
+        $offset = $this->ajaxpage * $pagesize;
         $offsetcount = 0;
         $recordcount = 0;
+        $this->currpage = $this->ajaxpage;
 
         foreach ($records as $record) {
             $searchcount = 0;

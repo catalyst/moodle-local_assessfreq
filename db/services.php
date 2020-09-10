@@ -100,4 +100,12 @@ $functions = array(
         'type' => 'write',
         'ajax' => true
     ),
+    'local_assessfreq_get_user_preferences' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_user_preferences',
+        'classpath' => '',
+        'description' => 'Gets user preference via ajax.',
+        'type' => 'read',
+        'ajax' => true
+    ),
 );

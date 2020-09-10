@@ -66,7 +66,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
      */
     const getUserPreference = function(name) {
         var request = {
-            methodname: 'core_user_get_user_preferences',
+            methodname: 'local_assessfreq_get_user_preferences',
             args: {
                 'name': name
             }
@@ -171,7 +171,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
         let targetSortOrder = linkUrl.searchParams.get('tdir');
 
         // We want to flip the clicked column.
-        if (targetSortOrder === '') {
+        if (!targetSortOrder) {
             targetSortOrder = "4";
         }
 
@@ -519,7 +519,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
 
         getUserPreference('local_assessfreq_quiz_refresh_preference')
         .then((response) => {
-            refreshPeriod =response.preferences[0].value ? response.preferences[0].value : 60;
+            refreshPeriod = response.preferences[0].value ? response.preferences[0].value : 60;
         })
         .fail(() => {
             Notification.exception(new Error('Failed to get use preference: refresh'));
