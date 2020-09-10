@@ -470,8 +470,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
           refreshCounter(true);
           processDashboard(quizId);
         } else if (element.tagName.toLowerCase() === 'a') {
-            let actionButton = element.closest('button');
-            window.console.log(actionButton);
+            let refreshElement = document.getElementById('local-assessfreq-period-container');
+            let actionButton = refreshElement.getElementsByClassName('dropdown-toggle')[0];
             actionButton.textContent = element.innerHTML;
             refreshPeriod = element.dataset.period;
             refreshCounter(true);
