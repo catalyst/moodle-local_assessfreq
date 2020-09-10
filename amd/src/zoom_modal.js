@@ -43,11 +43,25 @@ function(Str, ModalFactory, Fragment, Ajax, Templates, ModalLarge, Notification)
 
         Fragment.loadFragment('local_assessfreq', method, contextid, params)
         .done((response) => {
-            var context = { 'withtable' : false, 'chartdata' : response, aspect: false};
-            modalObj.setTitle(title);
-            modalObj.setBody(Templates.render('local_assessfreq/chart', context));
-            modalObj.show();
-            return;
+            let resObj = JSON.parse(response);
+            if (resObj.hasdata == true) {
+                var context = { 'withtable' : false, 'chartdata' : JSON.stringify(resObj.chart), aspect: false};
+                modalObj.setTitle(title);
+                modalObj.setBody(Templates.render('local_assessfreq/chart', context));
+                modalObj.show();
+                return;
+            } else {
+                Str.get_string('nodata', 'local_assessfreq').then((str) => {
+                    const noDatastr = document.createElement('h3');
+                    noDatastr.innerHTML = str;
+                    modalObj.setTitle(title);
+                    modalObj.setBody(noDatastr.outerHTML);
+                    modalObj.show();
+                    return;
+                }).catch(() => {
+                    Notification.exception(new Error('Failed to load string: nodata'));
+                });
+            }
         }).fail(() => {
             Notification.exception(new Error('Failed to load zoomed graph'));
             return;

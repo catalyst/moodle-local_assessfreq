@@ -42,15 +42,16 @@ class assess_by_month_student {
      * used in the dashboard.
      *
      * @param int $year Year to get chart data for.
-     * @return \core\chart_base $chart Generated chart object.
+     * @return array With Generated chart object and chart data status.
      */
-    public function get_assess_by_month_student_chart(int $year): \core\chart_base {
+    public function get_assess_by_month_student_chart(int $year): array {
 
         // Get events for the supplied year.
         $frequency = new frequency();
         $yeardata = $frequency->get_events_due_monthly_by_user($year);
         $seriesdata = array();
         $charttitle = get_string('assessbymonthstudents', 'local_assessfreq');
+        $result = array();
 
         // There is always 12 months in a year,
         // even if we don't have data for them all.
@@ -83,6 +84,9 @@ class assess_by_month_student {
         $chart->add_series($events);
         $chart->set_labels($labels);
 
-        return $chart;
+        $result['hasdata'] = true;
+        $result['chart'] = $chart;
+
+        return $result;
     }
 }
