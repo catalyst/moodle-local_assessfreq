@@ -49,11 +49,6 @@ define(['core/chart_output_chartjs'], function(Output) {
                 }
             }
         };
-        var legendOptions = this._chart.getLegendOptions();
-        if (legendOptions) {
-            config.options.legend = legendOptions;
-        }
-
 
         this._chart.getXAxes().forEach(function(axis, i) {
             var axisLabels = axis.getLabels();
