@@ -116,6 +116,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         return new Promise((resolve) => {
             let eventcount = new Array;
             let year = eventArray[dateObj.year];
+            window.console.log(dateObj);
+            window.consoel.log(year);
 
             // Itterate through all the event counts.
             // This code looks nasty but there is only 366 days in a year.
