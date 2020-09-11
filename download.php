@@ -25,6 +25,7 @@ define('NO_OUTPUT_BUFFERING', true);
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->libdir . '/dataformatlib.php');
 
 $year = required_param('year', PARAM_INT);
 $modules = required_param_array('modules', PARAM_ALPHA);
@@ -45,6 +46,6 @@ $data = $frequency->get_download_data($year, $metric, $modules);
 
 $rawfilename = $year . '_' . $metric . '_' . implode('_', $modules);
 $filename = clean_filename($rawfilename);
-\core\dataformat::download_data($filename, $dataformat, $fields, $data);
+download_as_dataformat($filename, $dataformat, $fields, $data);
 
 die();
