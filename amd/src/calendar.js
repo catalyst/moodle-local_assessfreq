@@ -114,6 +114,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const calcHeatRange = function(eventArray, dateObj) {
         return new Promise((resolve) => {
+            if (eventArray.length > 0) { // If scheduled tasks have not run yet we may not have any data.
+
             let eventcount = new Array;
             let year = eventArray[dateObj.year];
 
@@ -133,6 +135,10 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
             // Get min and max values to calculate heat spread.
             heatRangeMax = Math.max(...eventcount);
             heatRangeMin = Math.min(...eventcount);
+            } else {
+                heatRangeMax = 0;
+                heatRangeMin = 0;
+            }
 
             resolve(eventArray);
         });
