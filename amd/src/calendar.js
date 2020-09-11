@@ -114,11 +114,10 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const calcHeatRange = function(eventArray, dateObj) {
         return new Promise((resolve) => {
+            if (eventArray.length > 0) { // If scheduled tasks have not run yet we may not have any data.
+
             let eventcount = new Array;
             let year = eventArray[dateObj.year];
-            window.console.log(dateObj);
-            window.console.log(year);
-            window.console.log(eventArray);
 
             // Itterate through all the event counts.
             // This code looks nasty but there is only 366 days in a year.
@@ -136,6 +135,10 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
             // Get min and max values to calculate heat spread.
             heatRangeMax = Math.max(...eventcount);
             heatRangeMin = Math.min(...eventcount);
+            } else {
+                heatRangeMax = 0;
+                heatRangeMin = 0;
+            }
 
             resolve(eventArray);
         });
