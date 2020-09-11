@@ -56,7 +56,7 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
     ];
     var stringResult;
 
-    const getUserDate = function (timestamp, format) {
+    const getUserDate = function(timestamp, format) {
         return new Promise((resolve) => {
             let date = new Date(timestamp * 1000);
             const year = date.getFullYear();
@@ -77,45 +77,62 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
         });
     };
 
-    const formatData = async function(response) {
+    const formatData = function(response) {
         let responseArr = JSON.parse(response);
-
-        // We are displaying the event as a bar whose width represents the start and end time of the event.
-        // We need to scale the width of the bar to match the width of the container. Therefore 100% width of the container
-        // equals 24 hours (one day).
-        // There are 1440 mins per day. 1440 mins equals 100%, therefore 1 min = (100/1440)%. 5/72 == 100/1440.
-        let scaler = 5/72;
-
-        for (let i=0; i<responseArr.length; i++) {
-            const year = responseArr[i].endyear;
-            const month = (responseArr[i].endmonth) - 1; // Minus 1 for difference between months in PHP and JS.
-            const day = responseArr[i].endday;
-            const dayStart = (new Date(year, month, day).getTime()) / 1000;
-            let secondsSinceDayStart = responseArr[i].timestart - dayStart;
-            let leftMargin = 0;
-            let width = 0;
-
-            if (secondsSinceDayStart <= 0) {
-                secondsSinceDayStart = 0;
-                width = ((responseArr[i].timeend - dayStart) / 60) * scaler;
-                responseArr[i].start = await getUserDate(responseArr[i].timestart, 'strftimedatetime');
-            } else {
-                leftMargin = (secondsSinceDayStart / 60) * scaler;
-                width = ((responseArr[i].timeend - responseArr[i].timestart) / 60) * scaler;
-                responseArr[i].start = await getUserDate(responseArr[i].timestart, 'strftimetime');
-            }
-
-            if (leftMargin + width > 100) {
-                width = 100 - leftMargin;
-            }
-
-            responseArr[i].leftmargin = leftMargin;
-            responseArr[i].width = width;
-            responseArr[i].end = await getUserDate(responseArr[i].timeend, 'strftimetime');
-        }
-
         return new Promise((resolve) => {
-            resolve(responseArr);
+            let promiseAllArr = [];
+
+            // We are displaying the event as a bar whose width represents the start and end time of the event.
+            // We need to scale the width of the bar to match the width of the container. Therefore 100% width of the container
+            // equals 24 hours (one day).
+            // There are 1440 mins per day. 1440 mins equals 100%, therefore 1 min = (100/1440)%. 5/72 == 100/1440.
+            let scaler = 5/72;
+
+            for (let i=0; i<responseArr.length; i++) {
+                let promiseArr = [];
+                const year = responseArr[i].endyear;
+                const month = (responseArr[i].endmonth) - 1; // Minus 1 for difference between months in PHP and JS.
+                const day = responseArr[i].endday;
+                const dayStart = (new Date(year, month, day).getTime()) / 1000;
+                let secondsSinceDayStart = responseArr[i].timestart - dayStart;
+                let leftMargin = 0;
+                let width = 0;
+
+                if (secondsSinceDayStart <= 0) {
+                    secondsSinceDayStart = 0;
+                    width = ((responseArr[i].timeend - dayStart) / 60) * scaler;
+                    let startPromise = getUserDate(responseArr[i].timestart, 'strftimedatetime');
+                    promiseAllArr.push(startPromise);
+                    promiseArr.push(startPromise);
+                } else {
+                    leftMargin = (secondsSinceDayStart / 60) * scaler;
+                    width = ((responseArr[i].timeend - responseArr[i].timestart) / 60) * scaler;
+                    let startPromise = getUserDate(responseArr[i].timestart, 'strftimetime');
+                    promiseAllArr.push(startPromise);
+                    promiseArr.push(startPromise);
+                }
+
+                if (leftMargin + width > 100) {
+                    width = 100 - leftMargin;
+                }
+
+                responseArr[i].leftmargin = leftMargin;
+                responseArr[i].width = width;
+                let endPromise = getUserDate(responseArr[i].timeend, 'strftimetime');
+                promiseAllArr.push(endPromise);
+                promiseArr.push(endPromise);
+
+                Promise.all(promiseArr).then((values) => {
+                    responseArr[i].start = values[0];
+                    responseArr[i].end = values[1];
+                });
+
+            }
+
+            Promise.all(promiseAllArr).then(() => {
+                resolve(responseArr);
+            });
+
         });
     };
 
