@@ -114,6 +114,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const calcHeatRange = function(eventArray, dateObj) {
         return new Promise((resolve) => {
+            window.console.log(eventArray);
             if (eventArray.length > 0) { // If scheduled tasks have not run yet we may not have any data.
 
             let eventcount = new Array;
@@ -136,8 +137,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
             heatRangeMax = Math.max(...eventcount);
             heatRangeMin = Math.min(...eventcount);
             } else {
-                heatRangeMax = 0;
-                heatRangeMin = 0;
+                heatRangeMax = 1;
+                heatRangeMin = 1;
             }
 
             resolve(eventArray);
@@ -153,6 +154,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const getHeat = function(eventCount) {
         let scaleMin = 1;
+        window.console.log(eventCount);
 
         if (eventCount == heatRangeMin ) {
             return scaleMin;
@@ -326,6 +328,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                         let heat = getHeat(monthEvents[date]['number']);
+                        window.console.log(heat);
                         cell.style.backgroundColor = colorArray[heat];
 
                         // Add tooltip to cell.
