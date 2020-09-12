@@ -25,14 +25,14 @@
 <div id="local-assessfreq-heatmap-metrics" data-region="metric-filter" class="dropdown">
     <button type="button" class="btn btn-outline-secondary dropdown-toggle icon-no-margin"
      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-            aria-label="{{strselect}}" aria-controls="menudayfilter">
+            aria-label="{{strselect}}" aria-controls="local-assessfreq-heatmap-metrics-filter">
         {{#pix}} i/report {{/pix}} {{# str }} selectmetric, local_assessfreq {{/ str }}
         <span class="sr-only" data-active-item-text>
                 {{# str }} numberassessments, local_assessfreq {{/ str }}
                 {{# str }} numberstudents, local_assessfreq {{/ str }}
         </span>
     </button>
-    <div id="metricfilter" role="menu" class="dropdown-menu" data-show-active-item>
+    <div id="local-assessfreq-heatmap-metrics-filter" role="menu" class="dropdown-menu" data-show-active-item>
         <h6 class="dropdown-header">{{# str }} selectmetric, local_assessfreq {{/ str }}</h6>
         <a
             class="dropdown-item {{#metrics}}{{#assess}}active{{/assess}}{{/metrics}}"
