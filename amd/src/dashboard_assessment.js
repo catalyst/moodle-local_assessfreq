@@ -320,14 +320,14 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
         var element = event.target;
         let activeoptions = document.getElementById('local-assessfreq-heatmap-metrics-filter').getElementsByClassName('active');
 
-        // Fix active classes.
-        for (var i = 0; i < activeoptions.length; i++) {
-            activeoptions[i].classList.remove('active');
-        }
-        element.classList.add('active');
-
         if (element.tagName.toLowerCase() === 'a' && element.dataset.metric != metricselectheatmap) {
             metricselectheatmap = element.dataset.metric;
+
+            // Fix active classes.
+            for (var i = 0; i < activeoptions.length; i++) {
+                activeoptions[i].classList.remove('active');
+            }
+            element.classList.add('active');
 
             // Save selection as a user preference.
             updateUserPreferences('local_assessfreq_heatmap_metric_preference', metricselectheatmap);
