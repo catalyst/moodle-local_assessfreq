@@ -120,6 +120,13 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
 
         if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselect) { // Only act on certain elements.
             yearselect = element.dataset.year;
+            let activeoptions = document.getElementById('local-assessfreq-cards-year-filter').getElementsByClassName('active');
+
+            // Fix active classes.
+            for (var i = 0; i < activeoptions.length; i++) {
+                activeoptions[i].classList.remove('active');
+            }
+            element.classList.add('active');
 
             // Save selection as a user preference.
             updateUserPreferences('local_assessfreq_overview_year_preference', yearselect);
@@ -281,6 +288,13 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
 
         if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselectheatmap) { // Only act on certain elements.
             yearselectheatmap = element.dataset.year;
+            let activeoptions = document.getElementById('local-assessfreq-cards-year-heat-filter').getElementsByClassName('active');
+
+            // Fix active classes.
+            for (var i = 0; i < activeoptions.length; i++) {
+                activeoptions[i].classList.remove('active');
+            }
+            element.classList.add('active');
 
             // Save selection as a user preference.
             updateUserPreferences('local_assessfreq_heatmap_year_preference', yearselectheatmap);
@@ -303,6 +317,13 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
     const metricHeatmapButtonAction = function(event) {
         event.preventDefault();
         var element = event.target;
+        let activeoptions = document.getElementById('local-assessfreq-heatmap-metrics-filter').getElementsByClassName('active');
+
+        // Fix active classes.
+        for (var i = 0; i < activeoptions.length; i++) {
+            activeoptions[i].classList.remove('active');
+        }
+        element.classList.add('active');
 
         if (element.tagName.toLowerCase() === 'a' && element.dataset.metric != metricselectheatmap) {
             metricselectheatmap = element.dataset.metric;
