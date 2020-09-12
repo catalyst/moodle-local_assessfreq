@@ -56,6 +56,32 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     var processModules;
 
     /**
+     * Pick a contrasting text color based on the background color.
+     *
+     * @param  {String} A hexcolor value.
+     * @return {String} The contrasting color (black or white).
+     */
+    const getContrast = function (hexcolor) {
+
+        // If a leading # is provided, remove it.
+        if (hexcolor.slice(0, 1) === '#') {
+            hexcolor = hexcolor.slice(1);
+        }
+
+        // Convert to RGB value.
+        var r = parseInt(hexcolor.substr(0,2),16);
+        var g = parseInt(hexcolor.substr(2,2),16);
+        var b = parseInt(hexcolor.substr(4,2),16);
+
+        // Get YIQ ratio.
+        var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+
+        // Check contrast.
+        return (yiq >= 128) ? '#000000' : '#FFFFFF';
+    };
+
+
+    /**
      * Check how many days in a month code.
      * from https://dzone.com/articles/determining-number-days-month.
      *
@@ -327,6 +353,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                         let heat = getHeat(monthEvents[date]['number']);
                         cell.style.backgroundColor = colorArray[heat];
+                        cell.style.color = getContrast(colorArray[heat]);
 
                         // Add tooltip to cell.
                         cell.dataset.toggle = 'tooltip';
