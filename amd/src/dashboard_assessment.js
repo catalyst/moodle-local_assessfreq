@@ -21,9 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'local_assessfreq/calendar', 'core/str',
+define(['jquery', 'core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'local_assessfreq/calendar', 'core/str',
     'local_assessfreq/zoom_modal', 'local_assessfreq/dayview'],
-function(Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, Dayview) {
+function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, Dayview) {
 
     /**
      * Module level variables.
@@ -173,6 +173,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, Dayv
             calendarContainer.innerHTML = calendar.innerHTML;
             calendarContainer.addEventListener('click', detailView);
             spinner.classList.add('hide'); // Hide sinner if not already hidden.
+            $('[data-toggle="tooltip"]').tooltip();
             return;
         }).catch(() => {
             Notification.exception(new Error('Failed to calendar.'));
