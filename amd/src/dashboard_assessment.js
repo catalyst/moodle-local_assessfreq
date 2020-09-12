@@ -116,6 +116,7 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
      * @param {event} event The triggered event for the element.
      */
     const yearButtonAction = function(event) {
+        event.preventDefault();
         var element = event.target;
 
         if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselect) { // Only act on certain elements.
