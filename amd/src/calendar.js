@@ -137,9 +137,11 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
             heatRangeMax = Math.max(...eventcount);
             heatRangeMin = Math.min(...eventcount);
             } else {
-                heatRangeMax = 1;
+                heatRangeMax = 2;
                 heatRangeMin = 1;
             }
+            window.console.log(heatRangeMax);
+            window.console.log(heatRangeMin);
 
             resolve(eventArray);
         });
@@ -154,7 +156,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const getHeat = function(eventCount) {
         let scaleMin = 1;
-        window.console.log(eventCount);
 
         if (eventCount == heatRangeMin ) {
             return scaleMin;
@@ -328,7 +329,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                         let heat = getHeat(monthEvents[date]['number']);
-                        window.console.log(heat);
                         cell.style.backgroundColor = colorArray[heat];
 
                         // Add tooltip to cell.
