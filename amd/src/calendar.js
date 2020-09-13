@@ -187,7 +187,16 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         const scaleRange = 6;  // 0 - 5  steps
         const localRange = heatRangeMax - heatRangeMin;
         const localPercent = (eventCount - heatRangeMin) / localRange;
-        const heat = Math.round(localPercent * scaleRange);
+        let heat = Math.round(localPercent * scaleRange);
+
+        // Clamp values.
+        if (heat < 1) {
+            heat = 1;
+        }
+
+        if (heat > 6) {
+            heat = 6;
+        }
 
         return heat;
     };
