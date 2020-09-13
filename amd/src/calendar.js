@@ -375,8 +375,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     cell = document.createElement("td");
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
-//                        let heat = getHeat(monthEvents[date]['number']);
-                       // cell.style.backgroundColor = colorArray[heat];
+                       let heat = getHeat(monthEvents[date]['number']);
+                       cell.style.backgroundColor = colorArray[heat];
                        // cell.style.color = getContrast(colorArray[heat]);
 
                         // Add tooltip to cell.
