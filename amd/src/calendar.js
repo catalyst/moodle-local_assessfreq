@@ -360,9 +360,11 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
 
         for (let i = 0; i < 6; i++) {
             let row = document.createElement("tr"); // Creates a table row.
+            window.console.log('creating tr: ' + i);
 
             // Creating individual cells, filing them up with data.
             for (let j = 0; j < 7; j++) {
+                window.console.log('creating cell: ' + j);
                 if (i === 0 && j < firstDay) {
                     var cell = document.createElement("td");
                     var cellText = document.createTextNode("");
