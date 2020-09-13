@@ -353,6 +353,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                         let heat = getHeat(monthEvents[date]['number']);
                         window.console.log(heat);
+                        window.console.log(colorArray);
                         if(heat === false) {
                             cell.style.backgroundColor = colorArray[heat];
                             cell.style.color = getContrast(colorArray[heat]);
