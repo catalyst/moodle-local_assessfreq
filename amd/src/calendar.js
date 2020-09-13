@@ -352,6 +352,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                         let heat = getHeat(monthEvents[date]['number']);
+                        window.console.log(heat);
                         cell.style.backgroundColor = colorArray[heat];
                         cell.style.color = getContrast(colorArray[heat]);
 
