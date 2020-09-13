@@ -58,7 +58,8 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
 
     const getUserDate = function (timestamp, format) {
         return new Promise((resolve) => {
-            let date = new Date(timestamp * 1000);
+            const systemTimezone = new Date(timestamp * 1000).toLocaleString('en-US', {timeZone: 'America/Toronto'});
+            let date = new Date(systemTimezone);
             const year = date.getFullYear();
             const month = stringResult[(7 + date.getMonth())];
             const day = date.getDate();
