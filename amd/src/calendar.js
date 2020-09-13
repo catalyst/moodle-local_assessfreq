@@ -183,6 +183,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         window.console.log('getting heat');
         window.console.log(eventCount);
         window.console.log(heatRangeMin);
+        window.console.log(heatRangeMax);
 
         let scaleMin = 1;
 
