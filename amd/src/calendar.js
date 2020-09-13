@@ -189,6 +189,15 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         const localPercent = (eventCount - heatRangeMin) / localRange;
         const heat = Math.round(localPercent * scaleRange);
 
+        // Clamp values.
+        if (heat < 1) {
+            heat = 1;
+        }
+
+        if (heat > 6) {
+            heat = 6;
+        }
+
         return heat;
     };
 
@@ -352,12 +361,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                         let heat = getHeat(monthEvents[date]['number']);
-                        window.console.log(heat);
-                        window.console.log(colorArray);
-                        if(heat === false) {
-                            cell.style.backgroundColor = colorArray[heat];
-                            cell.style.color = getContrast(colorArray[heat]);
-                        }
+                        cell.style.backgroundColor = colorArray[heat];
+                        cell.style.color = getContrast(colorArray[heat]);
 
                         // Add tooltip to cell.
                         cell.dataset.toggle = 'tooltip';
