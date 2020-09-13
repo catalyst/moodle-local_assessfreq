@@ -356,6 +356,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         let monthEvents = getMonthEvents(year, (month + 1));  // We add one due to month diferences between PHP and JS.
         let date = 1;  // Creating all cells.
 
+        window.console.log('populating calendar days');
+
         for (let i = 0; i < 6; i++) {
             let row = document.createElement("tr"); // Creates a table row.
 
@@ -406,9 +408,13 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     const populateCalendar = function({calendarContainer, year, startMonth}) {
         return new Promise((resolve, reject) => {
             window.console.log('populating calendar');
+            window.console.log(calendarContainer);
+            window.console.log(year);
+            window.console.log(startMonth);
             // Get the table boodies.
             let tables = calendarContainer.getElementsByTagName("tbody");
             let month = startMonth;
+            window.console.log(tables);
 
             // For each table body populate with calendar.
             for (var i = 0; i < tables.length; i++) {
@@ -416,6 +422,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 populateCalendarDays(table, year, month);
                 month++;
             }
+            window.console.log('finished populating calendar');
 
             if (typeof calendarContainer === 'undefined') {
                 reject(Error('Failed to populate calendar tables.'));
