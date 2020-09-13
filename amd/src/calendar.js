@@ -100,6 +100,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const getHeatColors = function() {
         return new Promise((resolve, reject) => {
+            window.console.log('getting heat colors');
             Ajax.call([{
                 methodname: 'local_assessfreq_get_heat_colors',
                 args: {},
@@ -119,6 +120,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const getProcessModules = function() {
         return new Promise((resolve, reject) => {
+            window.console.log('get process modules');
             Ajax.call([{
                 methodname: 'local_assessfreq_get_process_modules',
                 args: {},
@@ -188,6 +190,14 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         const localRange = heatRangeMax - heatRangeMin;
         const localPercent = (eventCount - heatRangeMin) / localRange;
         const heat = Math.round(localPercent * scaleRange);
+                // Clamp values.
+        if (heat < 1) {
+            heat = 1;
+        }
+
+        if (heat > 6) {
+            heat = 6;
+        }
 
         // Clamp values.
         if (heat < 1) {
@@ -212,6 +222,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const getEvents = function({year, metric, modules}) {
         return new Promise((resolve, reject) => {
+            window.console.log('getting events');
             let args = {
                 year: year,
                 metric: metric,
@@ -261,6 +272,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const createTables = function({year, startMonth, endMonth}) {
         return new Promise((resolve, reject) => {
+            window.console.log('creating tables');
             let calendarContainer = document.createElement('div');
             let month = startMonth;
 
@@ -393,6 +405,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const populateCalendar = function({calendarContainer, year, startMonth}) {
         return new Promise((resolve, reject) => {
+            window.console.log('populating calendar');
             // Get the table boodies.
             let tables = calendarContainer.getElementsByTagName("tbody");
             let month = startMonth;
@@ -441,21 +454,25 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 return;
             }).then(stringReturn => { // Save string to global to be used later.
                 stringResult = stringReturn;
+                window.console.log('strings loaded');
                 return eventObj;
             })
             .then(getEvents)
             .then((eventArray) => {
+                window.console.log('calc heat range');
                 calcHeatRange(eventArray, dateObj);
             })
             .then(getHeatColors)
             .then(getProcessModules)
             .then(() => {
+                window.console.log('got process modules');
                 return dateObj;
             })
             .then(createTables) // Create tables for calendar.
             .then(populateCalendar)
             .then((calendarHTML) => { // Return the result of the generate function.
                 if (typeof calendarHTML !== 'undefined') {
+                    window.console.log('returning calendar html');
                     resolve(calendarHTML);
                 } else {
                     reject(Error('Could not generate calendar'));
