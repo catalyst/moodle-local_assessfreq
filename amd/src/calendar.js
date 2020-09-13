@@ -100,7 +100,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const getHeatColors = function() {
         return new Promise((resolve, reject) => {
-            window.console.log('getting heat colors');
             Ajax.call([{
                 methodname: 'local_assessfreq_get_heat_colors',
                 args: {},
@@ -120,7 +119,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const getProcessModules = function() {
         return new Promise((resolve, reject) => {
-            window.console.log('get process modules');
             Ajax.call([{
                 methodname: 'local_assessfreq_get_process_modules',
                 args: {},
@@ -180,11 +178,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @return {Number} heat The heat value.
      */
     const getHeat = function(eventCount) {
-        window.console.log('getting heat');
-        window.console.log(eventCount);
-        window.console.log(heatRangeMin);
-        window.console.log(heatRangeMax);
-
         let scaleMin = 1;
 
         if (eventCount == heatRangeMin) {
@@ -219,7 +212,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const getEvents = function({year, metric, modules}) {
         return new Promise((resolve, reject) => {
-            window.console.log('getting events');
             let args = {
                 year: year,
                 metric: metric,
@@ -269,7 +261,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const createTables = function({year, startMonth, endMonth}) {
         return new Promise((resolve, reject) => {
-            window.console.log('creating tables');
             let calendarContainer = document.createElement('div');
             let month = startMonth;
 
@@ -353,9 +344,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         let monthEvents = getMonthEvents(year, (month + 1));  // We add one due to month diferences between PHP and JS.
         let date = 1;  // Creating all cells.
 
-        window.console.log('populating calendar days');
-        window.console.log(monthEvents);
-
         for (let i = 0; i < 6; i++) {
             let row = document.createElement("tr"); // Creates a table row.
 
@@ -374,15 +362,15 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                        let heat = getHeat(monthEvents[date]['number']);
                        cell.style.backgroundColor = colorArray[heat];
-                       // cell.style.color = getContrast(colorArray[heat]);
+                       cell.style.color = getContrast(colorArray[heat]);
 
-                        // Add tooltip to cell.
-//                        cell.dataset.toggle = 'tooltip';
-//                        cell.dataset.html = 'true';
-//                        cell.dataset.event = 'true';
-//                        cell.dataset.date = year + '-' + (month +1) + '-' + date;
-//                        cell.title = getTooltip(monthEvents[date]);
-//                        cell.style.cursor = "pointer";
+                        //Add tooltip to cell.
+                        cell.dataset.toggle = 'tooltip';
+                        cell.dataset.html = 'true';
+                        cell.dataset.event = 'true';
+                        cell.dataset.date = year + '-' + (month +1) + '-' + date;
+                        cell.title = getTooltip(monthEvents[date]);
+                        cell.style.cursor = "pointer";
 
                     }
                     date++;
@@ -405,14 +393,9 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const populateCalendar = function({calendarContainer, year, startMonth}) {
         return new Promise((resolve, reject) => {
-            window.console.log('populating calendar');
-            window.console.log(calendarContainer);
-            window.console.log(year);
-            window.console.log(startMonth);
-            // Get the table boodies.
+            // Get the table bodies.
             let tables = calendarContainer.getElementsByTagName("tbody");
             let month = startMonth;
-            window.console.log(tables);
 
             // For each table body populate with calendar.
             for (var i = 0; i < tables.length; i++) {
@@ -420,7 +403,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 populateCalendarDays(table, year, month);
                 month++;
             }
-            window.console.log('finished populating calendar');
 
             if (typeof calendarContainer === 'undefined') {
                 reject(Error('Failed to populate calendar tables.'));
@@ -459,25 +441,21 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 return;
             }).then(stringReturn => { // Save string to global to be used later.
                 stringResult = stringReturn;
-                window.console.log('strings loaded');
                 return eventObj;
             })
             .then(getEvents)
             .then((eventArray) => {
-                window.console.log('calc heat range');
                 calcHeatRange(eventArray, dateObj);
             })
             .then(getHeatColors)
             .then(getProcessModules)
             .then(() => {
-                window.console.log('got process modules');
                 return dateObj;
             })
             .then(createTables) // Create tables for calendar.
             .then(populateCalendar)
             .then((calendarHTML) => { // Return the result of the generate function.
                 if (typeof calendarHTML !== 'undefined') {
-                    window.console.log('returning calendar html');
                     resolve(calendarHTML);
                 } else {
                     reject(Error('Could not generate calendar'));
