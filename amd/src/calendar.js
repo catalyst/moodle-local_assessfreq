@@ -357,14 +357,13 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         let date = 1;  // Creating all cells.
 
         window.console.log('populating calendar days');
+        window.console.log(monthEvents);
 
         for (let i = 0; i < 6; i++) {
             let row = document.createElement("tr"); // Creates a table row.
-            window.console.log('creating tr: ' + i);
 
             // Creating individual cells, filing them up with data.
             for (let j = 0; j < 7; j++) {
-                window.console.log('creating cell: ' + j);
                 if (i === 0 && j < firstDay) {
                     var cell = document.createElement("td");
                     var cellText = document.createTextNode("");
@@ -377,8 +376,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                         let heat = getHeat(monthEvents[date]['number']);
-                        cell.style.backgroundColor = colorArray[heat];
-                        cell.style.color = getContrast(colorArray[heat]);
+                       // cell.style.backgroundColor = colorArray[heat];
+                       // cell.style.color = getContrast(colorArray[heat]);
 
                         // Add tooltip to cell.
                         cell.dataset.toggle = 'tooltip';
