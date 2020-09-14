@@ -55,10 +55,11 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
         {key: 'dec', component: 'local_assessfreq'},
     ];
     var stringResult;
+    var systemTimezone = 'Australia/Melbourne';
 
     const getUserDate = function (timestamp, format) {
         return new Promise((resolve) => {
-            const systemTimezone = new Date(timestamp * 1000).toLocaleString('en-US', {timeZone: 'America/Toronto'});
+            const systemTimezone = new Date(timestamp * 1000).toLocaleString('en-US', {timeZone: systemTimezone});
             let date = new Date(systemTimezone);
             const year = date.getFullYear();
             const month = stringResult[(7 + date.getMonth())];
@@ -92,17 +93,21 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
             const month = (responseArr[i].endmonth) - 1; // Minus 1 for difference between months in PHP and JS.
             const day = responseArr[i].endday;
             const dayStart = (new Date(year, month, day).getTime()) / 1000;
-            let secondsSinceDayStart = responseArr[i].timestart - dayStart;
+            const timeStart = new Date(responseArr[i].timestart * 1000).toLocaleString('en-US', {timeZone: systemTimezone});
+            const timeStartTimestamp = (new Date(timeStart).getTime()) / 1000;
+            const timeEnd = new Date(responseArr[i].timeend * 1000).toLocaleString('en-US', {timeZone: systemTimezone});
+            const timeEndTimestamp = (new Date(timeEnd).getTime()) / 1000;
+            let secondsSinceDayStart = timeStartTimestamp - dayStart;
             let leftMargin = 0;
             let width = 0;
 
             if (secondsSinceDayStart <= 0) {
                 secondsSinceDayStart = 0;
-                width = ((responseArr[i].timeend - dayStart) / 60) * scaler;
+                width = ((timeEndTimestamp - dayStart) / 60) * scaler;
                 responseArr[i].start = await getUserDate(responseArr[i].timestart, 'strftimedatetime');
             } else {
                 leftMargin = (secondsSinceDayStart / 60) * scaler;
-                width = ((responseArr[i].timeend - responseArr[i].timestart) / 60) * scaler;
+                width = ((timeEndTimestamp - timeStartTimestamp) / 60) * scaler;
                 responseArr[i].start = await getUserDate(responseArr[i].timestart, 'strftimetime');
             }
 
@@ -160,6 +165,17 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
             return;
         }).then(stringReturn => { // Save string to global to be used later.
             stringResult = stringReturn;
+        });
+
+        // Get the system timzone.
+        Ajax.call([{
+            methodname: 'local_assessfreq_get_system_timezone',
+            args: {},
+        }], true, false)[0].then((response) => {
+            systemTimezone = response;
+            return;
+        }).fail(() => {
+            Notification.exception(new Error('Failed to get system timezone'));
         });
 
         Str.get_string('schedule', 'local_assessfreq').then((title) => {
