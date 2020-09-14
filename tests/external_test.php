@@ -126,7 +126,7 @@ class local_assessfreq_external_testcase extends advanced_testcase {
             'timelimit' => 3600,
             'layout' => $layout
         ));
-        $this->quiz2 =$generator->create_module('quiz', array(
+        $this->quiz2 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => 1593997200,
             'timeclose' => 1594004400,
@@ -145,7 +145,7 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         $generator->enrol_user($user3->id, $course->id, 'student');
         $generator->enrol_user($user4->id, $course->id, 'student');
 
-        // Add questions to quiz;
+        // Add questions to quiz.
         $quizobj = \quiz::create($this->quiz1->id);
         $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
@@ -163,7 +163,7 @@ class local_assessfreq_external_testcase extends advanced_testcase {
             if ($slot % 2 == 0) {
                 $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
 
-            } else{
+            } else {
                 $question = $questiongenerator->create_question('essay', null, ['category' => $cat->id]);
             }
 

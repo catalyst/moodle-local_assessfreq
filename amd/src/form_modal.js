@@ -40,7 +40,7 @@ function(Str, ModalFactory, Fragment, Ajax) {
     const observerConfig = { attributes: true, childList: false, subtree: true };
 
     const ObserverCallback = function(mutationsList) {
-        for (let i=0; i<mutationsList.length; i++) {
+        for (let i = 0; i < mutationsList.length; i++) {
             let element = mutationsList[i].target;
             if((element.tagName.toLowerCase() === 'li') && (element.getAttribute('role') == 'option')
                     && (element.getAttribute('aria-selected') == 'true')) {
@@ -60,14 +60,14 @@ function(Str, ModalFactory, Fragment, Ajax) {
                         document.getElementById('noquizwarning').remove();
                     }
                     // Clear exisitng options.
-                    for (let j=selectElementLength-1; j>=0; j--) {
+                    for (let j = selectElementLength - 1; j >= 0; j--) {
                         selectElement.options[j] = null;
                     }
 
                     if (quizArray.length > 0) {
 
                         // Add new options.
-                        for (let k=0; k<quizArray.length; k++) {
+                        for (let k = 0; k < quizArray.length; k++) {
                             let opt = quizArray[k];
                             let el = document.createElement('option');
                             el.textContent = opt.name;
@@ -93,7 +93,7 @@ function(Str, ModalFactory, Fragment, Ajax) {
                 break;
             }
 
-          }
+        }
     };
 
     const observer = new MutationObserver(ObserverCallback);
@@ -140,7 +140,7 @@ function(Str, ModalFactory, Fragment, Ajax) {
                 reject(new Error('Failed to load strings'));
                 return;
             }).then(stringReturn => { // Save string to global to be used later.
-                for (let i=0; i<stringReturn.length; i++) {
+                for (let i = 0; i < stringReturn.length; i++) {
                     let el = document.createElement('option');
                     el.textContent = stringReturn[i];
                     el.value = 0 - i;
@@ -171,7 +171,7 @@ function(Str, ModalFactory, Fragment, Ajax) {
             Str.get_string('searchquiz', 'local_assessfreq').then((title) => {
                 modalObj.setTitle(title);
                 modalObj.setBody(Fragment.loadFragment('local_assessfreq', 'new_base_form', contextid, params));
-                let modalContainer = document.querySelectorAll(`[data-region*="modal-container"]`)[0];
+                let modalContainer = document.querySelectorAll('[data-region*="modal-container"]')[0];
                 observer.observe(modalContainer, observerConfig);
 
                 return;

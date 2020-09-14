@@ -25,51 +25,51 @@
 
 define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
 
-/**
- * Module level variables.
- */
-var CourseSelector = {};
+    /**
+     * Module level variables.
+     */
+    var CourseSelector = {};
 
-/**
- * Source of data for Ajax element.
- *
- * @param {String} selector The selector of the auto complete element.
- * @param {String} query The query string.
- * @param {Function} callback A callback function receiving an array of results.
- * @return {Void}
-*/
-CourseSelector.transport = function(selector, query, callback) {
-    Ajax.call([{
-        methodname: 'local_assessfreq_get_courses',
-        args: {
-            query: query
-        },
-    }])[0].then((response) => {
-        let courseArray = JSON.parse(response);
-        callback(courseArray);
-    }).fail(() => {
-        Notification.exception(new Error('Failed to get events'));
-    });
-};
-
-/**
- * Process the results for auto complete elements.
- *
- * @param {String} selector The selector of the auto complete element.
- * @param {Array} results An array or results.
- * @return {Array} New array of results.
- */
-CourseSelector.processResults = function(selector, results) {
-    let options = [];
-    results.forEach((element) => {
-        options.push({
-            value: element.id,
-            label: element.fullname
+    /**
+     * Source of data for Ajax element.
+     *
+     * @param {String} selector The selector of the auto complete element.
+     * @param {String} query The query string.
+     * @param {Function} callback A callback function receiving an array of results.
+     * @return {Void}
+    */
+    CourseSelector.transport = function(selector, query, callback) {
+        Ajax.call([{
+            methodname: 'local_assessfreq_get_courses',
+            args: {
+                query: query
+            },
+        }])[0].then((response) => {
+            let courseArray = JSON.parse(response);
+            callback(courseArray);
+        }).fail(() => {
+            Notification.exception(new Error('Failed to get events'));
         });
-    });
+    };
 
-    return options;
-};
+    /**
+     * Process the results for auto complete elements.
+     *
+     * @param {String} selector The selector of the auto complete element.
+     * @param {Array} results An array or results.
+     * @return {Array} New array of results.
+     */
+    CourseSelector.processResults = function(selector, results) {
+        let options = [];
+        results.forEach((element) => {
+            options.push({
+                value: element.id,
+                label: element.fullname
+            });
+        });
 
-return CourseSelector;
+        return options;
+    };
+
+    return CourseSelector;
 });

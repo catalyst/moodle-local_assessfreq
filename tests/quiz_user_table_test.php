@@ -1,6 +1,4 @@
 <?php
-use local_assessfreq\output\quiz_user_table;
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -26,7 +24,7 @@ use local_assessfreq\output\quiz_user_table;
 
 defined('MOODLE_INTERNAL') || die();
 
-use local_assessfreq\output;
+use local_assessfreq\output\quiz_user_table;
 
 /**
  * This file contains the class that handles testing of the block assess frequency class.
@@ -103,13 +101,12 @@ class quiz_user_table_testcase extends advanced_testcase {
             'timelimit' => 3600,
             'layout' => $layout
         ));
-        $this->quiz2 =$generator->create_module('quiz', array(
+        $this->quiz2 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => 1593997200,
             'timeclose' => 1594004400,
             'timelimit' => 7200
         ));
-
 
         $this->course = $course;
 
@@ -149,14 +146,14 @@ class quiz_user_table_testcase extends advanced_testcase {
         $this->user3 = $user3;
         $this->user4 = $user4;
 
-        $CFG->sessiontimeout = 60*10;  // Short time out for test.
+        $CFG->sessiontimeout = 60 * 10;  // Short time out for test.
 
         $record4 = new \stdClass();
         $record4->state = 0;
         $record4->sid = md5('sid4');
         $record4->sessdata = null;
         $record4->userid = $this->user4->id;
-        $record4->timecreated = time() - 60*60;
+        $record4->timecreated = time() - 60 * 60;
         $record4->timemodified = time() - 30;
         $record4->firstip = '10.0.0.1';
         $record4->lastip = '10.0.0.1';

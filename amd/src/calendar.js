@@ -80,7 +80,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         return (yiq >= 128) ? '#000000' : '#FFFFFF';
     };
 
-
     /**
      * Check how many days in a month code.
      * from https://dzone.com/articles/determining-number-days-month.
@@ -142,25 +141,25 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         return new Promise((resolve) => {
             if (eventArray[dateObj.year] !== "undefined") { // If scheduled tasks have not run yet we may not have any data.
 
-            let eventcount = new Array;
-            let year = eventArray[dateObj.year];
+                let eventcount = new Array;
+                let year = eventArray[dateObj.year];
 
-            // Itterate through all the event counts.
-            // This code looks nasty but there is only 366 days in a year.
-            for (let i = 0; i < 12; i++) {
-                if (typeof year[i] !== "undefined") {
-                    let month = year[i];
-                    for (let j = 0; j < 32; j++) {
-                        if (typeof month[j] !== "undefined") {
-                            eventcount.push(month[j].number);
+                // Itterate through all the event counts.
+                // This code looks nasty but there is only 366 days in a year.
+                for (let i = 0; i < 12; i++) {
+                    if (typeof year[i] !== "undefined") {
+                        let month = year[i];
+                        for (let j = 0; j < 32; j++) {
+                            if (typeof month[j] !== "undefined") {
+                                eventcount.push(month[j].number);
+                            }
                         }
                     }
                 }
-            }
 
-            // Get min and max values to calculate heat spread.
-            heatRangeMax = Math.max(...eventcount);
-            heatRangeMin = Math.min(...eventcount);
+                // Get min and max values to calculate heat spread.
+                heatRangeMax = Math.max(...eventcount);
+                heatRangeMin = Math.min(...eventcount);
             } else {
                 heatRangeMax = 1;
                 heatRangeMin = 1;
@@ -184,7 +183,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
             return scaleMin;
         }
 
-        const scaleRange = 6;  // 0 - 5  steps
+        const scaleRange = 6;  // 0 - 5  steps.
         const localRange = heatRangeMax - heatRangeMin;
         const localPercent = (eventCount - heatRangeMin) / localRange;
         let heat = Math.round(localPercent * scaleRange);
@@ -327,7 +326,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
 
         for (let [key, value] of Object.entries(dayArray)) {
             tipHTML += '<strong>' + processModules[key] + ':</strong> ' + value + '<br/>';
-       }
+        }
 
         return tipHTML;
     };
@@ -368,7 +367,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                         cell.dataset.toggle = 'tooltip';
                         cell.dataset.html = 'true';
                         cell.dataset.event = 'true';
-                        cell.dataset.date = year + '-' + (month +1) + '-' + date;
+                        cell.dataset.date = year + '-' + (month + 1) + '-' + date;
                         cell.title = getTooltip(monthEvents[date]);
                         cell.style.cursor = "pointer";
 

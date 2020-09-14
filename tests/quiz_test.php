@@ -142,7 +142,7 @@ class quiz_testcase extends advanced_testcase {
             'timelimit' => 3600,
             'layout' => $layout
         ));
-        $this->quiz2 =$generator->create_module('quiz', array(
+        $this->quiz2 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => 1593997200,
             'timeclose' => 1594004400,
@@ -150,15 +150,15 @@ class quiz_testcase extends advanced_testcase {
         ));
 
         // Start is more than one hour in the past, but end is in the future. (Should return).
-        $this->quiz3 =$generator->create_module('quiz', array(
+        $this->quiz3 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 2)),
             'timeclose' => ($now + (3600 * 0.5)),
-            'timelimit' =>3600
+            'timelimit' => 3600
         ));
 
         // Start is less than one hour in the past, but end is in the future. (Should return).
-        $this->quiz4 =$generator->create_module('quiz', array(
+        $this->quiz4 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 0.5)),
             'timeclose' => ($now + (3600 * 0.5)),
@@ -166,15 +166,15 @@ class quiz_testcase extends advanced_testcase {
         ));
 
         // Start is less than one hour in the future, end is more than one hour in the future. (Should return).
-        $this->quiz5 =$generator->create_module('quiz', array(
+        $this->quiz5 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 0.5)),
             'timeclose' => ($now + (3600 * 2)),
-            'timelimit' =>3600
+            'timelimit' => 3600
         ));
 
         // Start is less than one hour in the future, end is less that one hour in the future. (Should return).
-        $this->quiz6 =$generator->create_module('quiz', array(
+        $this->quiz6 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 0.25)),
             'timeclose' => ($now + (3600 * 0.75)),
@@ -182,7 +182,7 @@ class quiz_testcase extends advanced_testcase {
         ));
 
         // Start is more than one hour in the future, end is more than one hour in the future. (Should not return).
-        $this->quiz7 =$generator->create_module('quiz', array(
+        $this->quiz7 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 2)),
             'timeclose' => ($now + (3600 * 3)),
@@ -190,7 +190,7 @@ class quiz_testcase extends advanced_testcase {
         ));
 
         // Start and end date of override is more than one hour in the past. (Should not be returned).
-        $this->quiz8 =$generator->create_module('quiz', array(
+        $this->quiz8 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 3)),
             'timeclose' => ($now - (3600 * 2)),
@@ -198,14 +198,14 @@ class quiz_testcase extends advanced_testcase {
         ));
 
         // Start is more than one hour in the past, but end is less than one hour in the past. (Should return).
-        $this->quiz9 =$generator->create_module('quiz', array(
+        $this->quiz9 = $generator->create_module('quiz', array(
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 2)),
             'timeclose' => ($now - (3600 * 0.5)),
             'timelimit' => 3600
         ));
 
-        // Add questions to quiz;
+        // Add questions to quiz.
         $quizobj = \quiz::create($this->quiz1->id);
         $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
@@ -223,13 +223,12 @@ class quiz_testcase extends advanced_testcase {
             if ($slot % 2 == 0) {
                 $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
 
-            } else{
+            } else {
                 $question = $questiongenerator->create_question('essay', null, ['category' => $cat->id]);
             }
 
             quiz_add_quiz_question($question->id, $this->quiz1, $page);
         }
-
 
         $this->course = $course;
 
@@ -264,7 +263,7 @@ class quiz_testcase extends advanced_testcase {
         $override3 = new \stdClass();
         $override3->quiz = 3; // OK to use fake id for this.
         $override3->userid = 5; // OK to use fake id for this.
-        $override3->timeopen = ($now - (3600 * 2)) ;
+        $override3->timeopen = ($now - (3600 * 2));
         $override3->timeclose = ($now + (3600 * 0.5));
         $override3->timelimit = 3600;
 
@@ -272,7 +271,7 @@ class quiz_testcase extends advanced_testcase {
         $override4 = new \stdClass();
         $override4->quiz = 4; // OK to use fake id for this.
         $override4->userid = 6; // OK to use fake id for this.
-        $override4->timeopen = ($now - (3600 * 0.5)) ;
+        $override4->timeopen = ($now - (3600 * 0.5));
         $override4->timeclose = ($now + (3600 * 0.5));
         $override4->timelimit = 3600;
 
@@ -280,7 +279,7 @@ class quiz_testcase extends advanced_testcase {
         $override5 = new \stdClass();
         $override5->quiz = 5; // OK to use fake id for this.
         $override5->userid = 7; // OK to use fake id for this.
-        $override5->timeopen = ($now + (3600 * 0.5)) ;
+        $override5->timeopen = ($now + (3600 * 0.5));
         $override5->timeclose = ($now + (3600 * 2));
         $override5->timelimit = 3600;
 
@@ -288,7 +287,7 @@ class quiz_testcase extends advanced_testcase {
         $override6 = new \stdClass();
         $override6->quiz = 6; // OK to use fake id for this.
         $override6->userid = 8; // OK to use fake id for this.
-        $override6->timeopen = ($now + (3600 * 0.25)) ;
+        $override6->timeopen = ($now + (3600 * 0.25));
         $override6->timeclose = ($now + (3600 * 0.75));
         $override6->timelimit = 1800;
 
@@ -296,7 +295,7 @@ class quiz_testcase extends advanced_testcase {
         $override7 = new \stdClass();
         $override7->quiz = 7; // OK to use fake id for this.
         $override7->userid = 9; // OK to use fake id for this.
-        $override7->timeopen = ($now + (3600 * 2)) ;
+        $override7->timeopen = ($now + (3600 * 2));
         $override7->timeclose = ($now + (3600 * 3));
         $override7->timelimit = 3600;
 
@@ -304,7 +303,7 @@ class quiz_testcase extends advanced_testcase {
         $override8 = new \stdClass();
         $override8->quiz = 1; // OK to use fake id for this.
         $override8->userid = 3; // OK to use fake id for this.
-        $override8->timeopen = ($now - (3600 * 3)) ;
+        $override8->timeopen = ($now - (3600 * 3));
         $override8->timeclose = ($now - (3600 * 2));
         $override8->timelimit = 3600;
 
@@ -312,7 +311,7 @@ class quiz_testcase extends advanced_testcase {
         $override9 = new \stdClass();
         $override9->quiz = 2; // OK to use fake id for this.
         $override9->userid = 4; // OK to use fake id for this.
-        $override9->timeopen = ($now - (3600 * 2)) ;
+        $override9->timeopen = ($now - (3600 * 2));
         $override9->timeclose = ($now - (3600 * 0.5));
         $override9->timelimit = 3600;
 
@@ -327,14 +326,14 @@ class quiz_testcase extends advanced_testcase {
         $this->user3 = $user3;
         $this->user4 = $user4;
 
-        $CFG->sessiontimeout = 60*10;  // Short time out for test.
+        $CFG->sessiontimeout = 60 * 10;  // Short time out for test.
 
         $record1 = new \stdClass();
         $record1->state = 0;
         $record1->sid = md5('sid1');
         $record1->sessdata = null;
         $record1->userid = $this->user1->id;
-        $record1->timecreated = time() - 60*60;
+        $record1->timecreated = time() - 60 * 60;
         $record1->timemodified = time() - 30;
         $record1->firstip = '10.0.0.1';
         $record1->lastip = '10.0.0.1';
@@ -344,7 +343,7 @@ class quiz_testcase extends advanced_testcase {
         $record2->sid = md5('sid2');
         $record2->sessdata = null;
         $record2->userid = $this->user2->id;
-        $record2->timecreated = time() - 60*60;
+        $record2->timecreated = time() - 60 * 60;
         $record2->timemodified = time() - 30;
         $record2->firstip = '10.0.0.1';
         $record2->lastip = '10.0.0.1';
@@ -354,7 +353,7 @@ class quiz_testcase extends advanced_testcase {
         $record3->sid = md5('sid3');
         $record3->sessdata = null;
         $record3->userid = $this->user3->id;
-        $record3->timecreated = time() - 60*60;
+        $record3->timecreated = time() - 60 * 60;
         $record3->timemodified = time() - 30;
         $record3->firstip = '10.0.0.1';
         $record3->lastip = '10.0.0.1';
@@ -364,8 +363,8 @@ class quiz_testcase extends advanced_testcase {
         $record4->sid = md5('sid4');
         $record4->sessdata = null;
         $record4->userid = $this->user4->id;
-        $record4->timecreated = time() - 60*60;
-        $record4->timemodified = time() - 60*60;
+        $record4->timecreated = time() - 60 * 60;
+        $record4->timemodified = time() - 60 * 60;
         $record4->firstip = '10.0.0.1';
         $record4->lastip = '10.0.0.1';
 
@@ -519,7 +518,7 @@ class quiz_testcase extends advanced_testcase {
         $override = new \stdClass();
         $override->quiz = $this->quiz4->id; // OK to use fake id for this.
         $override->userid = 7; // OK to use fake id for this.
-        $override->timeopen = ($now - (3600 * 0.75)) ;
+        $override->timeopen = ($now - (3600 * 0.75));
         $override->timeclose = ($now + (3600 * 0.25));
         $override->timelimit = 3600;
 

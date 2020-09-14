@@ -189,7 +189,7 @@ class quiz {
         $quizdata->timeclose = $timeclose;
         $quizdata->timelimit = format_time($quizrecord->timelimit);
         $quizdata->earlyopen = ($overrideinfo->start == 0) ? $timesopen : $overrideinfostart;
-        $quizdata->lateclose = ($overrideinfo->end == 0) ? $timeclose: $overrideinfoend;
+        $quizdata->lateclose = ($overrideinfo->end == 0) ? $timeclose : $overrideinfoend;
         $quizdata->participants = count($frequency->get_event_users_raw($context->id, 'quiz'));
         $quizdata->overrideparticipants = $overrideinfo->users;
         $quizdata->url = $context->get_url()->out(false);
@@ -310,7 +310,7 @@ class quiz {
         $loggedinusers = array();
         $loggedoutusers = array();
 
-        foreach ($userchunks as $userchunk){
+        foreach ($userchunks as $userchunk) {
             list($insql, $inparams) = $DB->get_in_or_equal($userchunk);
             $inparams[] = $timedout;
 
