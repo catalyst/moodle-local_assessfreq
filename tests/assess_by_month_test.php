@@ -105,7 +105,7 @@ class assess_by_month_testcase extends advanced_testcase {
 
         $assessbymonth = new assess_by_month();
         $result = $assessbymonth->get_assess_by_month_chart($year);
-        $values = $result->get_series()[0]->get_values();
+        $values = $result['chart']->get_series()[0]->get_values();
 
         foreach ($values as $value) {
             if ($value % 2 != 0) {

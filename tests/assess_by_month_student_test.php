@@ -100,7 +100,7 @@ class assess_by_month_student_testcase extends advanced_testcase {
 
         $assessbymonthstudent = new assess_by_month_student();
         $result = $assessbymonthstudent->get_assess_by_month_student_chart($year);
-        $values = $result->get_series()[0]->get_values();
+        $values = $result['chart']->get_series()[0]->get_values();
 
         foreach ($values as $key => $value) {
             $count = $key + 1;
