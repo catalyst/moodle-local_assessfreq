@@ -219,7 +219,7 @@ class local_assessfreq_external extends external_api {
     /**
      * Returns courses and quizzes in that course that match search data.
      *
-     * @param string $jsondata JSON data.
+     * @param string $query The search query.
      * @return string JSON response.
      */
     public static function get_courses($query) {
@@ -267,7 +267,7 @@ class local_assessfreq_external extends external_api {
     /**
      * Returns courses and quizzes in that course that match search data.
      *
-     * @param string $jsondata JSON data.
+     * @param string $query The search query.
      * @return string JSON response.
      */
     public static function get_quizzes($query) {
@@ -314,7 +314,7 @@ class local_assessfreq_external extends external_api {
     /**
      * Returns quiz data.
      *
-     * @param string $jsondata JSON data.
+     * @param string $quizid The quiz id to get data for.
      * @return string JSON response.
      */
     public static function get_quiz_data($quizid) {
@@ -362,7 +362,9 @@ class local_assessfreq_external extends external_api {
     /**
      * Returns quiz data.
      *
-     * @param string $jsondata JSON data.
+     * @param string $tableid The table id to set the preference for.
+     * @param string $preference The name of the preference to set.
+     * @param string $values The values to set for the preference, encoded as JSON.
      * @return string JSON response.
      */
     public static function set_table_preference($tableid, $preference, $values) {

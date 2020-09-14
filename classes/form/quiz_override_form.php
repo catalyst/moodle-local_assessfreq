@@ -40,10 +40,11 @@ class quiz_override_form extends \quiz_override_form {
 
     /**
      * Constructor.
-     * @param object course module object.
-     * @param object the quiz settings object.
-     * @param context the quiz context.
+     * @param object $cm course module object.
+     * @param object $quiz the quiz settings object.
+     * @param \context $context the quiz context.
      * @param object $override the override being edited, if it already exists.
+     * @param null|object $submitteddata The data submitted to the form via ajax.
      */
     public function __construct($cm, $quiz, $context, $override, $submitteddata=null) {
 
