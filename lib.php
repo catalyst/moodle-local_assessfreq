@@ -221,7 +221,6 @@ function local_assessfreq_output_fragment_new_override_form($args): string {
         parse_str($serialiseddata, $formdata);
     }
 
-
     // Get some data needed to generate the form.
     $quizid = $args['quizid'];
     $quizdata = new \local_assessfreq\quiz();
@@ -231,7 +230,7 @@ function local_assessfreq_output_fragment_new_override_form($args): string {
     $cm = get_course_and_cm_from_cmid($quizcontext->instanceid, 'quiz')[1];
 
     // Check if we have an existing override for this user.
-    $override =$DB->get_record('quiz_overrides', array('quiz' => $quiz->id, 'userid' => $args['userid']));
+    $override = $DB->get_record('quiz_overrides', array('quiz' => $quiz->id, 'userid' => $args['userid']));
 
     if ($override) {
         $data = clone $override;

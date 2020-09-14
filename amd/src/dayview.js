@@ -86,9 +86,9 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
         // We need to scale the width of the bar to match the width of the container. Therefore 100% width of the container
         // equals 24 hours (one day).
         // There are 1440 mins per day. 1440 mins equals 100%, therefore 1 min = (100/1440)%. 5/72 == 100/1440.
-        let scaler = 5/72;
+        let scaler = 5 / 72;
 
-        for (let i=0; i<responseArr.length; i++) {
+        for (let i = 0; i < responseArr.length; i++) {
             const year = responseArr[i].endyear;
             const month = (responseArr[i].endmonth) - 1; // Minus 1 for difference between months in PHP and JS.
             const day = responseArr[i].endday;
@@ -125,7 +125,6 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
         });
     };
 
-
     /**
      * Initialise the base modal to be used.
      *
@@ -134,10 +133,10 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
         modalObj.setBody(spinner);
         modalObj.show();
         let args = {
-                date: date,
-                modules: ['all']
-            };
-            let jsonArgs = JSON.stringify(args);
+            date: date,
+            modules: ['all']
+        };
+        let jsonArgs = JSON.stringify(args);
         Ajax.call([{
             methodname: 'local_assessfreq_get_day_events',
             args: {jsondata: jsonArgs},

@@ -60,7 +60,7 @@ class participant_trend {
             $result['chart'] = false;
         } else {
             $result['hasdata'] = true;
-            foreach ($allparticipantdata as $participantdata){
+            foreach ($allparticipantdata as $participantdata) {
                 $notloggedin[] = $participantdata->notloggedin;
                 $loggedin[] = $participantdata->loggedin;
                 $inprogress[] = $participantdata->inprogress;

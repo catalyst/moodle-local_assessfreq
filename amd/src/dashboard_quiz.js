@@ -75,7 +75,6 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
         return Ajax.call([request])[0];
     };
 
-
     /**
      *
      */
@@ -270,13 +269,13 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
      * Process the search events from the student table.
      */
     const tableSearch = function(event) {
-         if (event.target.value.length > 2) {
+        if (event.target.value.length > 2) {
             getStudentTable();
-         }
+        }
 
-         if (event.target.value.length == 0) {
-             getStudentTable();
-          }
+        if (event.target.value.length == 0) {
+            getStudentTable();
+        }
     };
 
     /**
@@ -467,8 +466,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
         var element = event.target;
 
         if (element.closest('button') !== null && element.closest('button').id == 'local-assessfreq-refresh-quiz-dashboard') {
-          refreshCounter(true);
-          processDashboard(quizId);
+            refreshCounter(true);
+            processDashboard(quizId);
         } else if (element.tagName.toLowerCase() === 'a') {
             refreshPeriod = element.dataset.period;
             refreshCounter(true);
@@ -519,7 +518,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
 
         getUserPreference('local_assessfreq_quiz_refresh_preference')
         .then((response) => {
-            refreshPeriod =response.preferences[0].value ? response.preferences[0].value : 60;
+            refreshPeriod = response.preferences[0].value ? response.preferences[0].value : 60;
         })
         .fail(() => {
             Notification.exception(new Error('Failed to get use preference: refresh'));

@@ -83,7 +83,6 @@ class quiz_user_table extends table_sql implements renderable {
         $this->downloadable = false;
         $this->define_baseurl($baseurl);
 
-
         $context = \context::instance_by_id($contextid);
 
         // Define the headers and columns.
@@ -222,7 +221,8 @@ class quiz_user_table extends table_sql implements renderable {
         $manage = '';
 
         $icon = $OUTPUT->render(new \pix_icon('i/duration', get_string('useroverride', 'local_assessfreq')));
-        $manage .= \html_writer::link('#', $icon, array('class' => 'action-icon override', 'id' => 'tool-assessfreq-override-' . $row->id));
+        $manage .= \html_writer::link('#', $icon,
+            array('class' => 'action-icon override', 'id' => 'tool-assessfreq-override-' . $row->id));
 
         if ($row->state == 'finished' || $row->state == 'inprogress') {
             $classes = 'action-icon';
@@ -232,7 +232,8 @@ class quiz_user_table extends table_sql implements renderable {
             $attempturl = '#';
         }
         $icon = $OUTPUT->render(new \pix_icon('i/search', get_string('userattempt', 'local_assessfreq')));
-        $manage .= \html_writer::link($attempturl, $icon, array('class' => $classes, 'id' => 'tool-assessfreq-attempt-' . $row->id));
+        $manage .= \html_writer::link($attempturl, $icon,
+            array('class' => $classes, 'id' => 'tool-assessfreq-attempt-' . $row->id));
 
         $profileurl = new \moodle_url('/user/profile.php', array('id' => $row->id));
         $icon = $OUTPUT->render(new \pix_icon('i/completion_self', get_string('userprofile', 'local_assessfreq')));

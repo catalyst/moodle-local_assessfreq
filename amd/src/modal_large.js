@@ -22,7 +22,7 @@
  */
 
 define(['jquery', 'core/notification', 'core/custom_interaction_events', 'core/modal', 'core/modal_registry'],
-        function($, Notification, CustomEvents, Modal, ModalRegistry) {
+function($, Notification, CustomEvents, Modal, ModalRegistry) {
 
     var registered = false;
 

@@ -70,7 +70,6 @@ class local_assessfreq_external extends external_api {
         $frequency = new \local_assessfreq\frequency();
         $freqarr = $frequency->get_frequency_array($data['year'], $data['metric'], $data['modules']);
 
-
         return json_encode($freqarr);
     }
 
@@ -380,7 +379,6 @@ class local_assessfreq_external extends external_api {
         self::validate_context($context);
         has_capability('moodle/site:config', $context);
 
-
         // Set up the initial preference template.
         if (isset($SESSION->flextable[$tableid])) {
             $prefs = $SESSION->flextable[$tableid];
@@ -466,7 +464,7 @@ class local_assessfreq_external extends external_api {
         has_capability('mod/quiz:manageoverrides', $context);
 
         // Check if we have an existing override for this user.
-        $override =$DB->get_record('quiz_overrides', array('quiz' => $quizid, 'userid' => $submitteddata['userid']));
+        $override = $DB->get_record('quiz_overrides', array('quiz' => $quizid, 'userid' => $submitteddata['userid']));
 
         // Submit the form data.
         $quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);

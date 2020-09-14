@@ -54,7 +54,6 @@ define(['core/chart_output_chartjs'], function(Output) {
             config.options.legend = legendOptions;
         }
 
-
         this._chart.getXAxes().forEach(function(axis, i) {
             var axisLabels = axis.getLabels();
 

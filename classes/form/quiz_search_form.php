@@ -53,7 +53,7 @@ class quiz_search_form extends \moodleform {
 
         $courseoptions = array(
             'multiple' => false,
-            'placeholder' =>  get_string('entercourse', 'local_assessfreq'),
+            'placeholder' => get_string('entercourse', 'local_assessfreq'),
             'noselectionstring' => get_string('nocourse', 'local_assessfreq'),
             'ajax' => 'local_assessfreq/course_selector',
             'casesensitive' => false
