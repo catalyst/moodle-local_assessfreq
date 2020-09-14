@@ -75,10 +75,12 @@ class renderer extends plugin_renderer_base {
      * @param string $baseurl the base url to render the table on.
      * @param int $quizid the id of the quiz in the quiz table.
      * @param int $contextid the id of the context the table is being called in.
+     * @param string $search The string to search for in the table.
      * @param int $page the page number for pagination.
      *
      * @return string $output HTML for the table.
      */
+
     public function render_student_table(string $baseurl, int $quizid, int $contextid, string $search = '', int $page = 0): string {
         $renderable = new quiz_user_table($baseurl, $quizid, $contextid, $search, $page);
         $perpage = 50;
@@ -196,6 +198,7 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
+     * Render the cards on the quiz dashboard.
      *
      * @return string
      */
