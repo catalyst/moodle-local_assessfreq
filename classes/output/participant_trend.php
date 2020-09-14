@@ -49,6 +49,7 @@ class participant_trend {
         $quizdata = new quiz();
         $allparticipantdata = $quizdata->get_quiz_tracking($quizid);
         $notloggedin = array();
+        $loggedin = array();
         $inprogress = array();
         $finished = array();
         $labels = array();
@@ -61,6 +62,7 @@ class participant_trend {
             $result['hasdata'] = true;
             foreach ($allparticipantdata as $participantdata){
                 $notloggedin[] = $participantdata->notloggedin;
+                $loggedin[] = $participantdata->loggedin;
                 $inprogress[] = $participantdata->inprogress;
                 $finished[] = $participantdata->finished;
                 $labels[] = userdate($participantdata->timecreated, get_string('trenddatetime', 'local_assessfreq'));
@@ -70,6 +72,7 @@ class participant_trend {
 
             // Create chart object.
             $notloggedinseries = new \core\chart_series(get_string('notloggedin', 'local_assessfreq'), $notloggedin);
+            $loggedinseries = new \core\chart_series(get_string('loggedin', 'local_assessfreq'), $loggedin);
             $inprogressseries = new \core\chart_series(get_string('inprogress', 'local_assessfreq'), $inprogress);
             $finishedseries = new \core\chart_series(get_string('finished', 'local_assessfreq'), $finished);
 
@@ -79,6 +82,7 @@ class participant_trend {
             $chart->set_smooth(true);
             $chart->set_title($charttitle);
             $chart->add_series($notloggedinseries);
+            $chart->add_series($loggedinseries);
             $chart->add_series($inprogressseries);
             $chart->add_series($finishedseries);
             $chart->set_labels($labels);
