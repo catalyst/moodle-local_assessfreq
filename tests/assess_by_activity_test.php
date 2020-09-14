@@ -136,7 +136,7 @@ class assess_by_activity_testcase extends advanced_testcase {
 
         $assessbymonth = new assess_by_activity();
         $result = $assessbymonth->get_assess_by_activity_chart($year);
-        $values = $result->get_series()[0]->get_values();
+        $values = $result['chart']->get_series()[0]->get_values();
 
         $version = get_config('moodle', 'version');
 
