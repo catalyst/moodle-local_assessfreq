@@ -106,6 +106,15 @@ $functions = array(
         'classpath' => '',
         'description' => 'Gets user preference via ajax.',
         'type' => 'read',
+         'ajax' => true
+    ),
+    'local_assessfreq_get_system_timezone' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_system_timezone',
+        'classpath' => '',
+        'description' => 'Returns system (not user) timezone.',
+        'type' => 'read',
+        'loginrequired' => false,
         'ajax' => true
     ),
 );

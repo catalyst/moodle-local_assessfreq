@@ -628,4 +628,42 @@ class local_assessfreq_external extends external_api {
             );
     }
 
+     /**
+     * Returns description of method parameters.
+     *
+     * @return void
+     */
+    public static function get_system_timezone_parameters() {
+        return new external_function_parameters(array(
+            // If I had params they'd be here, but I don't, so they're not.
+        ));
+    }
+
+    /**
+     * Returns system timezone.
+     * This method doesn't require login or user session update.
+     * It also doesn't need any capability check.
+     *
+     * @return string Timezone.
+     */
+    public static function get_system_timezone() {
+        \core\session\manager::write_close(); // Close session early this is a read op.
+        global $DB;
+
+        // Execute API call.
+        $timezone = $DB->get_field('config', 'value', array('name' => 'timezone'), MUST_EXIST);
+
+        return $timezone;
+    }
+
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     */
+    public static function get_system_timezone_returns() {
+        return new external_value(PARAM_TEXT, 'Timezone');
+    }
+
 }
