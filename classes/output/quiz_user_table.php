@@ -65,7 +65,7 @@ class quiz_user_table extends table_sql implements renderable {
     /**
      * report_table constructor.
      *
-     * @param string $uniqueid Unique id of table.
+     * @param string $baseurl Base URL of the page that contains the table.
      * @param int $quizid The id from the quiz table to get data for.
      * @param int $contextid The context id for the context the table is being displayed in.
      * @param string $search The string to search for in the table.
