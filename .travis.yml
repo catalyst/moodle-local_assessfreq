@@ -41,7 +41,7 @@ jobs:
       env: DB=pgsql MOODLE_BRANCH=master
     - php: 7.1
       env: DB=mysqli MOODLE_BRANCH=master
-        
+
 cache:
   directories:
     - $HOME/.composer/cache
