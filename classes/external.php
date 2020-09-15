@@ -408,7 +408,7 @@ class local_assessfreq_external extends external_api {
                 $values = json_decode($values, true);
                 $key = array_keys($values)[0];
 
-                if(!empty($prefs[$preference][$key])) {
+                if (!empty($prefs[$preference][$key])) {
                     $prefs['sortby'][$key] = 3;
                 } else {
                     $prefs['sortby'] = array();
@@ -629,10 +629,10 @@ class local_assessfreq_external extends external_api {
     }
 
      /**
-     * Returns description of method parameters.
-     *
-     * @return void
-     */
+      * Returns description of method parameters.
+      *
+      * @return void
+      */
     public static function get_system_timezone_parameters() {
         return new external_function_parameters(array(
             // If I had params they'd be here, but I don't, so they're not.
