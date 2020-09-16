@@ -46,9 +46,9 @@ function local_assessfreq_coursemodule_standard_elements($formwrapper, $mform) {
 
     // Figure out if this is a module we want to override the form for.
     if ($modname === 'quiz') {
-        $scheduler =& $mform->createElement('local_assessfreq_scheduler', 'schedular', 'Schedule', 'stuff');
-        $mform->insertElementBefore($scheduler, 'timeopen');
-        $mform->setExpanded('timing');
+//         $scheduler =& $mform->createElement('local_assessfreq_scheduler', 'schedular', 'Schedule', 'stuff');
+//         $mform->insertElementBefore($scheduler, 'timeopen');
+//         $mform->setExpanded('timing');
     }
 }
 
