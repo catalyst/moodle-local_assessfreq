@@ -295,6 +295,15 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
         event.preventDefault();
         if (event.target.tagName.toLowerCase() === 'a') {
             let rows = event.target.dataset.metric;
+            let activeoptions = document.getElementById('local-assessfreq-quiz-student-table-rows-filter')
+                .getElementsByClassName('active');
+
+            // Fix active classes.
+            for (var i = 0; i < activeoptions.length; i++) {
+                activeoptions[i].classList.remove('active');
+            }
+            event.target.classList.add('active');
+
             setUserPreference('local_assessfreq_quiz_table_rows_preference', rows)
             .then(() => {
                 getStudentTable(); // Reload the table.
@@ -472,6 +481,15 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             let refreshElement = document.getElementById('local-assessfreq-period-container');
             let actionButton = refreshElement.getElementsByClassName('dropdown-toggle')[0];
             actionButton.textContent = element.innerHTML;
+
+            let activeoptions = refreshElement.getElementsByClassName('active');
+
+            // Fix active classes.
+            for (var i = 0; i < activeoptions.length; i++) {
+                activeoptions[i].classList.remove('active');
+            }
+            element.classList.add('active');
+
             refreshPeriod = element.dataset.period;
             refreshCounter(true);
             setUserPreference('local_assessfreq_quiz_refresh_preference', refreshPeriod);

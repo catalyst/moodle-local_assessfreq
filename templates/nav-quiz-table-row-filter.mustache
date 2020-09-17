@@ -25,7 +25,8 @@
 <div id="local-assessfreq-quiz-student-table-rows" data-region="rows-filter" class="dropdown">
     <button type="button" class="btn btn-outline-secondary dropdown-toggle icon-no-margin"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-            aria-label="{{# str }} showrows, local_assessfreq {{/ str }}" aria-controls="rowsfilter">
+            aria-label="{{# str }} showrows, local_assessfreq {{/ str }}"
+            aria-controls="local-assessfreq-quiz-student-table-rows-filter">
         {{#pix}} i/group {{/pix}} {{# str }} showrows, local_assessfreq {{/ str }}
         <span class="sr-only" data-active-item-text>
                 {{# str }} rows20, local_assessfreq {{/ str }}
@@ -33,7 +34,7 @@
                 {{# str }} rows100, local_assessfreq {{/ str }}
         </span>
     </button>
-    <div id="rowsfilter" role="menu" class="dropdown-menu" data-show-active-item>
+    <div id="local-assessfreq-quiz-student-table-rows-filter" role="menu" class="dropdown-menu" data-show-active-item>
         <h6 class="dropdown-header">{{# str }} showrows, local_assessfreq {{/ str }}</h6>
         <a
             class="dropdown-item {{#rows}}{{#rows20}}active{{/rows20}}{{/rows}}"
