@@ -56,9 +56,15 @@ class participant_summary {
             $result['chart'] = false;
         } else {
             $result['hasdata'] = true;
+            // We only want to count users as logged in if they have not started and/or finished an attempt.
+            $loggedinval = $participantdata->loggedin - ($participantdata->inprogress + $participantdata->finished);
+            // Number of logged in users should never be less than zero. But it can happen with late enrolment changes and
+            // multiple attempts.
+            $loggedinval = ($loggedinval < 0) ? 0 : $loggedinval;
+
             $seriesdata = array(
                 $participantdata->notloggedin,
-                $participantdata->loggedin,
+                $loggedinval,
                 $participantdata->inprogress,
                 $participantdata->finished
             );
