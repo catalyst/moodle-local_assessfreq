@@ -362,7 +362,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                         let heat = getHeat(monthEvents[date]['number']);
 
-                        if (heatRangeScale[heat] < monthEvents[date]['number']) {
+                        if (heatRangeScale[heat] == 0 || heatRangeScale[heat] > monthEvents[date]['number']) {
                             heatRangeScale[heat] = monthEvents[date]['number'];
                         }
 
