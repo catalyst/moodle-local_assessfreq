@@ -444,7 +444,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
 
             tbody.appendChild(trow);
             table.appendChild(tbody);
-            window.console.log(table);
 
             resolve(table);
         });
