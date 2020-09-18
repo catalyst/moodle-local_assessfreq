@@ -280,11 +280,12 @@ class quiz_user_table extends table_sql implements renderable {
                          FROM {sessions}
                         WHERE timemodified >= :stm';
 
-        $joins .= ' LEFT JOIN {quiz_overrides} qo ON u.id = qo.userid';
+        $joins .= ' LEFT JOIN {quiz_overrides} qo ON u.id = qo.userid AND qo.quiz = :qoquiz';
         $joins .= " LEFT JOIN ($attemptsql) qa ON u.id = qa.userid";
         $joins .= " LEFT JOIN ($sessionsql) us ON u.id = us.userid";
 
         $params['qaquiz'] = $this->quizid;
+        $params['qoquiz'] = $this->quizid;
         $params['stm'] = $timedout;
 
         $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
