@@ -54,6 +54,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     var heatRangeMin;
     var colorArray;
     var processModules;
+    var heatRangeScale = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0};
 
     /**
      * Pick a contrasting text color based on the background color.
@@ -360,6 +361,11 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
                        let heat = getHeat(monthEvents[date]['number']);
+
+                       if (heatRangeScale[heat] < monthEvents[date]['number']) {
+                           heatRangeScale[heat] = monthEvents[date]['number'];
+                       }
+
                        cell.style.backgroundColor = colorArray[heat];
                        cell.style.color = getContrast(colorArray[heat]);
 
@@ -408,6 +414,39 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
             } else {
                 resolve(calendarContainer);
             }
+        });
+    };
+
+    /**
+     * Create the heatmap scale for the calendar.
+     *
+     * @method createHeatScale
+     */
+    Calendar.createHeatScale = function() {
+        return new Promise((resolve) => {
+            let table = document.createElement('table');
+            let tbody = document.createElement('tbody');
+            let trow = document.createElement('tr');
+
+            for (var i = 1; i < 7; i++) {
+                if (heatRangeScale[i] !== 0) {
+                    let cell = document.createElement('td');
+                    let cellText = document.createTextNode(heatRangeScale[i] + '+');
+
+                    cell.appendChild(cellText);
+                    cell.style.backgroundColor = colorArray[i];
+                    cell.style.color = getContrast(colorArray[i]);
+
+                    trow.appendChild(cell);
+                }
+
+            }
+
+            tbody.appendChild(trow);
+            table.appendChild(tbody);
+            window.console.log(table);
+
+            resolve(table);
         });
     };
 

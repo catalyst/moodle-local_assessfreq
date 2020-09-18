@@ -180,10 +180,16 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
             let calendarContainer = document.getElementById('local-assessfreq-report-heatmap-months');
             calendarContainer.innerHTML = calendar.innerHTML;
             calendarContainer.addEventListener('click', detailView);
-            spinner.classList.add('hide'); // Hide sinner if not already hidden.
             $('[data-toggle="tooltip"]').tooltip();
             return;
-        }).catch(() => {
+        })
+        .then(Calendar.createHeatScale)
+        .then((heatScale) => {
+            let heatScaleContainer = document.getElementById('local-assessfreq-report-heatmap-scale');
+            heatScaleContainer.innerHTML = heatScale.outerHTML;
+            spinner.classList.add('hide'); // Hide sinner if not already hidden.
+        })
+        .catch(() => {
             Notification.exception(new Error('Failed to calendar.'));
             return;
         });

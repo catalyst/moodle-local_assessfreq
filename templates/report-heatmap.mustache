@@ -58,8 +58,17 @@
         <span id="local-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
              <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
         </span>
-        <h4>{{# str }} assessheatmap, local_assessfreq {{/ str }} <span class="local-assessfreq-year">{{ currentyear }}</span></h4>
-        <div id="local-assessfreq-report-heatmap-months" class="local-assessfreq local-assessfreq-row">
+        <div class="row no-gutters m-2">
+	        <h4 class="col-sm d-flex justify-content-start">
+	           {{# str }} assessheatmap, local_assessfreq {{/ str }}
+	           <span class="local-assessfreq-year ml-2">{{ currentyear }}</span>
+	        </h4>
+	        <div class="col-sm d-flex justify-content-end">
+                <h5 class="mt-auto mr-2">{{# str }} scale, local_assessfreq {{/ str }}</h5>
+                <div id="local-assessfreq-report-heatmap-scale"></div>
+	        </div>
+        </div>
+        <div id="local-assessfreq-report-heatmap-months" class="local-assessfreq local-assessfreq-row justify-content-center">
 
         </div>
     </div>
