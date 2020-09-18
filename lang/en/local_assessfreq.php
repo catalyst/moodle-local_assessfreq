@@ -107,6 +107,7 @@ $string['reprocessall_desc'] = 'This will delete ALL existing event records from
 $string['rows20'] = '20 Rows';
 $string['rows50'] = '50 Rows';
 $string['rows100'] = '100 Rows';
+$string['scale'] = 'Scale:';
 $string['schedule'] = 'Daily schedule';
 $string['selectassessment'] = 'Select assessment type';
 $string['selectcourse'] = 'Select course first';

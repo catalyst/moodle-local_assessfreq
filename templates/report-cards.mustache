@@ -32,14 +32,16 @@
 	        </div>
 	    </div>
 	    <div class="col-sm d-flex justify-content-end">
-	        <button  id="local-assessfreq-hide-report-btn" class="btn btn-outline-secondary" type="button" data-toggle="collapse"
+	        <button id="local-assessfreq-hide-report-btn" class="btn btn-outline-secondary" type="button" data-toggle="collapse"
 	         data-target=".local-assessfreq-report-overview" aria-expanded="true" aria-controls="collapseOverview">
 	            {{#pix}} t/expanded {{/pix}} {{# str }} toggleoverview, local_assessfreq {{/ str }}
 	        </button>
 	    </div>
     </div>
     <div id="local-assessfreq-report-overview" class="collapse show local-assessfreq-report-overview ">
-        <h4>{{# str }} assessoverview, local_assessfreq {{/ str }} <span class="local-assessfreq-year">{{ currentyear }}</span></h4>
+        <h4 class="mt-2">
+            {{# str }} assessoverview, local_assessfreq {{/ str }} <span class="local-assessfreq-year ml-2">{{ currentyear }}</span>
+        </h4>
         <div id="local-assessfreq-report-cards" class="card-deck">
             {{> local_assessfreq/assess-due-month}}
             {{> local_assessfreq/assess-by-activity}}
