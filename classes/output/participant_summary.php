@@ -76,10 +76,18 @@ class participant_summary {
                 get_string('finished', 'local_assessfreq')
             );
 
+            $colors = array(
+                get_config('local_assessfreq', 'notloggedincolor'),
+                get_config('local_assessfreq', 'loggedincolor'),
+                get_config('local_assessfreq', 'inprogresscolor'),
+                get_config('local_assessfreq', 'finishedcolor')
+            );
+
             // Create chart object.
             $chart = new \core\chart_pie();
             $chart->set_doughnut(true);
             $participants = new \core\chart_series(get_string('participants', 'local_assessfreq'), $seriesdata);
+            $participants->set_colors($colors);
             $chart->add_series($participants);
             $chart->set_labels($labels);
 

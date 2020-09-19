@@ -119,6 +119,27 @@ $sitesettings->add(new admin_setting_configcolourpicker('local_assessfreq/heat6'
     get_string('settings:heat6', 'local_assessfreq'),
     get_string('settings:heat6_desc', 'local_assessfreq'), '#8C0010'));
 
+// Chart color settings.
+$sitesettings->add(new admin_setting_heading('local_assessfreq/chartheading',
+    get_string('settings:chartheading', 'local_assessfreq'),
+    get_string('settings:chartheading_desc', 'local_assessfreq')));
+
+$sitesettings->add(new admin_setting_configcolourpicker('local_assessfreq/notloggedincolor',
+    get_string('settings:notloggedincolor', 'local_assessfreq'),
+    get_string('settings:notloggedincolor_desc', 'local_assessfreq'), '#8C0010'));
+
+$sitesettings->add(new admin_setting_configcolourpicker('local_assessfreq/loggedincolor',
+    get_string('settings:loggedincolor', 'local_assessfreq'),
+    get_string('settings:loggedincolor_desc', 'local_assessfreq'), '#FA8900'));
+
+$sitesettings->add(new admin_setting_configcolourpicker('local_assessfreq/inprogresscolor',
+    get_string('settings:inprogresscolor', 'local_assessfreq'),
+    get_string('settings:inprogresscolor_desc', 'local_assessfreq'), '#875692'));
+
+$sitesettings->add(new admin_setting_configcolourpicker('local_assessfreq/finishedcolor',
+    get_string('settings:finishedcolor', 'local_assessfreq'),
+    get_string('settings:finishedcolor_desc', 'local_assessfreq'), '#1B8700'));
+
 // Build the admin menu tree.
 $ADMIN->add('localplugins', new admin_category('local_assessfreq_settings',
     get_string('pluginname', 'local_assessfreq')));

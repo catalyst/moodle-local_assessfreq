@@ -78,9 +78,16 @@ class participant_trend {
 
             // Create chart object.
             $notloggedinseries = new \core\chart_series(get_string('notloggedin', 'local_assessfreq'), $notloggedin);
+            $notloggedinseries->set_color(get_config('local_assessfreq', 'notloggedincolor'));
+
             $loggedinseries = new \core\chart_series(get_string('loggedin', 'local_assessfreq'), $loggedin);
+            $loggedinseries->set_color(get_config('local_assessfreq', 'loggedincolor'));
+
             $inprogressseries = new \core\chart_series(get_string('inprogress', 'local_assessfreq'), $inprogress);
+            $inprogressseries->set_color(get_config('local_assessfreq', 'inprogresscolor'));
+
             $finishedseries = new \core\chart_series(get_string('finished', 'local_assessfreq'), $finished);
+            $finishedseries->set_color(get_config('local_assessfreq', 'finishedcolor'));
 
             $chart = new \core\chart_line();
             $yaxis = $chart->get_yaxis(0, true);
