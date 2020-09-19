@@ -371,7 +371,7 @@ function(Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, Dayv
      * Thin wrapper to add extra data to click event.
      */
     const triggerZoomGraph = function(event) {
-        let call = event.target.parentElement.dataset.call;
+        let call = event.target.closest('div').dataset.call;
         let params = {'data': JSON.stringify({'year' : yearselect, 'call': call})};
         let method = 'get_chart';
 
