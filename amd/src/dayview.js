@@ -171,12 +171,12 @@ function($, Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
 
             modalObj.setTitle(dayViewTitle + ' ' + dayDate);
             modalObj.setBody(Templates.render('local_assessfreq/dayview', context));
+            $('[data-toggle="tooltip"]').tooltip();
 
         }).fail(() => {
             Notification.exception(new Error('Failed to load day view'));
         });
 
-        $('[data-toggle="tooltip"]').tooltip();
     };
 
     /**
@@ -215,6 +215,7 @@ function($, Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
             })
             .done((modal) => {
                 modalObj = modal;
+                $('[data-toggle="tooltip"]').tooltip();
 
             });
         }).catch(() => {
