@@ -270,6 +270,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                 let container = document.createElement('div');
                 container.classList.add('local-assessfreq-month');
                 let table = document.createElement('table');
+                table.classList.add('table-striped');
                 let thead = document.createElement('thead');
                 let tbody = document.createElement('tbody');
                 tbody.id = 'calendar-body-' + i;
