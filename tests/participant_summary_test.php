@@ -110,7 +110,7 @@ class participant_summary_testcase extends advanced_testcase {
 
         $this->assertTrue($result['hasdata']);
         $this->assertEquals(1, $values[0]);
-        $this->assertEquals(4, $values[1]);
+        $this->assertEquals(0, $values[1]);
         $this->assertEquals(3, $values[2]);
         $this->assertEquals(1, $values[3]);
         $this->assertEquals('Not logged in', $labels[0]);

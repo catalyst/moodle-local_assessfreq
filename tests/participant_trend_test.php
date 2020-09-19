@@ -114,7 +114,7 @@ class participant_trend_testcase extends advanced_testcase {
         $this->assertEquals('12:43, 15-07-20', $labels[2]);
 
         $this->assertEquals(4, $series[0]->get_values()[1]);
-        $this->assertEquals(2, $series[1]->get_values()[2]);
+        $this->assertEquals(0, $series[1]->get_values()[2]);
         $this->assertEquals(2, $series[2]->get_values()[2]);
         $this->assertEquals(1, $series[3]->get_values()[4]);
 
