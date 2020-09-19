@@ -56,6 +56,7 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
     ];
     var stringResult;
     var systemTimezone = 'Australia/Melbourne';
+    var dayViewTitle = '';
 
     const getUserDate = function(timestamp, format) {
         return new Promise((resolve) => {
@@ -162,6 +163,12 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
         .then((responseArr) => {
 
             let context = {rows: responseArr};
+            const year = responseArr[0].endyear;
+            const day = responseArr[0].endday;
+            const month = stringResult[(6 + parseInt(responseArr[0].endmonth))];
+            const dayDate = day + ' ' + month + ' ' + year;
+
+            modalObj.setTitle(dayViewTitle + ' ' + dayDate);
             modalObj.setBody(Templates.render('local_assessfreq/dayview', context));
 
         }).fail(() => {
@@ -195,6 +202,8 @@ function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
         });
 
         Str.get_string('schedule', 'local_assessfreq').then((title) => {
+            dayViewTitle = title;
+
             // Create the Modal.
             ModalFactory.create({
                 type: ModalLarge.TYPE,
