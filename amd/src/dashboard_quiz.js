@@ -21,9 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['local_assessfreq/form_modal', 'core/ajax', 'core/notification', 'core/str', 'core/fragment', 'core/templates',
+define(['jquery', 'local_assessfreq/form_modal', 'core/ajax', 'core/notification', 'core/str', 'core/fragment', 'core/templates',
     'local_assessfreq/zoom_modal', 'local_assessfreq/override_modal'],
-function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, OverrideModal) {
+function($, FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, OverrideModal) {
 
     /**
      * Module level variables.
@@ -389,6 +389,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             tableBody.innerHTML = response;
             spinner.classList.add('hide');
             tableEventListeners(); // Re-add table event listeners.
+            $('[data-toggle="tooltip"]').tooltip();
 
         }).fail(() => {
             Notification.exception(new Error('Failed to update table.'));
@@ -555,6 +556,8 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
 
         let trendZoom = document.getElementById('local-assessfreq-quiz-summary-trend-zoom');
         trendZoom.addEventListener('click', triggerZoomGraph);
+
+        $('[data-toggle="tooltip"]').tooltip();
 
     };
 
