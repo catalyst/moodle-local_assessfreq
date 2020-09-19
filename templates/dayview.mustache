@@ -81,3 +81,10 @@
   </tbody>
 </table>
 </div>
+{{^element.frozen}}
+{{#js}}
+require(['jquery'], function($) {
+    $('[data-toggle="tooltip"]').tooltip();
+});
+{{/js}}
+{{/element.frozen}}

@@ -21,9 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/str', 'core/notification', 'core/modal_factory', 'local_assessfreq/modal_large', 'core/templates',
+define(['core/str', 'core/notification', 'core/modal_factory', 'local_assessfreq/modal_large', 'core/templates',
     'core/ajax'],
-function($, Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
+function(Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
 
     /**
      * Module level variables.
@@ -171,7 +171,6 @@ function($, Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
 
             modalObj.setTitle(dayViewTitle + ' ' + dayDate);
             modalObj.setBody(Templates.render('local_assessfreq/dayview', context));
-            $('[data-toggle="tooltip"]').tooltip();
 
         }).fail(() => {
             Notification.exception(new Error('Failed to load day view'));
@@ -215,7 +214,6 @@ function($, Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
             })
             .done((modal) => {
                 modalObj = modal;
-                $('[data-toggle="tooltip"]').tooltip();
 
             });
         }).catch(() => {
