@@ -34,7 +34,9 @@
         <h5>{{# str }} assessbyactivity, local_assessfreq {{/ str }}</h5>
         <div id="local-assessfreq-assess-by-activity-zoom" class="local-assessfreq-zoom"
              data-title="{{# str }} assessbyactivity, local_assessfreq {{/ str }}" data-call="assess_by_activity">
-            {{#pix}} i/preview, core, {{#str}} zoom, local_assessfreq {{/str}} {{/pix}}
+             <span  data-toggle="tooltip" data-placement="top" title="{{#str}} zoom, local_assessfreq {{/str}}" data-offset="0,5">
+                {{#pix}} i/preview, core{{/pix}}
+             </span>
         </div>
     </div>
     <div class="card-body">

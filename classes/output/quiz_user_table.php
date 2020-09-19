@@ -222,25 +222,45 @@ class quiz_user_table extends table_sql implements renderable {
 
         $manage = '';
 
-        $icon = $OUTPUT->render(new \pix_icon('i/duration', get_string('useroverride', 'local_assessfreq')));
-        $manage .= \html_writer::link('#', $icon,
-            array('class' => 'action-icon override', 'id' => 'tool-assessfreq-override-' . $row->id));
+        $icon = $OUTPUT->render(new \pix_icon('i/duration', ''));
+        $manage .= \html_writer::link('#', $icon, array(
+            'class' => 'action-icon override',
+            'id' => 'tool-assessfreq-override-' . $row->id,
+            'data-toggle' => 'tooltip',
+            'data-placement' => 'top',
+            'title' => get_string('useroverride', 'local_assessfreq')
+        ));
 
         if ($row->state == 'finished' || $row->state == 'inprogress') {
             $classes = 'action-icon';
-            $attempturl = new \moodle_url('/mod/quiz/review.php', array('attempt' => $row->attemptid));;
+            $attempturl = new \moodle_url('/mod/quiz/review.php', array('attempt' => $row->attemptid));
+            $attributes = array(
+                'class' => $classes,
+                'id' => 'tool-assessfreq-attempt-' . $row->id,
+                'data-toggle' => 'tooltip',
+                'data-placement' => 'top',
+                'title' => get_string('userattempt', 'local_assessfreq')
+            );
         } else {
             $classes = 'action-icon disabled';
             $attempturl = '#';
+            $attributes = array(
+                'class' => $classes,
+                'id' => 'tool-assessfreq-attempt-' . $row->id,
+            );
         }
-        $icon = $OUTPUT->render(new \pix_icon('i/search', get_string('userattempt', 'local_assessfreq')));
-        $manage .= \html_writer::link($attempturl, $icon,
-            array('class' => $classes, 'id' => 'tool-assessfreq-attempt-' . $row->id));
+        $icon = $OUTPUT->render(new \pix_icon('i/search', ''));
+        $manage .= \html_writer::link($attempturl, $icon, $attributes);
 
         $profileurl = new \moodle_url('/user/profile.php', array('id' => $row->id));
-        $icon = $OUTPUT->render(new \pix_icon('i/completion_self', get_string('userprofile', 'local_assessfreq')));
-        $manage .= \html_writer::link($profileurl, $icon,
-            array('class' => 'action-icon', 'id' => 'tool-assessfreq-profile-' . $row->id));
+        $icon = $OUTPUT->render(new \pix_icon('i/completion_self', ''));
+        $manage .= \html_writer::link($profileurl, $icon, array(
+            'class' => 'action-icon',
+            'id' => 'tool-assessfreq-profile-' . $row->id,
+            'data-toggle' => 'tooltip',
+            'data-placement' => 'top',
+            'title' => get_string('userprofile', 'local_assessfreq')
+            ));
 
         return $manage;
     }

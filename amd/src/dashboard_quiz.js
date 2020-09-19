@@ -500,7 +500,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
      * Trigger the zoom graph. Thin wrapper to add extra data to click event.
      */
     const triggerZoomGraph = function(event) {
-        let call = event.target.parentElement.dataset.call;
+        let call = event.target.closest('div').dataset.call;
         let params = {'data': JSON.stringify({'quiz' : quizId, 'call': call})};
         let method = 'get_quiz_chart';
 

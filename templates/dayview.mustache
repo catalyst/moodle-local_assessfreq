@@ -36,10 +36,14 @@
     <tr>
       <th scope="col" rowspan="2">{{# str }} title, local_assessfreq {{/ str }}</th>
       <th scope="col" rowspan="2" class="text-center">
-        {{#pix}} i/cohort, core, {{#str}} students, local_assessfreq {{/str}} {{/pix}}
+        <span  data-toggle="tooltip" data-placement="top" title="{{#str}} students, local_assessfreq {{/str}}" data-offset="0,5">
+          {{#pix}} i/cohort, core{{/pix}}
+        </span>
       </th>
       <th scope="col" rowspan="2" class="text-center">
-        {{#pix}} i/calendareventtime, core, {{#str}} timelimit, local_assessfreq {{/str}} {{/pix}}
+        <span  data-toggle="tooltip" data-placement="top" title="{{#str}} timelimit, local_assessfreq {{/str}}" data-offset="0,5">
+          {{#pix}} i/calendareventtime, core{{/pix}}
+        </span>
       </th>
       <th scope="col">{{# str }} time, local_assessfreq {{/ str }}</th>
     </tr>
