@@ -75,6 +75,7 @@ class quiz_user_table extends table_sql implements renderable {
      */
     public function __construct(string $baseurl, int $quizid, int $contextid, string $search, int $page = 0) {
         parent::__construct('local_assessfreq_student_table');
+        global $DB;
 
         $this->quizid = $quizid;
         $this->contextid = $contextid;
@@ -83,6 +84,11 @@ class quiz_user_table extends table_sql implements renderable {
         $this->set_attribute('class', 'generaltable generalbox');
         $this->downloadable = false;
         $this->define_baseurl($baseurl);
+
+        $quizrecord = $DB->get_record('quiz', array('id' => $this->quizid), 'timeopen, timeclose, timelimit');
+        $this->timeopen = $quizrecord->timeopen;
+        $this->timeclose = $quizrecord->timeclose;
+        $this->timelimit = $quizrecord->timelimit;
 
         $context = \context::instance_by_id($contextid);
 
@@ -169,7 +175,13 @@ class quiz_user_table extends table_sql implements renderable {
     public function col_timeopen($row) {
         $datetime = userdate($row->timeopen, get_string('trenddatetime', 'local_assessfreq'));
 
-        return $datetime;
+        if ($row->timeopen != $this->timeopen) {
+            $content = \html_writer::span($datetime, 'local-assessfreq-override-status');
+        } else {
+            $content = \html_writer::span($datetime);
+        }
+
+        return $content;
     }
 
     /**
@@ -182,7 +194,13 @@ class quiz_user_table extends table_sql implements renderable {
     public function col_timeclose($row) {
         $datetime = userdate($row->timeclose, get_string('trenddatetime', 'local_assessfreq'));
 
-        return $datetime;
+        if ($row->timeclose != $this->timeclose) {
+            $content = \html_writer::span($datetime, 'local-assessfreq-override-status');
+        } else {
+            $content = \html_writer::span($datetime);
+        }
+
+        return $content;
     }
 
     /**
@@ -195,7 +213,13 @@ class quiz_user_table extends table_sql implements renderable {
     public function col_timelimit($row) {
         $timelimit = format_time($row->timelimit);
 
-        return $timelimit;
+        if ($row->timelimit != $this->timelimit) {
+            $content = \html_writer::span($timelimit, 'local-assessfreq-override-status');
+        } else {
+            $content = \html_writer::span($timelimit);
+        }
+
+        return $content;
     }
 
     /**
@@ -206,8 +230,22 @@ class quiz_user_table extends table_sql implements renderable {
      * @return string html used to display the field.
      */
     public function col_state($row) {
+        global $OUTPUT;
 
-        return get_string($row->state, 'local_assessfreq');
+        if ($row->state == 'notloggedin') {
+            $color = 'background: ' . get_config('local_assessfreq', 'notloggedincolor');
+        } else if ($row->state == 'loggedin') {
+            $color = 'background: ' . get_config('local_assessfreq', 'loggedincolor');
+        } else if ($row->state == 'inprogress') {
+            $color = 'background: ' . get_config('local_assessfreq', 'inprogresscolor');
+        } else if ($row->state == 'finished') {
+            $color = 'background: ' . get_config('local_assessfreq', 'finishedcolor');
+        }
+
+        $content = \html_writer::span('', 'local-assessfreq-status-icon', array('style' => $color));
+        $content .= get_string($row->state, 'local_assessfreq');
+
+        return $content;
     }
 
     /**
@@ -286,7 +324,6 @@ class quiz_user_table extends table_sql implements renderable {
         $quiz = new \local_assessfreq\quiz();
         $capabilities = $frequency->get_module_capabilities('quiz');
         $context = $quiz->get_quiz_context($this->quizid);
-        $quizrecord = $DB->get_record('quiz', array('id' => $this->quizid), 'timeopen, timeclose, timelimit');
 
         list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
         $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid
@@ -313,9 +350,9 @@ class quiz_user_table extends table_sql implements renderable {
         $params = $finaljoin->params;
 
         $sql = "SELECT u.*,
-                       COALESCE(qo.timeopen, $quizrecord->timeopen) AS timeopen,
-                       COALESCE(qo.timeclose, $quizrecord->timeclose) AS timeclose,
-                       COALESCE(qo.timelimit, $quizrecord->timelimit) AS timelimit,
+                       COALESCE(qo.timeopen, $this->timeopen) AS timeopen,
+                       COALESCE(qo.timeclose, $this->timeclose) AS timeclose,
+                       COALESCE(qo.timelimit, $this->timelimit) AS timelimit,
                        COALESCE(qa.state, (CASE
                                               WHEN us.userid > 0 THEN 'loggedin'
                                               ELSE 'notloggedin'
