@@ -176,12 +176,12 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
 
         spinner.classList.remove('hide'); // Show spinner if not already shown.
 
-        Calendar.generate(year, 0, 11, metric, modules).then(calendar => {
+        Calendar.generate(year, 0, 11, metric, modules)
+        .then(calendar => {
             let calendarContainer = document.getElementById('local-assessfreq-report-heatmap-months');
             calendarContainer.innerHTML = calendar.innerHTML;
             calendarContainer.addEventListener('click', detailView);
             $('[data-toggle="tooltip"]').tooltip();
-            return;
         })
         .then(Calendar.createHeatScale)
         .then((heatScale) => {
