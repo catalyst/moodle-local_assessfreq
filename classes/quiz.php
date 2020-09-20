@@ -184,12 +184,26 @@ class quiz {
         $overrideinfostart = userdate($overrideinfo->start, get_string('strftimedatetime', 'langconfig'));
         $overrideinfoend = userdate($overrideinfo->end, get_string('strftimedatetime', 'langconfig'));
 
+        // Handle override start.
+        if ($overrideinfo->start != 0 && $overrideinfo->start < $quizrecord->timeopen) {
+            $earlyopen = $overrideinfostart;
+        } else {
+            $earlyopen = $timesopen;
+        }
+
+        // Handle override end.
+        if ($overrideinfo->end != 0 && $overrideinfo->end > $quizrecord->timeclose) {
+            $lateclose = $overrideinfoend;
+        } else {
+            $lateclose = $timeclose;
+        }
+
         $quizdata->name = $quizrecord->name;
         $quizdata->timeopen = $timesopen;
         $quizdata->timeclose = $timeclose;
         $quizdata->timelimit = format_time($quizrecord->timelimit);
-        $quizdata->earlyopen = ($overrideinfo->start == 0) ? $timesopen : $overrideinfostart;
-        $quizdata->lateclose = ($overrideinfo->end == 0) ? $timeclose : $overrideinfoend;
+        $quizdata->earlyopen = $earlyopen;
+        $quizdata->lateclose = $lateclose;
         $quizdata->participants = count($frequency->get_event_users_raw($context->id, 'quiz'));
         $quizdata->overrideparticipants = $overrideinfo->users;
         $quizdata->url = $context->get_url()->out(false);

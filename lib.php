@@ -216,8 +216,9 @@ function local_assessfreq_output_fragment_new_override_form($args): string {
 
     $serialiseddata = json_decode($args['jsonformdata'], true);
 
+    $formdata = array();
+
     if (!empty($serialiseddata)) {
-        $formdata = array();
         parse_str($serialiseddata, $formdata);
     }
 
