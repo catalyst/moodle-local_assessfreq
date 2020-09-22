@@ -240,6 +240,11 @@ function local_assessfreq_output_fragment_new_override_form($args): string {
         $data->userid = $args['userid'];
     }
 
+    if (!$override && empty($formdata)) {
+        $override = new \stdClass();
+        $override->userid = $args['userid'];
+    }
+
     $mform = new \local_assessfreq\form\quiz_override_form($cm, $quiz, $quizcontext, $override, $formdata);
     $mform->set_data($data);
 
