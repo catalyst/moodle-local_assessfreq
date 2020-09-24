@@ -434,6 +434,14 @@ function($, FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, 
             const newUrl = currentdUrl.origin + currentdUrl.pathname + '?id=' + quizId;
             history.pushState({}, '', newUrl);
 
+            // Update page title with quiz name.
+            Str.get_string('dashboard:quiztitle', 'local_assessfreq', quizArray.name)
+            .then((str) => {
+                document.title = str;
+            }).catch(() => {
+                Notification.exception(new Error('Failed to load string: dashboard:quiztitle'));
+            });
+
             // Populate quiz summary card with details.
             document.getElementById('quiz-time-open').innerHTML = quizArray.timeopen;
             document.getElementById('quiz-time-close').innerHTML = quizArray.timeclose;

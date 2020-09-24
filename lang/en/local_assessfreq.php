@@ -50,6 +50,7 @@ $string['confirmreprocess'] = 'Delete ALL history and reprocess?';
 $string['course'] = 'Course';
 $string['dashboard:assessment'] = 'Assessment dashboard';
 $string['dashboard:quiz'] = 'Quiz dashboard';
+$string['dashboard:quiztitle'] = '{$a} - Dashboard';
 $string['duedate'] = 'Due date';
 $string['eventeventprocessed'] = 'event_processed';
 $string['eventeven_processed_desc'] = 'local assessfreq task event processing';
