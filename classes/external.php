@@ -238,7 +238,7 @@ class local_assessfreq_external extends external_api {
         has_capability('moodle/site:config', $context);
 
         // Execute API call.
-        $sql = 'SELECT id, fullname FROM {course} WHERE ' . $DB->sql_like('fullname', ':fullname') . ' AND id <> 1';
+        $sql = 'SELECT id, fullname FROM {course} WHERE ' . $DB->sql_like('fullname', ':fullname', false) . ' AND id <> 1';
         $params = array('fullname' => '%' . $DB->sql_like_escape($query) . '%');
         $courses = $DB->get_records_sql($sql, $params, 0, 11);
 
