@@ -92,6 +92,8 @@ class frequency_testcase extends advanced_testcase {
         ));
         $this->assign1 = new assign(context_module::instance($assignrow1->cmid), false, false);
         $this->assign2 = new assign(context_module::instance($assignrow2->cmid), false, false);
+        $this->assign1->cmid = $assignrow1->cmid;
+        $this->assign2->cmid = $assignrow2->cmid;
         $this->course = $course;
 
         // Create some users.
@@ -1089,6 +1091,30 @@ class frequency_testcase extends advanced_testcase {
         $frequency = new frequency();
         $frequency->process_site_events(0);
         $frequency->process_user_events(0);
+
+        $result = $frequency->get_day_events($date, $modules);
+
+        $this->assertEquals('assign', $result[0]->module);
+        $this->assertEquals(2, $result[0]->usercount);
+        $this->assertEquals(2020, $result[0]->endyear);
+        $this->assertEquals(3, $result[0]->endmonth);
+        $this->assertEquals(28, $result[0]->endday);
+
+    }
+
+    /**
+     * Test getting day event information with the case that an event has been deleted since the data was gathered.
+     */
+    public function test_get_day_events_deleted() {
+        $date = '2020-3-28';
+        $modules = array('all');
+
+        $frequency = new frequency();
+        $frequency->process_site_events(0);
+        $frequency->process_user_events(0);
+
+        course_delete_module($this->assign1->cmid);
+
         $result = $frequency->get_day_events($date, $modules);
 
         $this->assertEquals('assign', $result[0]->module);
