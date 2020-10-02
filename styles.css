@@ -88,8 +88,9 @@
 .local-assessfreq-day-period div {
     text-align: center;
     color: #FFFFFF;
-    font-weight: 600;
-    padding: .5rem;
+    font-weight: 400;
+    padding: .5rem .2rem .5rem .2rem;
+    font-size: clamp(.6rem, .6vw, 1rem)
 }
 
 .local-assessfreq-flex-row {
