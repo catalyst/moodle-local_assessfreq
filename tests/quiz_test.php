@@ -109,15 +109,27 @@ class quiz_testcase extends advanced_testcase {
 
     /**
      *
-     * @var stdClass Second test user.
+     * @var stdClass Third test user.
      */
     protected $user3;
 
     /**
      *
-     * @var stdClass Second test user.
+     * @var stdClass Fourth test user.
      */
     protected $user4;
+
+    /**
+     *
+     * @var stdClass Fifth test user.
+     */
+    protected $user5;
+
+    /**
+     *
+     * @var stdClass Sixth test user.
+     */
+    protected $user6;
 
     /**
      * Set up conditions for tests.
@@ -237,12 +249,16 @@ class quiz_testcase extends advanced_testcase {
         $user2 = $generator->create_user();
         $user3 = $generator->create_user();
         $user4 = $generator->create_user();
+        $user5 = $generator->create_user();
+        $user6 = $generator->create_user();
 
         // Enrol users into the course.
         $generator->enrol_user($user1->id, $course->id, 'student');
         $generator->enrol_user($user2->id, $course->id, 'student');
         $generator->enrol_user($user3->id, $course->id, 'student');
         $generator->enrol_user($user4->id, $course->id, 'student');
+        $generator->enrol_user($user5->id, $course->id, 'student');
+        $generator->enrol_user($user6->id, $course->id, 'student');
 
         // Set up a couple of overrides.
         $override1 = new \stdClass();
@@ -325,6 +341,8 @@ class quiz_testcase extends advanced_testcase {
         $this->user2 = $user2;
         $this->user3 = $user3;
         $this->user4 = $user4;
+        $this->user5 = $user5;
+        $this->user6 = $user6;
 
         $CFG->sessiontimeout = 60 * 10;  // Short time out for test.
 
@@ -368,41 +386,63 @@ class quiz_testcase extends advanced_testcase {
         $record4->firstip = '10.0.0.1';
         $record4->lastip = '10.0.0.1';
 
-        $sessionrecords = array($record1, $record2, $record3, $record4);
+        $record5 = new \stdClass();
+        $record5->state = 0;
+        $record5->sid = md5('sid5');
+        $record5->sessdata = null;
+        $record5->userid = $this->user5->id;
+        $record5->timecreated = time() - 60 * 60;
+        $record5->timemodified = time() - 30;
+        $record5->firstip = '10.0.0.1';
+        $record5->lastip = '10.0.0.1';
+
+        $record6 = new \stdClass();
+        $record6->state = 0;
+        $record6->sid = md5('sid6');
+        $record6->sessdata = null;
+        $record6->userid = $this->user6->id;
+        $record6->timecreated = time() - 60 * 60;
+        $record6->timemodified = time() - 30;
+        $record6->firstip = '10.0.0.1';
+        $record6->lastip = '10.0.0.1';
+
+        $sessionrecords = array($record1, $record2, $record3, $record4, $record5, $record6);
         $DB->insert_records('sessions', $sessionrecords);
 
         $fakeattempt = new stdClass();
-        $fakeattempt->userid = 123;
         $fakeattempt->quiz = $this->quiz3->id;
         $fakeattempt->layout = '1,2,0,3,4,0,5';
-        $fakeattempt->state = quiz_attempt::FINISHED;
 
+        $fakeattempt->userid = $this->user1->id;
         $fakeattempt->attempt = 3;
         $fakeattempt->sumgrades = 50;
         $fakeattempt->uniqueid = 13;
         $fakeattempt->state = quiz_attempt::FINISHED;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
+        $fakeattempt->userid = $this->user1->id;
         $fakeattempt->attempt = 2;
         $fakeattempt->sumgrades = 50;
         $fakeattempt->uniqueid = 26;
         $fakeattempt->state = quiz_attempt::IN_PROGRESS;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
-        $fakeattempt->attempt = 4;
-        $fakeattempt->sumgrades = null;
-        $fakeattempt->uniqueid = 39;
-        $fakeattempt->state = quiz_attempt::IN_PROGRESS;
-        $DB->insert_record('quiz_attempts', $fakeattempt);
-
+        $fakeattempt->userid = $this->user2->id;
         $fakeattempt->attempt = 1;
         $fakeattempt->sumgrades = 30;
         $fakeattempt->uniqueid = 52;
         $fakeattempt->state = quiz_attempt::ABANDONED;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
+        $fakeattempt->userid = $this->user3->id;
+        $fakeattempt->attempt = 3;
+        $fakeattempt->sumgrades = 50;
+        $fakeattempt->uniqueid = 53;
+        $fakeattempt->state = quiz_attempt::FINISHED;
+        $DB->insert_record('quiz_attempts', $fakeattempt);
+
         $fakeattempt->attempt = 1;
-        $fakeattempt->userid = 1;
+        $fakeattempt->userid = $this->user5->id;
         $fakeattempt->sumgrades = 100;
         $fakeattempt->uniqueid = 65;
         $fakeattempt->state = quiz_attempt::OVERDUE;
@@ -458,7 +498,7 @@ class quiz_testcase extends advanced_testcase {
 
         $this->assertEquals('5 July 2020, 9:00 AM', $result->earlyopen);
         $this->assertEquals('6 July 2020, 11:10 AM', $result->lateclose);
-        $this->assertEquals(4, $result->participants);
+        $this->assertEquals(6, $result->participants);
         $this->assertEquals($this->quiz1->name, $result->name);
         $this->assertEquals(2, $result->overrideparticipants);
         $this->assertEquals(2, $result->typecount);
@@ -571,7 +611,7 @@ class quiz_testcase extends advanced_testcase {
 
         $result = $method->invoke($quizdata, $this->quiz3->id);
 
-        $this->assertEquals(3, $result->inprogress);
+        $this->assertEquals(2, $result->inprogress);
         $this->assertEquals(2, $result->finished);
     }
 
@@ -593,8 +633,8 @@ class quiz_testcase extends advanced_testcase {
         $trendrecords = $DB->get_records('local_assessfreq_trend');
         foreach ($trendrecords as $trendrecord) {
             if ($trendrecord->assessid == $this->quiz3->id) {
-                $this->assertEquals(3, $trendrecord->inprogress);
-                $this->assertEquals(3, $trendrecord->loggedin);
+                $this->assertEquals(2, $trendrecord->inprogress);
+                $this->assertEquals(1, $trendrecord->loggedin);
                 $this->assertEquals(2, $trendrecord->finished);
                 $this->assertEquals(1, $trendrecord->notloggedin);
             }

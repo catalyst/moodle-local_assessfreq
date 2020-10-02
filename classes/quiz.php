@@ -344,6 +344,8 @@ class quiz {
         $usercounts = new \stdClass();
         $usercounts->loggedin = $loggedin;
         $usercounts->loggedout = $loggedout;
+        $usercounts->loggedinusers = $loggedinusers;
+        $usercounts->loggedoutusers = $loggedoutusers;
 
         return $usercounts;
 
@@ -358,34 +360,38 @@ class quiz {
     private function get_quiz_attempts(int $quizid): \stdClass {
         global $DB;
 
-        $sql = 'SELECT state, COUNT(id) AS count
-                  FROM {quiz_attempts}
-                 WHERE preview = 0
-                       AND quiz = ?
-              GROUP BY state';
+        $inprogress = 0;
+        $finished = 0;
+        $inprogressusers = array();
+        $finishedusers = array();
+
+        $sql = 'SELECT userid, state
+                   FROM {quiz_attempts}
+                  WHERE id IN (
+                        SELECT MAX(id)
+                          FROM {quiz_attempts}
+                         WHERE quiz = ?
+                      GROUP BY userid)';
+
         $params = array($quizid);
 
-        $attempts = $DB->get_records_sql_menu($sql, $params);
+        $usersattempts = $DB->get_records_sql($sql, $params);
 
-        if (empty($attempts['inprogress'])) {
-            $attempts['inprogress'] = 0;
-        }
-
-        if (empty($attempts['overdue'])) {
-            $attempts['overdue'] = 0;
-        }
-
-        if (empty($attempts['finished'])) {
-            $attempts['finished'] = 0;
-        }
-
-        if (empty($attempts['abandoned'])) {
-            $attempts['abandoned'] = 0;
+        foreach ($usersattempts as $usersattempt) {
+            if ($usersattempt->state == 'inprogress' || $usersattempt->state == 'overdue') {
+                $inprogress++;
+                $inprogressusers[] = $usersattempt->userid;
+            } else if ($usersattempt->state == 'finished' || $usersattempt->state == 'abandoned') {
+                $finished++;
+                $finishedusers[] = $usersattempt->userid;
+            }
         }
 
         $attemptcounts = new \stdClass();
-        $attemptcounts->inprogress = $attempts['inprogress'] + $attempts['overdue'];
-        $attemptcounts->finished = $attempts['finished'] + $attempts['abandoned'];
+        $attemptcounts->inprogress = $inprogress;
+        $attemptcounts->finished = $finished;
+        $attemptcounts->inprogressusers = $inprogressusers;
+        $attemptcounts->finishedusers = $finishedusers;
 
         return $attemptcounts;
 
@@ -408,20 +414,39 @@ class quiz {
         foreach ($quizzes as $quiz) {
             $context = $this->get_quiz_context($quiz->id);
             $quizusers = array_keys($frequency->get_event_users_raw($context->id, 'quiz'));
-            $loggedincounts = $this->get_loggedin_users($quizusers);
-            $attemptcounts = $this->get_quiz_attempts($quiz->id);
+            $loggedinusers = $this->get_loggedin_users($quizusers);
+            $attemptusers = $this->get_quiz_attempts($quiz->id);
+            $loggedout = 0;
+            $loggedin = 0;
+            $inprogress = 0;
+            $finished = 0;
+
+            foreach ($quizusers as $user) {
+                if (in_array($user, $attemptusers->finishedusers)) {
+                    $finished++;
+                    continue;
+                } else if (in_array($user, $attemptusers->inprogressusers)) {
+                    $inprogress++;
+                    continue;
+                } else if (in_array($user, $loggedinusers->loggedinusers)) {
+                    $loggedin++;
+                    continue;
+                } else if (in_array($user, $loggedinusers->loggedoutusers)) {
+                    $loggedout++;
+                    continue;
+                }
+            }
 
             $record = new \stdClass();
             $record->assessid = $quiz->id;
-            $record->notloggedin = $loggedincounts->loggedout;
-            $record->loggedin = $loggedincounts->loggedin;
-            $record->inprogress = $attemptcounts->inprogress;
-            $record->finished = $attemptcounts->finished;
+            $record->notloggedin = $loggedout;
+            $record->loggedin = $loggedin;
+            $record->inprogress = $inprogress;
+            $record->finished = $finished;
             $record->timecreated = time();
 
             $DB->insert_record('local_assessfreq_trend', $record);
             $count++;
-
         }
 
         return $count;
