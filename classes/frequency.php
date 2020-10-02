@@ -598,6 +598,29 @@ class frequency {
     }
 
     /**
+     * Delete processed event.
+     *
+     * @param int $duedate The unix timestamp to delete events from.
+     */
+    public function delete_event(\stdClass $event) : void {
+        global $DB;
+
+        // We do the following in a transaction to maintain data consistency.
+        try {
+            $transaction = $DB->start_delegated_transaction();
+
+            // Delete site events.
+            $DB->delete_records('local_assessfreq_site', $select, array($duedate));
+            $DB->delete_records('local_assessfreq_user', $inselect, $inparams);
+
+            $transaction->allow_commit();
+
+        } catch (\Exception $e) {
+            $transaction->rollback($e);
+        }
+    }
+
+    /**
      * Filter event dates by time period.
      * We do this PHP side not DB as we cache all the events.
      *
@@ -1127,11 +1150,19 @@ class frequency {
 
         // Get additional information and format the event data.
         foreach ($events as $event) {
-            $context = \context::instance_by_id($event->contextid);
-            $event->name = $context->get_context_name();
-            $event->url = $context->get_url()->out();
-            $event->usercount = count($this->get_event_users($event->contextid, $event->module));
-            $event->timelimit = ($event->timelimit == 0) ? get_string('na', 'local_assessfreq') : round(($event->timelimit / 60));
+            $context = \context::instance_by_id($event->contextid, IGNORE_MISSING);
+            if ($context) {
+                $event->name = $context->get_context_name();
+                $event->url = $context->get_url()->out();
+                $event->usercount = count($this->get_event_users($event->contextid, $event->module));
+                $event->timelimit =
+                    ($event->timelimit == 0) ? get_string('na', 'local_assessfreq') : round(($event->timelimit / 60));
+            } else {
+                // Context has been removed which means event has been deleted.
+                // Remove corresponding event.
+
+            }
+
 
             $dayevents[] = $event;
         }
