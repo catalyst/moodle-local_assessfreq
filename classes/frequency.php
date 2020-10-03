@@ -600,9 +600,9 @@ class frequency {
     /**
      * Delete processed event.
      *
-     * @param int $duedate The unix timestamp to delete events from.
+     * @param \stdClass $event The event to delete.
      */
-    public function delete_event(\stdClass $event) : void {
+    public function delete_event(\stdClass $event): void {
         global $DB;
 
         // We do the following in a transaction to maintain data consistency.
@@ -610,8 +610,8 @@ class frequency {
             $transaction = $DB->start_delegated_transaction();
 
             // Delete site events.
-            $DB->delete_records('local_assessfreq_site', $select, array($duedate));
-            $DB->delete_records('local_assessfreq_user', $inselect, $inparams);
+            $DB->delete_records('local_assessfreq_site', array('id' => $event->id));
+            $DB->delete_records('local_assessfreq_user', array('eventid' => $event->id));
 
             $transaction->allow_commit();
 
@@ -1157,14 +1157,13 @@ class frequency {
                 $event->usercount = count($this->get_event_users($event->contextid, $event->module));
                 $event->timelimit =
                     ($event->timelimit == 0) ? get_string('na', 'local_assessfreq') : round(($event->timelimit / 60));
+
+                $dayevents[] = $event;
             } else {
                 // Context has been removed which means event has been deleted.
                 // Remove corresponding event.
-
+                $this->delete_event($event);
             }
-
-
-            $dayevents[] = $event;
         }
 
         return $dayevents;
