@@ -300,6 +300,16 @@ class quiz_user_table extends table_sql implements renderable {
             'title' => get_string('userprofile', 'local_assessfreq')
             ));
 
+        $logurl = new \moodle_url('/report/log/user.php', array('id' => $row->id, 'course' => 1, 'mode' => 'all'));
+        $icon = $OUTPUT->render(new \pix_icon('i/report', ''));
+        $manage .= \html_writer::link($logurl, $icon, array(
+            'class' => 'action-icon',
+            'id' => 'tool-assessfreq-log-' . $row->id,
+            'data-toggle' => 'tooltip',
+            'data-placement' => 'top',
+            'title' => get_string('userlogs', 'local_assessfreq')
+        ));
+
         return $manage;
     }
 
