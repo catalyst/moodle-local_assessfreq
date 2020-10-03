@@ -1158,6 +1158,11 @@ class frequency {
                 $event->timelimit =
                     ($event->timelimit == 0) ? get_string('na', 'local_assessfreq') : round(($event->timelimit / 60));
 
+                if ($event->module == 'quiz') {
+                    $dashurl = new \moodle_url('/local/assessfreq/dashboard_quiz.php', array('id' => $event->instanceid));
+                    $event->dashurl = $dashurl->out();
+                }
+
                 $dayevents[] = $event;
             } else {
                 // Context has been removed which means event has been deleted.

@@ -30,6 +30,7 @@
     <col class="dayview-firstcol">
     <col class="dayview-midcol">
     <col class="dayview-midcol">
+    <col class="dayview-midcol">
     <col>
   </colgroup>
   <thead>
@@ -43,6 +44,11 @@
       <th scope="col" rowspan="2" class="text-center">
         <span  data-toggle="tooltip" data-placement="top" title="{{#str}} timelimit, local_assessfreq {{/str}}" data-offset="0,5">
           {{#pix}} i/calendareventtime, core{{/pix}}
+        </span>
+      </th>
+       <th scope="col" rowspan="2" class="text-center">
+        <span  data-toggle="tooltip" data-placement="top" title="{{#str}} dashboard, local_assessfreq {{/str}}" data-offset="0,5">
+          {{#pix}} i/report, core{{/pix}}
         </span>
       </th>
       <th scope="col">{{# str }} time, local_assessfreq {{/ str }}</th>
@@ -69,10 +75,16 @@
        <th scope="row" class="text-center">
         {{ timelimit }}
       </th>
+      <th scope="row" class="text-center">
+        {{#dashurl}} <a href="{{dashurl}}">{{#pix}} i/report, core{{/pix}}</a> {{/dashurl}}
+        {{^dashurl}} {{#str}} na, local_assessfreq {{/str}} {{/dashurl}}
+      </th>
       <td>
-        <div class="local-assessfreq-day-period" style="margin-left: {{leftmargin}}%;width: {{width}}%;">
-        <div>{{start}}</div>
-        <div>{{end}}</div>
+        <div class="local-assessfreq-day-period" 
+             style="margin-left: {{leftmargin}}%;width: {{width}}%;"
+              data-toggle="tooltip" data-html="true" data-placement="top"
+              title="<strong>{{#str}} open, local_assessfreq {{/str}}:</strong> {{start}}<br/>
+                     <strong>{{#str}} close, local_assessfreq {{/str}}: </strong> {{end}}">
         </div>
       </td>
     </tr>
