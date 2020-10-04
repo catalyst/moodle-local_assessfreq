@@ -114,6 +114,12 @@ class quiz_user_table extends table_sql implements renderable {
         $headers[] = get_string('quiztimelimit', 'local_assessfreq');
         $columns[] = 'timelimit';
 
+        $headers[] = get_string('quiztimestart', 'local_assessfreq');
+        $columns[] = 'timestart';
+
+        $headers[] = get_string('quiztimefinish', 'local_assessfreq');
+        $columns[] = 'timefinish';
+
         $headers[] = get_string('status', 'local_assessfreq');
         $columns[] = 'state';
 
@@ -216,6 +222,46 @@ class quiz_user_table extends table_sql implements renderable {
             $content = \html_writer::span($timelimit, 'local-assessfreq-override-status');
         } else {
             $content = \html_writer::span($timelimit);
+        }
+
+        return $content;
+    }
+
+    /**
+     * Get content for time start column.
+     * Displays the user attempt start time.
+     *
+     * @param \stdClass $row
+     * @return string html used to display the field.
+     */
+    public function col_timestart($row) {
+        if ($row->timestart == 0) {
+            $content = \html_writer::span(get_string('na', 'local_assessfreq'));
+        } else {
+            $datetime = userdate($row->timestart, get_string('trenddatetime', 'local_assessfreq'));
+            $content = \html_writer::span($datetime);
+        }
+
+        return $content;
+    }
+
+    /**
+     * Get content for time finish column.
+     * Displays the user attempt finish time.
+     *
+     * @param \stdClass $row
+     * @return string html used to display the field.
+     */
+    public function col_timefinish($row) {
+        if ($row->timefinish == 0 && $row->timestart == 0) {
+            $content = \html_writer::span(get_string('na', 'local_assessfreq'));
+        } else if ($row->timefinish == 0 && $row->timestart > 0) {
+            $time = $row->timestart + $row->timelimit;
+            $datetime = userdate($time, get_string('trenddatetime', 'local_assessfreq'));
+            $content = \html_writer::span($datetime, 'disabled');
+        } else {
+            $datetime = userdate($row->timefinish, get_string('trenddatetime', 'local_assessfreq'));
+            $content = \html_writer::span($datetime);
         }
 
         return $content;
@@ -335,7 +381,8 @@ class quiz_user_table extends table_sql implements renderable {
         $context = $quiz->get_quiz_context($this->quizid);
 
         list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
-        $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid
+        $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid,
+                              qa_a.timestart as timestart, qa_a.timefinish as timefinish
                          FROM {quiz_attempts} qa_a
                    INNER JOIN (SELECT userid, MAX(timestart) as timestart
                                  FROM {quiz_attempts}
@@ -366,7 +413,9 @@ class quiz_user_table extends table_sql implements renderable {
                                               WHEN us.userid > 0 THEN 'loggedin'
                                               ELSE 'notloggedin'
                                            END)) AS state,
-                       qa.attemptid
+                       qa.attemptid,
+                       qa.timestart,
+                       qa.timefinish
                   FROM {user} u
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
