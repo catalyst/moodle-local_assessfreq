@@ -566,8 +566,6 @@ function($, FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, 
         let trendZoom = document.getElementById('local-assessfreq-quiz-summary-trend-zoom');
         trendZoom.addEventListener('click', triggerZoomGraph);
 
-        $('[data-toggle="tooltip"]').tooltip();
-
     };
 
     return DashboardQuiz;
