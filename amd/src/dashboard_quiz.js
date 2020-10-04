@@ -442,6 +442,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             document.getElementById('quiz-participants-override').innerHTML = quizArray.overrideparticipants;
             document.getElementById('quiz-question-number').innerHTML = quizArray.questioncount;
             document.getElementById('quiz-question-types').innerHTML = quizArray.typecount;
+            document.getElementById('quiz-time-results').href = quizArray.resultlink;
 
             // Show the cards.
             cardsElement.classList.remove('hide');

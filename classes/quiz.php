@@ -198,6 +198,9 @@ class quiz {
             $lateclose = $timeclose;
         }
 
+        // Quiz result link.
+        $resultlink= new \moodle_url('/mod/quiz/report.php', array('id' => $context->instanceid, 'mode' => 'overview'));
+
         $quizdata->name = $quizrecord->name;
         $quizdata->timeopen = $timesopen;
         $quizdata->timeclose = $timeclose;
@@ -210,6 +213,7 @@ class quiz {
         $quizdata->types = $questions->types;
         $quizdata->typecount = $questions->typecount;
         $quizdata->questioncount = $questions->questioncount;
+        $quizdata->resultlink = $resultlink->out(false);
 
         return $quizdata;
     }
