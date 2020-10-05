@@ -61,14 +61,8 @@ class participant_trend {
         } else {
             $result['hasdata'] = true;
             foreach ($allparticipantdata as $participantdata) {
-                // We only want to count users as logged in if they have not started and/or finished an attempt.
-                $loggedinval = $participantdata->loggedin - ($participantdata->inprogress + $participantdata->finished);
-                // Number of logged in users should never be less than zero. But it can happen with late enrolment changes and
-                // multiple attempts.
-                $loggedinval = ($loggedinval < 0) ? 0 : $loggedinval;
-
                 $notloggedin[] = $participantdata->notloggedin;
-                $loggedin[] = $loggedinval;
+                $loggedin[] = $participantdata->loggedin;
                 $inprogress[] = $participantdata->inprogress;
                 $finished[] = $participantdata->finished;
                 $labels[] = userdate($participantdata->timecreated, get_string('trenddatetime', 'local_assessfreq'));
