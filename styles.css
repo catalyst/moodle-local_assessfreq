@@ -137,3 +137,8 @@
     font-weight: 600;
     text-shadow: 0 1px 1px rgba(0,0,0,.3);
 }
+
+.local-assessfreq-disabled {
+    font-weight: 200;
+    color: grey;
+}
