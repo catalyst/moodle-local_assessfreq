@@ -259,7 +259,7 @@ class quiz_user_table extends table_sql implements renderable {
         } else if ($row->timefinish == 0 && $row->timestart > 0) {
             $time = $row->timestart + $row->timelimit;
             $datetime = userdate($time, get_string('trenddatetime', 'local_assessfreq'));
-            $content = \html_writer::span($datetime, 'disabled');
+            $content = \html_writer::span($datetime, 'local-assessfreq-disabled');
         } else {
             $datetime = userdate($row->timefinish, get_string('trenddatetime', 'local_assessfreq'));
             $content = \html_writer::span($datetime);
