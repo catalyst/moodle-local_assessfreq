@@ -180,14 +180,14 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     const getHeat = function(eventCount) {
         let scaleMin = 1;
 
-        if (eventCount == heatRangeMin ) {
+        if (eventCount == heatRangeMin) {
             return scaleMin;
         }
 
-        const scaleRange = 6;  // 0 - 5  steps.
+        const scaleRange = 5;  // 0 - 5  steps.
         const localRange = heatRangeMax - heatRangeMin;
         const localPercent = (eventCount - heatRangeMin) / localRange;
-        let heat = Math.round(localPercent * scaleRange);
+        let heat = Math.round((localPercent * scaleRange) + 1);
 
         // Clamp values.
         if (heat < 1) {
