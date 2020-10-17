@@ -183,11 +183,18 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
         if (eventCount == heatRangeMin) {
             return scaleMin;
         }
+        window.console.log(heatRangeMax);
+        window.console.log(heatRangeMin);
+        window.console.log(eventCount);
 
-        const scaleRange = 6;  // 0 - 5  steps.
+        const scaleRange = 5;  // 0 - 5  steps.
         const localRange = heatRangeMax - heatRangeMin;
         const localPercent = (eventCount - heatRangeMin) / localRange;
-        let heat = Math.round(localPercent * scaleRange);
+        let heat = Math.round((localPercent * scaleRange) + 1);
+
+        window.console.log(localRange);
+        window.console.log(localPercent);
+        window.console.log(heat);
 
         // Clamp values.
         if (heat < 1) {
