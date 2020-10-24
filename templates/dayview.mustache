@@ -67,7 +67,12 @@
     {{#rows}}
     <tr>
       <th scope="row">
-        <a href="{{url}}">{{name}}</a>
+        <div class="local-assessfreq-day-activity">
+            <a href="{{url}}">{{name}}</a>
+        </div>
+        <div class="local-assessfreq-day-coursename">
+            {{courseshortname}}
+        </div>
       </th>
       <th scope="row" class="text-center">
         {{ usercount }}
@@ -80,7 +85,7 @@
         {{^dashurl}} {{#str}} na, local_assessfreq {{/str}} {{/dashurl}}
       </th>
       <td>
-        <div class="local-assessfreq-day-period" 
+        <div class="local-assessfreq-day-period"
              style="margin-left: {{leftmargin}}%;width: {{width}}%;"
               data-toggle="tooltip" data-html="true" data-placement="top"
               title="<strong>{{#str}} open, local_assessfreq {{/str}}:</strong> {{start}}<br/>

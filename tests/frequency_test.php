@@ -71,7 +71,7 @@ class frequency_testcase extends advanced_testcase {
     /**
      * Set up conditions for tests.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         global $CFG;

@@ -1151,6 +1151,8 @@ class frequency {
         // Get additional information and format the event data.
         foreach ($events as $event) {
             $context = \context::instance_by_id($event->contextid, IGNORE_MISSING);
+            $course = get_course($event->courseid);
+
             if ($context) {
                 $event->name = $context->get_context_name();
                 $event->url = $context->get_url()->out();
@@ -1162,6 +1164,8 @@ class frequency {
                     $dashurl = new \moodle_url('/local/assessfreq/dashboard_quiz.php', array('id' => $event->instanceid));
                     $event->dashurl = $dashurl->out();
                 }
+
+                $event->courseshortname = $course->shortname;
 
                 $dayevents[] = $event;
             } else {
