@@ -199,7 +199,7 @@ class quiz {
         }
 
         // Quiz result link.
-        $resultlink= new \moodle_url('/mod/quiz/report.php', array('id' => $context->instanceid, 'mode' => 'overview'));
+        $resultlink = new \moodle_url('/mod/quiz/report.php', array('id' => $context->instanceid, 'mode' => 'overview'));
 
         $quizdata->name = $quizrecord->name;
         $quizdata->timeopen = $timesopen;
