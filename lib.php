@@ -33,22 +33,33 @@ defined('MOODLE_INTERNAL') || die();
  */
 function local_assessfreq_coursemodule_standard_elements($formwrapper, $mform) {
     global $CFG;
-    $modname = $formwrapper->get_current()->modulename;  // Gets module name so we can filter.
 
-    // Register the new form element.
-    MoodleQuickForm::registerElementType('local_assessfreq_scheduler',
-        "$CFG->dirroot/local/assessfreq/classes/form/scheduler.php",
-        'scheduler_form_element');
+    $modname = '';
+    $cm = $formwrapper->get_coursemodule();
 
-    // TODO: Figure out if this is a new activity or an existing one.
-    // If it is new there is no point checking for schedule conflicts.
-    // Instead just render the schedule assistnace button. (Further checks will be done via ajax.)
+    // Gets module name so we can filter.
+    if (!empty($cm) && !empty($cm->modname)) {
+        $modname = $cm->modname;
+    } else if (!empty($formwrapper->get_current()->modulename)) {
+        $modname = $formwrapper->get_current()->modulename;
+    }
 
-    // Figure out if this is a module we want to override the form for.
-    if ($modname === 'quiz') {
-        $scheduler =& $mform->createElement('local_assessfreq_scheduler', 'schedular', 'Schedule', 'stuff');
-        $mform->insertElementBefore($scheduler, 'timeopen');
-        $mform->setExpanded('timing');
+    if (!empty($modname)) {
+        // Register the new form element.
+        MoodleQuickForm::registerElementType('local_assessfreq_scheduler',
+            "$CFG->dirroot/local/assessfreq/classes/form/scheduler.php",
+            'scheduler_form_element');
+
+        // TODO: Figure out if this is a new activity or an existing one.
+        // If it is new there is no point checking for schedule conflicts.
+        // Instead just render the schedule assistnace button. (Further checks will be done via ajax.)
+
+        // Figure out if this is a module we want to override the form for.
+        if ($modname === 'quiz') {
+            $scheduler =& $mform->createElement('local_assessfreq_scheduler', 'schedular', 'Schedule', 'stuff');
+            $mform->insertElementBefore($scheduler, 'timeopen');
+            $mform->setExpanded('timing');
+        }
     }
 }
 
