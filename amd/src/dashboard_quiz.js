@@ -435,7 +435,7 @@ function($, FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, 
             history.pushState({}, '', newUrl);
 
             // Update page title with quiz name.
-            Str.get_string('dashboard:quiztitle', 'local_assessfreq', quizArray.name)
+            Str.get_string('dashboard:quiztitle', 'local_assessfreq', {'quiz': quizArray.name, 'course': quizArray.courseshortname})
             .then((str) => {
                 document.title = str;
             }).catch(() => {
@@ -443,23 +443,21 @@ function($, FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, 
             });
 
             // Populate quiz summary card with details.
-            document.getElementById('quiz-time-open').innerHTML = quizArray.timeopen;
-            document.getElementById('quiz-time-close').innerHTML = quizArray.timeclose;
-            document.getElementById('quiz-time-limit').innerHTML = quizArray.timelimit;
-            document.getElementById('quiz-time-earlyopen').innerHTML = quizArray.earlyopen;
-            document.getElementById('quiz-time-lateclose').innerHTML = quizArray.lateclose;
-            document.getElementById('quiz-participants').innerHTML = quizArray.participants;
-            document.getElementById('quiz-participants-override').innerHTML = quizArray.overrideparticipants;
-            document.getElementById('quiz-question-number').innerHTML = quizArray.questioncount;
-            document.getElementById('quiz-question-types').innerHTML = quizArray.typecount;
-            document.getElementById('quiz-time-results').href = quizArray.resultlink;
+            Templates.render('local_assessfreq/quiz-summary-card-content', quizArray).done((html) => {
+                summarySpinner.classList.add('hide');
+                let contentcontainer = document.getElementById('local-assessfreq-quiz-summary-card-content');
+                Templates.replaceNodeContents(contentcontainer, html);
+            }).fail(() => {
+                Notification.exception(new Error('Failed to load quiz summary template.'));
+                return;
+            });
 
             // Show the cards.
             cardsElement.classList.remove('hide');
             trendElement.classList.remove('hide');
             tableElement.classList.remove('hide');
             periodElement.classList.remove('hide');
-            summarySpinner.classList.add('hide');
+
             getCardCharts();
             getStudentTable();
             refreshCounter();
@@ -468,8 +466,6 @@ function($, FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, 
             tableSearchInputElement.addEventListener('paste', tableSearch);
             tableSearchResetElement.addEventListener('click', tableSearchReset);
             tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
-
-            // TODO: Cancel autorefresh of cards while quiz in changing.
 
             return;
         }).fail(() => {

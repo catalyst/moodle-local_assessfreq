@@ -175,7 +175,10 @@ class quiz {
         $quizdata = new \stdClass();
         $context = $this->get_quiz_context($quizid);
 
-        $quizrecord = $DB->get_record('quiz', array('id' => $quizid), 'name, timeopen, timeclose, timelimit');
+        $quizrecord = $DB->get_record('quiz', array('id' => $quizid), 'name, timeopen, timeclose, timelimit, course');
+        $course = get_course($quizrecord->course);
+        $courseurl = new \moodle_url('/course/view.php', array('id' => $quizrecord->course));
+
         $overrideinfo = $this->get_quiz_override_info($quizid, $context);
         $questions = $this->get_quiz_questions($quizid);
         $frequency = new frequency();
@@ -199,7 +202,11 @@ class quiz {
         }
 
         // Quiz result link.
-        $resultlink= new \moodle_url('/mod/quiz/report.php', array('id' => $context->instanceid, 'mode' => 'overview'));
+        $resultlink = new \moodle_url('/mod/quiz/report.php', array('id' => $context->instanceid, 'mode' => 'overview'));
+        // Override link.
+        $overrridelink = new \moodle_url('/mod/quiz/overrides.php', array('cmid' => $context->instanceid, 'mode' => 'user'));
+        // Participant link.
+        $participantlink = new \moodle_url('/user/index.php', array('id' => $quizrecord->course));
 
         $quizdata->name = $quizrecord->name;
         $quizdata->timeopen = $timesopen;
@@ -214,6 +221,11 @@ class quiz {
         $quizdata->typecount = $questions->typecount;
         $quizdata->questioncount = $questions->questioncount;
         $quizdata->resultlink = $resultlink->out(false);
+        $quizdata->overridelink = $overrridelink->out(false);
+        $quizdata->coursefullname = $course->fullname;
+        $quizdata->courseshortname = $course->shortname;
+        $quizdata->courselink = $courseurl->out(false);
+        $quizdata->participantlink = $participantlink->out(false);
 
         return $quizdata;
     }
