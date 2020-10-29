@@ -433,16 +433,16 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             });
 
             // Populate quiz summary card with details.
-            document.getElementById('quiz-time-open').innerHTML = quizArray.timeopen;
-            document.getElementById('quiz-time-close').innerHTML = quizArray.timeclose;
-            document.getElementById('quiz-time-limit').innerHTML = quizArray.timelimit;
-            document.getElementById('quiz-time-earlyopen').innerHTML = quizArray.earlyopen;
-            document.getElementById('quiz-time-lateclose').innerHTML = quizArray.lateclose;
-            document.getElementById('quiz-participants').innerHTML = quizArray.participants;
-            document.getElementById('quiz-participants-override').innerHTML = quizArray.overrideparticipants;
-            document.getElementById('quiz-question-number').innerHTML = quizArray.questioncount;
-            document.getElementById('quiz-question-types').innerHTML = quizArray.typecount;
-            document.getElementById('quiz-time-results').href = quizArray.resultlink;
+            window.console.log(quizArray);
+
+            Templates.render('local_assessfreq/quiz-summary-card-content', quizArray).done((html) => {
+                summarySpinner.classList.add('hide');
+                let contentcontainer = document.getElementById('local-assessfreq-quiz-summary-card-content');
+                Templates.replaceNodeContents(contentcontainer, html);
+            }).fail(() => {
+                Notification.exception(new Error('Failed to load quiz summary template.'));
+                return;
+            });
 
             // Show the cards.
             cardsElement.classList.remove('hide');
