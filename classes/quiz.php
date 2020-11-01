@@ -202,9 +202,11 @@ class quiz {
         }
 
         // Quiz result link.
-        $resultlink= new \moodle_url('/mod/quiz/report.php', array('id' => $context->instanceid, 'mode' => 'overview'));
+        $resultlink = new \moodle_url('/mod/quiz/report.php', array('id' => $context->instanceid, 'mode' => 'overview'));
         // Override link.
-        $overrridelink= new \moodle_url('/mod/quiz/overrides.php', array('cmid' => $context->instanceid, 'mode' => 'user'));
+        $overrridelink = new \moodle_url('/mod/quiz/overrides.php', array('cmid' => $context->instanceid, 'mode' => 'user'));
+        // Participant link.
+        $participantlink = new \moodle_url('/user/index.php', array('id' => $quizrecord->course));
 
         $quizdata->name = $quizrecord->name;
         $quizdata->timeopen = $timesopen;
@@ -223,6 +225,7 @@ class quiz {
         $quizdata->coursefullname = $course->fullname;
         $quizdata->courseshortname = $course->shortname;
         $quizdata->courselink = $courseurl->out(false);
+        $quizdata->participantlink = $participantlink->out(false);
 
         return $quizdata;
     }

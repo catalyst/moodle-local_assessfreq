@@ -425,7 +425,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             history.pushState({}, '', newUrl);
 
             // Update page title with quiz name.
-            Str.get_string('dashboard:quiztitle', 'local_assessfreq', quizArray.name)
+            Str.get_string('dashboard:quiztitle', 'local_assessfreq', {'quiz': quizArray.name, 'course': quizArray.courseshortname})
             .then((str) => {
                 document.title = str;
             }).catch(() => {
@@ -433,8 +433,6 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             });
 
             // Populate quiz summary card with details.
-            window.console.log(quizArray);
-
             Templates.render('local_assessfreq/quiz-summary-card-content', quizArray).done((html) => {
                 summarySpinner.classList.add('hide');
                 let contentcontainer = document.getElementById('local-assessfreq-quiz-summary-card-content');
@@ -449,7 +447,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             trendElement.classList.remove('hide');
             tableElement.classList.remove('hide');
             periodElement.classList.remove('hide');
-            summarySpinner.classList.add('hide');
+
             getCardCharts();
             getStudentTable();
             refreshCounter();
@@ -458,8 +456,6 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             tableSearchInputElement.addEventListener('paste', tableSearch);
             tableSearchResetElement.addEventListener('click', tableSearchReset);
             tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
-
-            // TODO: Cancel autorefresh of cards while quiz in changing.
 
             return;
         }).fail(() => {
