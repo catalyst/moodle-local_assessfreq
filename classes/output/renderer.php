@@ -230,4 +230,18 @@ class renderer extends plugin_renderer_base {
 
         return $html;
     }
+
+    /**
+     * Get the html to render the quizzes in porgress dashboard.
+     *
+     * @param string $baseurl the base url to render this report on.
+     * @return string $html the html to display.
+     */
+    public function render_dashboard_quiz_inprogress(string $baseurl) : string {
+        $html = '';
+        $html .= $this->header();
+        $html .= $this->footer();
+
+        return $html;
+    }
 }
