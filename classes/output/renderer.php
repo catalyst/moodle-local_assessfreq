@@ -174,11 +174,11 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
-     * Html to add a button for adding a new broadcast.
+     * Add HTML for quiz selection and quiz refresh buttons.
      *
      * @return string html for the button.
      */
-    private function render_quiz_select_button(): string {
+    private function render_quiz_select_refresh_button(): string {
         $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
         $refreshminutes = array(
             60 => 'minuteone',
@@ -193,6 +193,28 @@ class renderer extends plugin_renderer_base {
         );
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-controls', $context);
+    }
+
+    /**
+     * Add HTML for quiz refresh button.
+     *
+     * @return string html for the button.
+     */
+    private function render_quiz_refresh_button(): string {
+        $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
+        $refreshminutes = array(
+            60 => 'minuteone',
+            120 => 'minutetwo',
+            300 => 'minutefive',
+            600 => 'minuteten',
+        );
+
+        $context = array(
+            'refreshinitial' => get_string($refreshminutes[$preferencerefresh], 'local_assessfreq'),
+            'refresh' => array($refreshminutes[$preferencerefresh] => 'true'),
+        );
+
+        return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-summary', $context);
     }
 
     /**
@@ -224,7 +246,7 @@ class renderer extends plugin_renderer_base {
     public function render_dashboard_quiz(string $baseurl) : string {
         $html = '';
         $html .= $this->header();
-        $html .= $this->render_quiz_select_button();
+        $html .= $this->render_quiz_select_refresh_button();
         $html .= $this->render_quiz_dashboard_cards();
         $html .= $this->footer();
 
@@ -240,6 +262,7 @@ class renderer extends plugin_renderer_base {
     public function render_dashboard_quiz_inprogress(string $baseurl) : string {
         $html = '';
         $html .= $this->header();
+        $html .= $this->render_quiz_refresh_button();
         $html .= $this->footer();
 
         return $html;
