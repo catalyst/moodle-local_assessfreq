@@ -52,6 +52,7 @@ $string['course'] = 'Course';
 $string['dashboard'] = 'View activity dashboard';
 $string['dashboard:assessment'] = 'Assessment dashboard';
 $string['dashboard:quiz'] = 'Quiz dashboard';
+$string['dashboard:quiz_inprogress'] = 'Quizzes in progress dashboard';
 $string['dashboard:quiztitle'] = '{$a->quiz} - {$a->course} - Dashboard';
 $string['duedate'] = 'Due date';
 $string['eventeventprocessed'] = 'event_processed';
