@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use local_assessfreq\quiz;
+use core_calendar\local\event\proxies\std_proxy;
 
 /**
  * This file contains the class that handles testing of the block assess frequency class.
@@ -451,6 +452,140 @@ class quiz_testcase extends advanced_testcase {
     }
 
     /**
+     * Helper method to create quiz tracking records used in quiz.
+     *
+     * @param int $now Timestamp for tracking.
+     * @param int $quizid Quiz ID to to create tracking records for.
+     */
+    public function setup_quiz_tracking(int $now, int $quizid): void {
+        global $DB;
+
+        $track1 = new \stdClass();
+        $track1->assessid = $quizid;
+        $track1->notloggedin = 5;
+        $track1->loggedin = 0;
+        $track1->inprogress = 0;
+        $track1->finished = 0;
+        $track1->timecreated = $now + (60 * 1);
+
+        $track2 = new \stdClass();
+        $track2->assessid = $quizid;
+        $track2->notloggedin = 4;
+        $track2->loggedin = 1;
+        $track2->inprogress = 1;
+        $track2->finished = 0;
+        $track2->timecreated = $now + (60 * 2);
+
+        $track3 = new \stdClass();
+        $track3->assessid = $quizid;
+        $track3->notloggedin = 3;
+        $track3->loggedin = 2;
+        $track3->inprogress = 2;
+        $track3->finished = 0;
+        $track3->timecreated = $now + (60 * 3);
+
+        $track4 = new \stdClass();
+        $track4->assessid = $quizid;
+        $track4->notloggedin = 2;
+        $track4->loggedin = 3;
+        $track4->inprogress = 3;
+        $track4->finished = 0;
+        $track4->timecreated = $now + (60 * 4);
+
+        $track5 = new \stdClass();
+        $track5->assessid = $quizid;
+        $track5->notloggedin = 1;
+        $track5->loggedin = 4;
+        $track5->inprogress = 3;
+        $track5->finished = 1;
+        $track5->timecreated = $now + (60 * 5);
+
+        // Insert out of order.
+        $trackrecords = array($track1, $track5, $track3, $track2, $track4);
+
+        $DB->insert_records('local_assessfreq_trend', $trackrecords);
+    }
+
+    public function setup_mock_quiz_data(): array {
+        $quizzes = array (
+            208002 =>
+            (object)array(
+                'name' => 'very SPECIAL Quiz 3',
+                'timeopen' => '15 July 2020, 10:40 AM',
+                'timeclose' => '15 July 2020, 1:10 PM',
+                'timelimit' => '1 hour',
+                'earlyopen' => '15 July 2020, 10:40 AM',
+                'lateclose' => '15 July 2020, 1:10 PM',
+                'participants' => 6,
+                'overrideparticipants' => 0,
+                'url' => 'https://www.example.com/moodle/mod/quiz/view.php?id=354002',
+                'types' =>
+                array (
+                ),
+                'typecount' => 0,
+                'questioncount' => 0,
+                'resultlink' => 'https://www.example.com/moodle/mod/quiz/report.php?id=354002&mode=overview',
+                'overridelink' => 'https://www.example.com/moodle/mod/quiz/overrides.php?cmid=354002&mode=user',
+                'coursefullname' => 'Test course 1',
+                'courseshortname' => 'tc_1',
+                'courselink' => 'https://www.example.com/moodle/course/view.php?id=187000',
+                'participantlink' => 'https://www.example.com/moodle/user/index.php?id=187000',
+                'dashboardlink' => 'https://www.example.com/moodle/local/assessfreq/dashboard_quiz.php?id=208002',
+                'timestampopen' => '1594780800',
+                'timestampclose' => '1594789800',
+                'tracking' =>
+                (object)array(
+                    'id' => '314001',
+                    'assessid' => '208002',
+                    'notloggedin' => '1',
+                    'loggedin' => '4',
+                    'inprogress' => '3',
+                    'finished' => '1',
+                    'timecreated' => '1594788300',
+                ),
+            ),
+            208003 =>
+            (object)array(
+                'name' => 'Independent Quiz 4',
+                'timeopen' => '15 July 2020, 12:10 PM',
+                'timeclose' => '15 July 2020, 1:10 PM',
+                'timelimit' => '1 hour',
+                'earlyopen' => '15 July 2020, 12:10 PM',
+                'lateclose' => '15 July 2020, 1:10 PM',
+                'participants' => 6,
+                'overrideparticipants' => 0,
+                'url' => 'https://www.example.com/moodle/mod/quiz/view.php?id=354003',
+                'types' =>
+                array (
+                ),
+                'typecount' => 0,
+                'questioncount' => 0,
+                'resultlink' => 'https://www.example.com/moodle/mod/quiz/report.php?id=354003&mode=overview',
+                'overridelink' => 'https://www.example.com/moodle/mod/quiz/overrides.php?cmid=354003&mode=user',
+                'coursefullname' => 'Independent course 1',
+                'courseshortname' => 'tc_1',
+                'courselink' => 'https://www.example.com/moodle/course/view.php?id=187000',
+                'participantlink' => 'https://www.example.com/moodle/user/index.php?id=187000',
+                'dashboardlink' => 'https://www.example.com/moodle/local/assessfreq/dashboard_quiz.php?id=208003',
+                'timestampopen' => '1594786200',
+                'timestampclose' => '1594789800',
+                'tracking' =>
+                (object)array(
+                    'id' => '314006',
+                    'assessid' => '208003',
+                    'notloggedin' => '1',
+                    'loggedin' => '4',
+                    'inprogress' => '3',
+                    'finished' => '1',
+                    'timecreated' => '1594788300',
+                ),
+            ),
+        );
+
+        return $quizzes;
+    }
+
+    /**
      * Test getting quiz override info.
      */
     public function test_get_quiz_override_info() {
@@ -517,7 +652,7 @@ class quiz_testcase extends advanced_testcase {
         $method->setAccessible(true); // Allow accessing of private method.
 
         $now = 1594788000;
-        $result = $method->invoke($quizdata, $now);
+        $result = $method->invoke($quizdata, $now, HOURSECS, HOURSECS);
 
         $this->assertCount(5, $result);
 
@@ -536,7 +671,7 @@ class quiz_testcase extends advanced_testcase {
         $method->setAccessible(true); // Allow accessing of private method.
 
         $now = 1594788000;
-        $result = $method->invoke($quizdata, $now);
+        $result = $method->invoke($quizdata, $now, HOURSECS, HOURSECS);
 
         $this->assertCount(5, $result);
 
@@ -645,53 +780,8 @@ class quiz_testcase extends advanced_testcase {
      * Test processing quiz tracking .
      */
     public function test_get_quiz_tracking() {
-        global $DB;
         $now = 1594788000;
-
-        $track1 = new \stdClass();
-        $track1->assessid = $this->quiz1->id;
-        $track1->notloggedin = 5;
-        $track1->loggedin = 0;
-        $track1->inprogress = 0;
-        $track1->finished = 0;
-        $track1->timecreated = $now + (60 * 1);
-
-        $track2 = new \stdClass();
-        $track2->assessid = $this->quiz1->id;
-        $track2->notloggedin = 4;
-        $track2->loggedin = 1;
-        $track2->inprogress = 1;
-        $track2->finished = 0;
-        $track2->timecreated = $now + (60 * 2);
-
-        $track3 = new \stdClass();
-        $track3->assessid = $this->quiz1->id;
-        $track3->notloggedin = 3;
-        $track3->loggedin = 2;
-        $track3->inprogress = 2;
-        $track3->finished = 0;
-        $track3->timecreated = $now + (60 * 3);
-
-        $track4 = new \stdClass();
-        $track4->assessid = $this->quiz1->id;
-        $track4->notloggedin = 2;
-        $track4->loggedin = 3;
-        $track4->inprogress = 3;
-        $track4->finished = 0;
-        $track4->timecreated = $now + (60 * 4);
-
-        $track5 = new \stdClass();
-        $track5->assessid = $this->quiz1->id;
-        $track5->notloggedin = 1;
-        $track5->loggedin = 4;
-        $track5->inprogress = 3;
-        $track5->finished = 1;
-        $track5->timecreated = $now + (60 * 5);
-
-        // Insert out of order.
-        $trackrecords = array($track1, $track5, $track3, $track2, $track4);
-
-        $DB->insert_records('local_assessfreq_trend', $trackrecords);
+        $this->setup_quiz_tracking($now, $this->quiz1->id);
 
         $quizdata = new quiz();
         $trackingdata = $quizdata->get_quiz_tracking($this->quiz1->id);
@@ -704,4 +794,132 @@ class quiz_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * Test getting in progress quiz counts.
+     */
+    public function test_get_inprogress_counts() {
+        $now = 1594788000;
+        $this->setup_quiz_tracking($now, $this->quiz3->id);
+        $this->setup_quiz_tracking($now, $this->quiz4->id);
+
+        $quizdata = new quiz();
+        $result = $quizdata->get_inprogress_counts($now);
+
+        $this->assertEquals(2, $result['assessments']);
+        $this->assertEquals(6, $result['participants']);
+
+    }
+
+    /**
+     * Test getting in progress quizzes.
+     */
+    public function test_get_quizzes_inprogress() {
+        $now = 1594788000;
+        $this->setup_quiz_tracking($now, $this->quiz3->id);
+        $this->setup_quiz_tracking($now, $this->quiz4->id);
+
+        $quizdata = new quiz();
+        $result = $quizdata->get_quiz_summaries($now);
+
+       // error_log(var_export($result['inprogress'], true));
+
+        $this->assertCount(2, $result['inprogress']);
+        $this->assertLessThan($now, $result['inprogress'][$this->quiz3->id]->timestampopen);
+        $this->assertGreaterThan($now, $result['inprogress'][$this->quiz3->id]->timestampclose);
+        $this->assertLessThan($now, $result['inprogress'][$this->quiz4->id]->timestampopen);
+        $this->assertGreaterThan($now, $result['inprogress'][$this->quiz4->id]->timestampclose);
+
+    }
+
+    /**
+     * Test getting upcomming quizzes.
+     */
+    public function test_get_quizzes_upcomming() {
+        $quizdata = new quiz();
+
+        $now = 1594780800;
+        $result = $quizdata->get_quiz_summaries($now);
+
+        $this->assertCount(2, $result['upcomming'][$now]);
+        $this->assertCount(1, $result['upcomming'][$now + HOURSECS]);
+        $this->assertCount(2, $result['upcomming'][$now + (HOURSECS * 2)]);
+        $this->assertCount(0, $result['upcomming'][$now + (HOURSECS * 3)]);
+
+        $now = 1594788000;
+        $result = $quizdata->get_quiz_summaries($now);
+
+        $this->assertCount(2, $result['upcomming'][$now]);
+        $this->assertCount(0, $result['upcomming'][$now + HOURSECS]);
+        $this->assertCount(1, $result['upcomming'][$now + (HOURSECS * 2)]);
+        $this->assertCount(0, $result['upcomming'][$now + (HOURSECS * 3)]);
+
+    }
+
+    /**
+     * Test filtering quizzes.
+     */
+    public function test_filter_quizzes() {
+        // Mock data.
+        $quizzes = $this->setup_mock_quiz_data();
+
+        $quizdata = new quiz();
+
+        $search = 'special';
+        $filtered = $quizdata->filter_quizzes($quizzes, $search, 0, 10);
+        $this->assertCount(1, $filtered[0]);
+        $this->assertEquals('very SPECIAL Quiz 3', $filtered[0][208002]->name);
+
+        $search = 'Independent';
+        $filtered = $quizdata->filter_quizzes($quizzes, $search, 0, 10);
+        $this->assertCount(1, $filtered[0]);
+        $this->assertEquals('Independent course 1', $filtered[0][208003]->coursefullname);
+    }
+
+    /**
+     * Test filtering quizzes with pages.
+     */
+    public function test_filter_quizzes_paging() {
+        // Mock data.
+        $quizzes = $this->setup_mock_quiz_data();
+
+        $quizdata = new quiz();
+        $search = 'quiz';
+
+        $filtered = $quizdata->filter_quizzes($quizzes, $search, 0, 10);
+        $this->assertCount(2, $filtered[0]);
+
+        $filtered = $quizdata->filter_quizzes($quizzes, $search, 0, 1);
+        $this->assertCount(1, $filtered[0]);
+        $this->assertEquals('very SPECIAL Quiz 3', $filtered[0][208002]->name);
+
+        $filtered = $quizdata->filter_quizzes($quizzes, $search, 1, 1);
+        $this->assertCount(1, $filtered[0]);
+        $this->assertEquals('Independent course 1', $filtered[0][208003]->coursefullname);
+    }
+
+    /**
+     * Test filtering quizzes with pages.
+     */
+    public function test_sort_quizzes() {
+        // Mock data.
+        $quizzes = $this->setup_mock_quiz_data();
+
+        $quizdata = new quiz();
+        $sorton = 'name';
+
+        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'asc');
+        $this->assertEquals('Independent Quiz 4', $sorted[208003]->name);
+
+        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'desc');
+        $this->assertEquals('very SPECIAL Quiz 3', $sorted[208002]->name);
+
+        $sorton = 'coursefullname';
+
+        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'asc');
+        $this->assertEquals('Independent course 1', $sorted[208003]->coursefullname);
+
+        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'desc');
+        $this->assertEquals('Test course 1', $sorted[208002]->coursefullname);
+
+    }
 }

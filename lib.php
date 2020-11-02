@@ -95,6 +95,18 @@ function local_assessfreq_user_preferences() {
         'type' => PARAM_INT
     );
 
+    $preferences['local_assessfreq_quiz_table_inprogress_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 20,
+        'type' => PARAM_INT
+    );
+
+    $preferences['local_assessfreq_quiz_table_inprogress_sort_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 'name_asc',
+        'type' => PARAM_ALPHAEXT
+    );
+
     return $preferences;
 }
 
@@ -153,7 +165,43 @@ function local_assessfreq_output_fragment_get_quiz_chart($args): string {
     }
 
     $assesschart = new $classname();
-    $chart = $assesschart->$methodname($data->quiz);
+
+    if ($data->call == 'participant_summary' && !empty($data->legendleft)) {
+        $chart = $assesschart->$methodname($data->quiz, true);
+    } else {
+        $chart = $assesschart->$methodname($data->quiz);
+    }
+
+    $chartdata = json_encode($chart);
+    return $chartdata;
+}
+
+/**
+ * Return the HTML for the given chart.
+ *
+ * @param string $args JSON from the calling AJAX function.
+ * @return string $chartdata The generated chart.
+ */
+function local_assessfreq_output_fragment_get_quiz_inprogress_chart($args): string {
+    $allowedcalls = array(
+        'upcomming_quizzes',
+        'all_participants_inprogress'
+    );
+
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+    $data = json_decode($args['data']);
+
+    if (in_array($data->call, $allowedcalls)) {
+        $classname = '\\local_assessfreq\\output\\' . $data->call;
+        $methodname = 'get_' . $data->call . '_chart';
+    } else {
+        throw new moodle_exception('Call not allowed');
+    }
+
+    $assesschart = new $classname();
+    $now = time();
+    $chart = $assesschart->$methodname($now);
 
     $chartdata = json_encode($chart);
     return $chartdata;
@@ -198,6 +246,31 @@ function local_assessfreq_output_fragment_get_student_table($args): string {
     $output = $PAGE->get_renderer('local_assessfreq');
 
     $o = $output->render_student_table($baseurl, $data->quiz, $context->id, $data->search, $data->page);
+
+    return $o;
+}
+
+/**
+ * Renders the quizzes in progress "table" on the quiz dashboard screen.
+ * We update the table via ajax.
+ * The table isn't a real table it's a collection of divs.
+ *
+ * @param array $args
+ * @return string $o Form HTML.
+ */
+function local_assessfreq_output_fragment_get_quizzes_inprogress_table($args): string {
+    global $PAGE;
+
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+
+    $data = json_decode($args['data']);
+    $search = is_null($data->search) ? '' : $data->search;
+    $sorton = is_null($data->sorton) ? 'name' : $data->sorton;
+    $direction = is_null($data->direction) ? 'asc' : $data->direction;
+
+    $output = $PAGE->get_renderer('local_assessfreq');
+    $o = $output->render_quizzes_inprogress_table($search, $data->page, $sorton, $direction);
 
     return $o;
 }

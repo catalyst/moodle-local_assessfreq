@@ -38,6 +38,29 @@ defined('MOODLE_INTERNAL') || die();
 class quiz {
 
     /**
+     * Ammount of time in hours for lookahead values.
+     * Defaults to 12.
+     *
+     * @var int $hoursahead.
+     */
+    private $hoursahead = 12;
+
+    /**
+     * The direction used in sorting.
+     *
+     * @var string $sortdirection
+     */
+    private $sortdirection;
+
+    /**
+     * The quiz details to sort by.
+     *
+     * @var string $sorton
+     */
+    private $sorton;
+
+
+    /**
      * Given a quiz id get the module context.
      *
      * @param int $quizid The quiz ID of the context to get.
@@ -207,6 +230,8 @@ class quiz {
         $overrridelink = new \moodle_url('/mod/quiz/overrides.php', array('cmid' => $context->instanceid, 'mode' => 'user'));
         // Participant link.
         $participantlink = new \moodle_url('/user/index.php', array('id' => $quizrecord->course));
+        // Dashboard link.
+        $dashboardlink = new \moodle_url('/local/assessfreq/dashboard_quiz.php', array('id' => $quizid));
 
         $quizdata->name = $quizrecord->name;
         $quizdata->timeopen = $timesopen;
@@ -226,6 +251,7 @@ class quiz {
         $quizdata->courseshortname = $course->shortname;
         $quizdata->courselink = $courseurl->out(false);
         $quizdata->participantlink = $participantlink->out(false);
+        $quizdata->dashboardlink = $dashboardlink->out(false);
 
         return $quizdata;
     }
@@ -236,13 +262,15 @@ class quiz {
      * And startdate != 0.
      *
      * @param int $now Timestamp to use for reference for time.
+     * @param int $lookahead The number of seconds from the provided now value to look ahead when getting overrides.
+     * @param int $lookbehind The number of seconds from the provided now value to look behind when getting overrides.
      * @return array $quizzes The quizzes with applicable overrides.
      */
-    private function get_tracked_overrides(int $now): array {
+    private function get_tracked_overrides(int $now, int $lookahead, int $lookbehind): array {
         global $DB;
 
-        $starttime = $now + HOURSECS;
-        $endtime = $now - HOURSECS;
+        $starttime = $now + $lookahead;
+        $endtime = $now - $lookbehind;
 
         $sql = 'SELECT id, quiz, timeopen, timeclose
                   FROM {quiz_overrides}
@@ -265,13 +293,15 @@ class quiz {
      * And startdate != 0.
      *
      * @param int $now Timestamp to use for reference for time.
+     * @param int $lookahead The number of seconds from the provided now value to look ahead when getting quizzes.
+     * @param int $lookbehind The number of seconds from the provided now value to look behind when getting quizzes.
      * @return array $quizzes The quizzes.
      */
-    private function get_tracked_quizzes(int $now): array {
+    private function get_tracked_quizzes(int $now, int $lookahead, int $lookbehind): array {
         global $DB;
 
-        $starttime = $now + HOURSECS;
-        $endtime = $now - HOURSECS;
+        $starttime = $now + $lookahead;
+        $endtime = $now - $lookbehind;
 
         $sql = 'SELECT id, timeopen, timeclose
                   FROM {quiz}
@@ -294,11 +324,13 @@ class quiz {
      * And startdate != 0. With quiz start and end times adjusted to take into account users with overrides.
      *
      * @param int $now Timestamp to use for reference for time.
+     * @param int $lookahead The number of seconds from the provided now value to look ahead when getting quizzes.
+     * @param int $lookbehind The number of seconds from the provided now value to look behind when getting quizzes.
      * @return array $quizzes The quizzes.
      */
-    private function get_tracked_quizzes_with_overrides(int $now): array {
-        $quizzes = $this->get_tracked_quizzes($now);
-        $overrides = $this->get_tracked_overrides($now);
+    private function get_tracked_quizzes_with_overrides(int $now, int $lookahead=HOURSECS, int $lookbehind=HOURSECS): array {
+        $quizzes = $this->get_tracked_quizzes($now, $lookahead, $lookbehind);
+        $overrides = $this->get_tracked_overrides($now, $lookahead, $lookbehind);
         $quizoverides = array();
 
         // Find which quizzes have overrides and adjust start and end times accodingly.
@@ -319,6 +351,89 @@ class quiz {
 
         return $quizoverides;
 
+    }
+
+    /**
+     * Get counts for inprogress assessments, both total in progress quiz activities
+     * and total participants in progress.
+     *
+     * @param int $now Timestamp to use for reference for time.
+     * @return array $quizzes Array of counts of inprogress assessments and participants.
+     */
+    public function get_inprogress_counts(int $now): array {
+        // Get tracked quizzes.
+        $trackedquizzes = $this->get_tracked_quizzes_with_overrides($now, 0, 0);
+
+        $counts = array(
+            'assessments' => 0,
+            'participants' => 0,
+        );
+
+        foreach ($trackedquizzes as $quiz) {
+            $counts['assessments']++;
+
+            // Get tracked users for quiz.
+            $trackedrecords = $this->get_quiz_tracking($quiz->id);
+            $tracking = array_pop($trackedrecords);
+            $counts['participants'] += $tracking->inprogress;
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Get in progress and upcomming quizzes and their associated data.
+     *
+     * @param int $now Timestamp to use for reference for time.
+     * @return array $quizzes Array of inprogress and upcomming quizzes with associated data.
+     */
+    public function get_quiz_summaries(int $now): array {
+        // Get tracked quizzes.
+        $lookahead = HOURSECS * $this->hoursahead;
+        $lookbehind = HOURSECS;
+        $trackedquizzes = $this->get_tracked_quizzes_with_overrides($now, $lookahead, $lookbehind);
+
+        // Set up array to hold quizzes and data.
+        $quizzes = array(
+            'inprogress' => array(),
+            'upcomming' => array(),
+        );
+
+        // Itterate through the hours, processing in progress and upcomming quizzes.
+        for ($hour = 0; $hour <= $this->hoursahead; $hour++) {
+            $time = $now + (HOURSECS * $hour);
+
+            if ($hour == 0) {
+                $quizzes['inprogress'] = array();
+            }
+
+            $quizzes['upcomming'][$time] = array();
+
+            //  Seperate out inprogress and upcomming quizzes, then get data for each quiz.
+            foreach ($trackedquizzes as $quiz) {
+                if ($quiz->timeopen < $time && $quiz->timeclose > $time && $hour === 0) { // Get inprogress quizzes.
+                    $quizdata = $this->get_quiz_data($quiz->id);
+                    $quizdata->timestampopen = $quiz->timeopen;
+                    $quizdata->timestampclose = $quiz->timeclose;
+
+                    // Get tracked users for quiz.
+                    $trackedrecords = $this->get_quiz_tracking($quiz->id);
+                    $quizdata->tracking = array_pop($trackedrecords);
+
+                    $quizzes['inprogress'][$quiz->id] = $quizdata;
+                    unset($trackedquizzes[$quiz->id]); // Remove quiz from array to help with performance.
+                } else if (($quiz->timeopen >= $time) && ($quiz->timeopen < ($time + HOURSECS))) { // Get upcomming quizzes.
+                    $quizdata = $this->get_quiz_data($quiz->id);
+                    $quizdata->timestampopen = $quiz->timeopen;
+                    $quizdata->timestampclose = $quiz->timeclose;
+                    $quizzes['upcomming'][$time][$quiz->id] = $quizdata;
+                    unset($trackedquizzes[$quiz->id]);
+                }
+            }
+
+        }
+
+        return $quizzes;
     }
 
     /**
@@ -480,5 +595,78 @@ class quiz {
         $tracking = $DB->get_records('local_assessfreq_trend', array('assessid' => $quizid), 'timecreated ASC');
 
         return $tracking;
+    }
+
+    /**
+     * Given an array of quizzes, filter based on a provided search string and apply pagination.
+     *
+     * @param array $quizzes Array of quizzes to search.
+     * @param string $search The string to search by.
+     * @param int $page The page number of results.
+     * @param int $pagesize The page size for results.
+     * @return array $result Array containing list of filtered quizzes and total of how many quizzes matched the filter.
+     */
+    public function filter_quizzes(array $quizzes, string $search, int $page, int $pagesize): array {
+        $filtered = array();
+        $searchfields = array('name', 'coursefullname');
+        $offset = $page * $pagesize;
+        $offsetcount = 0;
+        $recordcount = 0;
+
+        foreach ($quizzes as $id => $quiz) {
+            $searchcount = 0;
+            if ($search != '') {
+                $searchcount = -1;
+                foreach ($searchfields as $searchfield) {
+                    if (stripos($quiz->{$searchfield}, $search) !== false) {
+                        $searchcount++;
+                    }
+                }
+            }
+
+            if ($searchcount > -1 && $offsetcount >= $offset && $recordcount < $pagesize) {
+                $filtered[$id] = $quiz;
+            }
+
+            if ($searchcount > -1 && $offsetcount >= $offset) {
+                $recordcount++;
+            }
+
+            if ($searchcount > -1) {
+                $offsetcount ++;
+            }
+        }
+
+        $result = array($filtered, $offsetcount);
+
+        return $result;
+    }
+
+    /**
+     * Sort an array of quizzes.
+     *
+     * @param array $quizzes Array of quizzes to sort.
+     * @param string $sorton The value to sort the quizzes by.
+     * @param string $direction The direction to sort the quizzes.
+     * @return array $quizzes the sorted quizzes.
+     */
+    public function sort_quizzes(array $quizzes, string $sorton, string $direction):array {
+        $this->sortdirection = $direction;
+        $this->sorton = $sorton;
+
+        // The spaceship operator is used for comparing two expressions.
+        // It returns -1, 0 or 1 when $a is respectively less than, equal to, or greater than $b.
+        // Comparisons are performed according to PHP's usual type comparison rules.
+        uasort($quizzes, function($a, $b) {
+
+            if ($this->sortdirection  == 'asc') {
+                return strcasecmp($a->{$this->sorton}, $b->{$this->sorton});
+            } else {
+                return strcasecmp($b->{$this->sorton}, $a->{$this->sorton});
+            }
+
+        });
+
+        return $quizzes;
     }
 }

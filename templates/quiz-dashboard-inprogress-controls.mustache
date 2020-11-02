@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_assessfreq/quiz-dashboard-controls
+    @template local_assessfreq/quiz-dashboard-inprogress-summary
 
     Report Summary template.
 
@@ -24,13 +24,8 @@
 
     }
 }}
-<div id="local-assessfreq-quiz-dashboard-controls" class="mb-3">
-    <div class="row no-gutters">
-	    <div class="col-sm d-flex justify-content-start">
-	        <button  id="local-assessfreq-find-quiz" class="btn btn-primary" type="button">
-	            {{# str }} searchquiz, local_assessfreq {{/ str }}
-	        </button>
-	    </div>
+<div class="mb-3">
+    <div class="row no-gutters justify-content-end">
 	    {{> local_assessfreq/quiz-refresh-controls}}
     </div>
 </div>

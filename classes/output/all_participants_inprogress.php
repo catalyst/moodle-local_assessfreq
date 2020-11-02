@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderable for participant summary card.
+ * Renderable for all participant summary card.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
@@ -29,39 +29,55 @@ use local_assessfreq\quiz;
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Renderable for participant summary card.
+ * Renderable for all participant summary card.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class participant_summary {
+class all_participants_inprogress {
 
     /**
      * Generate the markup for the summary chart,
-     * used in the quiz dashboard.
+     * used in the in progress quizzes dashboard.
      *
-     * @param int $quizid Quiz id to get chart data for.
+     * @param int $now Timestamp to get chart data for.
      * @return array With Generated chart object and chart data status.
      */
-    public function get_participant_summary_chart(int $quizid, bool $legendleft=false): array {
+    public function get_all_participants_inprogress_chart(int $now): array {
 
-        $quizdata = new quiz();
-        $allparticipantdata = $quizdata->get_quiz_tracking($quizid);
-        $participantdata = array_pop($allparticipantdata);
+        // Get quizzes for the supplied timestamp.
+        $quiz = new quiz();
+        $quizzes = $quiz->get_quiz_summaries($now);
+
+        $notloggedin = 0;
+        $loggedin = 0;
+        $inprogress = 0;
+        $finished = 0;
+
+        foreach ($quizzes['inprogress'] as $quizobj) {
+            if (!empty($quizobj->tracking)) {
+                $notloggedin += $quizobj->tracking->notloggedin;
+                $loggedin += $quizobj->tracking->loggedin;
+                $inprogress += $quizobj->tracking->inprogress;
+                $finished += $quizobj->tracking->finished;
+            }
+
+        }
+
         $result = array();
 
-        if (empty($participantdata)) {
+        if (($notloggedin == 0) && ($loggedin == 0) && ($inprogress == 0) && ($finished == 0)) {
             $result['hasdata'] = false;
             $result['chart'] = false;
         } else {
             $result['hasdata'] = true;
 
             $seriesdata = array(
-                $participantdata->notloggedin,
-                $participantdata->loggedin,
-                $participantdata->inprogress,
-                $participantdata->finished
+                $notloggedin,
+                $loggedin,
+                $inprogress,
+                $finished
             );
 
             $labels = array(
@@ -85,10 +101,6 @@ class participant_summary {
             $participants->set_colors($colors);
             $chart->add_series($participants);
             $chart->set_labels($labels);
-
-            if ($legendleft) {
-                $chart->set_legend_options(['position' => 'left']);
-            }
 
             $result['chart'] = $chart;
         }

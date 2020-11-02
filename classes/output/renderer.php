@@ -23,6 +23,8 @@
  */
 namespace local_assessfreq\output;
 
+use local_assessfreq\quiz;
+
 defined('MOODLE_INTERNAL') || die;
 
 use plugin_renderer_base;
@@ -86,6 +88,43 @@ class renderer extends plugin_renderer_base {
         $renderable->out($perpage, true);
         $output = ob_get_contents();
         ob_end_clean();
+
+        return $output;
+    }
+
+    /**
+     * Renders the quizzes in progress "table" on the quiz dashboard screen.
+     * We update the table via ajax.
+     * The table isn't a real table it's a collection of divs.
+     *
+     * @param string $search The search string for the table.
+     * @param int $page The page number of results.
+     * @param string $sorton The value to sort the quizzes by.
+     * @param string $direction The direction to sort the quizzes.
+     * @return string $output HTML for the table.
+     */
+
+    public function render_quizzes_inprogress_table(string $search, int $page, string $sorton, string $direction): string {
+        $context = \context_system::instance(); // TODO: pass the actual context in from the caller.
+        $now = time();
+        $quiz = new quiz();
+        $quizzes = $quiz->get_quiz_summaries($now);
+        $pagesize = get_user_preferences('local_assessfreq_quiz_table_inprogress_preference', 5);
+
+        list($filtered, $totalrows) = $quiz->filter_quizzes($quizzes['inprogress'], $search, $page, $pagesize);
+        $sortedquizzes = $quiz->sort_quizzes($filtered, $sorton, $direction);
+
+        $pagingbar = new \paging_bar($totalrows, $page, $pagesize, '/');
+        $pagingoutput = $this->render($pagingbar);
+
+        $context = array(
+            'quizzes' => array_values($sortedquizzes),
+            'quizids' => json_encode(array_keys($sortedquizzes)),
+            'context' => $context->id,
+            'pagingbar' => $pagingoutput
+        );
+
+        $output = $this->render_from_template('local_assessfreq/quiz-inprogress-summary', $context);
 
         return $output;
     }
@@ -174,11 +213,34 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
-     * Html to add a button for adding a new broadcast.
+     * Add HTML for quiz selection and quiz refresh buttons.
      *
      * @return string html for the button.
      */
-    private function render_quiz_select_button(): string {
+    private function render_quiz_select_refresh_button(): string {
+        $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
+        $refreshminutes = array(
+            60 => 'minuteone',
+            120 => 'minutetwo',
+            300 => 'minutefive',
+            600 => 'minuteten',
+        );
+
+        $context = array(
+            'refreshinitial' => get_string($refreshminutes[$preferencerefresh], 'local_assessfreq'),
+            'refresh' => array($refreshminutes[$preferencerefresh] => 'true'),
+            'hide' => true
+        );
+
+        return $this->render_from_template('local_assessfreq/quiz-dashboard-controls', $context);
+    }
+
+    /**
+     * Add HTML for quiz refresh button.
+     *
+     * @return string html for the button.
+     */
+    private function render_quiz_refresh_button(): string {
         $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
         $refreshminutes = array(
             60 => 'minuteone',
@@ -192,7 +254,7 @@ class renderer extends plugin_renderer_base {
             'refresh' => array($refreshminutes[$preferencerefresh] => 'true'),
         );
 
-        return $this->render_from_template('local_assessfreq/quiz-dashboard-controls', $context);
+        return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-controls', $context);
     }
 
     /**
@@ -216,6 +278,28 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
+     * Render the cards on the quiz dashboard.
+     *
+     * @return string
+     */
+    private function render_quiz_dashboard_inprogress_cards(): string {
+        $preferencerows = get_user_preferences('local_assessfreq_quiz_table_inprogress_preference', 10);
+        $preferencesort = get_user_preferences('local_assessfreq_quiz_table_inprogress_sort_preference', 'name_asc');
+        $rows = array(
+            5 => 'rows5',
+            10 => 'rows10',
+            20 => 'rows20',
+        );
+
+        $context = array(
+            'rows' => array($rows[$preferencerows] => 'true'),
+            'sort' => array($preferencesort => 'true')
+        );
+
+        return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-cards', $context);
+    }
+
+    /**
      * Get the html to render the quiz dashboard.
      *
      * @param string $baseurl the base url to render this report on.
@@ -224,8 +308,24 @@ class renderer extends plugin_renderer_base {
     public function render_dashboard_quiz(string $baseurl) : string {
         $html = '';
         $html .= $this->header();
-        $html .= $this->render_quiz_select_button();
+        $html .= $this->render_quiz_select_refresh_button();
         $html .= $this->render_quiz_dashboard_cards();
+        $html .= $this->footer();
+
+        return $html;
+    }
+
+    /**
+     * Get the html to render the quizzes in porgress dashboard.
+     *
+     * @param string $baseurl the base url to render this report on.
+     * @return string $html the html to display.
+     */
+    public function render_dashboard_quiz_inprogress(string $baseurl) : string {
+        $html = '';
+        $html .= $this->header();
+        $html .= $this->render_quiz_refresh_button();
+        $html .= $this->render_quiz_dashboard_inprogress_cards();
         $html .= $this->footer();
 
         return $html;

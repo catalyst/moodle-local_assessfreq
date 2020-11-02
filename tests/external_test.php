@@ -36,7 +36,7 @@ use local_assessfreq\frequency;
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  */
-class local_assessfreq_external_testcase extends advanced_testcase {
+class external_testcase extends advanced_testcase {
 
     /**
      *
@@ -95,7 +95,7 @@ class local_assessfreq_external_testcase extends advanced_testcase {
     /**
      * Set up conditions for tests.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         global $CFG, $DB;
@@ -380,4 +380,19 @@ class local_assessfreq_external_testcase extends advanced_testcase {
         $this->assertEquals(0, $SESSION->flextable[$tableid]['collapse']['email']);
 
     }
+
+    /**
+     * Test ajax getting of in progress quiz counts.
+     */
+    public function test_get_inprogress_counts() {
+        $this->setAdminUser();
+
+        $returnvalue = local_assessfreq_external::get_inprogress_counts();
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_inprogress_counts_returns(), $returnvalue);
+        $returnarr = json_decode($returnjson, true);
+
+        $this->assertEquals(0, $returnarr['assessments']);
+        $this->assertEquals(0, $returnarr['participants']);
+    }
+
 }
