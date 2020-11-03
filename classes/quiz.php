@@ -236,13 +236,15 @@ class quiz {
      * And startdate != 0.
      *
      * @param int $now Timestamp to use for reference for time.
+     * @param int $lookahead The number of seconds from the provided now value to look ahead when getting overrides.
+     * @param int $lookbehind The number of seconds from the provided now value to look behind when getting overrides.
      * @return array $quizzes The quizzes with applicable overrides.
      */
-    private function get_tracked_overrides(int $now): array {
+    private function get_tracked_overrides(int $now, int $lookahead, int $lookbehind): array {
         global $DB;
 
-        $starttime = $now + HOURSECS;
-        $endtime = $now - HOURSECS;
+        $starttime = $now + $lookahead;
+        $endtime = $now - $lookbehind;
 
         $sql = 'SELECT id, quiz, timeopen, timeclose
                   FROM {quiz_overrides}
@@ -265,13 +267,15 @@ class quiz {
      * And startdate != 0.
      *
      * @param int $now Timestamp to use for reference for time.
+     * @param int $lookahead The number of seconds from the provided now value to look ahead when getting quizzes.
+     * @param int $lookbehind The number of seconds from the provided now value to look behind when getting quizzes.
      * @return array $quizzes The quizzes.
      */
-    private function get_tracked_quizzes(int $now): array {
+    private function get_tracked_quizzes(int $now, int $lookahead, int $lookbehind): array {
         global $DB;
 
-        $starttime = $now + HOURSECS;
-        $endtime = $now - HOURSECS;
+        $starttime = $now + $lookahead;
+        $endtime = $now - $lookbehind;
 
         $sql = 'SELECT id, timeopen, timeclose
                   FROM {quiz}
@@ -294,11 +298,13 @@ class quiz {
      * And startdate != 0. With quiz start and end times adjusted to take into account users with overrides.
      *
      * @param int $now Timestamp to use for reference for time.
+     * @param int $lookahead The number of seconds from the provided now value to look ahead when getting quizzes.
+     * @param int $lookbehind The number of seconds from the provided now value to look behind when getting quizzes.
      * @return array $quizzes The quizzes.
      */
-    private function get_tracked_quizzes_with_overrides(int $now): array {
-        $quizzes = $this->get_tracked_quizzes($now);
-        $overrides = $this->get_tracked_overrides($now);
+    private function get_tracked_quizzes_with_overrides(int $now, int $lookahead=HOURSECS, int $lookbehind=HOURSECS): array {
+        $quizzes = $this->get_tracked_quizzes($now, $lookahead, $lookbehind);
+        $overrides = $this->get_tracked_overrides($now, $lookahead, $lookbehind);
         $quizoverides = array();
 
         // Find which quizzes have overrides and adjust start and end times accodingly.
@@ -319,6 +325,32 @@ class quiz {
 
         return $quizoverides;
 
+    }
+
+    public function get_upcomming_quizzes(int $now): array {
+        $hoursahead = 11;
+        $lookahead = HOURSECS * $hoursahead;
+        $lookbehind = HOURSECS;
+
+        $upcomming = array();
+
+        $quizzes = $this->get_tracked_quizzes_with_overrides($now, $lookahead, $lookbehind);
+
+        for ($hour = 0; $hour <= $hoursahead; $hour++) {
+            $time = $now + (HOURSECS * $hour);
+            $upcomming[$time] = array();
+
+            // Find if any quizzes start in this hour.
+            foreach ($quizzes as $quiz) {
+                if (($quiz->timeopen >= $time) && ($quiz->timeopen < ($time + HOURSECS))) {
+                    $upcomming[$time][$quiz->id] = $quiz;
+                    unset($quizzes[$quiz->id]);
+                }
+            }
+
+        }
+
+        return $upcomming;
     }
 
     /**
