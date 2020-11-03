@@ -570,8 +570,6 @@ class quiz_testcase extends advanced_testcase {
 
         $result = $method->invoke($quizdata, $now);
 
-        error_log(print_r($result, true));
-
         // Time open should match earlier time in override but time close should be the same as original quiz.
         $this->assertEquals(($now - (3600 * 0.75)), $result[$this->quiz4->id]->timeopen);
         $this->assertEquals(($now + (3600 * 0.5)), $result[$this->quiz4->id]->timeclose);
@@ -706,15 +704,31 @@ class quiz_testcase extends advanced_testcase {
 
     }
 
+    // TODO: refacot quiz tracking setup into helper mehtod to allow for resue.
+
     /**
-     * Test getting in progress and upcomming quizzes.
+     * Test getting in progress quizzes.
      */
-    public function test_get_upcomming_quizzes() {
+    public function test_get_quizzes_inprogress() {
         $now = 1594788000;
 
         $quizdata = new quiz();
 
-        $result = $quizdata->get_upcomming_quizzes($now);
+        $result = $quizdata->get_quizzes($now);
+
+        error_log(print_r($result, true));
+
+    }
+
+    /**
+     * Test getting upcomming quizzes.
+     */
+    public function test_get_quizzes_upcomming() {
+        $now = 1594780800;
+
+        $quizdata = new quiz();
+
+        $result = $quizdata->get_quizzes($now);
 
         error_log(print_r($result, true));
 
