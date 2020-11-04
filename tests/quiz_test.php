@@ -714,8 +714,6 @@ class quiz_testcase extends advanced_testcase {
 
     }
 
-    // TODO: refacot quiz tracking setup into helper mehtod to allow for resue.
-
     /**
      * Test getting in progress quizzes.
      */
@@ -727,7 +725,11 @@ class quiz_testcase extends advanced_testcase {
         $quizdata = new quiz();
         $result = $quizdata->get_quizzes($now);
 
-        error_log(print_r($result, true));
+        $this->assertCount(2, $result['inprogress']);
+        $this->assertLessThan($now, $result['inprogress'][$this->quiz3->id]->timestampopen);
+        $this->assertGreaterThan($now, $result['inprogress'][$this->quiz3->id]->timestampclose);
+        $this->assertLessThan($now, $result['inprogress'][$this->quiz4->id]->timestampopen);
+        $this->assertGreaterThan($now, $result['inprogress'][$this->quiz4->id]->timestampclose);
 
     }
 
@@ -735,13 +737,23 @@ class quiz_testcase extends advanced_testcase {
      * Test getting upcomming quizzes.
      */
     public function test_get_quizzes_upcomming() {
-        $now = 1594780800;
-
         $quizdata = new quiz();
 
+        $now = 1594780800;
         $result = $quizdata->get_quizzes($now);
 
-      //  error_log(print_r($result, true));
+        $this->assertCount(2, $result['upcomming'][$now]);
+        $this->assertCount(1, $result['upcomming'][$now + HOURSECS]);
+        $this->assertCount(2, $result['upcomming'][$now + (HOURSECS * 2)]);
+        $this->assertCount(0, $result['upcomming'][$now + (HOURSECS * 3)]);
+
+        $now = 1594788000;
+        $result = $quizdata->get_quizzes($now);
+
+        $this->assertCount(2, $result['upcomming'][$now]);
+        $this->assertCount(0, $result['upcomming'][$now + HOURSECS]);
+        $this->assertCount(1, $result['upcomming'][$now + (HOURSECS * 2)]);
+        $this->assertCount(0, $result['upcomming'][$now + (HOURSECS * 3)]);
 
     }
 }
