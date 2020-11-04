@@ -723,7 +723,7 @@ class quiz_testcase extends advanced_testcase {
         $this->setup_quiz_tracking($now, $this->quiz4->id);
 
         $quizdata = new quiz();
-        $result = $quizdata->get_quizzes($now);
+        $result = $quizdata->get_quiz_summaries($now);
 
         $this->assertCount(2, $result['inprogress']);
         $this->assertLessThan($now, $result['inprogress'][$this->quiz3->id]->timestampopen);
@@ -740,7 +740,7 @@ class quiz_testcase extends advanced_testcase {
         $quizdata = new quiz();
 
         $now = 1594780800;
-        $result = $quizdata->get_quizzes($now);
+        $result = $quizdata->get_quiz_summaries($now);
 
         $this->assertCount(2, $result['upcomming'][$now]);
         $this->assertCount(1, $result['upcomming'][$now + HOURSECS]);
@@ -748,7 +748,7 @@ class quiz_testcase extends advanced_testcase {
         $this->assertCount(0, $result['upcomming'][$now + (HOURSECS * 3)]);
 
         $now = 1594788000;
-        $result = $quizdata->get_quizzes($now);
+        $result = $quizdata->get_quiz_summaries($now);
 
         $this->assertCount(2, $result['upcomming'][$now]);
         $this->assertCount(0, $result['upcomming'][$now + HOURSECS]);

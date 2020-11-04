@@ -333,7 +333,7 @@ class quiz {
      * @param int $now Timestamp to use for reference for time.
      * @return array $quizzes Array of inprogress and upcomming quizzes with associated data.
      */
-    public function get_quizzes(int $now): array {
+    public function get_quiz_summaries(int $now): array {
         // Get tracked quizzes.
         $hoursahead = 12;
         $lookahead = HOURSECS * $hoursahead;

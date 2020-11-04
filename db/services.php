@@ -109,4 +109,12 @@ $functions = array(
         'loginrequired' => false,
         'ajax' => true
     ),
+    'local_assessfreq_get_quiz_summaries' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_quiz_summaries',
+        'classpath' => '',
+        'description' => 'Gets summary data for in progress and upcomming quizzes.',
+        'type' => 'read',
+        'ajax' => true
+    ),
 );
