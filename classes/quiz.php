@@ -362,8 +362,13 @@ class quiz {
                     $quizdata = $this->get_quiz_data($quiz->id);
                     $quizdata->timestampopen = $quiz->timeopen;
                     $quizdata->timestampclose = $quiz->timeclose;
+
+                    // Get tracked users for quiz.
+                    $trackedrecords = $this->get_quiz_tracking($quiz->id);
+                    $quizdata->tracking = array_pop($trackedrecords);
+
                     $quizzes['inprogress'][$quiz->id] = $quizdata;
-                    unset($trackedquizzes[$quiz->id]);
+                    unset($trackedquizzes[$quiz->id]); // Remove quiz from array to help with performance.
                 } else if (($quiz->timeopen >= $time) && ($quiz->timeopen < ($time + HOURSECS))) { // Get upcomming quizzes.
                     $quizdata = $this->get_quiz_data($quiz->id);
                     $quizdata->timestampopen = $quiz->timeopen;

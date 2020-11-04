@@ -451,6 +451,61 @@ class quiz_testcase extends advanced_testcase {
     }
 
     /**
+     * Helper method to create quiz tracking records used in quiz.
+     *
+     * @param int $now Timestamp for tracking.
+     * @param int $quizid Quiz ID to to create tracking records for.
+     */
+    public function setup_quiz_tracking(int $now, int $quizid): void {
+        global $DB;
+
+        $track1 = new \stdClass();
+        $track1->assessid = $quizid;
+        $track1->notloggedin = 5;
+        $track1->loggedin = 0;
+        $track1->inprogress = 0;
+        $track1->finished = 0;
+        $track1->timecreated = $now + (60 * 1);
+
+        $track2 = new \stdClass();
+        $track2->assessid = $quizid;
+        $track2->notloggedin = 4;
+        $track2->loggedin = 1;
+        $track2->inprogress = 1;
+        $track2->finished = 0;
+        $track2->timecreated = $now + (60 * 2);
+
+        $track3 = new \stdClass();
+        $track3->assessid = $quizid;
+        $track3->notloggedin = 3;
+        $track3->loggedin = 2;
+        $track3->inprogress = 2;
+        $track3->finished = 0;
+        $track3->timecreated = $now + (60 * 3);
+
+        $track4 = new \stdClass();
+        $track4->assessid = $quizid;
+        $track4->notloggedin = 2;
+        $track4->loggedin = 3;
+        $track4->inprogress = 3;
+        $track4->finished = 0;
+        $track4->timecreated = $now + (60 * 4);
+
+        $track5 = new \stdClass();
+        $track5->assessid = $quizid;
+        $track5->notloggedin = 1;
+        $track5->loggedin = 4;
+        $track5->inprogress = 3;
+        $track5->finished = 1;
+        $track5->timecreated = $now + (60 * 5);
+
+        // Insert out of order.
+        $trackrecords = array($track1, $track5, $track3, $track2, $track4);
+
+        $DB->insert_records('local_assessfreq_trend', $trackrecords);
+    }
+
+    /**
      * Test getting quiz override info.
      */
     public function test_get_quiz_override_info() {
@@ -645,53 +700,8 @@ class quiz_testcase extends advanced_testcase {
      * Test processing quiz tracking .
      */
     public function test_get_quiz_tracking() {
-        global $DB;
         $now = 1594788000;
-
-        $track1 = new \stdClass();
-        $track1->assessid = $this->quiz1->id;
-        $track1->notloggedin = 5;
-        $track1->loggedin = 0;
-        $track1->inprogress = 0;
-        $track1->finished = 0;
-        $track1->timecreated = $now + (60 * 1);
-
-        $track2 = new \stdClass();
-        $track2->assessid = $this->quiz1->id;
-        $track2->notloggedin = 4;
-        $track2->loggedin = 1;
-        $track2->inprogress = 1;
-        $track2->finished = 0;
-        $track2->timecreated = $now + (60 * 2);
-
-        $track3 = new \stdClass();
-        $track3->assessid = $this->quiz1->id;
-        $track3->notloggedin = 3;
-        $track3->loggedin = 2;
-        $track3->inprogress = 2;
-        $track3->finished = 0;
-        $track3->timecreated = $now + (60 * 3);
-
-        $track4 = new \stdClass();
-        $track4->assessid = $this->quiz1->id;
-        $track4->notloggedin = 2;
-        $track4->loggedin = 3;
-        $track4->inprogress = 3;
-        $track4->finished = 0;
-        $track4->timecreated = $now + (60 * 4);
-
-        $track5 = new \stdClass();
-        $track5->assessid = $this->quiz1->id;
-        $track5->notloggedin = 1;
-        $track5->loggedin = 4;
-        $track5->inprogress = 3;
-        $track5->finished = 1;
-        $track5->timecreated = $now + (60 * 5);
-
-        // Insert out of order.
-        $trackrecords = array($track1, $track5, $track3, $track2, $track4);
-
-        $DB->insert_records('local_assessfreq_trend', $trackrecords);
+        $this->setup_quiz_tracking($now, $this->quiz1->id);
 
         $quizdata = new quiz();
         $trackingdata = $quizdata->get_quiz_tracking($this->quiz1->id);
@@ -711,9 +721,10 @@ class quiz_testcase extends advanced_testcase {
      */
     public function test_get_quizzes_inprogress() {
         $now = 1594788000;
+        $this->setup_quiz_tracking($now, $this->quiz3->id);
+        $this->setup_quiz_tracking($now, $this->quiz4->id);
 
         $quizdata = new quiz();
-
         $result = $quizdata->get_quizzes($now);
 
         error_log(print_r($result, true));
@@ -730,7 +741,7 @@ class quiz_testcase extends advanced_testcase {
 
         $result = $quizdata->get_quizzes($now);
 
-        error_log(print_r($result, true));
+      //  error_log(print_r($result, true));
 
     }
 }
