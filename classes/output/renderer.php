@@ -214,7 +214,7 @@ class renderer extends plugin_renderer_base {
             'refresh' => array($refreshminutes[$preferencerefresh] => 'true'),
         );
 
-        return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-summary', $context);
+        return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-controls', $context);
     }
 
     /**
@@ -235,6 +235,17 @@ class renderer extends plugin_renderer_base {
         );
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-cards', $context);
+    }
+
+    /**
+     * Render the cards on the quiz dashboard.
+     *
+     * @return string
+     */
+    private function render_quiz_dashboard_inprogress_cards(): string {
+
+        $context = array();
+        return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-cards', $context);
     }
 
     /**
@@ -263,6 +274,7 @@ class renderer extends plugin_renderer_base {
         $html = '';
         $html .= $this->header();
         $html .= $this->render_quiz_refresh_button();
+        $html .= $this->render_quiz_dashboard_inprogress_cards();
         $html .= $this->footer();
 
         return $html;
