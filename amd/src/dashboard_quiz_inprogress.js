@@ -41,11 +41,13 @@ function(Ajax) {
         }])[0].then((response) => {
             let quizSummary = JSON.parse(response);
             let titleElement = document.getElementById('local-assessfreq-quiz-inprogress-title');
+            let controlsElement = document.getElementById('local-assessfreq-period-container');
             let summaryElement = document.getElementById('local-assessfreq-quiz-dashboard-inprogress-summary');
             window.console.log(quizSummary);
             window.console.log(summaryElement);
 
             // Show the cards.
+            controlsElement.classList.remove('hide');
             summaryElement.classList.remove('hide');
             titleElement.classList.add('hide');
 
