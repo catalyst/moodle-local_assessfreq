@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define([],
-function() {
+define(['core/ajax'],
+function(Ajax) {
 
     /**
      * Module level variables.
@@ -31,11 +31,38 @@ function() {
     var contextid;
 
     /**
+     * Starts the processing of the dashboard.
+     */
+    const processDashboard = function() {
+        // Get summary quiz data.
+        Ajax.call([{
+            methodname: 'local_assessfreq_get_quiz_summaries',
+            args: {},
+        }])[0].then((response) => {
+            let quizSummary = JSON.parse(response);
+            let titleElement = document.getElementById('local-assessfreq-quiz-inprogress-title');
+            let summaryElement = document.getElementById('local-assessfreq-quiz-dashboard-inprogress-summary');
+            window.console.log(quizSummary);
+            window.console.log(summaryElement);
+
+            // Show the cards.
+            summaryElement.classList.remove('hide');
+            titleElement.classList.add('hide');
+
+            return;
+        }).fail(() => {
+            Notification.exception(new Error('Failed to get quiz summary data'));
+        });
+    };
+
+    /**
      * Initialise method for quizzes in progress dashboard rendering.
      */
     DashboardQuizInprogress.init = function(context) {
         contextid = context;
         window.console.log(contextid);
+
+        processDashboard();
 
     };
 
