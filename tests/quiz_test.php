@@ -715,6 +715,22 @@ class quiz_testcase extends advanced_testcase {
     }
 
     /**
+     * Test getting in progress quiz counts.
+     */
+    public function test_get_inprogress_counts() {
+        $now = 1594788000;
+        $this->setup_quiz_tracking($now, $this->quiz3->id);
+        $this->setup_quiz_tracking($now, $this->quiz4->id);
+
+        $quizdata = new quiz();
+        $result = $quizdata->get_inprogress_counts($now);
+
+        $this->assertEquals(2, $result['assessments']);
+        $this->assertEquals(6, $result['participants']);
+
+    }
+
+    /**
      * Test getting in progress quizzes.
      */
     public function test_get_quizzes_inprogress() {

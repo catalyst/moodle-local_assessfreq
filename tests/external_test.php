@@ -382,7 +382,21 @@ class external_testcase extends advanced_testcase {
     }
 
     /**
-     * Test ajax getting of quiz names.
+     * Test ajax getting of in progress quiz counts.
+     */
+    public function test_get_inprogress_counts() {
+        $this->setAdminUser();
+
+        $returnvalue = local_assessfreq_external::get_inprogress_counts();
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_inprogress_counts_returns(), $returnvalue);
+        $returnarr = json_decode($returnjson, true);
+
+        $this->assertEquals(0, $returnarr['assessments']);
+        $this->assertEquals(0, $returnarr['participants']);
+    }
+
+    /**
+     * Test ajax getting of quiz summaries.
      */
     public function test_get_quiz_summaries() {
         $this->setAdminUser();

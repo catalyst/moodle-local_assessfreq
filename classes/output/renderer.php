@@ -190,6 +190,7 @@ class renderer extends plugin_renderer_base {
         $context = array(
             'refreshinitial' => get_string($refreshminutes[$preferencerefresh], 'local_assessfreq'),
             'refresh' => array($refreshminutes[$preferencerefresh] => 'true'),
+            'hide' => true
         );
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-controls', $context);

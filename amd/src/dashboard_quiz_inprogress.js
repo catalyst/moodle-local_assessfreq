@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax'],
-function(Ajax) {
+define(['core/ajax', 'core/templates'],
+function(Ajax, Templates) {
 
     /**
      * Module level variables.
@@ -36,20 +36,29 @@ function(Ajax) {
     const processDashboard = function() {
         // Get summary quiz data.
         Ajax.call([{
-            methodname: 'local_assessfreq_get_quiz_summaries',
+            methodname: 'local_assessfreq_get_inprogress_counts',
             args: {},
         }])[0].then((response) => {
             let quizSummary = JSON.parse(response);
-            let titleElement = document.getElementById('local-assessfreq-quiz-inprogress-title');
-            let controlsElement = document.getElementById('local-assessfreq-period-container');
-            let summaryElement = document.getElementById('local-assessfreq-quiz-dashboard-inprogress-summary');
+            let summaryElement = document.getElementById('local-assessfreq-quiz-dashboard-inprogress-summary-card');
+            let summarySpinner = summaryElement.getElementsByClassName('overlay-icon-container')[0];
+
+            summaryElement.classList.remove('hide'); // Show the card.
+
             window.console.log(quizSummary);
             window.console.log(summaryElement);
 
-            // Show the cards.
-            controlsElement.classList.remove('hide');
-            summaryElement.classList.remove('hide');
-            titleElement.classList.add('hide');
+            // Populate summary card with details.
+            Templates.render('local_assessfreq/quiz-dashboard-inprogress-summary-card-content', quizSummary)
+            .done((html) => {
+                summarySpinner.classList.add('hide');
+
+                let contentcontainer = document.getElementById('local-assessfreq-quiz-dashboard-inprogress-summary-card-content');
+                Templates.replaceNodeContents(contentcontainer, html);
+            }).fail(() => {
+                Notification.exception(new Error('Failed to load quiz summary template.'));
+                return;
+            });
 
             return;
         }).fail(() => {

@@ -598,4 +598,45 @@ class local_assessfreq_external extends external_api {
     public static function get_quiz_summaries_returns() {
         return new external_value(PARAM_RAW, 'JSON quiz summary data');
     }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return void
+     */
+    public static function get_inprogress_counts_parameters() {
+        return new external_function_parameters(array(
+            // If I had params they'd be here, but I don't, so they're not.
+        ));
+    }
+
+    /**
+     * Returns quiz summary data for upcomming and inprogress quizzes.
+     *
+     * @return string JSON response.
+     */
+    public static function get_inprogress_counts() {
+        \core\session\manager::write_close(); // Close session early this is a read op.
+
+        // Context validation and permission check.
+        $context = context_system::instance();
+        self::validate_context($context);
+        has_capability('moodle/site:config', $context);
+
+        // Execute API call.
+        $quiz = new \local_assessfreq\quiz();
+        $now = time();
+        $quizdata = $quiz->get_inprogress_counts($now);
+
+        return json_encode($quizdata);
+    }
+
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_description
+     */
+    public static function get_inprogress_counts_returns() {
+        return new external_value(PARAM_RAW, 'JSON quiz count data');
+    }
 }

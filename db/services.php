@@ -117,4 +117,12 @@ $functions = array(
         'type' => 'read',
         'ajax' => true
     ),
+    'local_assessfreq_get_inprogress_counts' => array(
+        'classname' => 'local_assessfreq_external',
+        'methodname' => 'get_inprogress_counts',
+        'classpath' => '',
+        'description' => 'Get counts for inprogress assessments.',
+        'type' => 'read',
+        'ajax' => true
+    ),
 );

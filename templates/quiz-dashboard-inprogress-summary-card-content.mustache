@@ -25,17 +25,9 @@
     }
 }}
 
-<div id="local-assessfreq-quiz-dashboard-inprogress-summary-card" class="card">
-
-    <span id="local-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
-        <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
-    </span>
-
-    <div class="card-header">
-        <h5>{{# str }} inprogress, local_assessfreq {{/ str }}</h5>
-    </div>
-    <div class="card-body" id="local-assessfreq-quiz-dashboard-inprogress-summary-card-content">
-        <div class="">Quizzes in progress: x</div>
-        <div class="">Participants in progress: x</div>
-    </div>
+<div class="local-assessfreq-inprogress-summary">
+    {{# str }} inprogressquiz, local_assessfreq, {{assessments}} {{/ str }}
+</div>
+<div class="local-assessfreq-inprogress-summary">
+    {{# str }} inprogressparticpants, local_assessfreq, {{participants}} {{/ str }}
 </div>

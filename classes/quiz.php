@@ -38,6 +38,14 @@ defined('MOODLE_INTERNAL') || die();
 class quiz {
 
     /**
+     * Ammount of time in hours for lookahead values.
+     * Defaults to 12.
+     *
+     * @var int $hoursahead.
+     */
+    private $hoursahead = 12;
+
+    /**
      * Given a quiz id get the module context.
      *
      * @param int $quizid The quiz ID of the context to get.
@@ -328,6 +336,34 @@ class quiz {
     }
 
     /**
+     * Get counts for inprogress assessments, both total in progress quiz activities
+     * and total participants in progress.
+     *
+     * @param int $now Timestamp to use for reference for time.
+     * @return array $quizzes Array of counts of inprogress assessments and participants.
+     */
+    public function get_inprogress_counts(int $now): array {
+        // Get tracked quizzes.
+        $trackedquizzes = $this->get_tracked_quizzes_with_overrides($now, 0, 0);
+
+        $counts = array(
+            'assessments' => 0,
+            'participants' => 0,
+        );
+
+        foreach ($trackedquizzes as $quiz) {
+            $counts['assessments']++;
+
+            // Get tracked users for quiz.
+            $trackedrecords = $this->get_quiz_tracking($quiz->id);
+            $tracking = array_pop($trackedrecords);
+            $counts['participants'] += $tracking->inprogress;
+        }
+
+        return $counts;
+    }
+
+    /**
      * Get in progress and upcomming quizzes and their associated data.
      *
      * @param int $now Timestamp to use for reference for time.
@@ -335,8 +371,7 @@ class quiz {
      */
     public function get_quiz_summaries(int $now): array {
         // Get tracked quizzes.
-        $hoursahead = 12;
-        $lookahead = HOURSECS * $hoursahead;
+        $lookahead = HOURSECS * $this->hoursahead;
         $lookbehind = HOURSECS;
         $trackedquizzes = $this->get_tracked_quizzes_with_overrides($now, $lookahead, $lookbehind);
 
@@ -347,7 +382,7 @@ class quiz {
         );
 
         // Itterate through the hours, processing in progress and upcomming quizzes.
-        for ($hour = 0; $hour <= $hoursahead; $hour++) {
+        for ($hour = 0; $hour <= $this->hoursahead; $hour++) {
             $time = $now + (HOURSECS * $hour);
 
             if ($hour == 0) {
