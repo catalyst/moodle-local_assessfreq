@@ -133,6 +133,37 @@ function local_assessfreq_output_fragment_get_quiz_chart($args): string {
 }
 
 /**
+ * Return the HTML for the given chart.
+ *
+ * @param string $args JSON from the calling AJAX function.
+ * @return string $chartdata The generated chart.
+ */
+function local_assessfreq_output_fragment_get_quiz_inprogress_chart($args): string {
+    $allowedcalls = array(
+        'upcomming_quizzes',
+        'all_participants_inprogress'
+    );
+
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+    $data = json_decode($args['data']);
+
+    if (in_array($data->call, $allowedcalls)) {
+        $classname = '\\local_assessfreq\\output\\' . $data->call;
+        $methodname = 'get_' . $data->call . '_chart';
+    } else {
+        throw new moodle_exception('Call not allowed');
+    }
+
+    $assesschart = new $classname();
+    $now = time();
+    $chart = $assesschart->$methodname($now);
+
+    $chartdata = json_encode($chart);
+    return $chartdata;
+}
+
+/**
  * Renders the quiz search form for the modal on the quiz dashboard.
  *
  * @param array $args

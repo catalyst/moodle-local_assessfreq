@@ -175,6 +175,7 @@ $string['title'] = 'Title';
 $string['toggleoverview'] = 'Toggle overview graphs';
 $string['trenddatetime'] = '%H:%M, %d-%m-%y';
 $string['userattempt'] = 'View user attempt';
+$string['upcommingquizes'] = 'Upcomming quizzes starting';
 $string['userlogs'] = 'View user logs';
 $string['useroverride'] = 'Add user override';
 $string['userprofile'] = 'View user profile';

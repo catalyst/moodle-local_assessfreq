@@ -1,0 +1,54 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_assessfreq/assess-due-month
+
+    Report Summary template.
+
+    Example context (json):
+    {
+
+    }
+}}
+
+<div id="local-assessfreq-quiz-summary-upcomming-graph" class="card">
+	<span id="local-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
+	    <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
+	</span>
+
+    <div class="card-header">
+        <h5>{{# str }} upcommingquizes, local_assessfreq {{/ str }}</h5>
+        <div id="local-assessfreq-quiz-summary-upcomming-graph-zoom" class="local-assessfreq-zoom"
+             data-title="{{# str }} upcommingquizes, local_assessfreq {{/ str }}" data-call="upcomming_quizzes">
+             <span  data-toggle="tooltip" data-placement="top" title="{{#str}} zoom, local_assessfreq {{/str}}" data-offset="0,5">
+                {{#pix}} i/preview, core{{/pix}}
+             </span>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="class-desc">
+            <!-- Chart description goes here via ajax -->
+        </div>
+        <div class="chart-body">
+            <!-- Chart goes here via ajax -->
+        </div>
+    </div>
+    <div class="footer">
+        <!-- Footer goes here via ajax -->
+    </div>
+</div>
+

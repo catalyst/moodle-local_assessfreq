@@ -1,0 +1,86 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Renderable for assessments by activity card.
+ *
+ * @package    local_assessfreq
+ * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_assessfreq\output;
+
+use local_assessfreq\quiz;
+
+defined('MOODLE_INTERNAL') || die;
+
+/**
+ * Renderable for assessments by activity card.
+ *
+ * @package    local_assessfreq
+ * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class upcomming_quizzes {
+
+    /**
+     * Generate the markup for the upcomming quizzes chart,
+     * used in the in progress quizzes dashboard.
+     *
+     * @return array With Generated chart object and chart data status.
+     */
+    public function get_upcomming_quizzes_chart(int $now): array {
+
+        // Get events for the supplied year.
+        $quiz = new quiz();
+        $quizzes = $quiz->get_quiz_summaries($now);
+
+        $labels = array();
+        $charttitle = get_string('upcommingquizes', 'local_assessfreq');
+        $result = array();
+        $result['hasdata'] = true;
+
+        $quizseriesdata = array();
+        $participantseriesdata = array();
+
+        foreach ($quizzes['upcomming'] as $timestamp => $upcomming) {
+            $quizcount = 0;
+            $participantcount = 0;
+
+            foreach ($upcomming as $quiz) {
+                $quizcount++;
+                $participantcount += $quiz->participants;
+            }
+
+            $quizseriesdata[] = $quizcount;
+            $participantseriesdata[] = $participantcount;
+            $labels[] = $timestamp;
+        }
+
+        // Create chart object.
+        $quizseries = new \core\chart_series($charttitle, $quizseriesdata);
+        $participantseries = new \core\chart_series($charttitle, $participantseriesdata);
+
+        $chart = new \core\chart_bar();
+        $chart->add_series($quizseries);
+        $chart->add_series($participantseries);
+        $chart->set_labels($labels);
+        $result['chart'] = $chart;
+
+        return $result;
+    }
+}

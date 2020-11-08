@@ -21,14 +21,19 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/templates'],
-function(Ajax, Templates) {
+define(['core/ajax', 'core/templates', 'core/fragment'],
+function(Ajax, Templates, Fragment) {
 
     /**
      * Module level variables.
      */
     var DashboardQuizInprogress = {};
     var contextid;
+
+    const cards = [
+        {cardId: 'local-assessfreq-quiz-summary-upcomming-graph', call: 'upcomming_quizzes', aspect: false},
+        {cardId: 'local-assessfreq-quiz-summary-inprogress-graph', call: 'all_participants_inprogress', aspect: true}
+    ];
 
     /**
      * Starts the processing of the dashboard.
@@ -45,9 +50,6 @@ function(Ajax, Templates) {
 
             summaryElement.classList.remove('hide'); // Show the card.
 
-            window.console.log(quizSummary);
-            window.console.log(summaryElement);
-
             // Populate summary card with details.
             Templates.render('local_assessfreq/quiz-dashboard-inprogress-summary-card-content', quizSummary)
             .done((html) => {
@@ -56,13 +58,13 @@ function(Ajax, Templates) {
                 let contentcontainer = document.getElementById('local-assessfreq-quiz-dashboard-inprogress-summary-card-content');
                 Templates.replaceNodeContents(contentcontainer, html);
             }).fail(() => {
-                Notification.exception(new Error('Failed to load quiz summary template.'));
+                Notification.exception(new Error('Failed to load quiz counts template.'));
                 return;
             });
 
             return;
         }).fail(() => {
-            Notification.exception(new Error('Failed to get quiz summary data'));
+            Notification.exception(new Error('Failed to get quiz summary counts'));
         });
     };
 
