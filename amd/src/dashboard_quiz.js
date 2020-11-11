@@ -368,7 +368,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             page = 0;
         }
 
-        let search = document.getElementById('local-assessfreq-quiz-student-table-search').value;
+        let search = document.getElementById('local-assessfreq-quiz-student-table-search').value.trim();
         let tableElement = document.getElementById('local-assessfreq-quiz-table');
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
