@@ -113,7 +113,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
     };
 
     /**
-     * For each of the cards on the dashbaord get their corresponding chart data.
+     * For each of the cards on the dashboard get their corresponding chart data.
      * Data is based on the year variable from the corresponding dropdown.
      * Chart data is loaded via ajax.
      *
