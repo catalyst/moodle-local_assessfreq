@@ -29,11 +29,85 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
      */
     var DashboardQuizInprogress = {};
     var contextid;
+    var refreshPeriod = 60;
+    var counterid;
 
     const cards = [
         {cardId: 'local-assessfreq-quiz-summary-upcomming-graph', call: 'upcomming_quizzes', aspect: false},
         {cardId: 'local-assessfreq-quiz-summary-inprogress-graph', call: 'all_participants_inprogress', aspect: true}
     ];
+
+    /**
+     * Generic handler to persist user preferences.
+     *
+     * @param {string} type The name of the attribute you're updating
+     * @param {string} value The value of the attribute you're updating
+     * @return {object} jQuery promise
+     */
+    const setUserPreference = function(type, value) {
+        var request = {
+            methodname: 'core_user_update_user_preferences',
+            args: {
+                preferences: [{type: type, value: value}]
+            }
+        };
+
+        return Ajax.call([request])[0];
+    };
+
+    /**
+     * Generic handler to get user preference.
+     *
+     * @param {string} name The name of the attribute you're getting.
+     * @return {object} jQuery promise
+     */
+    const getUserPreference = function(name) {
+        var request = {
+            methodname: 'core_user_get_user_preferences',
+            args: {
+                'name': name
+            }
+        };
+
+        return Ajax.call([request])[0];
+    };
+
+    /**
+    *
+    */
+   const refreshCounter = function(reset) {
+       let progressElement = document.getElementById('local-assessfreq-period-progress');
+
+       // Reset the current count process.
+       if (reset == true) {
+           clearInterval(counterid);
+           counterid = null;
+           progressElement.setAttribute('style', 'width: 100%');
+           progressElement.setAttribute('aria-valuenow', 100);
+       }
+
+       // Exit early if there is already a counter running.
+       if (counterid) {
+           return;
+       }
+
+       counterid = setInterval(() => {
+           let progressWidthAria = progressElement.getAttribute('aria-valuenow');
+           const progressStep = 100 / refreshPeriod;
+
+           if ((progressWidthAria - progressStep) > 0) {
+               progressElement.setAttribute('style', 'width: ' + (progressWidthAria - progressStep) + '%');
+               progressElement.setAttribute('aria-valuenow', (progressWidthAria - progressStep));
+           } else {
+               clearInterval(counterid);
+               counterid = null;
+               progressElement.setAttribute('style', 'width: 100%');
+               progressElement.setAttribute('aria-valuenow', 100);
+               processDashboard();
+               refreshCounter();
+           }
+       }, (1000));
+   };
 
     /**
      * For each of the cards on the dashbaord get their corresponding chart data.
@@ -109,11 +183,29 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             });
 
             getCardCharts();
+            refreshCounter();
 
             return;
         }).fail(() => {
             Notification.exception(new Error('Failed to get quiz summary counts'));
         });
+    };
+
+    /**
+     * Handle processing of refresh and period button actions.
+     */
+    const refreshAction = function(event) {
+        event.preventDefault();
+        var element = event.target;
+
+        if (element.closest('button') !== null && element.closest('button').id == 'local-assessfreq-refresh-quiz-dashboard') {
+            refreshCounter(true);
+            processDashboard();
+        } else if (element.tagName.toLowerCase() === 'a') {
+            refreshPeriod = element.dataset.period;
+            refreshCounter(true);
+            setUserPreference('local_assessfreq_quiz_refresh_preference', refreshPeriod);
+        }
     };
 
     /**
@@ -123,6 +215,18 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         contextid = context;
         window.console.log(contextid);
         ZoomModal.init(context); // Create the zoom modal.
+
+        getUserPreference('local_assessfreq_quiz_refresh_preference')
+        .then((response) => {
+            refreshPeriod = response.preferences[0].value ? response.preferences[0].value : 60;
+        })
+        .fail(() => {
+            Notification.exception(new Error('Failed to get use preference: refresh'));
+        });
+
+        // Event handling for refresh and period buttons.
+        let refreshElement = document.getElementById('local-assessfreq-period-container');
+        refreshElement.addEventListener('click', refreshAction);
 
         processDashboard();
 
