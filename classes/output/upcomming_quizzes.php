@@ -51,7 +51,8 @@ class upcomming_quizzes {
         $quizzes = $quiz->get_quiz_summaries($now);
 
         $labels = array();
-        $charttitle = get_string('upcommingquizes', 'local_assessfreq');
+        $quizseriestitle = get_string('quizzes', 'local_assessfreq');
+        $participantseries = get_string('students', 'local_assessfreq');
         $result = array();
         $result['hasdata'] = true;
 
@@ -69,12 +70,12 @@ class upcomming_quizzes {
 
             $quizseriesdata[] = $quizcount;
             $participantseriesdata[] = $participantcount;
-            $labels[] = $timestamp;
+            $labels[] = userdate($timestamp, get_string('inprogressdatetime', 'local_assessfreq'));
         }
 
         // Create chart object.
-        $quizseries = new \core\chart_series($charttitle, $quizseriesdata);
-        $participantseries = new \core\chart_series($charttitle, $participantseriesdata);
+        $quizseries = new \core\chart_series($quizseriestitle, $quizseriesdata);
+        $participantseries = new \core\chart_series($participantseries, $participantseriesdata);
 
         $chart = new \core\chart_bar();
         $chart->add_series($quizseries);
