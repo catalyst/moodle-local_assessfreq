@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderable for assessments by activity card.
+ * Renderable for upcomming quizzes card.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
@@ -29,7 +29,7 @@ use local_assessfreq\quiz;
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Renderable for assessments by activity card.
+ * Renderable for upcomming quizzes card.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
@@ -41,11 +41,12 @@ class upcomming_quizzes {
      * Generate the markup for the upcomming quizzes chart,
      * used in the in progress quizzes dashboard.
      *
+     * @param int $now Timestamp to get chart data for.
      * @return array With Generated chart object and chart data status.
      */
     public function get_upcomming_quizzes_chart(int $now): array {
 
-        // Get events for the supplied year.
+        // Get quizzes for the supplied timestamp.
         $quiz = new quiz();
         $quizzes = $quiz->get_quiz_summaries($now);
 
