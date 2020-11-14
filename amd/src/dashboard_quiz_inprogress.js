@@ -209,6 +209,17 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     };
 
     /**
+     * Trigger the zoom graph. Thin wrapper to add extra data to click event.
+     */
+    const triggerZoomGraph = function(event) {
+        let call = event.target.closest('div').dataset.call;
+        let params = {'data': JSON.stringify({'call': call})};
+        let method = 'get_quiz_inprogress_chart';
+
+        ZoomModal.zoomGraph(event, params, method);
+    };
+
+    /**
      * Initialise method for quizzes in progress dashboard rendering.
      */
     DashboardQuizInprogress.init = function(context) {
@@ -227,6 +238,13 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         // Event handling for refresh and period buttons.
         let refreshElement = document.getElementById('local-assessfreq-period-container');
         refreshElement.addEventListener('click', refreshAction);
+
+        // Set up zoom event listeners.
+        let summaryZoom = document.getElementById('local-assessfreq-quiz-summary-inprogress-graph-zoom');
+        summaryZoom.addEventListener('click', triggerZoomGraph);
+
+        let upcommingZoom = document.getElementById('local-assessfreq-quiz-summary-upcomming-graph-zoom');
+        upcommingZoom.addEventListener('click', triggerZoomGraph);
 
         processDashboard();
 
