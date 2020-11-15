@@ -207,6 +207,26 @@ function local_assessfreq_output_fragment_get_student_table($args): string {
 }
 
 /**
+ * Renders the quizzes in progress "table" on the quiz dashboard screen.
+ * We update the table via ajax.
+ * The table isn't a real table it's a collection of divs.
+ *
+ * @param array $args
+ * @return string $o Form HTML.
+ */
+function local_assessfreq_output_fragment_get_quizzes_inprogress_table($args): string {
+    global $PAGE;
+
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+
+    $output = $PAGE->get_renderer('local_assessfreq');
+    $o = $output->render_quizzes_inprogress_table();
+
+    return $o;
+}
+
+/**
  * Renders the quiz user override form for the modal on the quiz dashboard.
  *
  * @param array $args

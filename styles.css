@@ -150,3 +150,8 @@
 .local-assessfreq-day-coursename {
     font-weight: 400;
 }
+
+.local-assessfreq-inprogress-summary {
+    font-size: 1.25rem;
+    font-weight: 400;
+}

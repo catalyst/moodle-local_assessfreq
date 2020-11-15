@@ -91,6 +91,24 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
+     * Renders the quizzes in progress "table" on the quiz dashboard screen.
+     * We update the table via ajax.
+     * The table isn't a real table it's a collection of divs.
+     *
+     * @return string $output HTML for the table.
+     */
+    public function render_quizzes_inprogress_table(): string {
+        $renderable = new quiz_user_table();
+
+        ob_start();
+        $renderable->out($perpage, true);
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        return $output;
+    }
+
+    /**
      * Return heatmap HTML.
      *
      * @return string The heatmap HTML.
