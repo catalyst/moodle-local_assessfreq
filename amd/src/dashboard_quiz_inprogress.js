@@ -33,7 +33,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     var counterid;
 
     const cards = [
-        {cardId: 'local-assessfreq-quiz-summary-upcomming-graph', call: 'upcomming_quizzes', aspect: false},
+        {cardId: 'local-assessfreq-quiz-summary-upcomming-graph', call: 'upcomming_quizzes', aspect: true},
         {cardId: 'local-assessfreq-quiz-summary-inprogress-graph', call: 'all_participants_inprogress', aspect: true}
     ];
 

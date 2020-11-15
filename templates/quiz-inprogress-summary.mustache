@@ -26,6 +26,50 @@
 }}
 <div id="local-assessfreq-quiz-inprogress-summary">
     <div class="row no-gutters">
-    content
-    </div>
+    {{#quizzes}}
+      <div class="summary-table">
+        <table class="table table-striped table-sm table-bordered local-assessfreq-quiz-summary-table">
+          <tbody>
+          <tr>
+            <td>{{#str}} quiz, local_assessfreq {{/str}}:</td>
+            <td><a href='{{{url}}}'>{{name}}</a></td>
+          </tr>
+          <tr>
+            <td>{{#str}} course, local_assessfreq {{/str}}:</td>
+            <td><a href='{{{courselink}}}'>{{courseshortname}}</a></td>
+          </tr>
+          <tr>
+            <td>{{#str}} quiztimelimit, local_assessfreq {{/str}}:</td>
+            <td>{{timelimit}}</td>
+          </tr>
+          <tr>
+            <td>{{#str}} quiztimeearlyopen, local_assessfreq {{/str}}</td>
+            <td>{{earlyopen}}</td>
+          </tr>
+          <tr>
+            <td>{{#str}} quiztimelateclose, local_assessfreq {{/str}}</td>
+            <td>{{lateclose}}</td>
+          </tr>
+          <tr>
+            <td>{{#str}} participants, local_assessfreq {{/str}} ({{#str}} overrides, local_assessfreq {{/str}}):</td>
+            <td>
+              <a href='{{{participantlink}}}'>{{participants}}</a> (<a href='{{{overridelink}}}'>{{overrideparticipants}}</a>)
+            </td>
+          </tr>
+          </tbody>
+       </table>
+     </div>
+     <div id="{{#tracking}}{{assessid}}{{/tracking}}-summary-graph" class="summary-graph">
+     {{#tracking}}{{assessid}}{{/tracking}}
+     </div>
+  {{/quizzes}}
+  </div>
 </div>
+
+{{^element.frozen}}
+{{#js}}
+require(['local_assessfreq/summary_participants'], function(Summary) {
+    Sumamry.chart({{#tracking}}{{assessid}}{{/tracking}});
+});
+{{/js}}
+{{/element.frozen}}

@@ -83,6 +83,7 @@ $string['numberassessments'] = 'By number of assessments';
 $string['numberevents'] = 'Event Count';
 $string['numberstudents'] = 'By number of students with assessments';
 $string['open'] = 'Open';
+$string['overrides'] = 'Overrides';
 $string['participantsummary'] = 'Participant summary';
 $string['participanttrend'] = 'Participant trend';
 $string['participants'] = 'Participants';

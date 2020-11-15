@@ -104,7 +104,7 @@ class renderer extends plugin_renderer_base {
         $now = time();
         $quiz = new quiz();
         $quizzes = $quiz->get_quiz_summaries($now);
-        $context = array();
+        $context = array('quizzes' => array_values($quizzes['inprogress']));
 
         $output = $this->render_from_template('local_assessfreq/quiz-inprogress-summary', $context);
 
