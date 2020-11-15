@@ -156,6 +156,25 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     };
 
     /**
+     * Display the table that contains all in progress quiz summaries.
+     */
+    const getSummaryTable = function() {
+        let tableElement = document.getElementById('local-assessfreq-quiz-inprogress-table');
+        let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
+        let tableBody = tableElement.getElementsByClassName('table-body')[0];
+
+        spinner.classList.remove('hide'); // Show sinner if not already shown.
+        Fragment.loadFragment('local_assessfreq', 'get_quizzes_inprogress_table', contextid)
+        .done((response) => {
+            tableBody.innerHTML = response;
+            spinner.classList.add('hide'); // Hide spinner if not already hidden.
+        }).fail(() => {
+            Notification.exception(new Error('Failed to update table.'));
+            return;
+        });
+    };
+
+    /**
      * Starts the processing of the dashboard.
      */
     const processDashboard = function() {
@@ -183,6 +202,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             });
 
             getCardCharts();
+            getSummaryTable();
             refreshCounter();
 
             return;
@@ -224,7 +244,6 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
      */
     DashboardQuizInprogress.init = function(context) {
         contextid = context;
-        window.console.log(contextid);
         ZoomModal.init(context); // Create the zoom modal.
 
         getUserPreference('local_assessfreq_quiz_refresh_preference')

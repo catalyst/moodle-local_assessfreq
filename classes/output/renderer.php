@@ -23,6 +23,8 @@
  */
 namespace local_assessfreq\output;
 
+use local_assessfreq\quiz;
+
 defined('MOODLE_INTERNAL') || die;
 
 use plugin_renderer_base;
@@ -98,12 +100,13 @@ class renderer extends plugin_renderer_base {
      * @return string $output HTML for the table.
      */
     public function render_quizzes_inprogress_table(): string {
-        $renderable = new quiz_user_table();
+        // Get quizzes for the supplied timestamp.
+        $now = time();
+        $quiz = new quiz();
+        $quizzes = $quiz->get_quiz_summaries($now);
+        $context = array();
 
-        ob_start();
-        $renderable->out($perpage, true);
-        $output = ob_get_contents();
-        ob_end_clean();
+        $output = $this->render_from_template('local_assessfreq/quiz-inprogress-summary', $context);
 
         return $output;
     }
