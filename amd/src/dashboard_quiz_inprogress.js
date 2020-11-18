@@ -165,8 +165,9 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
 
         spinner.classList.remove('hide'); // Show sinner if not already shown.
         Fragment.loadFragment('local_assessfreq', 'get_quizzes_inprogress_table', contextid)
-        .done((response) => {
+        .done((response, js) => {
             tableBody.innerHTML = response;
+            Templates.runTemplateJS(js); // Magic call the initialises JS from template included in response template HTML.
             spinner.classList.add('hide'); // Hide spinner if not already hidden.
         }).fail(() => {
             Notification.exception(new Error('Failed to update table.'));

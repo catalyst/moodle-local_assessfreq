@@ -100,11 +100,15 @@ class renderer extends plugin_renderer_base {
      * @return string $output HTML for the table.
      */
     public function render_quizzes_inprogress_table(): string {
-        // Get quizzes for the supplied timestamp.
+        $context = \context_system::instance(); // TODO: pass the actual context in from the caller.
         $now = time();
         $quiz = new quiz();
         $quizzes = $quiz->get_quiz_summaries($now);
-        $context = array('quizzes' => array_values($quizzes['inprogress']));
+        $context = array(
+            'quizzes' => array_values($quizzes['inprogress']),
+            'quizids' => json_encode(array_keys($quizzes['inprogress'])),
+            'context' => $context->id
+        );
 
         $output = $this->render_from_template('local_assessfreq/quiz-inprogress-summary', $context);
 

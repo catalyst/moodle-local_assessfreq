@@ -24,6 +24,7 @@
 
     }
 }}
+
 <div id="local-assessfreq-quiz-inprogress-summary">
     <div class="row no-gutters">
     {{#quizzes}}
@@ -60,7 +61,7 @@
        </table>
      </div>
      <div id="{{#tracking}}{{assessid}}{{/tracking}}-summary-graph" class="summary-graph">
-     {{#tracking}}{{assessid}}{{/tracking}}
+       {{! graph goes here via ajax }}
      </div>
   {{/quizzes}}
   </div>
@@ -69,7 +70,7 @@
 {{^element.frozen}}
 {{#js}}
 require(['local_assessfreq/summary_participants'], function(Summary) {
-    Sumamry.chart({{#tracking}}{{assessid}}{{/tracking}});
+    Summary.chart({{{quizids}}}, {{{context}}});
 });
 {{/js}}
 {{/element.frozen}}

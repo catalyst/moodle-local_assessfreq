@@ -159,3 +159,7 @@
 #local-assessfreq-quiz-inprogress-summary .summary-table {
     width: 60%;
 }
+
+#local-assessfreq-quiz-inprogress-summary .summary-graph {
+    width: 40%;
+}
