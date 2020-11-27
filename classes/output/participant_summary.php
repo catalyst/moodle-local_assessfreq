@@ -44,7 +44,7 @@ class participant_summary {
      * @param int $quizid Quiz id to get chart data for.
      * @return array With Generated chart object and chart data status.
      */
-    public function get_participant_summary_chart(int $quizid): array {
+    public function get_participant_summary_chart(int $quizid, bool $legendleft=false): array {
 
         $quizdata = new quiz();
         $allparticipantdata = $quizdata->get_quiz_tracking($quizid);
@@ -85,6 +85,10 @@ class participant_summary {
             $participants->set_colors($colors);
             $chart->add_series($participants);
             $chart->set_labels($labels);
+
+            if ($legendleft) {
+                $chart->set_legend_options(['position' => 'left']);
+            }
 
             $result['chart'] = $chart;
         }

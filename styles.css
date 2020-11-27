@@ -157,9 +157,13 @@
 }
 
 #local-assessfreq-quiz-inprogress-summary .summary-table {
-    width: 60%;
+    width: 70%;
 }
 
 #local-assessfreq-quiz-inprogress-summary .summary-graph {
-    width: 40%;
+    width: 30%;
+    border: 1px solid #dee2e6;
+    height: 210px;
+    padding-top: 25px;
+    padding-right: 10px;
 }

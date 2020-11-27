@@ -215,6 +215,8 @@ class quiz {
         $overrridelink = new \moodle_url('/mod/quiz/overrides.php', array('cmid' => $context->instanceid, 'mode' => 'user'));
         // Participant link.
         $participantlink = new \moodle_url('/user/index.php', array('id' => $quizrecord->course));
+        // Dashboard link.
+        $dashboardlink = new \moodle_url('/local/assessfreq/dashboard_quiz.php', array('id' => $quizid));
 
         $quizdata->name = $quizrecord->name;
         $quizdata->timeopen = $timesopen;
@@ -234,6 +236,7 @@ class quiz {
         $quizdata->courseshortname = $course->shortname;
         $quizdata->courselink = $courseurl->out(false);
         $quizdata->participantlink = $participantlink->out(false);
+        $quizdata->dashboardlink = $dashboardlink->out(false);
 
         return $quizdata;
     }

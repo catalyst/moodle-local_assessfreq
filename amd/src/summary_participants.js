@@ -32,7 +32,7 @@ function(Fragment, Templates, Str) {
     Summary.chart = function(assessids, contextid) {
         assessids.forEach((assessid) => {
             let chartElement = document.getElementById(assessid + '-summary-graph');
-            let params = {'data': JSON.stringify({'quiz' : assessid, 'call': 'participant_summary'})};
+            let params = {'data': JSON.stringify({'quiz' : assessid, 'call': 'participant_summary', 'legendleft': true})};
 
             Fragment.loadFragment('local_assessfreq', 'get_quiz_chart', contextid, params)
             .done((response) => {

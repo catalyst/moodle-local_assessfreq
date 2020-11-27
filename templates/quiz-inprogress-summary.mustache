@@ -33,7 +33,13 @@
           <tbody>
           <tr>
             <td>{{#str}} quiz, local_assessfreq {{/str}}:</td>
-            <td><a href='{{{url}}}'>{{name}}</a></td>
+            <td>
+              <a href='{{{url}}}'>{{name}}</a>
+              &nbsp;
+              |&nbsp;<a href='{{{dashboardlink}}}'>
+                {{#pix}} i/report, core, {{#str}} dashboard:assessment, local_assessfreq {{/str}}{{/pix}}
+              </a>
+            </td>
           </tr>
           <tr>
             <td>{{#str}} course, local_assessfreq {{/str}}:</td>

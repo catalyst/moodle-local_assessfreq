@@ -72,6 +72,7 @@ class inprogress_participant_summary {
         $participants->set_colors($colors);
         $chart->add_series($participants);
         $chart->set_labels($labels);
+        $chart->set_legend_options(['display' => false]);
 
         return $chart;
     }
