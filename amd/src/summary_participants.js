@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/fragment', 'core/templates', 'core/str'],
-function(Fragment, Templates, Str) {
+define(['core/fragment', 'core/templates', 'core/str', 'core/notification'],
+function(Fragment, Templates, Str, Notification) {
 
     /**
      * Module level variables.

@@ -581,4 +581,27 @@ class quiz {
 
         return $tracking;
     }
+
+    /**
+     * Given an array of quizzes, filter based on a provided search string.
+     *
+     * @param array $quizzes Array of quizzes to search.
+     * @param string $search The string to search by.
+     * @return array $filtered The array of filtered quizzes.
+     */
+    public function filter_quizzes(array $quizzes, string $search): array {
+        $filtered = array();
+        $searchfields = array('name', 'coursefullname');
+
+        foreach ($quizzes as $id => $quiz) {
+            foreach ($searchfields as $searchfield) {
+                if (stripos($quiz->{
+                    $searchfield}, $search) !== false) {
+                    $filtered[$id] = $quiz;
+                }
+            }
+        }
+
+        return $filtered;
+    }
 }

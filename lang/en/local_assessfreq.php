@@ -59,6 +59,7 @@ $string['eventeventprocessed'] = 'event_processed';
 $string['eventeven_processed_desc'] = 'local assessfreq task event processing';
 $string['entercourse'] = 'Enter course name';
 $string['entersearch'] = 'Enter search text';
+$string['entersearchquiz'] = 'Search by quiz or course name';
 $string['findcourse'] = 'Find course';
 $string['finished'] = 'Finished';
 $string['inprogress'] = 'In progress';

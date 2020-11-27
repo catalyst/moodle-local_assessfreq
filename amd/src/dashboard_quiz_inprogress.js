@@ -109,6 +109,29 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
        }, (1000));
    };
 
+   /**
+    * Process the search events from the student table.
+    */
+   const tableSearch = function(event) {
+       if (event.target.value.length > 2) {
+           getSummaryTable();
+       }
+
+       if (event.target.value.length == 0) {
+           getSummaryTable();
+       }
+   };
+
+   /**
+    * Process the search reset click event from the student table.
+    */
+   const tableSearchReset = function() {
+       let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-inprogress-table-search');
+       tableSearchInputElement.value = '';
+       tableSearchInputElement.focus();
+       getSummaryTable();
+   };
+
     /**
      * For each of the cards on the dashbaord get their corresponding chart data.
      * Data is based on the year variable from the corresponding dropdown.
@@ -162,9 +185,11 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         let tableElement = document.getElementById('local-assessfreq-quiz-inprogress-table');
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
+        let search = document.getElementById('local-assessfreq-quiz-inprogress-table-search').value.trim();
+        let params = {'data': JSON.stringify({'search': search})};
 
         spinner.classList.remove('hide'); // Show sinner if not already shown.
-        Fragment.loadFragment('local_assessfreq', 'get_quizzes_inprogress_table', contextid)
+        Fragment.loadFragment('local_assessfreq', 'get_quizzes_inprogress_table', contextid, params)
         .done((response, js) => {
             tableBody.innerHTML = response;
             Templates.runTemplateJS(js); // Magic call the initialises JS from template included in response template HTML.
@@ -187,6 +212,8 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             let quizSummary = JSON.parse(response);
             let summaryElement = document.getElementById('local-assessfreq-quiz-dashboard-inprogress-summary-card');
             let summarySpinner = summaryElement.getElementsByClassName('overlay-icon-container')[0];
+            let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-inprogress-table-search');
+            let tableSearchResetElement = document.getElementById('local-assessfreq-quiz-inprogress-table-search-reset');
 
             summaryElement.classList.remove('hide'); // Show the card.
 
@@ -205,6 +232,11 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             getCardCharts();
             getSummaryTable();
             refreshCounter();
+
+            // Table event listeners.
+            tableSearchInputElement.addEventListener('keyup', tableSearch);
+            tableSearchInputElement.addEventListener('paste', tableSearch);
+            tableSearchResetElement.addEventListener('click', tableSearchReset);
 
             return;
         }).fail(() => {

@@ -97,16 +97,25 @@ class renderer extends plugin_renderer_base {
      * We update the table via ajax.
      * The table isn't a real table it's a collection of divs.
      *
+     * @param string $search The search string for the table.
      * @return string $output HTML for the table.
      */
-    public function render_quizzes_inprogress_table(): string {
+
+    public function render_quizzes_inprogress_table(string $search): string {
         $context = \context_system::instance(); // TODO: pass the actual context in from the caller.
         $now = time();
         $quiz = new quiz();
         $quizzes = $quiz->get_quiz_summaries($now);
+
+        if ($search != '') {
+            $filtered = $quiz->filter_quizzes($quizzes['inprogress'], $search);
+        } else {
+            $filtered = $quizzes['inprogress'];
+        }
+
         $context = array(
-            'quizzes' => array_values($quizzes['inprogress']),
-            'quizids' => json_encode(array_keys($quizzes['inprogress'])),
+            'quizzes' => array_values($filtered),
+            'quizids' => json_encode(array_keys($filtered)),
             'context' => $context->id
         );
 

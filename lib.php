@@ -225,8 +225,11 @@ function local_assessfreq_output_fragment_get_quizzes_inprogress_table($args): s
     $context = $args['context'];
     has_capability('moodle/site:config', $context);
 
+    $data = json_decode($args['data']);
+    $search = is_null($data->search) ? '' : $data->search;
+
     $output = $PAGE->get_renderer('local_assessfreq');
-    $o = $output->render_quizzes_inprogress_table();
+    $o = $output->render_quizzes_inprogress_table($search);
 
     return $o;
 }
