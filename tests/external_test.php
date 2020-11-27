@@ -395,17 +395,4 @@ class external_testcase extends advanced_testcase {
         $this->assertEquals(0, $returnarr['participants']);
     }
 
-    /**
-     * Test ajax getting of quiz summaries.
-     */
-    public function test_get_quiz_summaries() {
-        $this->setAdminUser();
-
-        $returnvalue = local_assessfreq_external::get_quiz_summaries();
-        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_quiz_summaries_returns(), $returnvalue);
-        $returnarr = json_decode($returnjson, true);
-
-        $this->assertEmpty($returnarr['inprogress']);
-        $this->assertNotEmpty($returnarr['upcomming']);
-    }
 }
