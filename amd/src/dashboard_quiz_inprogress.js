@@ -179,6 +179,32 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     };
 
     /**
+     * Process the nav event from the student table.
+     */
+    const tableNav = function(event) {
+        event.preventDefault();
+
+        const linkUrl = new URL(event.target.closest('a').href);
+        const page = linkUrl.searchParams.get('page');
+
+        if (page) {
+            getSummaryTable(page);
+        }
+    };
+
+    /**
+     * Re-add event listeners when the student table is updated.
+     */
+    const tableEventListeners = function() {
+        const tableElement = document.getElementById('local-assessfreq-quiz-inprogress-table');
+        const tableNavElement = tableElement.querySelectorAll('nav'); // There are two nav paging elements per table.
+
+        tableNavElement.forEach((navElement) => {
+            navElement.addEventListener('click', tableNav);
+        });
+    };
+
+    /**
      * Display the table that contains all in progress quiz summaries.
      */
     const getSummaryTable =function(page) {
@@ -190,22 +216,10 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
         let search = document.getElementById('local-assessfreq-quiz-inprogress-table-search').value.trim();
-        let pagerTop = document.getElementById('local-assessfreq-quiz-inprogress-table-paging-top');
-        let pagerBottom = document.getElementById('local-assessfreq-quiz-inprogress-table-paging-bottom');
 
         let params = {'data': JSON.stringify({'search': search, 'page': page})};
 
         spinner.classList.remove('hide'); // Show sinner if not already shown.
-
-        // Load table pager.
-        Fragment.loadFragment('local_assessfreq', 'get_quizzes_inprogress_table_pager', contextid, params)
-        .done((response) => {
-            pagerTop.innerHTML = response;
-            pagerBottom.innerHTML = response;
-        }).fail(() => {
-            Notification.exception(new Error('Failed to get table pager.'));
-            return;
-        });
 
         // Load table content.
         Fragment.loadFragment('local_assessfreq', 'get_quizzes_inprogress_table', contextid, params)
@@ -213,6 +227,8 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             tableBody.innerHTML = response;
             Templates.runTemplateJS(js); // Magic call the initialises JS from template included in response template HTML.
             spinner.classList.add('hide'); // Hide spinner if not already hidden.
+            tableEventListeners(); // Re-add table event listeners.
+
         }).fail(() => {
             Notification.exception(new Error('Failed to update table.'));
             return;

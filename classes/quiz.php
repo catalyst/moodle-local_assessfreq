@@ -583,25 +583,47 @@ class quiz {
     }
 
     /**
-     * Given an array of quizzes, filter based on a provided search string.
+     * Given an array of quizzes, filter based on a provided search string and apply pagination.
      *
      * @param array $quizzes Array of quizzes to search.
      * @param string $search The string to search by.
-     * @return array $filtered The array of filtered quizzes.
+     * @param int $page The page number of results.
+     * @param int $pagesize The page size for results.
+     * @return array $result Array containing list of filtered quizzes and total of how many quizzes matched the filter.
      */
-    public function filter_quizzes(array $quizzes, string $search): array {
+    public function filter_quizzes(array $quizzes, string $search, int $page, int $pagesize): array {
         $filtered = array();
         $searchfields = array('name', 'coursefullname');
+        $offset = $page * $pagesize;
+        $offsetcount = 0;
+        $recordcount = 0;
 
         foreach ($quizzes as $id => $quiz) {
-            foreach ($searchfields as $searchfield) {
-                if (stripos($quiz->{
-                    $searchfield}, $search) !== false) {
-                    $filtered[$id] = $quiz;
+            $searchcount = 0;
+            if ($search != '') {
+                $searchcount = -1;
+                foreach ($searchfields as $searchfield) {
+                    if (stripos($quiz->{$searchfield}, $search) !== false) {
+                        $searchcount++;
+                    }
                 }
+            }
+
+            if ($searchcount > -1 && $offsetcount >= $offset && $recordcount < $pagesize) {
+                $filtered[$id] = $quiz;
+            }
+
+            if ($searchcount > -1 && $offsetcount >= $offset) {
+                $recordcount++;
+            }
+
+            if ($searchcount > -1) {
+                $offsetcount ++;
             }
         }
 
-        return $filtered;
+        $result = array($filtered, $offsetcount);
+
+        return $result;
     }
 }

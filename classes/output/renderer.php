@@ -98,59 +98,30 @@ class renderer extends plugin_renderer_base {
      * The table isn't a real table it's a collection of divs.
      *
      * @param string $search The search string for the table.
+     * @param int $page The page number of results.
      * @return string $output HTML for the table.
      */
 
-    public function render_quizzes_inprogress_table(string $search): string {
+    public function render_quizzes_inprogress_table(string $search, int $page): string {
         $context = \context_system::instance(); // TODO: pass the actual context in from the caller.
         $now = time();
         $quiz = new quiz();
         $quizzes = $quiz->get_quiz_summaries($now);
+        // $pagesize = get_user_preferences('local_assessfreq_quiz_inprogress_table_rows_preference', 20);
+        $pagesize = 1;
 
-        if ($search != '') {
-            $filtered = $quiz->filter_quizzes($quizzes['inprogress'], $search);
-        } else {
-            $filtered = $quizzes['inprogress'];
-        }
+        list($filtered, $totalrows) = $quiz->filter_quizzes($quizzes['inprogress'], $search, $page, $pagesize);
+        $pagingbar = new \paging_bar($totalrows, $page, $pagesize, '/');
+        $pagingoutput = $this->render($pagingbar);
 
         $context = array(
             'quizzes' => array_values($filtered),
             'quizids' => json_encode(array_keys($filtered)),
-            'context' => $context->id
+            'context' => $context->id,
+            'pagingbar' => $pagingoutput
         );
 
         $output = $this->render_from_template('local_assessfreq/quiz-inprogress-summary', $context);
-
-        return $output;
-    }
-
-    /**
-     * Renders the quizzes in progress "table" on the quiz dashboard screen.
-     * We update the table via ajax.
-     * The table isn't a real table it's a collection of divs.
-     *
-     * @param string $search The search string for the table.
-     * @return string $output HTML for the table.
-     */
-
-    public function render_quizzes_inprogress_table_pager(string $search, int $page): string {
-        $now = time();
-        $quiz = new quiz();
-        $quizzes = $quiz->get_quiz_summaries($now);
-
-        if ($search != '') {
-            $filtered = $quiz->filter_quizzes($quizzes['inprogress'], $search);
-        } else {
-            $filtered = $quizzes['inprogress'];
-        }
-
-        $totalrows = count($filtered);
-        // $pagesize = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
-        $pagesize = 1;
-
-        $pagingbar = new \paging_bar($totalrows, 0, $pagesize, '/');
-        //$pagingbar->pagevar = $this->request[TABLE_VAR_PAGE];
-        $output = $this->render($pagingbar);
 
         return $output;
     }
