@@ -181,14 +181,33 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     /**
      * Display the table that contains all in progress quiz summaries.
      */
-    const getSummaryTable = function() {
+    const getSummaryTable =function(page) {
+        if (typeof page === "undefined") {
+            page = 0;
+        }
+
         let tableElement = document.getElementById('local-assessfreq-quiz-inprogress-table');
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
         let search = document.getElementById('local-assessfreq-quiz-inprogress-table-search').value.trim();
-        let params = {'data': JSON.stringify({'search': search})};
+        let pagerTop = document.getElementById('local-assessfreq-quiz-inprogress-table-paging-top');
+        let pagerBottom = document.getElementById('local-assessfreq-quiz-inprogress-table-paging-bottom');
+
+        let params = {'data': JSON.stringify({'search': search, 'page': page})};
 
         spinner.classList.remove('hide'); // Show sinner if not already shown.
+
+        // Load table pager.
+        Fragment.loadFragment('local_assessfreq', 'get_quizzes_inprogress_table_pager', contextid, params)
+        .done((response) => {
+            pagerTop.innerHTML = response;
+            pagerBottom.innerHTML = response;
+        }).fail(() => {
+            Notification.exception(new Error('Failed to get table pager.'));
+            return;
+        });
+
+        // Load table content.
         Fragment.loadFragment('local_assessfreq', 'get_quizzes_inprogress_table', contextid, params)
         .done((response, js) => {
             tableBody.innerHTML = response;

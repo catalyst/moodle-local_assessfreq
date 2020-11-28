@@ -156,6 +156,10 @@
     font-weight: 400;
 }
 
+#local-assessfreq-quiz-inprogress-table .table-container {
+    min-height: 100px;
+}
+
 #local-assessfreq-quiz-inprogress-summary .summary-table {
     width: 70%;
 }

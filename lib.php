@@ -235,6 +235,27 @@ function local_assessfreq_output_fragment_get_quizzes_inprogress_table($args): s
 }
 
 /**
+ * Renders the quizzes in progress "table pager" on the quiz dashboard screen.
+ *
+ * @param array $args
+ * @return string $o Form HTML.
+ */
+function local_assessfreq_output_fragment_get_quizzes_inprogress_table_pager($args): string {
+    global $PAGE;
+
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+
+    $data = json_decode($args['data']);
+    $search = is_null($data->search) ? '' : $data->search;
+
+    $output = $PAGE->get_renderer('local_assessfreq');
+    $o = $output->render_quizzes_inprogress_table_pager($search, $data->page);
+
+    return $o;
+}
+
+/**
  * Renders the quiz user override form for the modal on the quiz dashboard.
  *
  * @param array $args
