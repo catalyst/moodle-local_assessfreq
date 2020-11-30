@@ -99,10 +99,12 @@ class renderer extends plugin_renderer_base {
      *
      * @param string $search The search string for the table.
      * @param int $page The page number of results.
+     * @param string $sorton The value to sort the quizzes by.
+     * @param string $direction The direction to sort the quizzes.
      * @return string $output HTML for the table.
      */
 
-    public function render_quizzes_inprogress_table(string $search, int $page): string {
+    public function render_quizzes_inprogress_table(string $search, int $page, string $sorton, string $direction): string {
         $context = \context_system::instance(); // TODO: pass the actual context in from the caller.
         $now = time();
         $quiz = new quiz();
@@ -110,12 +112,14 @@ class renderer extends plugin_renderer_base {
         $pagesize = get_user_preferences('local_assessfreq_quiz_table_inprogress_preference', 5);
 
         list($filtered, $totalrows) = $quiz->filter_quizzes($quizzes['inprogress'], $search, $page, $pagesize);
+        $sortedquizzes = $quiz->sort_quizzes($filtered, $sorton, $direction);
+
         $pagingbar = new \paging_bar($totalrows, $page, $pagesize, '/');
         $pagingoutput = $this->render($pagingbar);
 
         $context = array(
-            'quizzes' => array_values($filtered),
-            'quizids' => json_encode(array_keys($filtered)),
+            'quizzes' => array_values($sortedquizzes),
+            'quizids' => json_encode(array_keys($sortedquizzes)),
             'context' => $context->id,
             'pagingbar' => $pagingoutput
         );
@@ -280,6 +284,7 @@ class renderer extends plugin_renderer_base {
      */
     private function render_quiz_dashboard_inprogress_cards(): string {
         $preferencerows = get_user_preferences('local_assessfreq_quiz_table_inprogress_preference', 10);
+        $preferencesort = get_user_preferences('local_assessfreq_quiz_table_inprogress_sort_preference', 'name_asc');
         $rows = array(
             5 => 'rows5',
             10 => 'rows10',
@@ -288,6 +293,7 @@ class renderer extends plugin_renderer_base {
 
         $context = array(
             'rows' => array($rows[$preferencerows] => 'true'),
+            'sort' => array($preferencesort => 'true')
         );
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-cards', $context);

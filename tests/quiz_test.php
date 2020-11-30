@@ -866,13 +866,13 @@ class quiz_testcase extends advanced_testcase {
 
         $search = 'special';
         $filtered = $quizdata->filter_quizzes($quizzes, $search, 0, 10);
-        $this->assertCount(1, $filtered);
-        $this->assertEquals('very SPECIAL Quiz 3', $filtered[208002]->name);
+        $this->assertCount(1, $filtered[0]);
+        $this->assertEquals('very SPECIAL Quiz 3', $filtered[0][208002]->name);
 
         $search = 'Independent';
         $filtered = $quizdata->filter_quizzes($quizzes, $search, 0, 10);
-        $this->assertCount(1, $filtered);
-        $this->assertEquals('Independent course 1', $filtered[208003]->coursefullname);
+        $this->assertCount(1, $filtered[0]);
+        $this->assertEquals('Independent course 1', $filtered[0][208003]->coursefullname);
     }
 
     /**
@@ -886,14 +886,40 @@ class quiz_testcase extends advanced_testcase {
         $search = 'quiz';
 
         $filtered = $quizdata->filter_quizzes($quizzes, $search, 0, 10);
-        $this->assertCount(2, $filtered);
+        $this->assertCount(2, $filtered[0]);
 
         $filtered = $quizdata->filter_quizzes($quizzes, $search, 0, 1);
-        $this->assertCount(1, $filtered);
-        $this->assertEquals('very SPECIAL Quiz 3', $filtered[208002]->name);
+        $this->assertCount(1, $filtered[0]);
+        $this->assertEquals('very SPECIAL Quiz 3', $filtered[0][208002]->name);
 
         $filtered = $quizdata->filter_quizzes($quizzes, $search, 1, 1);
-        $this->assertCount(1, $filtered);
-        $this->assertEquals('Independent course 1', $filtered[208003]->coursefullname);
+        $this->assertCount(1, $filtered[0]);
+        $this->assertEquals('Independent course 1', $filtered[0][208003]->coursefullname);
+    }
+
+    /**
+     * Test filtering quizzes with pages.
+     */
+    public function test_sort_quizzes() {
+        // Mock data.
+        $quizzes = $this->setup_mock_quiz_data();
+
+        $quizdata = new quiz();
+        $sorton = 'name';
+
+        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'asc');
+        $this->assertEquals('Independent Quiz 4', $sorted[208003]->name);
+
+        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'desc');
+        $this->assertEquals('very SPECIAL Quiz 3', $sorted[208002]->name);
+
+        $sorton = 'coursefullname';
+
+        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'asc');
+        $this->assertEquals('Independent course 1', $sorted[208003]->coursefullname);
+
+        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'desc');
+        $this->assertEquals('Test course 1', $sorted[208002]->coursefullname);
+
     }
 }

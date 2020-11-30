@@ -46,6 +46,21 @@ class quiz {
     private $hoursahead = 12;
 
     /**
+     * The direction used in sorting.
+     *
+     * @var string $sortdirection
+     */
+    private $sortdirection;
+
+    /**
+     * The quiz details to sort by.
+     *
+     * @var string $sorton
+     */
+    private $sorton;
+
+
+    /**
      * Given a quiz id get the module context.
      *
      * @param int $quizid The quiz ID of the context to get.
@@ -625,5 +640,38 @@ class quiz {
         $result = array($filtered, $offsetcount);
 
         return $result;
+    }
+
+    /**
+     * Sort an array of quizzes.
+     *
+     * @param array $quizzes Array of quizzes to sort.
+     * @param string $sorton The value to sort the quizzes by.
+     * @param string $direction The direction to sort the quizzes.
+     * @return array $quizzes the sorted quizzes.
+     */
+    public function sort_quizzes(array $quizzes, string $sorton, string $direction):array {
+        $this->sortdirection = $direction;
+        $this->sorton = $sorton;
+
+        error_log($this->sortdirection);
+        error_log($this->sorton);
+
+        // The spaceship operator is used for comparing two expressions.
+        // It returns -1, 0 or 1 when $a is respectively less than, equal to, or greater than $b.
+        // Comparisons are performed according to PHP's usual type comparison rules.
+        uasort($quizzes, function($a, $b) {
+
+            if ($this->sortdirection  == 'asc') {
+                return $a->{$this->sorton} <=> $b->{$this->sorton};
+            } else {
+                return $b->{$this->sorton} <=> $a->{$this->sorton};
+            }
+
+        });
+
+        error_log(print_r($quizzes, true));
+
+        return $quizzes;
     }
 }

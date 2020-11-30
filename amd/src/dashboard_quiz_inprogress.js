@@ -31,6 +31,8 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     var contextid;
     var refreshPeriod = 60;
     var counterid;
+    var tablesort = 'name_asc';
+    var timeout;
 
     const cards = [
         {cardId: 'local-assessfreq-quiz-summary-upcomming-graph', call: 'upcomming_quizzes', aspect: true},
@@ -73,6 +75,17 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     };
 
     /**
+     * Quick and dirty debounce method for the settings.
+     * This stops the ajax method that updates the table from being updated
+     * while the user is still checking options.
+     *
+     */
+    const updateDebounce = function(method) {
+        clearTimeout(timeout);
+        timeout = setTimeout(method(), 750);
+    };
+
+    /**
     *
     */
    const refreshCounter = function(reset) {
@@ -110,7 +123,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
    };
 
    /**
-    * Process the search events from the student table.
+    * Process the search events from the quiz table.
     */
    const tableSearch = function(event) {
        if (event.target.value.length > 2) {
@@ -123,7 +136,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
    };
 
    /**
-    * Process the search reset click event from the student table.
+    * Process the search reset click event from the quiz table.
     */
    const tableSearchReset = function() {
        let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-inprogress-table-search');
@@ -179,7 +192,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     };
 
     /**
-     * Process the nav event from the student table.
+     * Process the nav event from the quiz table.
      */
     const tableNav = function(event) {
         event.preventDefault();
@@ -193,7 +206,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     };
 
     /**
-     * Process the row set event from the student table.
+     * Process the row set event from the quiz table.
      */
     const tableSearchRowSet = function(event) {
         event.preventDefault();
@@ -210,7 +223,36 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     };
 
     /**
-     * Re-add event listeners when the student table is updated.
+     * Get and process the selected assessment metric from the dropdown for the heatmap display,
+     * and update the corresponding user perference.
+     *
+     * @param {event} event The triggered event for the element.
+     */
+    const tableSortButtonAction = function(event) {
+        event.preventDefault();
+        var element = event.target;
+        window.console.log(element.dataset.sort);
+
+        if (element.tagName.toLowerCase() === 'a' && element.dataset.sort != tablesort) {
+            tablesort = element.dataset.sort;
+
+            let links = element.parentNode.getElementsByTagName('a');
+            for (let i = 0; i < links.length; i++) {
+                links[i].classList.remove('active');
+            }
+
+            element.classList.add('active');
+
+            // Save selection as a user preference.
+            setUserPreference('local_assessfreq_quiz_table_inprogress_sort_preference', tablesort);
+
+            updateDebounce(getSummaryTable); // Call function to update table.
+
+        }
+    };
+
+    /**
+     * Re-add event listeners when the quiz table is updated.
      */
     const tableEventListeners = function() {
         const tableElement = document.getElementById('local-assessfreq-quiz-inprogress-table');
@@ -233,8 +275,13 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
         let search = document.getElementById('local-assessfreq-quiz-inprogress-table-search').value.trim();
+        let sortarray = tablesort.split('_');
+        let sorton = sortarray[0];
+        let direction = sortarray[1];
+        window.console.log(sorton);
+        window.console.log(direction);
 
-        let params = {'data': JSON.stringify({'search': search, 'page': page})};
+        let params = {'data': JSON.stringify({'search': search, 'page': page, 'sorton': sorton, 'direction': direction})};
 
         spinner.classList.remove('hide'); // Show sinner if not already shown.
 
@@ -267,6 +314,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-inprogress-table-search');
             let tableSearchResetElement = document.getElementById('local-assessfreq-quiz-inprogress-table-search-reset');
             let tableSearchRowsElement = document.getElementById('local-assessfreq-quiz-inprogress-table-rows');
+            let tableSortElement = document.getElementById('local-assessfreq-inprogress-table-sort');
 
             summaryElement.classList.remove('hide'); // Show the card.
 
@@ -291,6 +339,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             tableSearchInputElement.addEventListener('paste', tableSearch);
             tableSearchResetElement.addEventListener('click', tableSearchReset);
             tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
+            tableSortElement.addEventListener('click', tableSortButtonAction);
 
             return;
         }).fail(() => {
@@ -339,6 +388,14 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         })
         .fail(() => {
             Notification.exception(new Error('Failed to get use preference: refresh'));
+        });
+
+        getUserPreference('local_assessfreq_quiz_table_inprogress_sort_preference')
+        .then((response) => {
+            tablesort = response.preferences[0].value ? response.preferences[0].value : 'name_asc';
+        })
+        .fail(() => {
+            Notification.exception(new Error('Failed to get use preference: tablesort'));
         });
 
         // Event handling for refresh and period buttons.
