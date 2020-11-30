@@ -107,8 +107,7 @@ class renderer extends plugin_renderer_base {
         $now = time();
         $quiz = new quiz();
         $quizzes = $quiz->get_quiz_summaries($now);
-        // $pagesize = get_user_preferences('local_assessfreq_quiz_inprogress_table_rows_preference', 20);
-        $pagesize = 1;
+        $pagesize = get_user_preferences('local_assessfreq_quiz_table_inprogress_preference', 5);
 
         list($filtered, $totalrows) = $quiz->filter_quizzes($quizzes['inprogress'], $search, $page, $pagesize);
         $pagingbar = new \paging_bar($totalrows, $page, $pagesize, '/');
@@ -280,8 +279,17 @@ class renderer extends plugin_renderer_base {
      * @return string
      */
     private function render_quiz_dashboard_inprogress_cards(): string {
+        $preferencerows = get_user_preferences('local_assessfreq_quiz_table_inprogress_preference', 10);
+        $rows = array(
+            5 => 'rows5',
+            10 => 'rows10',
+            20 => 'rows20',
+        );
 
-        $context = array();
+        $context = array(
+            'rows' => array($rows[$preferencerows] => 'true'),
+        );
+
         return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-cards', $context);
     }
 

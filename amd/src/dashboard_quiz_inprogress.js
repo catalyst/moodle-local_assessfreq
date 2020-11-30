@@ -193,6 +193,23 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     };
 
     /**
+     * Process the row set event from the student table.
+     */
+    const tableSearchRowSet = function(event) {
+        event.preventDefault();
+        if (event.target.tagName.toLowerCase() === 'a') {
+            let rows = event.target.dataset.metric;
+            setUserPreference('local_assessfreq_quiz_table_inprogress_preference', rows)
+            .then(() => {
+                getSummaryTable(); // Reload the table.
+            })
+            .fail(() => {
+                Notification.exception(new Error('Failed to update user preference: rows'));
+            });
+        }
+    };
+
+    /**
      * Re-add event listeners when the student table is updated.
      */
     const tableEventListeners = function() {
@@ -249,6 +266,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             let summarySpinner = summaryElement.getElementsByClassName('overlay-icon-container')[0];
             let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-inprogress-table-search');
             let tableSearchResetElement = document.getElementById('local-assessfreq-quiz-inprogress-table-search-reset');
+            let tableSearchRowsElement = document.getElementById('local-assessfreq-quiz-inprogress-table-rows');
 
             summaryElement.classList.remove('hide'); // Show the card.
 
@@ -272,6 +290,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             tableSearchInputElement.addEventListener('keyup', tableSearch);
             tableSearchInputElement.addEventListener('paste', tableSearch);
             tableSearchResetElement.addEventListener('click', tableSearchReset);
+            tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
 
             return;
         }).fail(() => {
