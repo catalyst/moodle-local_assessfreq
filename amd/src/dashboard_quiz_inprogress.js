@@ -65,7 +65,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
      */
     const getUserPreference = function(name) {
         var request = {
-            methodname: 'core_user_get_user_preferences',
+            methodname: 'local_assessfreq_get_user_preferences',
             args: {
                 'name': name
             }
