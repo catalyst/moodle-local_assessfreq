@@ -231,7 +231,6 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     const tableSortButtonAction = function(event) {
         event.preventDefault();
         var element = event.target;
-        window.console.log(element.dataset.sort);
 
         if (element.tagName.toLowerCase() === 'a' && element.dataset.sort != tablesort) {
             tablesort = element.dataset.sort;
@@ -278,8 +277,6 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         let sortarray = tablesort.split('_');
         let sorton = sortarray[0];
         let direction = sortarray[1];
-        window.console.log(sorton);
-        window.console.log(direction);
 
         let params = {'data': JSON.stringify({'search': search, 'page': page, 'sorton': sorton, 'direction': direction})};
 

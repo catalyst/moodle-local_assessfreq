@@ -654,23 +654,18 @@ class quiz {
         $this->sortdirection = $direction;
         $this->sorton = $sorton;
 
-        error_log($this->sortdirection);
-        error_log($this->sorton);
-
         // The spaceship operator is used for comparing two expressions.
         // It returns -1, 0 or 1 when $a is respectively less than, equal to, or greater than $b.
         // Comparisons are performed according to PHP's usual type comparison rules.
         uasort($quizzes, function($a, $b) {
 
             if ($this->sortdirection  == 'asc') {
-                return $a->{$this->sorton} <=> $b->{$this->sorton};
+                return strcasecmp($a->{$this->sorton}, $b->{$this->sorton});
             } else {
-                return $b->{$this->sorton} <=> $a->{$this->sorton};
+                return strcasecmp($b->{$this->sorton}, $a->{$this->sorton});
             }
 
         });
-
-        error_log(print_r($quizzes, true));
 
         return $quizzes;
     }
