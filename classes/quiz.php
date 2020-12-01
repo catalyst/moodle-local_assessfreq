@@ -412,7 +412,7 @@ class quiz {
 
             $quizzes['upcomming'][$time] = array();
 
-            //  Seperate out inprogress and upcomming quizzes, then get data for each quiz.
+            // Seperate out inprogress and upcomming quizzes, then get data for each quiz.
             foreach ($trackedquizzes as $quiz) {
                 if ($quiz->timeopen < $time && $quiz->timeclose > $time && $hour === 0) { // Get inprogress quizzes.
                     $quizdata = $this->get_quiz_data($quiz->id);
@@ -662,7 +662,7 @@ class quiz {
         // Comparisons are performed according to PHP's usual type comparison rules.
         uasort($quizzes, function($a, $b) {
 
-            if ($this->sortdirection  == 'asc') {
+            if ($this->sortdirection == 'asc') {
                 return strcasecmp($a->{$this->sorton}, $b->{$this->sorton});
             } else {
                 return strcasecmp($b->{$this->sorton}, $a->{$this->sorton});

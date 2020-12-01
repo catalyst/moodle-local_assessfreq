@@ -406,14 +406,13 @@ class local_assessfreq_external extends external_api {
         } else {
             if ($preference == 'sortby') {
                 $values = json_decode($values, true);
-                error_log(print_r($values, true));
                 $key = array_keys($values)[0];
 
                 if (!empty($prefs[$preference][$key]) && ($prefs['sortby'][$key] == 3)) {
                     $prefs['sortby'][$key] = 4;
                 } else if (!empty($prefs[$preference][$key]) && ($prefs['sortby'][$key] == 4)) {
                     $prefs['sortby'][$key] = 3;
-                }else {
+                } else {
                     $prefs['sortby'] = array();
                     $prefs['sortby'][$key] = 4;
                 }

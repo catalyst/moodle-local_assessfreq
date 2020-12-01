@@ -55,7 +55,7 @@ class quiz_override_form extends \quiz_override_form {
         $this->groupid = 0;
         $this->userid = empty($override->userid) ? 0 : $override->userid;
 
-        if($this->userid == 0 && !empty($submitteddata['userid'])) {
+        if ($this->userid == 0 && !empty($submitteddata['userid'])) {
             $this->userid = $submitteddata['userid'];
         }
 

@@ -103,7 +103,6 @@ class renderer extends plugin_renderer_base {
      * @param string $direction The direction to sort the quizzes.
      * @return string $output HTML for the table.
      */
-
     public function render_quizzes_inprogress_table(string $search, int $page, string $sorton, string $direction): string {
         $context = \context_system::instance(); // TODO: pass the actual context in from the caller.
         $now = time();

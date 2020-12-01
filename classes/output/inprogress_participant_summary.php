@@ -39,8 +39,8 @@ class inprogress_participant_summary {
      * Generate the markup for the summary chart,
      * used in the quiz dashboard.
      *
-     * @param int $quizid Quiz id to get chart data for.
-     * @return array With Generated chart object and chart data status.
+     * @param \stdClass $participants The participants.
+     * @return \core\chart_pie $chart Generated chart object and chart data status.
      */
     public function get_inprogress_participant_summary_chart(\stdClass $participants): \core\chart_pie {
 

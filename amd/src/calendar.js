@@ -361,16 +361,16 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     cell = document.createElement("td");
                     cellText = document.createTextNode(date);
                     if ((typeof monthEvents !== "undefined") && (monthEvents.hasOwnProperty(date))) {
-                       let heat = getHeat(monthEvents[date]['number']);
+                        let heat = getHeat(monthEvents[date]['number']);
 
-                       if (heatRangeScale[heat] == 0 || heatRangeScale[heat] > monthEvents[date]['number']) {
-                           heatRangeScale[heat] = monthEvents[date]['number'];
-                       }
+                        if (heatRangeScale[heat] == 0 || heatRangeScale[heat] > monthEvents[date]['number']) {
+                            heatRangeScale[heat] = monthEvents[date]['number'];
+                        }
 
-                       cell.style.backgroundColor = colorArray[heat];
-                       cell.style.color = getContrast(colorArray[heat]);
+                        cell.style.backgroundColor = colorArray[heat];
+                        cell.style.color = getContrast(colorArray[heat]);
 
-                        //Add tooltip to cell.
+                        // Add tooltip to cell.
                         cell.dataset.toggle = 'tooltip';
                         cell.dataset.html = 'true';
                         cell.dataset.event = 'true';

@@ -88,62 +88,62 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     /**
     *
     */
-   const refreshCounter = function(reset) {
-       let progressElement = document.getElementById('local-assessfreq-period-progress');
+    const refreshCounter = function(reset) {
+        let progressElement = document.getElementById('local-assessfreq-period-progress');
 
-       // Reset the current count process.
-       if (reset == true) {
-           clearInterval(counterid);
-           counterid = null;
-           progressElement.setAttribute('style', 'width: 100%');
-           progressElement.setAttribute('aria-valuenow', 100);
-       }
+        // Reset the current count process.
+        if (reset == true) {
+            clearInterval(counterid);
+            counterid = null;
+            progressElement.setAttribute('style', 'width: 100%');
+            progressElement.setAttribute('aria-valuenow', 100);
+        }
 
-       // Exit early if there is already a counter running.
-       if (counterid) {
-           return;
-       }
+        // Exit early if there is already a counter running.
+        if (counterid) {
+            return;
+        }
 
-       counterid = setInterval(() => {
-           let progressWidthAria = progressElement.getAttribute('aria-valuenow');
-           const progressStep = 100 / refreshPeriod;
+        counterid = setInterval(() => {
+            let progressWidthAria = progressElement.getAttribute('aria-valuenow');
+            const progressStep = 100 / refreshPeriod;
 
-           if ((progressWidthAria - progressStep) > 0) {
-               progressElement.setAttribute('style', 'width: ' + (progressWidthAria - progressStep) + '%');
-               progressElement.setAttribute('aria-valuenow', (progressWidthAria - progressStep));
-           } else {
-               clearInterval(counterid);
-               counterid = null;
-               progressElement.setAttribute('style', 'width: 100%');
-               progressElement.setAttribute('aria-valuenow', 100);
-               processDashboard();
-               refreshCounter();
-           }
-       }, (1000));
-   };
+            if ((progressWidthAria - progressStep) > 0) {
+                progressElement.setAttribute('style', 'width: ' + (progressWidthAria - progressStep) + '%');
+                progressElement.setAttribute('aria-valuenow', (progressWidthAria - progressStep));
+            } else {
+                clearInterval(counterid);
+                counterid = null;
+                progressElement.setAttribute('style', 'width: 100%');
+                progressElement.setAttribute('aria-valuenow', 100);
+                processDashboard();
+                refreshCounter();
+            }
+        }, (1000));
+    };
 
-   /**
-    * Process the search events from the quiz table.
-    */
-   const tableSearch = function(event) {
-       if (event.target.value.length > 2) {
-           getSummaryTable();
-       }
+    /**
+     * Process the search events from the quiz table.
+     */
+    const tableSearch = function(event) {
+        if (event.target.value.length > 2) {
+            getSummaryTable();
+        }
 
-       if (event.target.value.length == 0) {
-           getSummaryTable();
-       }
-   };
+        if (event.target.value.length == 0) {
+            getSummaryTable();
+        }
+    };
 
-   /**
-    * Process the search reset click event from the quiz table.
-    */
-   const tableSearchReset = function() {
-       let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-inprogress-table-search');
-       tableSearchInputElement.value = '';
-       tableSearchInputElement.focus();
-       getSummaryTable();
-   };
+    /**
+     * Process the search reset click event from the quiz table.
+     */
+    const tableSearchReset = function() {
+        let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-inprogress-table-search');
+        tableSearchInputElement.value = '';
+        tableSearchInputElement.focus();
+        getSummaryTable();
+    };
 
     /**
      * For each of the cards on the dashbaord get their corresponding chart data.
@@ -274,7 +274,7 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     /**
      * Display the table that contains all in progress quiz summaries.
      */
-    const getSummaryTable =function(page) {
+    const getSummaryTable = function(page) {
         if (typeof page === "undefined") {
             page = 0;
         }

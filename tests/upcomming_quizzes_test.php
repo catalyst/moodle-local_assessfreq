@@ -206,7 +206,6 @@ class upcomming_quizzes_test extends advanced_testcase {
         $this->user5 = $user5;
         $this->user6 = $user6;
 
-
     }
 
     /**
