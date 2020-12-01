@@ -22,7 +22,7 @@
     Example context (json):
     {}
 }}
-<div id="local-assessfreq-inprogress-table-sort" data-region="sort-filter" class="dropdown mr-3">
+<div id="local-assessfreq-inprogress-table-sort" data-region="sort-filter" class="mr-3">
     <button type="button" class="btn btn-secondary dropdown-toggle icon-no-margin"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
             aria-label="{{strselect}}" aria-controls="local-assessfreq-inprogress-table-sort">
@@ -32,10 +32,10 @@
                 {{# str }} numberstudents, local_assessfreq {{/ str }}
         </span>
     </button>
-    <div id="local-assessfreq-inprogress-table-sort" role="menu" class="dropdown-menu">
+    <div id="local-assessfreq-inprogress-table-sort" role="menu" class="dropdown-menu"  data-show-active-item>
         <h6 class="dropdown-header">{{# str }} sorttable, local_assessfreq {{/ str }}</h6>
         <a
-            class="dropdown-item {{#sort}}{{#quizasc}}active{{/quizasc}}{{/sort}}"
+            class="dropdown-item {{#sort}}{{#name_asc}}active{{/name_asc}}{{/sort}}"
             href="#"
             data-sort="name_asc"
             aria-label="{{# str }} quizasc, local_assessfreq {{/ str }}"
@@ -44,7 +44,7 @@
             {{# str }} quizasc, local_assessfreq {{/ str }}
         </a>
         <a
-            class="dropdown-item {{#sort}}{{#quizdesc}}active{{/quizdesc}}{{/sort}}"
+            class="dropdown-item {{#sort}}{{#name_desc}}active{{/name_desc}}{{/sort}}"
             href="#"
             data-sort="name_desc"
             aria-label="{{# str }} quizdesc, local_assessfreq {{/ str }}"
@@ -53,7 +53,7 @@
             {{# str }} quizdesc, local_assessfreq {{/ str }}
         </a>
         <a
-            class="dropdown-item {{#sort}}{{#courseasc}}active{{/courseasc}}{{/sort}}"
+            class="dropdown-item {{#sort}}{{#coursefullname_asc}}active{{/coursefullname_asc}}{{/sort}}"
             href="#"
             data-sort="coursefullname_asc"
             aria-label="{{# str }} courseasc, local_assessfreq {{/ str }}"
@@ -62,7 +62,7 @@
             {{# str }} courseasc, local_assessfreq {{/ str }}
         </a>
         <a
-            class="dropdown-item {{#sort}}{{#coursedesc}}active{{/coursedesc}}{{/sort}}"
+            class="dropdown-item {{#sort}}{{#coursefullname_desc}}active{{/coursefullname_desc}}{{/sort}}"
             href="#"
             data-sort="coursefullname_desc"
             aria-label="{{# str }} coursedesc, local_assessfreq {{/ str }}"
