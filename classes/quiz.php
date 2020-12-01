@@ -252,6 +252,7 @@ class quiz {
         $quizdata->courselink = $courseurl->out(false);
         $quizdata->participantlink = $participantlink->out(false);
         $quizdata->dashboardlink = $dashboardlink->out(false);
+        $quizdata->assessid = $quizid;
 
         return $quizdata;
     }
