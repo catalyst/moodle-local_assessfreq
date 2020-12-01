@@ -42,6 +42,7 @@ class participant_summary {
      * used in the quiz dashboard.
      *
      * @param int $quizid Quiz id to get chart data for.
+     * @param bool $legendleft Set true to place the chart legend on the left.
      * @return array With Generated chart object and chart data status.
      */
     public function get_participant_summary_chart(int $quizid, bool $legendleft=false): array {
