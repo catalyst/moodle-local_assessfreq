@@ -821,8 +821,6 @@ class quiz_testcase extends advanced_testcase {
         $quizdata = new quiz();
         $result = $quizdata->get_quiz_summaries($now);
 
-       // error_log(var_export($result['inprogress'], true));
-
         $this->assertCount(2, $result['inprogress']);
         $this->assertLessThan($now, $result['inprogress'][$this->quiz3->id]->timestampopen);
         $this->assertGreaterThan($now, $result['inprogress'][$this->quiz3->id]->timestampclose);
