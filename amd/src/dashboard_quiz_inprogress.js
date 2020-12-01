@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/templates', 'core/fragment', 'local_assessfreq/zoom_modal', 'core/str', 'core/notification'],
-function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
+define(['jquery', 'core/ajax', 'core/templates', 'core/fragment', 'local_assessfreq/zoom_modal', 'core/str', 'core/notification'],
+function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
 
     /**
      * Module level variables.
@@ -289,6 +289,7 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             Templates.runTemplateJS(js); // Magic call the initialises JS from template included in response template HTML.
             spinner.classList.add('hide'); // Hide spinner if not already hidden.
             tableEventListeners(); // Re-add table event listeners.
+            $('[data-toggle="tooltip"]').tooltip();
 
         }).fail(() => {
             Notification.exception(new Error('Failed to update table.'));
@@ -337,6 +338,8 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             tableSearchResetElement.addEventListener('click', tableSearchReset);
             tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
             tableSortElement.addEventListener('click', tableSortButtonAction);
+
+            $('[data-toggle="tooltip"]').tooltip();
 
             return;
         }).fail(() => {
