@@ -367,6 +367,18 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             refreshCounter(true);
             processDashboard();
         } else if (element.tagName.toLowerCase() === 'a') {
+            let refreshElement = document.getElementById('local-assessfreq-period-container');
+            let actionButton = refreshElement.getElementsByClassName('dropdown-toggle')[0];
+            actionButton.textContent = element.innerHTML;
+
+            let activeoptions = refreshElement.getElementsByClassName('active');
+
+            // Fix active classes.
+            for (var i = 0; i < activeoptions.length; i++) {
+                activeoptions[i].classList.remove('active');
+            }
+            element.classList.add('active');
+
             refreshPeriod = element.dataset.period;
             refreshCounter(true);
             setUserPreference('local_assessfreq_quiz_refresh_preference', refreshPeriod);
