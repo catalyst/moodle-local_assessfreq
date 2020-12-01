@@ -212,6 +212,15 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         event.preventDefault();
         if (event.target.tagName.toLowerCase() === 'a') {
             let rows = event.target.dataset.metric;
+            let activeoptions = document.getElementById('local-assessfreq-quiz-inprogress-table-rows')
+            .getElementsByClassName('active');
+
+            // Fix active classes.
+            for (var i = 0; i < activeoptions.length; i++) {
+                activeoptions[i].classList.remove('active');
+            }
+            event.target.classList.add('active');
+
             setUserPreference('local_assessfreq_quiz_table_inprogress_preference', rows)
             .then(() => {
                 getSummaryTable(); // Reload the table.
