@@ -375,8 +375,10 @@ class quiz {
 
             // Get tracked users for quiz.
             $trackedrecords = $this->get_quiz_tracking($quiz->id);
-            $tracking = array_pop($trackedrecords);
-            $counts['participants'] += $tracking->inprogress;
+            if (!empty($trackedrecords)) {
+                $tracking = array_pop($trackedrecords);
+                $counts['participants'] += $tracking->inprogress;
+            }
         }
 
         return $counts;
