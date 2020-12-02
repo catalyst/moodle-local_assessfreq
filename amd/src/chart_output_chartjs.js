@@ -27,6 +27,7 @@ define(['core/chart_output_chartjs'], function(Output) {
      */
     var ChartOutput = {};
     var aspectRatio = false;
+    var rtLegendoptions = false;
 
     /**
      * Overrride the config.
@@ -49,6 +50,11 @@ define(['core/chart_output_chartjs'], function(Output) {
                 }
             }
         };
+
+        // Override legend options with those provided at run time.
+        if (rtLegendoptions)  {
+            config.options.legend = rtLegendoptions;
+        }
 
         this._chart.getXAxes().forEach(function(axis, i) {
             var axisLabels = axis.getLabels();
@@ -94,8 +100,9 @@ define(['core/chart_output_chartjs'], function(Output) {
     /**
      * Get the aspect ratio setting and initialise the chart.
      */
-    ChartOutput.init = function(chartImage, ChartInst, aspect) {
+    ChartOutput.init = function(chartImage, ChartInst, aspect, legend) {
         aspectRatio = aspect;
+        rtLegendoptions = legend;
         new Output(chartImage, ChartInst);
     };
 

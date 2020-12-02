@@ -32,13 +32,19 @@ function(Fragment, Templates, Str, Notification) {
     Summary.chart = function(assessids, contextid) {
         assessids.forEach((assessid) => {
             let chartElement = document.getElementById(assessid + '-summary-graph');
-            let params = {'data': JSON.stringify({'quiz' : assessid, 'call': 'participant_summary', 'legendleft': true})};
+            let params = {'data': JSON.stringify({'quiz' : assessid, 'call': 'participant_summary'})};
 
             Fragment.loadFragment('local_assessfreq', 'get_quiz_chart', contextid, params)
             .done((response) => {
                 let resObj = JSON.parse(response);
                 if (resObj.hasdata == true) {
-                    let context = { 'withtable' : false, 'chartdata' : JSON.stringify(resObj.chart), 'aspect' : false};
+                    let legend = {position: 'left'};
+                    let context = {
+                            'withtable' : false,
+                            'chartdata' : JSON.stringify(resObj.chart),
+                            'aspect' : false,
+                            'legend' : JSON.stringify(legend)
+                            };
                     Templates.render('local_assessfreq/chart', context).done((html, js) => {
                         // Load card body.
                         Templates.replaceNodeContents(chartElement, html, js);

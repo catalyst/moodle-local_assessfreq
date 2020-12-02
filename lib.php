@@ -137,12 +137,7 @@ function local_assessfreq_output_fragment_get_quiz_chart($args): string {
     }
 
     $assesschart = new $classname();
-
-    if ($data->call == 'participant_summary' && !empty($data->legendleft)) {
-        $chart = $assesschart->$methodname($data->quiz, true);
-    } else {
-        $chart = $assesschart->$methodname($data->quiz);
-    }
+    $chart = $assesschart->$methodname($data->quiz);
 
     $chartdata = json_encode($chart);
     return $chartdata;
