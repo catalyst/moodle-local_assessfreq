@@ -54,9 +54,10 @@ require([
         chartImage = chartArea.find('.chart-image'),
         chartTable = chartArea.find('.chart-table-data'),
         chartLink = chartArea.find('.chart-table-expand a'),
-        aspect = (chartImage.attr('data-aspect') === 'true');
+        aspect = (chartImage.attr('data-aspect') === 'true'),
+        rtLegendoptions = {{{legend}}} {{^legend}}''{{/legend}};
     Builder.make(data).then(function(ChartInst) {
-        new Output.init(chartImage, ChartInst, aspect);
+        new Output.init(chartImage, ChartInst, aspect, rtLegendoptions);
         new OutputTable(chartTable, ChartInst);
     });
 
