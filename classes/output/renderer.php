@@ -329,4 +329,18 @@ class renderer extends plugin_renderer_base {
 
         return $html;
     }
+
+    /**
+     * Get the html to render the student search.
+     *
+     * @return string $html the html to display.
+     */
+    public function render_student_search() : string {
+        $html = '';
+        $html .= $this->header();
+
+        $html .= $this->footer();
+
+        return $html;
+    }
 }

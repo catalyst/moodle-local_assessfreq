@@ -175,6 +175,7 @@ $string['settings:disabledmodules_desc'] = 'Include modules that have been disab
 $string['showrows'] = 'Show rows';
 $string['sorttable'] = 'Sort table';
 $string['status'] = 'Status';
+$string['student_search'] = 'Student Search';
 $string['students'] = 'Students';
 $string['studenttable'] = 'Student attempt status';
 $string['submitoverridefail'] = 'Ajax override form submission failed';
