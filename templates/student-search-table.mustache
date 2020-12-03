@@ -1,0 +1,64 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_assessfreq/assess-due-month
+
+    Report Summary template.
+
+    Example context (json):
+    {
+
+    }
+}}
+
+<div id="local-assessfreq-quiz-student-table" class="card">
+    <div class="card-header">
+        <h5>{{# str }} studenttable, local_assessfreq {{/ str }}</h5>
+    </div>
+    <div class="card-body">
+	    <div class="row no-gutters mb-2">
+	        <div class="table-search col-6">
+	            <div class="input-group">
+	                <input id="local-assessfreq-quiz-student-table-search" type="text" class="form-control"
+	                       placeholder="{{# str }} entersearch, local_assessfreq {{/ str }}"
+	                       aria-label="{{# str }} entersearch, local_assessfreq {{/ str }}" aria-describedby="basic-addon2">
+	                <div class="input-group-append">
+	                    <button id="local-assessfreq-quiz-student-table-search-reset"
+	                            class="btn btn-secondary" type="button">
+	                            {{# str }} reset, local_assessfreq {{/ str }}
+	                    </button>
+	                </div>
+	            </div>
+	        </div>
+	        <div class="col-sm d-flex justify-content-end">
+	               {{> local_assessfreq/nav-quiz-table-row-filter}}
+	        </div>
+        </div>
+        <div class="table-container">
+            <span id="local-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
+                <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
+            </span>
+            <div class="table-body">
+                <!--Table goes here via ajax -->
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <!-- Footer goes here via ajax -->
+    </div>
+</div>
+
