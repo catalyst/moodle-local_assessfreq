@@ -52,6 +52,10 @@ $ADMIN->add('local_assessfreq_reports', new admin_externalpage('local_assessfreq
 $ADMIN->add('local_assessfreq_reports', new admin_externalpage('local_assessfreq_quiz_inprogress',
     get_string('dashboard:quiz_inprogress', 'local_assessfreq'), "$CFG->wwwroot/local/assessfreq/dashboard_quiz_inprogress.php"));
 
+// Quiz student search link.
+$ADMIN->add('local_assessfreq_reports', new admin_externalpage('local_assessfreq_student_search',
+    get_string('student_search', 'local_assessfreq'), "$CFG->wwwroot/local/assessfreq/student_search.php"));
+
 // Module settings.
 $sitesettings->add(new admin_setting_heading('local_assessfreq/moduleheading',
     get_string('settings:moduleheading', 'local_assessfreq'),

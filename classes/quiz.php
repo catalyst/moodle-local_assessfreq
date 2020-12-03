@@ -46,6 +46,14 @@ class quiz {
     private $hoursahead = 12;
 
     /**
+     * Ammount of time in hours for lookbehind values.
+     * Defaults to 1.
+     *
+     * @var int $hoursahead.
+     */
+    private $hoursbehind = 1;
+
+    /**
      * The direction used in sorting.
      *
      * @var string $sortdirection
@@ -59,6 +67,16 @@ class quiz {
      */
     private $sorton;
 
+    /**
+     * Class constructor.
+     *
+     * @param int $hoursahead
+     * @param int $hoursbehind
+     */
+    public function __construct(int $hoursahead=12, int $hoursbehind=1) {
+        $this->hoursahead = $hoursahead;
+        $this->hoursbehind = $hoursbehind;
+    }
 
     /**
      * Given a quiz id get the module context.
@@ -393,7 +411,7 @@ class quiz {
     public function get_quiz_summaries(int $now): array {
         // Get tracked quizzes.
         $lookahead = HOURSECS * $this->hoursahead;
-        $lookbehind = HOURSECS;
+        $lookbehind = HOURSECS * $this->hoursbehind;
         $trackedquizzes = $this->get_tracked_quizzes_with_overrides($now, $lookahead, $lookbehind);
 
         // Set up array to hold quizzes and data.
@@ -657,9 +675,6 @@ class quiz {
         $this->sortdirection = $direction;
         $this->sorton = $sorton;
 
-        // The spaceship operator is used for comparing two expressions.
-        // It returns -1, 0 or 1 when $a is respectively less than, equal to, or greater than $b.
-        // Comparisons are performed according to PHP's usual type comparison rules.
         uasort($quizzes, function($a, $b) {
 
             if ($this->sortdirection == 'asc') {

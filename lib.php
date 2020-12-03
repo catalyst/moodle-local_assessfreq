@@ -67,6 +67,24 @@ function local_assessfreq_user_preferences() {
         'type' => PARAM_INT
     );
 
+    $preferences['local_assessfreq_student_search_table_rows_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 20,
+        'type' => PARAM_INT
+    );
+
+    $preferences['local_assessfreq_student_search_table_hoursahead_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 4,
+        'type' => PARAM_INT
+    );
+
+    $preferences['local_assessfreq_student_search_table_hoursbehind_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 1,
+        'type' => PARAM_INT
+    );
+
     $preferences['local_assessfreq_quiz_table_inprogress_preference'] = array(
         'null' => NULL_NOT_ALLOWED,
         'default' => 20,
@@ -213,6 +231,32 @@ function local_assessfreq_output_fragment_get_student_table($args): string {
     $output = $PAGE->get_renderer('local_assessfreq');
 
     $o = $output->render_student_table($baseurl, $data->quiz, $context->id, $data->search, $data->page);
+
+    return $o;
+}
+
+/**
+ * Renders the student table on the student search screen.
+ * We update the table via ajax.
+ *
+ * @param array $args
+ * @return string $o Form HTML.
+ */
+function local_assessfreq_output_fragment_get_student_search_table($args): string {
+    global $CFG, $PAGE;
+
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+    $data = json_decode($args['data']);
+    $search = is_null($data->search) ? '' : $data->search;
+    $now = time();
+    $hoursahead = (int)$data->hoursahead;
+    $hoursbehind = (int)$data->hoursbehind;
+
+    $baseurl = $CFG->wwwroot . '/local/assessfreq/student_search.php';
+    $output = $PAGE->get_renderer('local_assessfreq');
+
+    $o = $output->render_student_search_table($baseurl, $context->id, $search, $hoursahead, $hoursbehind, $now, $data->page);
 
     return $o;
 }

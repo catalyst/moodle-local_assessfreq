@@ -15,17 +15,31 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Student search.
  *
  * @package     local_assessfreq
  * @copyright   2020 Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once('../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 
-defined('MOODLE_INTERNAL') || die();
+$baseurl = $CFG->wwwroot . "/local/assessfreq/student_search.php";
 
-$plugin->component = 'local_assessfreq';
-$plugin->release = '2020120600';
-$plugin->version = 2020120600;
-$plugin->requires = 2018051712;
-$plugin->maturity = MATURITY_BETA;
+// Calls require_login and performs permissions checks for admin pages.
+admin_externalpage_setup('local_assessfreq_student_search', '', null, '',
+    array('pagelayout' => 'admin'));
+
+$title = get_string('student_search', 'local_assessfreq');
+$url = new moodle_url($baseurl);
+$context = context_system::instance();
+
+$PAGE->set_url($url);
+$PAGE->set_context($context);
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+$PAGE->requires->js_call_amd('local_assessfreq/student_search', 'init', array($context->id));
+
+$output = $PAGE->get_renderer('local_assessfreq');
+
+echo $output->render_student_search($baseurl);

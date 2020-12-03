@@ -160,6 +160,14 @@
     min-height: 150px;
 }
 
+#local-assessfreq-quiz-student-table .table-container {
+    min-height: 150px;
+}
+
+#local-assessfreq-student-search-table .table-container {
+    min-height: 150px;
+}
+
 #local-assessfreq-quiz-inprogress-summary .summary-table {
     width: 70%;
 }
