@@ -219,6 +219,32 @@ function local_assessfreq_output_fragment_get_student_table($args): string {
 }
 
 /**
+ * Renders the student table on the student search screen.
+ * We update the table via ajax.
+ *
+ * @param array $args
+ * @return string $o Form HTML.
+ */
+function local_assessfreq_output_fragment_get_student_search_table($args): string {
+    global $CFG, $PAGE;
+
+    $context = $args['context'];
+    has_capability('moodle/site:config', $context);
+    $data = json_decode($args['data']);
+    $search = is_null($data->search) ? '' : $data->search;
+    $now = time();
+    $hoursahead = 4;
+    $hoursbehind = 1;
+
+    $baseurl = $CFG->wwwroot . '/local/assessfreq/student_search.php';
+    $output = $PAGE->get_renderer('local_assessfreq');
+
+    $o = $output->render_student_search_table($baseurl, $context->id, $search, $hoursahead, $hoursbehind, $now, $data->page);
+
+    return $o;
+}
+
+/**
  * Renders the quizzes in progress "table" on the quiz dashboard screen.
  * We update the table via ajax.
  * The table isn't a real table it's a collection of divs.

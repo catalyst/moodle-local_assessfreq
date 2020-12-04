@@ -77,13 +77,39 @@ class renderer extends plugin_renderer_base {
      * @param string $baseurl the base url to render the table on.
      * @param int $quizid the id of the quiz in the quiz table.
      * @param int $contextid the id of the context the table is being called in.
-     * @param string $search The string to search for in the table.
+     * @param int $contextid the id of the context the table is being called in.
      * @param int $page the page number for pagination.
      * @return string $output HTML for the table.
      */
     public function render_student_table(string $baseurl, int $quizid, int $contextid, string $search = '', int $page = 0): string {
         $renderable = new quiz_user_table($baseurl, $quizid, $contextid, $search, $page);
         $perpage = 50;
+        ob_start();
+        $renderable->out($perpage, true);
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        return $output;
+    }
+
+    /**
+     * Render the HTML for the student search table.
+     *
+     * @param string $baseurl the base url to render the table on.
+     * @param int $contextid the id of the context the table is being called in.
+     * @param int $contextid the id of the context the table is being called in.
+     * @param int $hoursahead Ammount of time in hours to look ahead for quizzes starting.
+     * @param int $hoursbehind Ammount of time in hours to look behind for quizzes starting.
+     * @param int $now The timestamp to use for the current time.
+     * @param int $page the page number for pagination.
+     * @return string $output HTML for the table.
+     */
+    public function render_student_search_table(
+        string $baseurl, int $contextid, string $search, int $hoursahead, int $hoursbehind, int $now, int $page=0): string {
+
+        $renderable = new student_search_table($baseurl, $contextid, $search, $hoursahead, $hoursbehind, $now, $page);
+        $perpage = 50;
+
         ob_start();
         $renderable->out($perpage, true);
         $output = ob_get_contents();
@@ -299,6 +325,26 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
+     * Render the cards on the quiz dashboard.
+     *
+     * @return string
+     */
+    private function render_student_table_cards(): string {
+        $preferencerows = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
+        $rows = array(
+            20 => 'rows20',
+            50 => 'rows50',
+            100 => 'rows100',
+        );
+
+        $context = array(
+            'rows' => array($rows[$preferencerows] => 'true'),
+        );
+
+        return $this->render_from_template('local_assessfreq/student-search', $context);
+    }
+
+    /**
      * Get the html to render the quiz dashboard.
      *
      * @param string $baseurl the base url to render this report on.
@@ -338,7 +384,7 @@ class renderer extends plugin_renderer_base {
     public function render_student_search() : string {
         $html = '';
         $html .= $this->header();
-
+        $html .= $this->render_student_table_cards();
         $html .= $this->footer();
 
         return $html;

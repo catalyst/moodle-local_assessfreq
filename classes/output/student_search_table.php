@@ -38,18 +38,28 @@ use \renderable;
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class quiz_user_table extends table_sql implements renderable {
+class student_search_table extends table_sql implements renderable {
 
     /**
-     * @var integer $quizid The ID of the braodcast to get the acknowledgements for.
-     */
-    private $quizid;
-
-    /**
+     * Ammount of time in hours for lookahead values.
      *
-     * @var integer $contextid The context id.
+     * @var int $hoursahead.
      */
-    private $contextid;
+    private $hoursahead;
+
+    /**
+     * Ammount of time in hours for lookbehind values.
+     *
+     * @var int $hoursahead.
+     */
+    private $hoursbehind;
+
+    /**
+     * The timestamp used when getting quiz data.
+     *
+     * @var int $now.
+     */
+    private $now;
 
     /**
      *
@@ -66,29 +76,28 @@ class quiz_user_table extends table_sql implements renderable {
      * report_table constructor.
      *
      * @param string $baseurl Base URL of the page that contains the table.
-     * @param int $quizid The id from the quiz table to get data for.
      * @param int $contextid The context id for the context the table is being displayed in.
      * @param string $search The string to search for in the table.
+     * @param int $hoursahead Ammount of time in hours to look ahead for quizzes starting.
+     * @param int $hoursbehind Ammount of time in hours to look behind for quizzes starting.
+     * @param int $now The timestamp to use for the current time.
      * @param int $page the page number for pagination.
      *
      * @throws \coding_exception
      */
-    public function __construct(string $baseurl, int $quizid, int $contextid, string $search, int $page = 0) {
-        parent::__construct('local_assessfreq_student_table');
-        global $DB;
 
-        $this->quizid = $quizid;
-        $this->contextid = $contextid;
+    public function __construct(
+        string $baseurl, int $contextid, string $search, int $hoursahead, int $hoursbehind, int $now, int $page=0) {
+        parent::__construct('local_assessfreq_student_table');
+
         $this->search = $search;
         $this->set_attribute('id', 'local_assessfreq_ackreport_table');
         $this->set_attribute('class', 'generaltable generalbox');
         $this->downloadable = false;
         $this->define_baseurl($baseurl);
-
-        $quizrecord = $DB->get_record('quiz', array('id' => $this->quizid), 'timeopen, timeclose, timelimit');
-        $this->timeopen = $quizrecord->timeopen;
-        $this->timeclose = $quizrecord->timeclose;
-        $this->timelimit = $quizrecord->timelimit;
+        $this->hoursahead = $hoursahead;
+        $this->hoursbehind = $hoursbehind;
+        $this->now = $now;
 
         $context = \context::instance_by_id($contextid);
 
@@ -180,7 +189,7 @@ class quiz_user_table extends table_sql implements renderable {
     public function col_timeopen($row) {
         $datetime = userdate($row->timeopen, get_string('trenddatetime', 'local_assessfreq'));
 
-        if ($row->timeopen != $this->timeopen) {
+        if ($row->timeopen != $row->quiztimeopen) {
             $content = \html_writer::span($datetime, 'local-assessfreq-override-status');
         } else {
             $content = \html_writer::span($datetime);
@@ -199,7 +208,7 @@ class quiz_user_table extends table_sql implements renderable {
     public function col_timeclose($row) {
         $datetime = userdate($row->timeclose, get_string('trenddatetime', 'local_assessfreq'));
 
-        if ($row->timeclose != $this->timeclose) {
+        if ($row->timeclose != $row->quiztimeclose) {
             $content = \html_writer::span($datetime, 'local-assessfreq-override-status');
         } else {
             $content = \html_writer::span($datetime);
@@ -218,7 +227,7 @@ class quiz_user_table extends table_sql implements renderable {
     public function col_timelimit($row) {
         $timelimit = format_time($row->timelimit);
 
-        if ($row->timelimit != $this->timelimit) {
+        if ($row->timelimit != $row->quiztimelimit) {
             $content = \html_writer::span($timelimit, 'local-assessfreq-override-status');
         } else {
             $content = \html_writer::span($timelimit);
@@ -380,12 +389,31 @@ class quiz_user_table extends table_sql implements renderable {
         $this->initialbars(false);
 
         $frequency = new \local_assessfreq\frequency();
-        $quiz = new \local_assessfreq\quiz();
         $capabilities = $frequency->get_module_capabilities('quiz');
-        $context = $quiz->get_quiz_context($this->quizid);
 
-        list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
-        $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid,
+        // Get the quizzes that we want users for.
+        $quiz = new \local_assessfreq\quiz($this->hoursahead, $this->hoursbehind);
+        $allquizzes = $quiz->get_quiz_summaries($this->now);
+
+        $inprogressquizzes = array_keys($allquizzes['inprogress']);
+        $upcommingquizzes = array();
+
+        foreach ($allquizzes['upcomming'] as $upcomming) {
+            foreach ($upcomming as $quizobj) {
+                $upcommingquizzes[] = $quizobj->assessid;
+            }
+        }
+
+        $quizzes = array_merge($inprogressquizzes, $upcommingquizzes);
+
+        $allrecords = array();
+
+        foreach ($quizzes as $quizid) {
+            $context = $quiz->get_quiz_context($quizid);
+            $quizrecord = $DB->get_record('quiz', array('id' => $quizid), 'timeopen, timeclose, timelimit');
+
+            list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
+            $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid,
                               qa_a.timestart as timestart, qa_a.timefinish as timefinish
                          FROM {quiz_attempts} qa_a
                    INNER JOIN (SELECT userid, MAX(timestart) as timestart
@@ -394,55 +422,59 @@ class quiz_user_table extends table_sql implements renderable {
                                               AND qa_a.timestart = qa_b.timestart
                         WHERE qa_a.quiz = :qaquiz';
 
-        $sessionsql = 'SELECT DISTINCT (userid)
+            $sessionsql = 'SELECT DISTINCT (userid)
                          FROM {sessions}
                         WHERE timemodified >= :stm';
 
-        $joins .= ' LEFT JOIN {quiz_overrides} qo ON u.id = qo.userid AND qo.quiz = :qoquiz';
-        $joins .= " LEFT JOIN ($attemptsql) qa ON u.id = qa.userid";
-        $joins .= " LEFT JOIN ($sessionsql) us ON u.id = us.userid";
+            $joins .= ' LEFT JOIN {quiz_overrides} qo ON u.id = qo.userid AND qo.quiz = :qoquiz';
+            $joins .= " LEFT JOIN ($attemptsql) qa ON u.id = qa.userid";
+            $joins .= " LEFT JOIN ($sessionsql) us ON u.id = us.userid";
 
-        $params['qaquiz'] = $this->quizid;
-        $params['qoquiz'] = $this->quizid;
-        $params['stm'] = $timedout;
+            $params['qaquiz'] = $quizid;
+            $params['qoquiz'] = $quizid;
+            $params['stm'] = $timedout;
 
-        $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
-        $params = $finaljoin->params;
+            $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
+            $params = $finaljoin->params;
 
-        $sql = "SELECT u.*,
-                       COALESCE(qo.timeopen, $this->timeopen) AS timeopen,
-                       COALESCE(qo.timeclose, $this->timeclose) AS timeclose,
-                       COALESCE(qo.timelimit, $this->timelimit) AS timelimit,
+            $sql = "SELECT u.*,
+                       COALESCE(qo.timeopen, $quizrecord->timeopen) AS timeopen,
+                       COALESCE(qo.timeclose, $quizrecord->timeclose) AS timeclose,
+                       COALESCE(qo.timelimit, $quizrecord->timelimit) AS timelimit,
                        COALESCE(qa.state, (CASE
                                               WHEN us.userid > 0 THEN 'loggedin'
                                               ELSE 'notloggedin'
                                            END)) AS state,
                        qa.attemptid,
                        qa.timestart,
-                       qa.timefinish
+                       qa.timefinish,
+                       $quizid AS quiz,
+                       $quizrecord->timeopen AS quiztimeopen,
+                       $quizrecord->timeclose AS quiztimeclose,
+                       $quizrecord->timelimit AS quiztimelimit
                   FROM {user} u
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
 
-        $pagesize = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
-
-        if (!empty($sort)) {
-            $sql .= " ORDER BY $sort";
+             $records = $DB->get_records_sql($sql, $params);
+             $allrecords = array_merge($allrecords, $records);
         }
 
-        $records = $DB->get_recordset_sql($sql, $params);
+        // TODO: Add sorting of results as a new method.
+
+        $pagesize = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
         $data = array();
         $offset = $this->currpage * $pagesize;
         $offsetcount = 0;
         $recordcount = 0;
 
-        foreach ($records as $record) {
+        foreach ($allrecords as $key => $record) {
             $searchcount = 0;
             if ($this->search != '') {
                 // Because we are using COALESE and CASE for state we can't use SQL WHERE so we need to filter in PHP land.
                 // Also because we need to do some filtering in PHP land, we'll do it all here.
                 $searchcount = -1;
-                $searchfields = array_merge($this->extrafields, array('firstname', 'lastname', 'state'));
+                $searchfields = array_merge($this->extrafields, array('firstname', 'lastname', 'state', 'quiz'));
 
                 foreach ($searchfields as $searchfield) {
                     if (stripos($record->{$searchfield}, $this->search) !== false) {
@@ -453,7 +485,7 @@ class quiz_user_table extends table_sql implements renderable {
             }
 
             if ($searchcount > -1 && $offsetcount >= $offset && $recordcount < $pagesize) {
-                $data[$record->id] = $record;
+                $data[$key] = $record;
             }
 
             if ($searchcount > -1 && $offsetcount >= $offset) {
@@ -465,8 +497,6 @@ class quiz_user_table extends table_sql implements renderable {
             }
 
         }
-
-        $records->close();
 
         $this->pagesize($pagesize, $offsetcount);
         $this->rawdata = $data;
