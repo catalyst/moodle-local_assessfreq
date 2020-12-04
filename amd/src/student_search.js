@@ -70,7 +70,7 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         Ajax.call([{
             methodname: 'local_assessfreq_set_table_preference',
             args: {
-                tableid: 'local_assessfreq_student_table',
+                tableid: 'local_assessfreq_student_search_table',
                 preference: 'sortby',
                 values: JSON.stringify(sortArray)
             },
@@ -125,7 +125,7 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         Ajax.call([{
             methodname: 'local_assessfreq_set_table_preference',
             args: {
-                tableid: 'local_assessfreq_student_table',
+                tableid: 'local_assessfreq_student_search_table',
                 preference: 'collapse',
                 values: JSON.stringify(hideArray)
             },
@@ -145,7 +145,7 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         Ajax.call([{
             methodname: 'local_assessfreq_set_table_preference',
             args: {
-                tableid: 'local_assessfreq_student_table',
+                tableid: 'local_assessfreq_student_search_table',
                 preference: 'reset',
                 values: JSON.stringify({})
             },
@@ -208,12 +208,13 @@ function(Ajax, Fragment, Notification, OverrideModal) {
             getStudentTable(page);
         }
     };
+
     /**
      * Re-add event listeners when the student table is updated.
      */
     const tableEventListeners = function() {
-        const tableElement = document.getElementById('local-assessfreq-quiz-table');
-        const tableCardElement = document.getElementById('local-assessfreq-quiz-student-table');
+        const tableElement = document.getElementById('local-assessfreq-student-search');
+        const tableCardElement = document.getElementById('local-assessfreq-student-search-table');
         const links = tableElement.querySelectorAll('a');
         const resetlink = tableElement.getElementsByClassName('resettable');
         const overrideLinks = tableElement.getElementsByClassName('action-icon override');
@@ -258,7 +259,7 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         }
 
         let search = document.getElementById('local-assessfreq-quiz-student-table-search').value.trim();
-        let tableElement = document.getElementById('local-assessfreq-quiz-student-table');
+        let tableElement = document.getElementById('local-assessfreq-student-search-table');
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
         let params = {'data': JSON.stringify({'search': search, 'page': page})};

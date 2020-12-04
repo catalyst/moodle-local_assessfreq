@@ -88,7 +88,7 @@ class student_search_table extends table_sql implements renderable {
 
     public function __construct(
         string $baseurl, int $contextid, string $search, int $hoursahead, int $hoursbehind, int $now, int $page=0) {
-        parent::__construct('local_assessfreq_student_table');
+        parent::__construct('local_assessfreq_student_search_table');
 
         $this->search = $search;
         $this->set_attribute('id', 'local_assessfreq_ackreport_table');
@@ -371,6 +371,43 @@ class student_search_table extends table_sql implements renderable {
         return $manage;
     }
 
+    /**
+     * Sort an array of quizzes.
+     *
+     * @param array $quizzes Array of quizzes to sort.
+     * @return array $quizzes the sorted quizzes.
+     */
+    public function sort_quizzes(array $quizzes):array {
+        // Comparisons are performed according to PHP's usual type comparison rules.
+        uasort($quizzes, function($a, $b) {
+
+            $sort = $this->get_sql_sort();
+            $sortobj = explode(' ', $sort);
+            $sorton = $sortobj[0];
+            $dir = $sortobj[1];
+
+            if ($dir == 'ASC') {
+                if (gettype($a->{$sorton}) == 'string') {
+                    return strcasecmp($a->{$sorton}, $b->{$sorton});
+                } else {
+                    // The spaceship operator is used for comparing two expressions.
+                    // It returns -1, 0 or 1 when $a is respectively less than, equal to, or greater than $b.
+                    return $a->{$sorton} <=> $b->{$sorton};
+                }
+            } else {
+                if (gettype($a->{$sorton}) == 'string') {
+                    return strcasecmp($b->{$sorton}, $a->{$sorton});
+                } else {
+                    // The spaceship operator is used for comparing two expressions.
+                    // It returns -1, 0 or 1 when $a is respectively less than, equal to, or greater than $b.
+                    return $b->{$sorton} <=> $a->{$sorton};
+                }
+            }
+
+        });
+
+        return $quizzes;
+    }
 
     /**
      * Query the database for results to display in the table.
@@ -383,7 +420,7 @@ class student_search_table extends table_sql implements renderable {
 
         $maxlifetime = $CFG->sessiontimeout;
         $timedout = time() - $maxlifetime;
-        $sort = $this->get_sql_sort();
+
 
         // We never want initial bars. We are using a custom search.
         $this->initialbars(false);
@@ -460,7 +497,9 @@ class student_search_table extends table_sql implements renderable {
              $allrecords = array_merge($allrecords, $records);
         }
 
-        // TODO: Add sorting of results as a new method.
+        if (!empty($this->get_sql_sort())) {
+            $allrecords = $this->sort_quizzes($allrecords);
+        }
 
         $pagesize = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
         $data = array();
