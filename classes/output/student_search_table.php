@@ -338,7 +338,7 @@ class student_search_table extends table_sql implements renderable {
         $icon = $OUTPUT->render(new \pix_icon('i/duration', ''));
         $manage .= \html_writer::link('#', $icon, array(
             'class' => 'action-icon override',
-            'id' => 'tool-assessfreq-override-' . $row->id,
+            'id' => 'tool-assessfreq-override-' . $row->id . '-' . $row->quiz,
             'data-toggle' => 'tooltip',
             'data-placement' => 'top',
             'title' => get_string('useroverride', 'local_assessfreq')

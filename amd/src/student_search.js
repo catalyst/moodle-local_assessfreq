@@ -29,6 +29,7 @@ function(Ajax, Fragment, Notification, OverrideModal) {
      */
     var StudentSearch = {};
     var contextid;
+    var overridden = false;
 
     /**
      * Generic handler to persist user preferences.
@@ -254,9 +255,11 @@ function(Ajax, Fragment, Notification, OverrideModal) {
      * Display the table that contains all the students that have exams.
      */
     const getStudentTable = function(page) {
-        if (typeof page === "undefined") {
+        if (typeof page === "undefined" || overridden == true) {
             page = 0;
         }
+
+        overridden = false;
 
         let search = document.getElementById('local-assessfreq-quiz-student-table-search').value.trim();
         let tableElement = document.getElementById('local-assessfreq-student-search-table');
@@ -282,8 +285,10 @@ function(Ajax, Fragment, Notification, OverrideModal) {
      */
     const triggerOverrideModal = function(event) {
         event.preventDefault();
-        const userid = event.target.closest('a').id.substring(25);
-        const quizId = 0;
+        let elements = event.target.closest('a').id.split('-');
+        const quizId = elements.pop();
+        const userid = elements.pop();
+        overridden = true;
 
         OverrideModal.displayModalForm(quizId, userid);
     };
