@@ -74,6 +74,18 @@ function local_assessfreq_user_preferences() {
         'type' => PARAM_INT
     );
 
+    $preferences['local_assessfreq_student_search_table_hoursahead_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 4,
+        'type' => PARAM_INT
+    );
+
+    $preferences['local_assessfreq_student_search_table_hoursbehind_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 1,
+        'type' => PARAM_INT
+    );
+
     $preferences['local_assessfreq_quiz_table_inprogress_preference'] = array(
         'null' => NULL_NOT_ALLOWED,
         'default' => 20,

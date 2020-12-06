@@ -1,0 +1,66 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_assessfreq/nav-year-filter
+
+    This template renders the day range selector for the timeline view.
+
+    Example context (json):
+    {}
+}}
+<div id="local-assessfreq-quiz-student-table-hoursahead" data-region="hoursahead-filter" class="mr-3">
+    <button type="button" class="btn btn-secondary dropdown-toggle icon-no-margin"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            aria-label="{{# str }} hoursahead, local_assessfreq {{/ str }}" aria-controls="hoursaheadfilter">
+        {{#pix}} i/next {{/pix}} {{# str }} hoursahead, local_assessfreq {{/ str }}
+        <span class="sr-only" data-active-item-text>
+                {{# str }} hours1, local_assessfreq {{/ str }}
+                {{# str }} hours4, local_assessfreq {{/ str }}
+                {{# str }} hours8, local_assessfreq {{/ str }}
+        </span>
+    </button>
+    <div id="hoursaheadfilter" role="menu" class="dropdown-menu" data-show-active-item>
+        <h6 class="dropdown-header">{{# str }} hoursahead, local_assessfreq {{/ str }}</h6>
+        <a
+            class="dropdown-item {{#hours}}{{#hours1}}active{{/hours1}}{{/hours}}"
+            href="#"
+            data-metric="1"
+            aria-label="{{# str }} hours1, local_assessfreq {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} hours1, local_assessfreq {{/ str }}
+        </a>
+        <a
+            class="dropdown-item {{#hours}}{{#hours4}}active{{/hours4}}{{/hours}}"
+            href="#"
+            data-metric="4"
+            aria-label="{{# str }} hours4, local_assessfreq {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} hours4, local_assessfreq {{/ str }}
+        </a>
+        <a
+            class="dropdown-item {{#hours}}{{#hours8}}active{{/hours8}}{{/hours}}"
+            href="#"
+            data-metric="8"
+            aria-label="{{# str }} hours8, local_assessfreq {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} hours8, local_assessfreq {{/ str }}
+        </a>
+    </div>
+</div>
