@@ -68,6 +68,12 @@ function local_assessfreq_user_preferences() {
         'type' => PARAM_INT
     );
 
+    $preferences['local_assessfreq_student_search_table_rows_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 20,
+        'type' => PARAM_INT
+    );
+
     $preferences['local_assessfreq_quiz_table_inprogress_preference'] = array(
         'null' => NULL_NOT_ALLOWED,
         'default' => 20,

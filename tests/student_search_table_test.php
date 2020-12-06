@@ -468,6 +468,7 @@ class student_search_table_testcase extends advanced_testcase {
         set_user_preference('local_assessfreq_quiz_table_rows_preference', 30);
         $quizusertable->query_db(30, false);
         $rawdata = $quizusertable->rawdata;
+        error_log(print_r($rawdata, true));
         $this->assertCount(30, $rawdata);
 
     }

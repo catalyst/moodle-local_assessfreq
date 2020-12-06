@@ -114,6 +114,9 @@ class student_search_table extends table_sql implements renderable {
             $columns[] = $field;
         }
 
+        $headers[] = get_string('quiz', 'local_assessfreq');
+        $columns[] = 'quizname';
+
         $headers[] = get_string('quiztimeopen', 'local_assessfreq');
         $columns[] = 'timeopen';
 
@@ -177,6 +180,20 @@ class student_search_table extends table_sql implements renderable {
         }
 
         return s($data->{$colname});
+    }
+
+    /**
+     * Displays quiz name
+     *
+     * @param \stdClass $row
+     * @return string html used to display the field.
+     */
+    public function col_quizname($row) {
+
+        $quizurl = new \moodle_url('/mod/quiz/view.php', array('id' => $row->quizinstance));
+        $quizlink = \html_writer::link($quizurl, $row->quizname);
+
+        return $quizlink;
     }
 
     /**
@@ -447,7 +464,7 @@ class student_search_table extends table_sql implements renderable {
 
         foreach ($quizzes as $quizid) {
             $context = $quiz->get_quiz_context($quizid);
-            $quizrecord = $DB->get_record('quiz', array('id' => $quizid), 'timeopen, timeclose, timelimit');
+            $quizrecord = $DB->get_record('quiz', array('id' => $quizid), 'name, timeopen, timeclose, timelimit');
 
             list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
             $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid,
@@ -486,9 +503,11 @@ class student_search_table extends table_sql implements renderable {
                        qa.timestart,
                        qa.timefinish,
                        $quizid AS quiz,
+                       $context->instanceid as quizinstance,
                        $quizrecord->timeopen AS quiztimeopen,
                        $quizrecord->timeclose AS quiztimeclose,
-                       $quizrecord->timelimit AS quiztimelimit
+                       $quizrecord->timelimit AS quiztimelimit,
+                       '$quizrecord->name' AS quizname
                   FROM {user} u
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";

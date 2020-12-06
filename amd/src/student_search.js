@@ -88,7 +88,7 @@ function(Ajax, Fragment, Notification, OverrideModal) {
 
         let hideArray = {};
         const linkUrl = new URL(event.target.closest('a').href);
-        const tableElement = document.getElementById('local-assessfreq-quiz-table');
+        const tableElement = document.getElementById('local-assessfreq-student-search');
         const links = tableElement.querySelectorAll('a');
         let targetAction;
         let targetColumn;
@@ -185,7 +185,7 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         event.preventDefault();
         if (event.target.tagName.toLowerCase() === 'a') {
             let rows = event.target.dataset.metric;
-            setUserPreference('local_assessfreq_quiz_table_rows_preference', rows)
+            setUserPreference('local_assessfreq_student_search_table_rows_preference', rows)
             .then(() => {
                 getStudentTable(); // Reload the table.
             })

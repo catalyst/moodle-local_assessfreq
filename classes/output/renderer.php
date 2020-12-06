@@ -330,7 +330,7 @@ class renderer extends plugin_renderer_base {
      * @return string
      */
     private function render_student_table_cards(): string {
-        $preferencerows = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
+        $preferencerows = get_user_preferences('local_assessfreq_student_search_table_rows_preference', 20);
         $rows = array(
             20 => 'rows20',
             50 => 'rows50',
