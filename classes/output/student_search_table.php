@@ -85,7 +85,6 @@ class student_search_table extends table_sql implements renderable {
      *
      * @throws \coding_exception
      */
-
     public function __construct(
         string $baseurl, int $contextid, string $search, int $hoursahead, int $hoursbehind, int $now, int $page=0) {
         parent::__construct('local_assessfreq_student_search_table');
@@ -437,7 +436,6 @@ class student_search_table extends table_sql implements renderable {
 
         $maxlifetime = $CFG->sessiontimeout;
         $timedout = time() - $maxlifetime;
-
 
         // We never want initial bars. We are using a custom search.
         $this->initialbars(false);

@@ -40,11 +40,11 @@ function(Fragment, Templates, Str, Notification) {
                 if (resObj.hasdata == true) {
                     let legend = {position: 'left'};
                     let context = {
-                            'withtable' : false,
-                            'chartdata' : JSON.stringify(resObj.chart),
-                            'aspect' : false,
-                            'legend' : JSON.stringify(legend)
-                            };
+                        'withtable' : false,
+                        'chartdata' : JSON.stringify(resObj.chart),
+                        'aspect' : false,
+                        'legend' : JSON.stringify(legend)
+                    };
                     Templates.render('local_assessfreq/chart', context).done((html, js) => {
                         // Load card body.
                         Templates.replaceNodeContents(chartElement, html, js);

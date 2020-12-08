@@ -343,7 +343,6 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
 
-
         let params = {'data': JSON.stringify(
                     {'search': search, 'page': page, 'hoursahead': hoursAhead, 'hoursbehind': hoursBehind}
                 )};

@@ -77,7 +77,7 @@ class renderer extends plugin_renderer_base {
      * @param string $baseurl the base url to render the table on.
      * @param int $quizid the id of the quiz in the quiz table.
      * @param int $contextid the id of the context the table is being called in.
-     * @param int $contextid the id of the context the table is being called in.
+     * @param string $search The string to search for.
      * @param int $page the page number for pagination.
      * @return string $output HTML for the table.
      */
@@ -97,7 +97,7 @@ class renderer extends plugin_renderer_base {
      *
      * @param string $baseurl the base url to render the table on.
      * @param int $contextid the id of the context the table is being called in.
-     * @param int $contextid the id of the context the table is being called in.
+     * @param string $search The string to search for.
      * @param int $hoursahead Ammount of time in hours to look ahead for quizzes starting.
      * @param int $hoursbehind Ammount of time in hours to look behind for quizzes starting.
      * @param int $now The timestamp to use for the current time.
