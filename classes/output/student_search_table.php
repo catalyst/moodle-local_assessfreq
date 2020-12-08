@@ -143,6 +143,7 @@ class student_search_table extends table_sql implements renderable {
 
         // Setup pagination.
         $this->currpage = $page;
+        $this->ajaxpage = $page;
         $this->sortable(true);
         $this->column_nosort = array('actions');
 
@@ -520,9 +521,10 @@ class student_search_table extends table_sql implements renderable {
 
         $pagesize = get_user_preferences('local_assessfreq_student_search_table_rows_preference', 20);
         $data = array();
-        $offset = $this->currpage * $pagesize;
+        $offset = $this->ajaxpage * $pagesize;
         $offsetcount = 0;
         $recordcount = 0;
+        $this->currpage = $this->ajaxpage;
 
         foreach ($allrecords as $key => $record) {
             $searchcount = 0;
