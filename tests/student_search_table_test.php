@@ -465,7 +465,7 @@ class student_search_table_testcase extends advanced_testcase {
         $quizusertable->out(1, false);
 
         // Query data.
-        set_user_preference('local_assessfreq_quiz_table_rows_preference', 30);
+        set_user_preference('local_assessfreq_student_search_table_rows_preference', 30);
         $quizusertable->query_db(30, false);
         $rawdata = $quizusertable->rawdata;
 
