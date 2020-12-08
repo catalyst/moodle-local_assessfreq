@@ -331,14 +331,26 @@ class renderer extends plugin_renderer_base {
      */
     private function render_student_table_cards(): string {
         $preferencerows = get_user_preferences('local_assessfreq_student_search_table_rows_preference', 20);
+        $preferencehoursahead = get_user_preferences('local_assessfreq_student_search_table_hoursahead_preference', 4);
+        $preferencehoursbehind = get_user_preferences('local_assessfreq_student_search_table_hoursbehind_preference', 1);
+
         $rows = array(
             20 => 'rows20',
             50 => 'rows50',
             100 => 'rows100',
         );
 
+        $hours = array(
+            1 => 'hours1',
+            4 => 'hours4',
+            8 => 'hours8',
+        );
+
+
         $context = array(
             'rows' => array($rows[$preferencerows] => 'true'),
+            'hoursahead' => array($hours[$preferencehoursahead] => 'true'),
+            'hoursbehind' => array($hours[$preferencehoursbehind] => 'true')
         );
 
         return $this->render_from_template('local_assessfreq/student-search', $context);

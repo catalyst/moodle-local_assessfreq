@@ -251,8 +251,8 @@ function local_assessfreq_output_fragment_get_student_search_table($args): strin
     $data = json_decode($args['data']);
     $search = is_null($data->search) ? '' : $data->search;
     $now = time();
-    $hoursahead = 4;
-    $hoursbehind = 1;
+    $hoursahead = (int)$data->hoursahead;
+    $hoursbehind = (int)$data->hoursbehind;
 
     $baseurl = $CFG->wwwroot . '/local/assessfreq/student_search.php';
     $output = $PAGE->get_renderer('local_assessfreq');

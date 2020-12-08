@@ -30,6 +30,8 @@ function(Ajax, Fragment, Notification, OverrideModal) {
     var StudentSearch = {};
     var contextid;
     var overridden = false;
+    var hoursAhead = 4;
+    var hoursBehind = 1;
 
     /**
      * Generic handler to persist user preferences.
@@ -197,6 +199,42 @@ function(Ajax, Fragment, Notification, OverrideModal) {
     };
 
     /**
+     * Process the hours ahead event from the student table.
+     */
+    const tableSearchAheadSet = function(event) {
+        event.preventDefault();
+        if (event.target.tagName.toLowerCase() === 'a') {
+            let hours = event.target.dataset.metric;
+            setUserPreference('local_assessfreq_student_search_table_hoursahead_preference', hours)
+            .then(() => {
+                hoursAhead = hours;
+                getStudentTable(); // Reload the table.
+            })
+            .fail(() => {
+                Notification.exception(new Error('Failed to update user preference: hours ahead'));
+            });
+        }
+    };
+
+    /**
+     * Process the hours behind event from the student table.
+     */
+    const tableSearchBehindSet = function(event) {
+        event.preventDefault();
+        if (event.target.tagName.toLowerCase() === 'a') {
+            let hours = event.target.dataset.metric;
+            setUserPreference('local_assessfreq_student_search_table_hoursbehind_preference', hours)
+            .then(() => {
+                hoursBehind = hours;
+                getStudentTable(); // Reload the table.
+            })
+            .fail(() => {
+                Notification.exception(new Error('Failed to update user preference: hours behind'));
+            });
+        }
+    };
+
+    /**
      * Process the nav event from the student table.
      */
     const tableNav = function(event) {
@@ -265,7 +303,11 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         let tableElement = document.getElementById('local-assessfreq-student-search-table');
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
-        let params = {'data': JSON.stringify({'search': search, 'page': page})};
+
+
+        let params = {'data': JSON.stringify(
+                    {'search': search, 'page': page, 'hoursahead': hoursAhead, 'hoursbehind': hoursBehind}
+                )};
 
         spinner.classList.remove('hide'); // Show spinner if not already shown.
 
@@ -306,11 +348,15 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-student-table-search');
         let tableSearchResetElement = document.getElementById('local-assessfreq-quiz-student-table-search-reset');
         let tableSearchRowsElement = document.getElementById('local-assessfreq-quiz-student-table-rows');
+        let tableSearchAheadElement = document.getElementById('local-assessfreq-quiz-student-table-hoursbehind');
+        let tableSearchBehindElement = document.getElementById('local-assessfreq-quiz-student-table-hoursahead');
 
         tableSearchInputElement.addEventListener('keyup', tableSearch);
         tableSearchInputElement.addEventListener('paste', tableSearch);
         tableSearchResetElement.addEventListener('click', tableSearchReset);
         tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
+        tableSearchAheadElement.addEventListener('click', tableSearchAheadSet);
+        tableSearchBehindElement.addEventListener('click', tableSearchBehindSet);
 
         // Render the student search table.
         getStudentTable();
