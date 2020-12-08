@@ -70,5 +70,41 @@
         >
             {{# str }} coursedesc, local_assessfreq {{/ str }}
         </a>
+        <a
+            class="dropdown-item {{#sort}}{{#earlyopenstamp_asc}}active{{/earlyopenstamp_asc}}{{/sort}}"
+            href="#"
+            data-sort="earlyopenstamp_asc"
+            aria-label="{{# str }} timestartasc, local_assessfreq {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} timestartasc, local_assessfreq {{/ str }}
+        </a>
+        <a
+            class="dropdown-item {{#sort}}{{#earlyopenstamp_desc}}active{{/earlyopenstamp_desc}}{{/sort}}"
+            href="#"
+            data-sort="earlyopenstamp_desc"
+            aria-label="{{# str }} timestartdesc, local_assessfreq {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} timestartdesc, local_assessfreq {{/ str }}
+        </a>
+                <a
+            class="dropdown-item {{#sort}}{{#lateclosestamp_asc}}active{{/lateclosestamp_asc}}{{/sort}}"
+            href="#"
+            data-sort="lateclosestamp_asc"
+            aria-label="{{# str }} timeendasc, local_assessfreq {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} timeendasc, local_assessfreq {{/ str }}
+        </a>
+        <a
+            class="dropdown-item {{#sort}}{{#lateclosestamp_desc}}active{{/lateclosestamp_desc}}{{/sort}}"
+            href="#"
+            data-sort="lateclosestamp_desc"
+            aria-label="{{# str }} timeenddesc, local_assessfreq {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} timeenddesc, local_assessfreq {{/ str }}
+        </a>
     </div>
 </div>
