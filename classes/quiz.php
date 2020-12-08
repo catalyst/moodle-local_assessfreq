@@ -231,15 +231,19 @@ class quiz {
         // Handle override start.
         if ($overrideinfo->start != 0 && $overrideinfo->start < $quizrecord->timeopen) {
             $earlyopen = $overrideinfostart;
+            $earlyopenstamp = $overrideinfo->start;
         } else {
             $earlyopen = $timesopen;
+            $earlyopenstamp = $quizrecord->timeopen;
         }
 
         // Handle override end.
         if ($overrideinfo->end != 0 && $overrideinfo->end > $quizrecord->timeclose) {
             $lateclose = $overrideinfoend;
+            $lateclosestamp = $overrideinfo->end;
         } else {
             $lateclose = $timeclose;
+            $lateclosestamp = $quizrecord->timeclose;
         }
 
         // Quiz result link.
@@ -256,7 +260,9 @@ class quiz {
         $quizdata->timeclose = $timeclose;
         $quizdata->timelimit = format_time($quizrecord->timelimit);
         $quizdata->earlyopen = $earlyopen;
+        $quizdata->earlyopenstamp = $earlyopenstamp;
         $quizdata->lateclose = $lateclose;
+        $quizdata->lateclosestamp = $lateclosestamp;
         $quizdata->participants = count($frequency->get_event_users_raw($context->id, 'quiz'));
         $quizdata->overrideparticipants = $overrideinfo->users;
         $quizdata->url = $context->get_url()->out(false);
@@ -676,11 +682,22 @@ class quiz {
         $this->sorton = $sorton;
 
         uasort($quizzes, function($a, $b) {
-
             if ($this->sortdirection == 'asc') {
-                return strcasecmp($a->{$this->sorton}, $b->{$this->sorton});
+                if (gettype($a->{$this->sorton}) == 'string') {
+                    return strcasecmp($a->{$this->sorton}, $b->{$this->sorton});
+                } else {
+                    // The spaceship operator is used for comparing two expressions.
+                    // It returns -1, 0 or 1 when $a is respectively less than, equal to, or greater than $b.
+                    return $a->{$this->sorton} <=> $b->{$this->sorton};
+                }
             } else {
-                return strcasecmp($b->{$this->sorton}, $a->{$this->sorton});
+                if (gettype($a->{$this->sorton}) == 'string') {
+                    return strcasecmp($b->{$this->sorton}, $a->{$this->sorton});
+                } else {
+                    // The spaceship operator is used for comparing two expressions.
+                    // It returns -1, 0 or 1 when $a is respectively less than, equal to, or greater than $b.
+                    return $b->{$this->sorton} <=> $a->{$this->sorton};
+                }
             }
 
         });
