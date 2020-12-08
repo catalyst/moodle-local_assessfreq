@@ -404,8 +404,8 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         let tableSearchInputElement = document.getElementById('local-assessfreq-quiz-student-table-search');
         let tableSearchResetElement = document.getElementById('local-assessfreq-quiz-student-table-search-reset');
         let tableSearchRowsElement = document.getElementById('local-assessfreq-quiz-student-table-rows');
-        let tableSearchAheadElement = document.getElementById('local-assessfreq-quiz-student-table-hoursbehind');
-        let tableSearchBehindElement = document.getElementById('local-assessfreq-quiz-student-table-hoursahead');
+        let tableSearchAheadElement = document.getElementById('local-assessfreq-quiz-student-table-hoursahead');
+        let tableSearchBehindElement = document.getElementById('local-assessfreq-quiz-student-table-hoursbehind');
         let refreshElement = document.getElementById('local-assessfreq-period-container');
 
         tableSearchInputElement.addEventListener('keyup', tableSearch);
