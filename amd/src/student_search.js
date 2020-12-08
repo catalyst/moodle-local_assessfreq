@@ -32,6 +32,8 @@ function(Ajax, Fragment, Notification, OverrideModal) {
     var overridden = false;
     var hoursAhead = 4;
     var hoursBehind = 1;
+    var refreshPeriod = 60;
+    var counterid;
 
     /**
      * Generic handler to persist user preferences.
@@ -49,6 +51,43 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         };
 
         return Ajax.call([request])[0];
+    };
+
+    /**
+    *
+    */
+    const refreshCounter = function(reset) {
+        let progressElement = document.getElementById('local-assessfreq-period-progress');
+
+        // Reset the current count process.
+        if (reset == true) {
+            clearInterval(counterid);
+            counterid = null;
+            progressElement.setAttribute('style', 'width: 100%');
+            progressElement.setAttribute('aria-valuenow', 100);
+        }
+
+        // Exit early if there is already a counter running.
+        if (counterid) {
+            return;
+        }
+
+        counterid = setInterval(() => {
+            let progressWidthAria = progressElement.getAttribute('aria-valuenow');
+            const progressStep = 100 / refreshPeriod;
+
+            if ((progressWidthAria - progressStep) > 0) {
+                progressElement.setAttribute('style', 'width: ' + (progressWidthAria - progressStep) + '%');
+                progressElement.setAttribute('aria-valuenow', (progressWidthAria - progressStep));
+            } else {
+                clearInterval(counterid);
+                counterid = null;
+                progressElement.setAttribute('style', 'width: 100%');
+                progressElement.setAttribute('aria-valuenow', 100);
+                getStudentTable();
+                refreshCounter();
+            }
+        }, (1000));
     };
 
     /**
@@ -315,11 +354,29 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         .done((response) => {
             tableBody.innerHTML = response;
             spinner.classList.add('hide');
+            refreshCounter();
             tableEventListeners(); // Re-add table event listeners.
 
         }).fail(() => {
             Notification.exception(new Error('Failed to update table.'));
         });
+    };
+
+    /**
+     * Handle processing of refresh and period button actions.
+     */
+    const refreshAction = function(event) {
+        event.preventDefault();
+        var element = event.target;
+
+        if (element.closest('button') !== null && element.closest('button').id == 'local-assessfreq-refresh-quiz-dashboard') {
+            refreshCounter(true);
+            getStudentTable();
+        } else if (element.tagName.toLowerCase() === 'a') {
+            refreshPeriod = element.dataset.period;
+            refreshCounter(true);
+            setUserPreference('local_assessfreq_quiz_refresh_preference', refreshPeriod);
+        }
     };
 
     /**
@@ -350,6 +407,7 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         let tableSearchRowsElement = document.getElementById('local-assessfreq-quiz-student-table-rows');
         let tableSearchAheadElement = document.getElementById('local-assessfreq-quiz-student-table-hoursbehind');
         let tableSearchBehindElement = document.getElementById('local-assessfreq-quiz-student-table-hoursahead');
+        let refreshElement = document.getElementById('local-assessfreq-period-container');
 
         tableSearchInputElement.addEventListener('keyup', tableSearch);
         tableSearchInputElement.addEventListener('paste', tableSearch);
@@ -357,6 +415,7 @@ function(Ajax, Fragment, Notification, OverrideModal) {
         tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
         tableSearchAheadElement.addEventListener('click', tableSearchAheadSet);
         tableSearchBehindElement.addEventListener('click', tableSearchBehindSet);
+        refreshElement.addEventListener('click', refreshAction);
 
         // Render the student search table.
         getStudentTable();

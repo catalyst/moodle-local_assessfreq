@@ -333,6 +333,14 @@ class renderer extends plugin_renderer_base {
         $preferencerows = get_user_preferences('local_assessfreq_student_search_table_rows_preference', 20);
         $preferencehoursahead = get_user_preferences('local_assessfreq_student_search_table_hoursahead_preference', 4);
         $preferencehoursbehind = get_user_preferences('local_assessfreq_student_search_table_hoursbehind_preference', 1);
+        $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
+
+        $refreshminutes = array(
+            60 => 'minuteone',
+            120 => 'minutetwo',
+            300 => 'minutefive',
+            600 => 'minuteten',
+        );
 
         $rows = array(
             20 => 'rows20',
@@ -346,11 +354,20 @@ class renderer extends plugin_renderer_base {
             8 => 'hours8',
         );
 
+        $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
+        $refreshminutes = array(
+            60 => 'minuteone',
+            120 => 'minutetwo',
+            300 => 'minutefive',
+            600 => 'minuteten',
+        );
 
         $context = array(
             'rows' => array($rows[$preferencerows] => 'true'),
             'hoursahead' => array($hours[$preferencehoursahead] => 'true'),
-            'hoursbehind' => array($hours[$preferencehoursbehind] => 'true')
+            'hoursbehind' => array($hours[$preferencehoursbehind] => 'true'),
+            'refreshinitial' => get_string($refreshminutes[$preferencerefresh], 'local_assessfreq'),
+            'refresh' => array($refreshminutes[$preferencerefresh] => 'true')
         );
 
         return $this->render_from_template('local_assessfreq/student-search', $context);
