@@ -518,7 +518,7 @@ class student_search_table extends table_sql implements renderable {
             $allrecords = $this->sort_quizzes($allrecords);
         }
 
-        $pagesize = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
+        $pagesize = get_user_preferences('local_assessfreq_student_search_table_rows_preference', 20);
         $data = array();
         $offset = $this->currpage * $pagesize;
         $offsetcount = 0;
