@@ -32,7 +32,6 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     var refreshPeriod = 60;
     var counterid;
     var tablesort = 'name_asc';
-    var timeout;
 
     const cards = [
         {cardId: 'local-assessfreq-quiz-summary-upcomming-graph', call: 'upcomming_quizzes', aspect: true},
@@ -80,10 +79,23 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
      * while the user is still checking options.
      *
      */
-    const updateDebounce = function(method) {
-        clearTimeout(timeout);
-        timeout = setTimeout(method(), 750);
+    const debouncer = function (func, wait) {
+        let timeout;
+
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
     };
+
+    const debounceTable = debouncer(() => {
+        getSummaryTable();
+    }, 750);
 
     /**
     *
@@ -126,12 +138,12 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
      * Process the search events from the quiz table.
      */
     const tableSearch = function(event) {
-        if (event.target.value.length > 2) {
-            getSummaryTable();
+        if (event.key === 'Meta' || event.ctrlKey) {
+            return false;
         }
 
-        if (event.target.value.length == 0) {
-            getSummaryTable();
+        if (event.target.value.length === 0 || event.target.value.length > 2) {
+            debounceTable();
         }
     };
 
@@ -254,7 +266,7 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             // Save selection as a user preference.
             setUserPreference('local_assessfreq_quiz_table_inprogress_sort_preference', tablesort);
 
-            updateDebounce(getSummaryTable); // Call function to update table.
+            debounceTable(); // Call function to update table.
 
         }
     };
