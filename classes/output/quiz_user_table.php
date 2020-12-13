@@ -318,7 +318,11 @@ class quiz_user_table extends table_sql implements renderable {
             'title' => get_string('useroverride', 'local_assessfreq')
         ));
 
-        if ($row->state == 'finished' || $row->state == 'inprogress') {
+        if ($row->state == 'finished'
+                || $row->state == 'inprogress'
+                || $row->state == 'uploadpending'
+                || $row->state == 'abandoned'
+                || $row->state == 'overdue') {
             $classes = 'action-icon';
             $attempturl = new \moodle_url('/mod/quiz/review.php', array('attempt' => $row->attemptid));
             $attributes = array(
