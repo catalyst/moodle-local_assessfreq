@@ -54,6 +54,30 @@ function(Ajax, Fragment, Notification, OverrideModal) {
     };
 
     /**
+     * Quick and dirty debounce method for the settings.
+     * This stops the ajax method that updates the table from being updated
+     * while the user is still checking options.
+     *
+     */
+    const debouncer = function (func, wait) {
+        let timeout;
+
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    };
+
+    const debounceTable = debouncer(() => {
+        getStudentTable();
+    }, 750);
+
+    /**
     *
     */
     const refreshCounter = function(reset) {
@@ -201,12 +225,12 @@ function(Ajax, Fragment, Notification, OverrideModal) {
      * Process the search events from the student table.
      */
     const tableSearch = function(event) {
-        if (event.target.value.length > 2) {
-            getStudentTable();
+        if (event.key === 'Meta' || event.ctrlKey) {
+            return false;
         }
 
-        if (event.target.value.length == 0) {
-            getStudentTable();
+        if (event.target.value.length === 0 || event.target.value.length > 2) {
+            debounceTable();
         }
     };
 
