@@ -39,10 +39,10 @@ class utils {
     /**
      * Sort an array.
      *
-     * @param array $inputarray Array of quizzes to sort.
-     * @param string $sorton The value to sort the quizzes by.
-     * @param string $direction The direction to sort the quizzes.
-     * @return array $quizzes the sorted quizzes.
+     * @param array $inputarray Array to sort.
+     * @param string $sorton The value to sort the array by.
+     * @param string $direction The direction to sort in.
+     * @return array $inputarray the sorted arrays.
      */
     public static function sort(array $inputarray, string $sorton, string $direction):array {
 
@@ -66,6 +66,55 @@ class utils {
             }
 
         });
+
+        return $inputarray;
+    }
+
+    /**
+     * Sort an array of arrays/objects by multiple values.
+     *
+     * @param array $inputarray Array of quizzes to sort.
+     * @param array $sorton Associative array to sort by in the format field => direction.
+     * @return array $inputarray the sorted array.
+     */
+    public static function multi_sort(array $inputarray, array $sorton):array {
+        // Convert to an array of arrays if required.
+        $element = reset($inputarray);
+        if (gettype($element) == 'object') {
+            $makearray = array();
+            foreach ($inputarray as $object) {
+                $makearray[] = (array)$object;
+            }
+            $inputarray = $makearray;
+        }
+
+        // Take sort on array and format it for passing to array_multisort.
+        $sortvariables = array();
+        foreach ($sorton as $sort => $direction) {
+            $sortvariables[] =  array_column($inputarray, $sort);
+
+            if (strtolower($direction) == 'asc') {
+                $dir = SORT_ASC;
+            } else {
+                $dir = SORT_DESC;
+            }
+
+            $sortvariables[] = $dir;
+        }
+        $sortvariables[] = &$inputarray;
+
+        // As we have a dynamic array of variables we call array_multisort
+        // via call_user_func_array.
+        call_user_func_array('array_multisort', $sortvariables);
+
+        // Convert back to an array of objects if needed.
+        if (gettype($element) == 'object') {
+            $makeobject= array();
+            foreach ($inputarray as $object) {
+                $makeobject[] = (object)$object;
+            }
+            $inputarray = $makeobject;
+        }
 
         return $inputarray;
     }
