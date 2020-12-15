@@ -1165,7 +1165,7 @@ class frequency_testcase extends advanced_testcase {
         $third = array_shift($result);
 
         $this->assertStringEndsWith($this->assign1->get_course_module()->name, $first->name);
-        $this->assertStringEndsWith($assign4->get_course_module()->name, $second->name);
-        $this->assertStringEndsWith($assign3->get_course_module()->name, $third->name);
+        $this->assertStringEndsWith($assign3->get_course_module()->name, $second->name);
+        $this->assertStringEndsWith($assign4->get_course_module()->name, $third->name);
     }
 }
