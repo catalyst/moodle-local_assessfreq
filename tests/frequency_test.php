@@ -1119,4 +1119,53 @@ class frequency_testcase extends advanced_testcase {
         $this->assertEmpty($result);
 
     }
+
+    /**
+     * Test getting sorted day event information.
+     */
+    public function test_get_day_events_sorting() {
+        // Create some extra data to sort.
+        $generator = $this->getDataGenerator();
+        $course2 = $generator->create_course(
+                array('format' => 'topics', 'numsections' => 3, 'enablecompletion' => 1, 'shortname' => 'zzz'),
+                array('createsections' => true));
+        $assignrow3 = $generator->create_module('assign', array(
+                'course' => $this->course->id,
+                'duedate' => 1585359375,
+                'allowsubmissionsfromdate' => 100,
+                'name' => 'zzzz assign'
+        ));
+        $assignrow4 = $generator->create_module('assign', array(
+                'course' => $course2->id,
+                'duedate' => 1585359375,
+                'allowsubmissionsfromdate' => 100
+        ));
+        $assignrow5 = $generator->create_module('assign', array(
+                'course' => $course2->id,
+                'duedate' => 1585359375,
+                'allowsubmissionsfromdate' => 100,
+                'name' => 'zzzz assign'
+        ));
+
+        $assign3 = new assign(context_module::instance($assignrow3->cmid), false, false);
+        $assign4 = new assign(context_module::instance($assignrow4->cmid), false, false);
+        new assign(context_module::instance($assignrow5->cmid), false, false);
+
+        $date = '2020-3-28';
+        $modules = array('all');
+
+        $frequency = new frequency();
+        $frequency->process_site_events(0);
+        $frequency->process_user_events(0);
+
+        $result = $frequency->get_day_events($date, $modules);
+
+        $first = array_shift($result);
+        $second = array_shift($result);
+        $third = array_shift($result);
+
+        $this->assertStringEndsWith($this->assign1->get_course_module()->name, $first->name);
+        $this->assertStringEndsWith($assign4->get_course_module()->name, $second->name);
+        $this->assertStringEndsWith($assign3->get_course_module()->name, $third->name);
+    }
 }
