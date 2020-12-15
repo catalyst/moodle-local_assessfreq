@@ -1178,9 +1178,9 @@ class frequency {
         // Sort results if we have more than one.
         if(count($dayevents) > 1) {
             $sorton = array(
-                    'name' => 'ASC',
+                    'timestart' => 'ASC',
                     'courseshortname' => 'ASC',
-                    'timestart' => 'ASC'
+                    'name' => 'ASC'
             );
             $dayevents = \local_assessfreq\utils::multi_sort($dayevents, $sorton);
 
