@@ -905,18 +905,18 @@ class quiz_testcase extends advanced_testcase {
         $quizdata = new quiz();
         $sorton = 'name';
 
-        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'asc');
+        $sorted = \local_assessfreq\utils::sort($quizzes, $sorton, 'asc');
         $this->assertEquals('Independent Quiz 4', $sorted[208003]->name);
 
-        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'desc');
+        $sorted = \local_assessfreq\utils::sort($quizzes, $sorton, 'desc');
         $this->assertEquals('very SPECIAL Quiz 3', $sorted[208002]->name);
 
         $sorton = 'coursefullname';
 
-        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'asc');
+        $sorted = \local_assessfreq\utils::sort($quizzes, $sorton, 'asc');
         $this->assertEquals('Independent course 1', $sorted[208003]->coursefullname);
 
-        $sorted = $quizdata->sort_quizzes($quizzes, $sorton, 'desc');
+        $sorted = \local_assessfreq\utils::sort($quizzes, $sorton, 'desc');
         $this->assertEquals('Test course 1', $sorted[208002]->coursefullname);
 
     }

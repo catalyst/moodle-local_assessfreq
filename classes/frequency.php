@@ -1175,6 +1175,15 @@ class frequency {
             }
         }
 
+        // Sort by course name first.
+        $dayevents = \local_assessfreq\utils::sort($dayevents, 'courseshortname', 'asc');
+        // Sort by name second.
+        $dayevents = \local_assessfreq\utils::sort($dayevents, 'name', 'asc');
+        // Then sort by start last.
+        $dayevents = \local_assessfreq\utils::sort($dayevents, 'timestart', 'asc');
+
+        $dayevents =array_values($dayevents);
+
         return $dayevents;
     }
 

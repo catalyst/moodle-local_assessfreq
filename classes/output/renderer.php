@@ -137,7 +137,7 @@ class renderer extends plugin_renderer_base {
         $pagesize = get_user_preferences('local_assessfreq_quiz_table_inprogress_preference', 5);
 
         list($filtered, $totalrows) = $quiz->filter_quizzes($quizzes['inprogress'], $search, $page, $pagesize);
-        $sortedquizzes = $quiz->sort_quizzes($filtered, $sorton, $direction);
+        $sortedquizzes = \local_assessfreq\utils::sort($filtered, $sorton, $direction);
 
         $pagingbar = new \paging_bar($totalrows, $page, $pagesize, '/');
         $pagingoutput = $this->render($pagingbar);

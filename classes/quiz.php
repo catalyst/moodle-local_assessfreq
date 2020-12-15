@@ -668,40 +668,4 @@ class quiz {
 
         return $result;
     }
-
-    /**
-     * Sort an array of quizzes.
-     *
-     * @param array $quizzes Array of quizzes to sort.
-     * @param string $sorton The value to sort the quizzes by.
-     * @param string $direction The direction to sort the quizzes.
-     * @return array $quizzes the sorted quizzes.
-     */
-    public function sort_quizzes(array $quizzes, string $sorton, string $direction):array {
-        $this->sortdirection = $direction;
-        $this->sorton = $sorton;
-
-        uasort($quizzes, function($a, $b) {
-            if ($this->sortdirection == 'asc') {
-                if (gettype($a->{$this->sorton}) == 'string') {
-                    return strcasecmp($a->{$this->sorton}, $b->{$this->sorton});
-                } else {
-                    // The spaceship operator is used for comparing two expressions.
-                    // It returns -1, 0 or 1 when $a is respectively less than, equal to, or greater than $b.
-                    return $a->{$this->sorton} <=> $b->{$this->sorton};
-                }
-            } else {
-                if (gettype($a->{$this->sorton}) == 'string') {
-                    return strcasecmp($b->{$this->sorton}, $a->{$this->sorton});
-                } else {
-                    // The spaceship operator is used for comparing two expressions.
-                    // It returns -1, 0 or 1 when $a is respectively less than, equal to, or greater than $b.
-                    return $b->{$this->sorton} <=> $a->{$this->sorton};
-                }
-            }
-
-        });
-
-        return $quizzes;
-    }
 }
