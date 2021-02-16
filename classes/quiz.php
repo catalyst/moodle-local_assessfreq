@@ -409,10 +409,10 @@ class quiz {
     }
 
     /**
-     * Get in progress and upcomming quizzes and their associated data.
+     * Get finished, in progress and upcomming quizzes and their associated data.
      *
      * @param int $now Timestamp to use for reference for time.
-     * @return array $quizzes Array of inprogress and upcomming quizzes with associated data.
+     * @return array $quizzes Array of finished, inprogress and upcomming quizzes with associated data.
      */
     public function get_quiz_summaries(int $now): array {
         // Get tracked quizzes.
@@ -422,6 +422,7 @@ class quiz {
 
         // Set up array to hold quizzes and data.
         $quizzes = array(
+            'finished' => array(),
             'inprogress' => array(),
             'upcomming' => array(),
         );
@@ -456,6 +457,26 @@ class quiz {
                     $quizdata->timestampclose = $quiz->timeclose;
                     $quizdata->timestamplimit = $quiz->timelimit;
                     $quizzes['upcomming'][$time][$quiz->id] = $quizdata;
+                    unset($trackedquizzes[$quiz->id]);
+                }
+            }
+
+        }
+
+        // Iterate through the hours, processing finished quizzes.
+        for ($hour = 1; $hour <= $this->hoursbehind; $hour++) {
+            $time = $now - (HOURSECS * $hour);
+
+            $quizzes['finished'][$time] = array();
+
+            // Get data for each finished quiz.
+            foreach ($trackedquizzes as $quiz) {
+                if (($quiz->timeclose >= $time) && ($quiz->timeclose < ($time + HOURSECS))) { // Get finished quizzes.
+                    $quizdata = $this->get_quiz_data($quiz->id);
+                    $quizdata->timestampopen = $quiz->timeopen;
+                    $quizdata->timestampclose = $quiz->timeclose;
+                    $quizdata->timestamplimit = $quiz->timelimit;
+                    $quizzes['finished'][$time][$quiz->id] = $quizdata;
                     unset($trackedquizzes[$quiz->id]);
                 }
             }
