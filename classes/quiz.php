@@ -328,7 +328,7 @@ class quiz {
         $starttime = $now + $lookahead;
         $endtime = $now - $lookbehind;
 
-        $sql = 'SELECT id, timeopen, timeclose
+        $sql = 'SELECT id, timeopen, timeclose, timelimit
                   FROM {quiz}
                  WHERE (timeopen > 0 AND timeopen < :starttime)
                        AND (timeclose > :endtime OR timeclose > :now)';
@@ -442,6 +442,7 @@ class quiz {
                     $quizdata = $this->get_quiz_data($quiz->id);
                     $quizdata->timestampopen = $quiz->timeopen;
                     $quizdata->timestampclose = $quiz->timeclose;
+                    $quizdata->timestamplimit = $quiz->timelimit;
 
                     // Get tracked users for quiz.
                     $trackedrecords = $this->get_quiz_tracking($quiz->id);
@@ -453,6 +454,7 @@ class quiz {
                     $quizdata = $this->get_quiz_data($quiz->id);
                     $quizdata->timestampopen = $quiz->timeopen;
                     $quizdata->timestampclose = $quiz->timeclose;
+                    $quizdata->timestamplimit = $quiz->timelimit;
                     $quizzes['upcomming'][$time][$quiz->id] = $quizdata;
                     unset($trackedquizzes[$quiz->id]);
                 }

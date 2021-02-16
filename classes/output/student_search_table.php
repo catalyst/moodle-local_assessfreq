@@ -451,12 +451,12 @@ class student_search_table extends table_sql implements renderable {
         $quiz = new \local_assessfreq\quiz($this->hoursahead, $this->hoursbehind);
         $allquizzes = $quiz->get_quiz_summaries($this->now);
 
-        $inprogressquizzes = array_keys($allquizzes['inprogress']);
+        $inprogressquizzes = $allquizzes['inprogress'];
         $upcommingquizzes = array();
 
         foreach ($allquizzes['upcomming'] as $upcomming) {
             foreach ($upcomming as $quizobj) {
-                $upcommingquizzes[] = $quizobj->assessid;
+                $upcommingquizzes[] = $quizobj;
             }
         }
 
@@ -464,9 +464,9 @@ class student_search_table extends table_sql implements renderable {
 
         $allrecords = array();
 
-        foreach ($quizzes as $quizid) {
-            $context = $quiz->get_quiz_context($quizid);
-            $quizrecord = $DB->get_record('quiz', array('id' => $quizid), 'name, timeopen, timeclose, timelimit');
+        foreach ($quizzes as $quizobj) {
+            $context = $quiz->get_quiz_context($quizobj->assessid);
+            error_log(print_r($quizobj->name, true));
 
             list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
             $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid,
@@ -486,17 +486,17 @@ class student_search_table extends table_sql implements renderable {
             $joins .= " LEFT JOIN ($attemptsql) qa ON u.id = qa.userid";
             $joins .= " LEFT JOIN ($sessionsql) us ON u.id = us.userid";
 
-            $params['qaquiz'] = $quizid;
-            $params['qoquiz'] = $quizid;
+            $params['qaquiz'] = $quizobj->assessid;
+            $params['qoquiz'] = $quizobj->assessid;
             $params['stm'] = $timedout;
 
             $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
             $params = $finaljoin->params;
 
-            $sql = "SELECT u.*,
-                       COALESCE(qo.timeopen, $quizrecord->timeopen) AS timeopen,
-                       COALESCE(qo.timeclose, $quizrecord->timeclose) AS timeclose,
-                       COALESCE(qo.timelimit, $quizrecord->timelimit) AS timelimit,
+            $sql = "SELECT u.*,.
+                       COALESCE(qo.timeopen, $quizobj->timestampopen) AS timeopen,
+                       COALESCE(qo.timeclose, $quizobj->timestampclose) AS timeclose,
+                       COALESCE(qo.timelimit, $quizobj->timestamplimit) AS timelimit,
                        COALESCE(qa.state, (CASE
                                               WHEN us.userid > 0 THEN 'loggedin'
                                               ELSE 'notloggedin'
@@ -504,12 +504,12 @@ class student_search_table extends table_sql implements renderable {
                        qa.attemptid,
                        qa.timestart,
                        qa.timefinish,
-                       $quizid AS quiz,
+                       $quizobj->assessid AS quiz,
                        $context->instanceid as quizinstance,
-                       $quizrecord->timeopen AS quiztimeopen,
-                       $quizrecord->timeclose AS quiztimeclose,
-                       $quizrecord->timelimit AS quiztimelimit,
-                       '$quizrecord->name' AS quizname
+                       $quizobj->timestampopen AS quiztimeopen,
+                       $quizobj->timestampclose AS quiztimeclose,
+                       $quizobj->timestamplimit AS quiztimelimit,
+                       '$quizobj->name' AS quizname
                   FROM {user} u
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
@@ -531,7 +531,7 @@ class student_search_table extends table_sql implements renderable {
         foreach ($allrecords as $key => $record) {
             $searchcount = 0;
             if ($this->search != '') {
-                // Because we are using COALESE and CASE for state we can't use SQL WHERE so we need to filter in PHP land.
+                // Because we are using COALESCE and CASE for state we can't use SQL WHERE so we need to filter in PHP land.
                 // Also because we need to do some filtering in PHP land, we'll do it all here.
                 $searchcount = -1;
                 $searchfields = array_merge($this->extrafields, array('firstname', 'lastname', 'state', 'quiz'));
