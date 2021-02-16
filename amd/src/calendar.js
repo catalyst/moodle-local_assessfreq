@@ -140,7 +140,8 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const calcHeatRange = function(eventArray, dateObj) {
         return new Promise((resolve) => {
-            if (eventArray[dateObj.year] !== "undefined") { // If scheduled tasks have not run yet we may not have any data.
+            // If scheduled tasks have not run yet we may not have any data.
+            if ((typeof eventArray !== "undefined") && (eventArray[dateObj.year] !== "undefined")) {
 
                 let eventcount = new Array;
                 let year = eventArray[dateObj.year];
