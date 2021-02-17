@@ -2,9 +2,32 @@
 
 # Assessment frequency #
 
-TODO Describe the plugin shortly here.
+Advanced assessment reporting for the Moodle LMS.
 
-TODO Provide more detailed description here.
+## Branches ##
+The following maps the plugin version to use depending on your Moodle version.
+
+| Moodle verion     | Branch      |
+| ----------------- | ----------- |
+| Moodle 3.5 to 3.8 | MOODLE_35   |
+| Moodle 3.9 to 3.10| MOODLE_39   |
+| Moodle 3.11+      | master      |
+
+
+## Plugin Installation ##
+The following steps will help you install this plugin into your Moodle instance.
+
+1. Clone or copy the code for this repository into your Moodle installation at the following location: `<moodledir>/local/assessfreq`
+2. Make sure you have checked-out the correct version of the code, e.g. for Moodle version 3.10: `git checkout MOODLE_39`
+3. Run the upgrade: `sudo -u www-data php admin/cli/upgrade` **Note:** the user may be different to www-data on your system.
+
+Once the plugin is installed, next the Moodle setup needs to be performed.
+
+**Note:** It is recommended that installation be completed via the command line instead of the Moodle user interface.
+
+## Moodle setup
+TODO: this
+
 
 ## License ##
 
