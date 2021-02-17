@@ -141,12 +141,12 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
     const calcHeatRange = function(eventArray, dateObj) {
         return new Promise((resolve) => {
             // If scheduled tasks have not run yet we may not have any data.
-            if ((typeof eventArray !== "undefined") && (eventArray[dateObj.year] !== "undefined")) {
+            if ((typeof(eventArray) !== "undefined") && (eventArray.length > 0) && (eventArray[dateObj.year] !== "undefined")) {
 
                 let eventcount = new Array;
                 let year = eventArray[dateObj.year];
 
-                // Itterate through all the event counts.
+                // Iterate through all the event counts.
                 // This code looks nasty but there is only 366 days in a year.
                 for (let i = 0; i < 12; i++) {
                     if (typeof year[i] !== "undefined") {
