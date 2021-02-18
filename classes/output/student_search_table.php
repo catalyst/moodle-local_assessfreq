@@ -453,6 +453,7 @@ class student_search_table extends table_sql implements renderable {
 
         $inprogressquizzes = $allquizzes['inprogress'];
         $upcommingquizzes = array();
+        $finishedquizzes = array();
 
         foreach ($allquizzes['upcomming'] as $upcomming) {
             foreach ($upcomming as $quizobj) {
@@ -460,7 +461,13 @@ class student_search_table extends table_sql implements renderable {
             }
         }
 
-        $quizzes = array_merge($inprogressquizzes, $upcommingquizzes);
+        foreach ($allquizzes['finished'] as $finished) {
+            foreach ($finished as $quizobj) {
+                $finishedquizzes[] = $quizobj;
+            }
+        }
+
+        $quizzes = array_merge($inprogressquizzes, $upcommingquizzes, $finishedquizzes);
 
         $allrecords = array();
 
@@ -493,7 +500,20 @@ class student_search_table extends table_sql implements renderable {
             $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
             $params = $finaljoin->params;
 
-            $sql = "SELECT u.*,.
+            // If a quiz has overrides, get only students that are in the window time.
+            if ($quizobj->isoverride){
+                $userids = array();
+                foreach ($quizobj->overrides as $override) {
+                    $userids[] = $override->userid;
+                }
+
+                list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
+                $finaljoin->wheres = $finaljoin->wheres . " AND u.id " .  $insql;
+                $params = array_merge($params, $inparams);
+
+            }
+
+            $sql = "SELECT u.*,
                        COALESCE(qo.timeopen, $quizobj->timestampopen) AS timeopen,
                        COALESCE(qo.timeclose, $quizobj->timestampclose) AS timeclose,
                        COALESCE(qo.timelimit, $quizobj->timestamplimit) AS timelimit,
