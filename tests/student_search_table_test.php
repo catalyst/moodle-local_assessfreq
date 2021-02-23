@@ -469,6 +469,6 @@ class student_search_table_testcase extends advanced_testcase {
         $quizusertable->query_db(30, false);
         $rawdata = $quizusertable->rawdata;
 
-        $this->assertCount(24, $rawdata);
+        $this->assertCount(30, $rawdata);
     }
 }
