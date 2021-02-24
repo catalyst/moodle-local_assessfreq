@@ -370,14 +370,19 @@ class quiz {
 
             $quizzesoverride = $DB->get_record_sql($sql, $params);
 
-            if (array_key_exists($quizzesoverride->id, $quizzes)) {
-                $quizzesoverride->isoverride = $quizzes[$quizzesoverride->id]->isoverride;
-                $quizzesoverride->overrides = $overrides;
-                $quizzes[$quizzesoverride->id] = $quizzesoverride;
-            } else {
-                $quizzesoverride->isoverride = 1;
-                $quizzesoverride->overrides = $overrides;
-                $quizzes[$quizzesoverride->id] = $quizzesoverride;
+            if ($quizzesoverride) {
+                if (array_key_exists($quizzesoverride->id, $quizzes)) {
+                    $quizzesoverride->isoverride = $quizzes[$quizzesoverride->id]->isoverride;
+                    if (isset($quizzes[$quizzesoverride->id]->overrides)) {
+                        $quizzesoverride->overrides = $quizzes[$quizzesoverride->id]->overrides;
+                    }
+                    $quizzesoverride->overrides[] = $override;
+                    $quizzes[$quizzesoverride->id] = $quizzesoverride;
+                } else {
+                    $quizzesoverride->isoverride = 1;
+                    $quizzesoverride->overrides[] = $override;
+                    $quizzes[$quizzesoverride->id] = $quizzesoverride;
+                }
             }
         }
 
