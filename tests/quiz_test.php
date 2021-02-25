@@ -705,8 +705,16 @@ class quiz_testcase extends advanced_testcase {
 
         $result = $method->invoke($quizdata, $now);
 
-        // Time open should match earlier time in override but time close should be the same as original quiz.
-        $this->assertEquals(($now - (3600 * 0.75)), $result[$this->quiz4->id]->timeopen);
+        // Get override students array for test quiz.
+        foreach ($result[$this->quiz4->id]->overrides as $quizoverride) {
+            if ($override->userid == 7) {
+                $this->assertEquals(($now - (3600 * 0.75)), $quizoverride->timeopen);
+                $this->assertEquals(($now + (3600 * 0.25)), $quizoverride->timeclose);
+            }
+        }
+
+        // Time open and time close should be the same as original quiz. Override should added as an array.
+        $this->assertEquals(($now - (3600 * 0.5)), $result[$this->quiz4->id]->timeopen);
         $this->assertEquals(($now + (3600 * 0.5)), $result[$this->quiz4->id]->timeclose);
 
         $this->assertCount(5, $result);
@@ -807,6 +815,19 @@ class quiz_testcase extends advanced_testcase {
 
         $this->assertEquals(2, $result['assessments']);
         $this->assertEquals(6, $result['participants']);
+
+    }
+
+    /**
+     * Test getting finished quizzes.
+     */
+    public function test_get_quizzes_finished() {
+        $quizdata = new quiz();
+
+        $now = 1594788000;
+        $result = $quizdata->get_quiz_summaries($now);
+
+        $this->assertCount(1, $result['finished'][$now - HOURSECS]);
 
     }
 
