@@ -35,12 +35,40 @@ jobs:
           --health-retries 3
     strategy:
       fail-fast: false
-      matrix:
-        database: ['pgsql', 'mariadb']
-        moodle-branch: ['MOODLE_35_STABLE']
-        node: ['14.15.1']
-        php: ['7.2']
-
+matrix:
+  include:
+    - php: '7.0'
+      moodle-branch: 'MOODLE_35_STABLE'
+      database: 'mariadb'
+      node: '14.15'
+    - php: '7.2'
+      moodle-branch: 'MOODLE_35_STABLE'
+      database: 'pgsql'
+      node: '14.15'
+    - php: '7.0'
+      moodle-branch: 'MOODLE_36_STABLE'
+      database: 'mariadb'
+      node: '8.9'
+    - php: '7.3'
+      moodle-branch: 'MOODLE_36_STABLE'
+      database: 'pgsql'
+      node: '8.9'
+    - php: '7.1'
+      moodle-branch: 'MOODLE_37_STABLE'
+      database: 'mariadb'
+      node: '14.15'
+    - php: '7.3'
+      moodle-branch: 'MOODLE_37_STABLE'
+      database: 'pgsql'
+      node: '14.15'
+    - php: '7.1'
+      moodle-branch: 'MOODLE_38_STABLE'
+      database: 'mariadb'
+      node: '14.15'
+    - php: '7.3'
+      moodle-branch: 'MOODLE_38_STABLE'
+      database: 'pgsql'
+      node: '14.15'
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
