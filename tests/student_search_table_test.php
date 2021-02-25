@@ -458,7 +458,7 @@ class student_search_table_testcase extends advanced_testcase {
         $baseurl = $CFG->wwwroot . '/local/assessfreq/dashboard_quiz.php';
         $context = context_system::instance();
         $now = 1594788000;
-        $quizusertable = new student_search_table($baseurl, $context->id, '', 4, 4, $now);
+        $quizusertable = new student_search_table($baseurl, $context->id, '', 1, 1, $now);
 
         // Fake getting table.
         $this->expectOutputRegex("/table/");
@@ -470,7 +470,5 @@ class student_search_table_testcase extends advanced_testcase {
         $rawdata = $quizusertable->rawdata;
 
         $this->assertCount(30, $rawdata);
-
     }
-
 }

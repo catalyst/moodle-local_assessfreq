@@ -297,7 +297,7 @@ class quiz {
         $starttime = $now + $lookahead;
         $endtime = $now - $lookbehind;
 
-        $sql = 'SELECT id, quiz, timeopen, timeclose
+        $sql = 'SELECT id, quiz, userid, timeopen, timeclose
                   FROM {quiz_overrides}
                  WHERE (timeopen > 0 AND timeopen < :starttime)
                        AND (timeclose > :endtime OR timeclose > :now)';
@@ -328,7 +328,7 @@ class quiz {
         $starttime = $now + $lookahead;
         $endtime = $now - $lookbehind;
 
-        $sql = 'SELECT id, timeopen, timeclose
+        $sql = 'SELECT id, timeopen, timeclose, timelimit, 0 AS isoverride
                   FROM {quiz}
                  WHERE (timeopen > 0 AND timeopen < :starttime)
                        AND (timeclose > :endtime OR timeclose > :now)';
@@ -354,28 +354,39 @@ class quiz {
      * @return array $quizzes The quizzes.
      */
     private function get_tracked_quizzes_with_overrides(int $now, int $lookahead=HOURSECS, int $lookbehind=HOURSECS): array {
+        global $DB;
+
         $quizzes = $this->get_tracked_quizzes($now, $lookahead, $lookbehind);
         $overrides = $this->get_tracked_overrides($now, $lookahead, $lookbehind);
-        $quizoverides = array();
 
-        // Find which quizzes have overrides and adjust start and end times accodingly.
-        foreach ($quizzes as $quiz) {
-            // Nested for each is bad, but number of overrides should always be small.
-            foreach ($overrides as $override) {
-                if ($override->quiz == $quiz->id && $override->timeopen < $quiz->timeopen) {
-                    $quiz->timeopen = $override->timeopen;
-                }
+        // Add override data to each quiz in the array.
+        foreach ($overrides as $override) {
+            $sql = 'SELECT id, timeopen, timeclose, timelimit
+                      FROM {quiz}
+                     WHERE id = :id';
+            $params = array(
+                'id' => $override->quiz,
+            );
 
-                if ($override->quiz == $quiz->id && $override->timeclose > $quiz->timeclose) {
-                    $quiz->timeclose = $override->timeclose;
+            $quizzesoverride = $DB->get_record_sql($sql, $params);
+
+            if ($quizzesoverride) {
+                if (array_key_exists($quizzesoverride->id, $quizzes)) {
+                    $quizzesoverride->isoverride = $quizzes[$quizzesoverride->id]->isoverride;
+                    if (isset($quizzes[$quizzesoverride->id]->overrides)) {
+                        $quizzesoverride->overrides = $quizzes[$quizzesoverride->id]->overrides;
+                    }
+                    $quizzesoverride->overrides[] = $override;
+                    $quizzes[$quizzesoverride->id] = $quizzesoverride;
+                } else {
+                    $quizzesoverride->isoverride = 1;
+                    $quizzesoverride->overrides[] = $override;
+                    $quizzes[$quizzesoverride->id] = $quizzesoverride;
                 }
             }
-
-            $quizoverides[$quiz->id] = $quiz;
         }
 
-        return $quizoverides;
-
+        return $quizzes;
     }
 
     /**
@@ -409,10 +420,10 @@ class quiz {
     }
 
     /**
-     * Get in progress and upcomming quizzes and their associated data.
+     * Get finished, in progress and upcomming quizzes and their associated data.
      *
      * @param int $now Timestamp to use for reference for time.
-     * @return array $quizzes Array of inprogress and upcomming quizzes with associated data.
+     * @return array $quizzes Array of finished, inprogress and upcomming quizzes with associated data.
      */
     public function get_quiz_summaries(int $now): array {
         // Get tracked quizzes.
@@ -422,6 +433,7 @@ class quiz {
 
         // Set up array to hold quizzes and data.
         $quizzes = array(
+            'finished' => array(),
             'inprogress' => array(),
             'upcomming' => array(),
         );
@@ -442,6 +454,12 @@ class quiz {
                     $quizdata = $this->get_quiz_data($quiz->id);
                     $quizdata->timestampopen = $quiz->timeopen;
                     $quizdata->timestampclose = $quiz->timeclose;
+                    $quizdata->timestamplimit = $quiz->timelimit;
+                    $quizdata->isoverride = $quiz->isoverride;
+
+                    if (isset($quiz->overrides)){
+                        $quizdata->overrides = $quiz->overrides;
+                    }
 
                     // Get tracked users for quiz.
                     $trackedrecords = $this->get_quiz_tracking($quiz->id);
@@ -453,7 +471,55 @@ class quiz {
                     $quizdata = $this->get_quiz_data($quiz->id);
                     $quizdata->timestampopen = $quiz->timeopen;
                     $quizdata->timestampclose = $quiz->timeclose;
+                    $quizdata->timestamplimit = $quiz->timelimit;
+                    $quizdata->isoverride = $quiz->isoverride;
+
+                    if (isset($quiz->overrides)){
+                        $quizdata->overrides = $quiz->overrides;
+                    }
+
                     $quizzes['upcomming'][$time][$quiz->id] = $quizdata;
+                    unset($trackedquizzes[$quiz->id]);
+                } else {
+                    if (isset($quiz->overrides)) {
+                        $quizdata = $this->get_quiz_data($quiz->id);
+                        $quizdata->timestampopen = $quiz->timeopen;
+                        $quizdata->timestampclose = $quiz->timeclose;
+                        $quizdata->timestamplimit = $quiz->timelimit;
+                        $quizdata->isoverride = $quiz->isoverride;
+
+                        if (isset($quiz->overrides)){
+                            $quizdata->overrides = $quiz->overrides;
+                        }
+
+                        $quizzes['inprogress'][$quiz->id] = $quizdata;
+                        unset($trackedquizzes[$quiz->id]);
+                    }
+                }
+            }
+
+        }
+
+        // Iterate through the hours, processing finished quizzes.
+        for ($hour = 1; $hour <= $this->hoursbehind; $hour++) {
+            $time = $now - (HOURSECS * $hour);
+
+            $quizzes['finished'][$time] = array();
+
+            // Get data for each finished quiz.
+            foreach ($trackedquizzes as $quiz) {
+                if (($quiz->timeclose >= $time) && ($quiz->timeclose < ($time + HOURSECS))) { // Get finished quizzes.
+                    $quizdata = $this->get_quiz_data($quiz->id);
+                    $quizdata->timestampopen = $quiz->timeopen;
+                    $quizdata->timestampclose = $quiz->timeclose;
+                    $quizdata->timestamplimit = $quiz->timelimit;
+                    $quizdata->isoverride = $quiz->isoverride;
+
+                    if (isset($quiz->overrides)){
+                        $quizdata->overrides = $quiz->overrides;
+                    }
+
+                    $quizzes['finished'][$time][$quiz->id] = $quizdata;
                     unset($trackedquizzes[$quiz->id]);
                 }
             }
