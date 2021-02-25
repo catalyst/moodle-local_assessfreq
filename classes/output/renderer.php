@@ -54,6 +54,9 @@ class renderer extends plugin_renderer_base {
             $years = array(date('Y'));
         }
 
+        // Always add current year to the selection of years.
+        $years[] = date('Y');
+
         $context = array('years' => array(), 'currentyear' => $preferenceyear);
 
         if (!empty($years)) {
@@ -178,9 +181,13 @@ class renderer extends plugin_renderer_base {
 
         // Get years that have events and load into context.
         $years = $frequency->get_years_has_events();
+
         if (empty($years)) {
             $years = array(date('Y'));
         }
+
+        // Always add current year to the selection of years.
+        $years[] = date('Y');
 
         if (!empty($years)) {
             foreach ($years as $year) {
