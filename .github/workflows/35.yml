@@ -1,4 +1,4 @@
-name: 3.5 branch test
+name: MOODLE_35 branch test
 
 on: [push, pull_request]
 
