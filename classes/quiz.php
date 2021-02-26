@@ -457,7 +457,7 @@ class quiz {
                     $quizdata->timestamplimit = $quiz->timelimit;
                     $quizdata->isoverride = $quiz->isoverride;
 
-                    if (isset($quiz->overrides)){
+                    if (isset($quiz->overrides)) {
                         $quizdata->overrides = $quiz->overrides;
                     }
 
@@ -474,7 +474,7 @@ class quiz {
                     $quizdata->timestamplimit = $quiz->timelimit;
                     $quizdata->isoverride = $quiz->isoverride;
 
-                    if (isset($quiz->overrides)){
+                    if (isset($quiz->overrides)) {
                         $quizdata->overrides = $quiz->overrides;
                     }
 
@@ -488,7 +488,7 @@ class quiz {
                         $quizdata->timestamplimit = $quiz->timelimit;
                         $quizdata->isoverride = $quiz->isoverride;
 
-                        if (isset($quiz->overrides)){
+                        if (isset($quiz->overrides)) {
                             $quizdata->overrides = $quiz->overrides;
                         }
 
@@ -515,7 +515,7 @@ class quiz {
                     $quizdata->timestamplimit = $quiz->timelimit;
                     $quizdata->isoverride = $quiz->isoverride;
 
-                    if (isset($quiz->overrides)){
+                    if (isset($quiz->overrides)) {
                         $quizdata->overrides = $quiz->overrides;
                     }
 

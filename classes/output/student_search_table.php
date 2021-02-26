@@ -473,7 +473,6 @@ class student_search_table extends table_sql implements renderable {
 
         foreach ($quizzes as $quizobj) {
             $context = $quiz->get_quiz_context($quizobj->assessid);
-            error_log(print_r($quizobj->name, true));
 
             list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
             $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid,
@@ -501,7 +500,7 @@ class student_search_table extends table_sql implements renderable {
             $params = $finaljoin->params;
 
             // If a quiz has overrides, get only students that are in the window time.
-            if ($quizobj->isoverride){
+            if ($quizobj->isoverride) {
                 $userids = array();
                 foreach ($quizobj->overrides as $override) {
                     $userids[] = $override->userid;
