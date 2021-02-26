@@ -1176,7 +1176,7 @@ class frequency {
         }
 
         // Sort results if we have more than one.
-        if(count($dayevents) > 1) {
+        if (count($dayevents) > 1) {
             $sorton = array(
                     'timestart' => 'ASC',
                     'courseshortname' => 'ASC',

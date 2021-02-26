@@ -25,15 +25,15 @@
 <div id="local-assessfreq-quiz-student-table-hoursbehind" data-region="hoursbehind-filter" class="mr-3">
     <button type="button" class="btn btn-secondary dropdown-toggle icon-no-margin"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-            aria-label="{{# str }} hoursbehind, local_assessfreq {{/ str }}" aria-controls="hoursaheadfilter">
-        {{#pix}} i/up {{/pix}} {{# str }} hoursbehind, local_assessfreq {{/ str }}
+            aria-label="{{# str }} hoursbehind, local_assessfreq {{/ str }}" aria-controls="hoursbehindfilter">
+        {{#pix}} i/previous {{/pix}} {{# str }} hoursbehind, local_assessfreq {{/ str }}
         <span class="sr-only" data-active-item-text>
                 {{# str }} hours1, local_assessfreq {{/ str }}
                 {{# str }} hours4, local_assessfreq {{/ str }}
                 {{# str }} hours8, local_assessfreq {{/ str }}
         </span>
     </button>
-    <div id="hoursaheadfilter" role="menu" class="dropdown-menu" data-show-active-item>
+    <div id="hoursbehindfilter" role="menu" class="dropdown-menu" data-show-active-item>
         <h6 class="dropdown-header">{{# str }} hoursbehind, local_assessfreq {{/ str }}</h6>
         <a
             class="dropdown-item {{#hoursbehind}}{{#hours1}}active{{/hours1}}{{/hoursbehind}}"

@@ -91,7 +91,7 @@ class utils {
         // Take sort on array and format it for passing to array_multisort.
         $sortvariables = array();
         foreach ($sorton as $sort => $direction) {
-            $sortvariables[] =  array_column($inputarray, $sort);
+            $sortvariables[] = array_column($inputarray, $sort);
 
             if (strtolower($direction) == 'asc') {
                 $dir = SORT_ASC;
@@ -109,7 +109,7 @@ class utils {
 
         // Convert back to an array of objects if needed.
         if (gettype($element) == 'object') {
-            $makeobject= array();
+            $makeobject = array();
             foreach ($inputarray as $object) {
                 $makeobject[] = (object)$object;
             }
