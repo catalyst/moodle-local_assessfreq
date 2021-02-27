@@ -37,7 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php: '7.0'
+          - php: '7.1'
             moodle-branch: 'MOODLE_35_STABLE'
             database: 'mariadb'
             node: '14.15'
@@ -45,15 +45,15 @@ jobs:
             moodle-branch: 'MOODLE_35_STABLE'
             database: 'pgsql'
             node: '14.15'
-          - php: '7.0'
+          - php: '7.1'
             moodle-branch: 'MOODLE_36_STABLE'
             database: 'mariadb'
             node: '8.9'
-          - php: '7.3'
+          - php: '7.2'
             moodle-branch: 'MOODLE_36_STABLE'
             database: 'pgsql'
             node: '8.9'
-          - php: '7.1'
+          - php: '7.2'
             moodle-branch: 'MOODLE_37_STABLE'
             database: 'mariadb'
             node: '14.15'
@@ -61,7 +61,7 @@ jobs:
             moodle-branch: 'MOODLE_37_STABLE'
             database: 'pgsql'
             node: '14.15'
-          - php: '7.1'
+          - php: '7.3'
             moodle-branch: 'MOODLE_38_STABLE'
             database: 'mariadb'
             node: '14.15'
@@ -123,6 +123,7 @@ jobs:
         run: moodle-plugin-ci savepoints
 
       - name: Run mustache
+        continue-on-error: true # This step will show errors but will not fail
         if: ${{ always() }}
         run: moodle-plugin-ci mustache
 
