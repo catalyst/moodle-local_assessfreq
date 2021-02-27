@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mattporritt/moodle-local_assessfreq.svg?branch=master)](https://travis-ci.org/mattporritt/moodle-local_assessfreq)
+![Build Status](https://github.com/catalyst/moodle-local_assessfreq/actions/workflows/master.yml/badge.svg?branch=master)
 
 # Assessment frequency #
 
@@ -10,8 +10,8 @@ The following maps the plugin version to use depending on your Moodle version.
 | Moodle verion     | Branch      |
 | ----------------- | ----------- |
 | Moodle 3.5 to 3.8 | MOODLE_35   |
-| Moodle 3.9 to 3.10| MOODLE_39   |
-| Moodle 3.11+      | master      |
+| Moodle 3.9        | MOODLE_39   |
+| Moodle 3.10+      | master      |
 
 
 ## Plugin Installation ##
