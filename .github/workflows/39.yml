@@ -108,6 +108,7 @@ jobs:
         run: moodle-plugin-ci savepoints
 
       - name: Run mustache
+        continue-on-error: true # This step will show errors but will not fail
         if: ${{ always() }}
         run: moodle-plugin-ci mustache
 
