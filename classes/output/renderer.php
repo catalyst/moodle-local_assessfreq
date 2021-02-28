@@ -50,12 +50,15 @@ class renderer extends plugin_renderer_base {
         $preferenceyear = get_user_preferences('local_assessfreq_overview_year_preference', $currentyear);
         $frequency = new frequency();
 
+        // Get years that have events and load into context.
+        $years = $frequency->get_years_has_events();
+
         if (empty($years)) {
             $years = array($currentyear);
         }
 
         // Add current year to the selection of years if missing.
-        if (empty($years[$currentyear])) {
+        if (!in_array($currentyear, $years)) {
             $years[] = $currentyear;
         }
 
@@ -190,7 +193,7 @@ class renderer extends plugin_renderer_base {
         }
 
         // Add current year to the selection of years if missing.
-        if (empty($years[$currentyear])) {
+        if (!in_array($currentyear, $years)) {
             $years[] = $currentyear;
         }
 
