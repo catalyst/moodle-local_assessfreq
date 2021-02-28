@@ -46,16 +46,18 @@ class renderer extends plugin_renderer_base {
      * @return string html to display.
      */
     public function render_report_cards(): string {
-        $preferenceyear = get_user_preferences('local_assessfreq_overview_year_preference', date('Y'));
+        $currentyear = date('Y');
+        $preferenceyear = get_user_preferences('local_assessfreq_overview_year_preference', $currentyear);
         $frequency = new frequency();
-        $years = $frequency->get_years_has_events();
 
         if (empty($years)) {
-            $years = array(date('Y'));
+            $years = array($currentyear);
         }
 
-        // Always add current year to the selection of years.
-        $years[] = date('Y');
+        // Add current year to the selection of years if missing.
+        if (empty($years[$currentyear])) {
+            $years[] = $currentyear;
+        }
 
         $context = array('years' => array(), 'currentyear' => $preferenceyear);
 
@@ -163,7 +165,8 @@ class renderer extends plugin_renderer_base {
      * @return string The heatmap HTML.
      */
     public function render_report_heatmap(): string {
-        $preferenceyear = get_user_preferences('local_assessfreq_heatmap_year_preference', date('Y'));
+        $currentyear = date('Y');
+        $preferenceyear = get_user_preferences('local_assessfreq_heatmap_year_preference', $currentyear);
         $preferencemetric = get_user_preferences('local_assessfreq_heatmap_metric_preference', 'assess');
         $preferencemodules = json_decode(get_user_preferences('local_assessfreq_heatmap_modules_preference', '["all"]'), true);
 
@@ -183,11 +186,13 @@ class renderer extends plugin_renderer_base {
         $years = $frequency->get_years_has_events();
 
         if (empty($years)) {
-            $years = array(date('Y'));
+            $years = array($currentyear);
         }
 
-        // Always add current year to the selection of years.
-        $years[] = date('Y');
+        // Add current year to the selection of years if missing.
+        if (empty($years[$currentyear])) {
+            $years[] = $currentyear;
+        }
 
         if (!empty($years)) {
             foreach ($years as $year) {
