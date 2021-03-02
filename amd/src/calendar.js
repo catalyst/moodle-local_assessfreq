@@ -64,6 +64,10 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const getContrast = function (hexcolor) {
 
+        if (typeof (hexcolor) === "undefined") {
+            return '#000000';
+        }
+
         // If a leading # is provided, remove it.
         if (hexcolor.slice(0, 1) === '#') {
             hexcolor = hexcolor.slice(1);
@@ -140,9 +144,17 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      */
     const calcHeatRange = function(eventArray, dateObj) {
         return new Promise((resolve) => {
+
+            // Resolve early if there are no events.
+            if (typeof (eventArray) === "undefined") {
+                heatRangeMax = 0;
+                heatRangeMin = 0;
+
+                resolve(eventArray);
+            }
             // If scheduled tasks have not run yet we may not have any data.
             let eventArrayLength = Object.keys(eventArray).length;
-            if ((typeof (eventArray) !== "undefined") && (eventArrayLength > 0) && (eventArray[dateObj.year] !== "undefined")) {
+            if ((eventArrayLength > 0) && (eventArray[dateObj.year] !== "undefined")) {
 
                 let eventcount = new Array;
                 let year = eventArray[dateObj.year];
