@@ -31,6 +31,7 @@
     <col class="dayview-midcol">
     <col class="dayview-midcol">
     <col class="dayview-midcol">
+    <col class="dayview-midcol">
     <col>
   </colgroup>
   <thead>
@@ -46,7 +47,12 @@
           {{#pix}} i/calendareventtime, core{{/pix}}
         </span>
       </th>
-       <th scope="col" rowspan="2" class="text-center">
+      <th scope="col" rowspan="2" class="text-center">
+        <span  data-toggle="tooltip" data-placement="top" title="{{#str}} attempts, local_assessfreq {{/str}}" data-offset="0,5">
+          {{#pix}} i/checked, core{{/pix}}
+        </span>
+      </th>
+      <th scope="col" rowspan="2" class="text-center">
         <span  data-toggle="tooltip" data-placement="top" title="{{#str}} dashboard, local_assessfreq {{/str}}" data-offset="0,5">
           {{#pix}} i/report, core{{/pix}}
         </span>
@@ -77,8 +83,11 @@
       <th scope="row" class="text-center">
         {{ usercount }}
       </th>
-       <th scope="row" class="text-center">
+      <th scope="row" class="text-center">
         {{ timelimit }}
+      </th>
+      <th scope="row" class="text-center">
+        {{ attempts }}
       </th>
       <th scope="row" class="text-center">
         {{#dashurl}} <a href="{{dashurl}}">{{#pix}} i/report, core{{/pix}}</a> {{/dashurl}}
