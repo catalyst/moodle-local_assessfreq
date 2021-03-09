@@ -137,14 +137,30 @@ class renderer extends plugin_renderer_base {
      * @param string $direction The direction to sort the quizzes.
      * @return string $output HTML for the table.
      */
-    public function render_quizzes_inprogress_table(string $search, int $page, string $sorton, string $direction): string {
+    public function render_quizzes_inprogress_table(string $search, int $page, string $sorton, string $direction, int $hoursahead = 0, int $hoursbehind = 0): string {
         $context = \context_system::instance(); // TODO: pass the actual context in from the caller.
         $now = time();
-        $quiz = new quiz();
+        $quiz = new quiz($hoursahead, $hoursbehind);
         $quizzes = $quiz->get_quiz_summaries($now);
         $pagesize = get_user_preferences('local_assessfreq_quiz_table_inprogress_preference', 5);
 
-        list($filtered, $totalrows) = $quiz->filter_quizzes($quizzes['inprogress'], $search, $page, $pagesize);
+        $inprogressquizzes = $quizzes['inprogress'];
+        $upcommingquizzes = $quizzes['upcomming'];
+        $finishedquizzes = $quizzes['finished'];
+
+        foreach ($upcommingquizzes as $key=>$upcommingquiz) {
+            foreach ($upcommingquiz as $keyupcomming=>$upcomming) {
+                $inprogressquizzes[$keyupcomming] = $upcomming;
+            }
+        }
+
+        foreach ($finishedquizzes as $key=>$finishedquiz) {
+            foreach ($finishedquiz as $keyfinished=>$finished) {
+                $inprogressquizzes[$keyfinished] = $finished;
+            }
+        }
+
+        list($filtered, $totalrows) = $quiz->filter_quizzes($inprogressquizzes, $search, $page, $pagesize);
         $sortedquizzes = \local_assessfreq\utils::sort($filtered, $sorton, $direction);
 
         $pagingbar = new \paging_bar($totalrows, $page, $pagesize, '/');
@@ -282,6 +298,9 @@ class renderer extends plugin_renderer_base {
      */
     private function render_quiz_refresh_button(): string {
         $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
+        $preferencehoursahead = get_user_preferences('local_assessfreq_quizzes_inprogress_table_hoursahead_preference', 0);
+        $preferencehoursbehind = get_user_preferences('local_assessfreq_quizzes_inprogress_table_hoursbehind_preference', 0);
+
         $refreshminutes = array(
             60 => 'minuteone',
             120 => 'minutetwo',
@@ -289,9 +308,18 @@ class renderer extends plugin_renderer_base {
             600 => 'minuteten',
         );
 
+        $hours = array(
+            0 => 'hours0',
+            1 => 'hours1',
+            4 => 'hours4',
+            8 => 'hours8',
+        );
+
         $context = array(
             'refreshinitial' => get_string($refreshminutes[$preferencerefresh], 'local_assessfreq'),
             'refresh' => array($refreshminutes[$preferencerefresh] => 'true'),
+            'hoursahead' => array($hours[$preferencehoursahead] => 'true'),
+            'hoursbehind' => array($hours[$preferencehoursbehind] => 'true'),
         );
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-controls', $context);
@@ -364,6 +392,7 @@ class renderer extends plugin_renderer_base {
         );
 
         $hours = array(
+            0 => 'hours0',
             1 => 'hours1',
             4 => 'hours4',
             8 => 'hours8',

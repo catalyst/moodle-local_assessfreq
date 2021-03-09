@@ -85,6 +85,18 @@ function local_assessfreq_user_preferences() {
         'type' => PARAM_INT
     );
 
+    $preferences['local_assessfreq_quizzes_inprogress_table_hoursahead_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 0,
+        'type' => PARAM_INT
+    );
+
+    $preferences['local_assessfreq_quizzes_inprogress_table_hoursbehind_preference'] = array(
+        'null' => NULL_NOT_ALLOWED,
+        'default' => 0,
+        'type' => PARAM_INT
+    );
+
     $preferences['local_assessfreq_quiz_table_inprogress_preference'] = array(
         'null' => NULL_NOT_ALLOWED,
         'default' => 20,
@@ -279,9 +291,11 @@ function local_assessfreq_output_fragment_get_quizzes_inprogress_table($args): s
     $search = is_null($data->search) ? '' : $data->search;
     $sorton = is_null($data->sorton) ? 'name' : $data->sorton;
     $direction = is_null($data->direction) ? 'asc' : $data->direction;
+    $hoursahead = (int)$data->hoursahead;
+    $hoursbehind = (int)$data->hoursbehind;
 
     $output = $PAGE->get_renderer('local_assessfreq');
-    $o = $output->render_quizzes_inprogress_table($search, $data->page, $sorton, $direction);
+    $o = $output->render_quizzes_inprogress_table($search, $data->page, $sorton, $direction, $hoursahead, $hoursbehind);
 
     return $o;
 }
