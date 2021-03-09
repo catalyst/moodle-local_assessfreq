@@ -32,6 +32,8 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     var refreshPeriod = 60;
     var counterid;
     var tablesort = 'name_asc';
+    var hoursAhead = 1;
+    var hoursBehind = 1;
 
     const cards = [
         {cardId: 'local-assessfreq-quiz-summary-upcomming-graph', call: 'upcomming_quizzes', aspect: true},
@@ -290,7 +292,10 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         let sorton = sortarray[0];
         let direction = sortarray[1];
 
-        let params = {'data': JSON.stringify({'search': search, 'page': page, 'sorton': sorton, 'direction': direction})};
+        let params = {'data': JSON.stringify(
+            {'search': search, 'page': page, 'sorton': sorton, 'direction': direction,
+                'hoursahead': hoursAhead, 'hoursbehind': hoursBehind}
+            )};
 
         spinner.classList.remove('hide'); // Show sinner if not already shown.
 
@@ -385,6 +390,42 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     };
 
     /**
+     * Process the hours ahead event from the in progress quizzes table.
+     */
+    const quizzesAheadSet = function(event) {
+        event.preventDefault();
+        if (event.target.tagName.toLowerCase() === 'a') {
+            let hours = event.target.dataset.metric;
+            setUserPreference('local_assessfreq_quizzes_inprogress_table_hoursahead_preference', hours)
+                .then(() => {
+                    hoursAhead = hours;
+                    processDashboard(); // Reload the table.
+                })
+                .fail(() => {
+                    Notification.exception(new Error('Failed to update user preference: hours ahead'));
+                });
+        }
+    };
+
+    /**
+     * Process the hours behind event from the in progress quizzes table.
+     */
+    const quizzesBehindSet = function(event) {
+        event.preventDefault();
+        if (event.target.tagName.toLowerCase() === 'a') {
+            let hours = event.target.dataset.metric;
+            setUserPreference('local_assessfreq_quizzes_inprogress_table_hoursbehind_preference', hours)
+                .then(() => {
+                    hoursBehind = hours;
+                    processDashboard(); // Reload the table.
+                })
+                .fail(() => {
+                    Notification.exception(new Error('Failed to update user preference: hours behind'));
+                });
+        }
+    };
+
+    /**
      * Initialise method for quizzes in progress dashboard rendering.
      */
     DashboardQuizInprogress.init = function(context) {
@@ -417,6 +458,13 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
 
         let upcommingZoom = document.getElementById('local-assessfreq-quiz-summary-upcomming-graph-zoom');
         upcommingZoom.addEventListener('click', triggerZoomGraph);
+
+        // Set up behind and ahead quizzes event listeners.
+        let quizzesAheadElement = document.getElementById('local-assessfreq-quiz-student-table-hoursahead');
+        quizzesAheadElement.addEventListener('click', quizzesAheadSet);
+
+        let quizzesBehindElement = document.getElementById('local-assessfreq-quiz-student-table-hoursbehind');
+        quizzesBehindElement.addEventListener('click', quizzesBehindSet);
 
         processDashboard();
 

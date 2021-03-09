@@ -65,6 +65,7 @@ $string['entersearch'] = 'Enter search text';
 $string['entersearchquiz'] = 'Search by quiz or course name';
 $string['findcourse'] = 'Find course';
 $string['finished'] = 'Finished';
+$string['hours0'] = 'Now';
 $string['hours1'] = '1 Hour';
 $string['hours4'] = '4 Hours';
 $string['hours8'] = '8 Hours';
