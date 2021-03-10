@@ -54,15 +54,15 @@ class all_participants_inprogress {
         $upcommingquizzes = $quizzes['upcomming'];
         $finishedquizzes = $quizzes['finished'];
 
-        foreach ($upcommingquizzes as $key=>$upcommingquiz) {
-            foreach ($upcommingquiz as $keyupcomming=>$upcomming) {
-                $inprogressquizzes[$keyupcomming] = $upcomming;
+        foreach ($upcommingquizzes as $timestamp => $upcommingquiz) {
+            foreach ($upcommingquiz as $timestampupcomming => $upcomming) {
+                $inprogressquizzes[$timestampupcomming] = $upcomming;
             }
         }
 
-        foreach ($finishedquizzes as $key=>$finishedquiz) {
-            foreach ($finishedquiz as $keyfinished=>$finished) {
-                $inprogressquizzes[$keyfinished] = $finished;
+        foreach ($finishedquizzes as $timestamp => $finishedquiz) {
+            foreach ($finishedquiz as $timestampfinished => $finished) {
+                $inprogressquizzes[$timestampfinished] = $finished;
             }
         }
 
