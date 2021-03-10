@@ -170,7 +170,9 @@ function(Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
             let cardElement = document.getElementById(cardData.cardId);
             let spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
             let chartbody = cardElement.getElementsByClassName('chart-body')[0];
-            let params = {'data': JSON.stringify({'call': cardData.call})};
+            let params = {
+                'data': JSON.stringify({'call': cardData.call, 'hoursahead': hoursAhead, 'hoursbehind': hoursBehind
+            })};
 
             spinner.classList.remove('hide'); // Show sinner if not already shown.
             Fragment.loadFragment('local_assessfreq', 'get_quiz_inprogress_chart', contextid, params)

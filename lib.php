@@ -199,7 +199,12 @@ function local_assessfreq_output_fragment_get_quiz_inprogress_chart($args): stri
 
     $assesschart = new $classname();
     $now = time();
-    $chart = $assesschart->$methodname($now);
+
+    if ($methodname == 'get_all_participants_inprogress_chart') {
+        $chart = $assesschart->$methodname($now, $data->hoursahead, $data->hoursbehind);
+    } else {
+        $chart = $assesschart->$methodname($now);
+    }
 
     $chartdata = json_encode($chart);
     return $chartdata;
