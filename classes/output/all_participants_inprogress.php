@@ -44,18 +44,34 @@ class all_participants_inprogress {
      * @param int $now Timestamp to get chart data for.
      * @return array With Generated chart object and chart data status.
      */
-    public function get_all_participants_inprogress_chart(int $now): array {
+    public function get_all_participants_inprogress_chart(int $now, int $hoursahead = 0, int $hoursbehind = 0): array {
 
         // Get quizzes for the supplied timestamp.
-        $quiz = new quiz();
+        $quiz = new quiz($hoursahead, $hoursbehind);
         $quizzes = $quiz->get_quiz_summaries($now);
+
+        $inprogressquizzes = $quizzes['inprogress'];
+        $upcommingquizzes = $quizzes['upcomming'];
+        $finishedquizzes = $quizzes['finished'];
+
+        foreach ($upcommingquizzes as $key=>$upcommingquiz) {
+            foreach ($upcommingquiz as $keyupcomming=>$upcomming) {
+                $inprogressquizzes[$keyupcomming] = $upcomming;
+            }
+        }
+
+        foreach ($finishedquizzes as $key=>$finishedquiz) {
+            foreach ($finishedquiz as $keyfinished=>$finished) {
+                $inprogressquizzes[$keyfinished] = $finished;
+            }
+        }
 
         $notloggedin = 0;
         $loggedin = 0;
         $inprogress = 0;
         $finished = 0;
 
-        foreach ($quizzes['inprogress'] as $quizobj) {
+        foreach ($inprogressquizzes as $quizobj) {
             if (!empty($quizobj->tracking)) {
                 $notloggedin += $quizobj->tracking->notloggedin;
                 $loggedin += $quizobj->tracking->loggedin;
