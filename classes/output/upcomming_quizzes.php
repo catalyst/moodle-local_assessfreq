@@ -68,9 +68,17 @@ class upcomming_quizzes {
                 $participantcount += $quiz->participants;
             }
 
+            // Check if inprogress quizzes are upcomming quizzes with overrides.
+            foreach ($quizzes['inprogress'] as $inprogress) {
+                if ($inprogress->timestampopen >= $timestamp && $inprogress->timestampopen < $timestamp + HOURSECS) {
+                    $quizcount++;
+                    $participantcount += $inprogress->participants;
+                }
+            }
+
             $quizseriesdata[] = $quizcount;
             $participantseriesdata[] = $participantcount;
-            $labels[] = userdate($timestamp, get_string('inprogressdatetime', 'local_assessfreq'));
+            $labels[] = userdate($timestamp + HOURSECS, get_string('inprogressdatetime', 'local_assessfreq'));
         }
 
         // Create chart object.
