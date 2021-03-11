@@ -32,8 +32,8 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
     var refreshPeriod = 60;
     var counterid;
     var tablesort = 'name_asc';
-    var hoursAhead = 1;
-    var hoursBehind = 1;
+    var hoursAhead = 0;
+    var hoursBehind = 0;
 
     const cards = [
         {cardId: 'local-assessfreq-quiz-summary-upcomming-graph', call: 'upcomming_quizzes', aspect: true},
@@ -473,6 +473,22 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         .fail(() => {
             Notification.exception(new Error('Failed to get use preference: tablesort'));
         });
+
+        getUserPreference('local_assessfreq_quizzes_inprogress_table_hoursahead_preference')
+            .then((response) => {
+                hoursAhead = response.preferences[0].value ? response.preferences[0].value : 0;
+            })
+            .fail(() => {
+                Notification.exception(new Error('Failed to get use preference: hoursahead'));
+            });
+
+        getUserPreference('local_assessfreq_quizzes_inprogress_table_hoursbehind_preference')
+            .then((response) => {
+                hoursBehind = response.preferences[0].value ? response.preferences[0].value : 0;
+            })
+            .fail(() => {
+                Notification.exception(new Error('Failed to get use preference: hoursbehind'));
+            });
 
         // Event handling for refresh and period buttons.
         let refreshElement = document.getElementById('local-assessfreq-period-container');
