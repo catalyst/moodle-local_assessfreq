@@ -28,6 +28,7 @@
             aria-label="{{# str }} hoursbehind, local_assessfreq {{/ str }}" aria-controls="hoursbehindfilter">
         {{#pix}} i/previous {{/pix}} {{# str }} hoursbehind, local_assessfreq {{/ str }}
         <span class="sr-only" data-active-item-text>
+                {{# str }} hours0, local_assessfreq {{/ str }}
                 {{# str }} hours1, local_assessfreq {{/ str }}
                 {{# str }} hours4, local_assessfreq {{/ str }}
                 {{# str }} hours8, local_assessfreq {{/ str }}
@@ -35,6 +36,15 @@
     </button>
     <div id="hoursbehindfilter" role="menu" class="dropdown-menu" data-show-active-item>
         <h6 class="dropdown-header">{{# str }} hoursbehind, local_assessfreq {{/ str }}</h6>
+        <a
+                class="dropdown-item {{#hoursbehind}}{{#hours0}}active{{/hours0}}{{/hoursbehind}}"
+                href="#"
+                data-metric="0"
+                aria-label="{{# str }} hours0, local_assessfreq {{/ str }}"
+                role="menuitem"
+        >
+            {{# str }} hours0, local_assessfreq {{/ str }}
+        </a>
         <a
             class="dropdown-item {{#hoursbehind}}{{#hours1}}active{{/hours1}}{{/hoursbehind}}"
             href="#"

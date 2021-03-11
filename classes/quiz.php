@@ -478,6 +478,10 @@ class quiz {
                         $quizdata->overrides = $quiz->overrides;
                     }
 
+                    // Get tracked users for quiz.
+                    $trackedrecords = $this->get_quiz_tracking($quiz->id);
+                    $quizdata->tracking = array_pop($trackedrecords);
+
                     $quizzes['upcomming'][$time][$quiz->id] = $quizdata;
                     unset($trackedquizzes[$quiz->id]);
                 } else {
@@ -491,6 +495,10 @@ class quiz {
                         if (isset($quiz->overrides)) {
                             $quizdata->overrides = $quiz->overrides;
                         }
+
+                        // Get tracked users for quiz.
+                        $trackedrecords = $this->get_quiz_tracking($quiz->id);
+                        $quizdata->tracking = array_pop($trackedrecords);
 
                         $quizzes['inprogress'][$quiz->id] = $quizdata;
                         unset($trackedquizzes[$quiz->id]);
@@ -518,6 +526,10 @@ class quiz {
                     if (isset($quiz->overrides)) {
                         $quizdata->overrides = $quiz->overrides;
                     }
+
+                    // Get tracked users for quiz.
+                    $trackedrecords = $this->get_quiz_tracking($quiz->id);
+                    $quizdata->tracking = array_pop($trackedrecords);
 
                     $quizzes['finished'][$time][$quiz->id] = $quizdata;
                     unset($trackedquizzes[$quiz->id]);
