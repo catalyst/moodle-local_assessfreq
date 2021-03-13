@@ -471,6 +471,7 @@ function($, FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, 
                 summarySpinner.classList.add('hide');
                 let contentcontainer = document.getElementById('local-assessfreq-quiz-summary-card-content');
                 Templates.replaceNodeContents(contentcontainer, html, '');
+                $('[data-toggle="tooltip"]').tooltip();
             }).fail(() => {
                 Notification.exception(new Error('Failed to load quiz summary template.'));
                 return;
@@ -490,6 +491,8 @@ function($, FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, 
             tableSearchInputElement.addEventListener('paste', tableSearch);
             tableSearchResetElement.addEventListener('click', tableSearchReset);
             tableSearchRowsElement.addEventListener('click', tableSearchRowSet);
+
+            $('[data-toggle="tooltip"]').tooltip();
 
             return;
         }).fail(() => {
