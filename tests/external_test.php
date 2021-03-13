@@ -355,8 +355,6 @@ class external_testcase extends advanced_testcase {
         $this->assertEquals(2, $eventarr['overrideparticipants']);
         $this->assertEquals(2, $eventarr['typecount']);
         $this->assertEquals(6, $eventarr['questioncount']);
-        $this->assertContains('essay', $eventarr['types']);
-        $this->assertContains('shortanswer', $eventarr['types']);
     }
 
     /**
