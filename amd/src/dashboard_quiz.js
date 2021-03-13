@@ -460,7 +460,7 @@ function(FormModal, Ajax, Notification, Str, Fragment, Templates, ZoomModal, Ove
             Templates.render('local_assessfreq/quiz-summary-card-content', quizArray).done((html) => {
                 summarySpinner.classList.add('hide');
                 let contentcontainer = document.getElementById('local-assessfreq-quiz-summary-card-content');
-                Templates.replaceNodeContents(contentcontainer, html);
+                Templates.replaceNodeContents(contentcontainer, html, '');
             }).fail(() => {
                 Notification.exception(new Error('Failed to load quiz summary template.'));
                 return;

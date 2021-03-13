@@ -180,14 +180,17 @@ class quiz {
         $questionsrecords = $DB->get_records_sql($sql, $params);
 
         foreach ($questionsrecords as $questionrecord) {
-            $types[] = $questionrecord->qtype;
+            $types[] = get_string('pluginname', 'qtype_' . $questionrecord->qtype);
             $questioncount++;
         }
 
-        $types = array_unique($types);
+        $typeswithcounts = array();
+        foreach (array_count_values($types) as $type => $count) {
+            $typeswithcounts[] = array('type' => $type, 'count' => $count);
+        }
 
-        $questions->types = $types;
-        $questions->typecount = count($types);
+        $questions->types = $typeswithcounts;
+        $questions->typecount = count($typeswithcounts);
         $questions->questioncount = $questioncount;
 
         return $questions;

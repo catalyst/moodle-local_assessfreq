@@ -78,7 +78,11 @@
         </tr>
         <tr>
           <td>{{#str}} quizquestiontypes, local_assessfreq {{/str}}</td>
-          <td id="quiz-question-types">{{typecount}}</td>
+          <td id="quiz-question-types" >
+              <span data-toggle="tooltip" data-html="true" title=" {{#types}}{{type}}: {{count}}<br/>{{/types}}">
+                  {{typecount}}
+              </span>
+          </td>
         </tr>
         </tbody>
       </table>
