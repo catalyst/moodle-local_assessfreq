@@ -618,8 +618,6 @@ class quiz_testcase extends advanced_testcase {
 
         $this->assertEquals(2, $result->typecount);
         $this->assertEquals(6, $result->questioncount);
-        $this->assertContains('essay', $result->types);
-        $this->assertContains('shortanswer', $result->types);
 
     }
 
@@ -638,8 +636,6 @@ class quiz_testcase extends advanced_testcase {
         $this->assertEquals(2, $result->overrideparticipants);
         $this->assertEquals(2, $result->typecount);
         $this->assertEquals(6, $result->questioncount);
-        $this->assertContains('essay', $result->types);
-        $this->assertContains('shortanswer', $result->types);
 
     }
 

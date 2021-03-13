@@ -42,6 +42,8 @@ class all_participants_inprogress {
      * used in the in progress quizzes dashboard.
      *
      * @param int $now Timestamp to get chart data for.
+     * @param int $hoursahead Amount of time in hours to look ahead for quizzes starting.
+     * @param int $hoursbehind Amount of time in hours to look behind for quizzes starting.
      * @return array With Generated chart object and chart data status.
      */
     public function get_all_participants_inprogress_chart(int $now, int $hoursahead = 0, int $hoursbehind = 0): array {

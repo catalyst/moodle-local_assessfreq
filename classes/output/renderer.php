@@ -135,6 +135,8 @@ class renderer extends plugin_renderer_base {
      * @param int $page The page number of results.
      * @param string $sorton The value to sort the quizzes by.
      * @param string $direction The direction to sort the quizzes.
+     * @param int $hoursahead Amount of time in hours to look ahead for quizzes starting.
+     * @param int $hoursbehind Amount of time in hours to look behind for quizzes starting.
      * @return string $output HTML for the table.
      */
     public function render_quizzes_inprogress_table(string $search, int $page, string $sorton, string $direction,
