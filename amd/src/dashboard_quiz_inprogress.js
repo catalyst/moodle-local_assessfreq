@@ -350,7 +350,7 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
                 summarySpinner.classList.add('hide');
 
                 let contentcontainer = document.getElementById('local-assessfreq-quiz-dashboard-inprogress-summary-card-content');
-                Templates.replaceNodeContents(contentcontainer, html);
+                Templates.replaceNodeContents(contentcontainer, html, '');
             }).fail(() => {
                 Notification.exception(new Error('Failed to load quiz counts template.'));
                 return;
