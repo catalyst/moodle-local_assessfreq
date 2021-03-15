@@ -422,6 +422,14 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         event.preventDefault();
         if (event.target.tagName.toLowerCase() === 'a') {
             let hours = event.target.dataset.metric;
+            let activeoptions = document.getElementById('local-assessfreq-quiz-student-table-hoursahead')
+                .getElementsByClassName('active');
+
+            // Fix active classes.
+            for (var i = 0; i < activeoptions.length; i++) {
+                activeoptions[i].classList.remove('active');
+            }
+            event.target.classList.add('active');
             setUserPreference('local_assessfreq_quizzes_inprogress_table_hoursahead_preference', hours)
                 .then(() => {
                     hoursAhead = hours;
@@ -440,6 +448,14 @@ function($, Ajax, Templates, Fragment, ZoomModal, Str, Notification) {
         event.preventDefault();
         if (event.target.tagName.toLowerCase() === 'a') {
             let hours = event.target.dataset.metric;
+            let activeoptions = document.getElementById('local-assessfreq-quiz-student-table-hoursbehind')
+                .getElementsByClassName('active');
+
+            // Fix active classes.
+            for (var i = 0; i < activeoptions.length; i++) {
+                activeoptions[i].classList.remove('active');
+            }
+            event.target.classList.add('active');
             setUserPreference('local_assessfreq_quizzes_inprogress_table_hoursbehind_preference', hours)
                 .then(() => {
                     hoursBehind = hours;
