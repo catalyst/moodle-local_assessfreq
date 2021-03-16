@@ -76,7 +76,7 @@ jobs:
           path: plugin
 
       - name: Install node  ${{ matrix.node }}
-        uses: actions/setup-node@v2
+        shell: bash -l {0}
         with:
           node-version: ${{ matrix.node }}
 
