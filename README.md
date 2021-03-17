@@ -11,7 +11,8 @@ The following maps the plugin version to use depending on your Moodle version.
 | ----------------- | ----------- |
 | Moodle 3.5 to 3.8 | MOODLE_35   |
 | Moodle 3.9        | MOODLE_39   |
-| Moodle 3.10+      | master      |
+| Moodle 3.10       | MOODLE_310  |
+| Moodle 3.11+      | master      |
 
 
 ## Plugin Installation ##
