@@ -1,4 +1,4 @@
-name: master branch test
+name: MOODLE_310 branch test
 
 on: [push, pull_request]
 
@@ -43,22 +43,6 @@ jobs:
             node: '14.15'
           - php: '7.3'
             moodle-branch: 'MOODLE_310_STABLE'
-            database: 'pgsql'
-            node: '14.15'
-          - php: '7.3'
-            moodle-branch: 'MOODLE_311_STABLE'
-            database: 'mariadb'
-            node: '14.15'
-          - php: '7.3'
-            moodle-branch: 'MOODLE_311_STABLE'
-            database: 'pgsql'
-            node: '14.15'
-          - php: '7.3'
-            moodle-branch: 'master'
-            database: 'mariadb'
-            node: '14.15'
-          - php: '7.3'
-            moodle-branch: 'master'
             database: 'pgsql'
             node: '14.15'
 
