@@ -36,9 +36,20 @@ require_capability('moodle/site:config', $context);
 
 $dataformat = 'csv';
 $fields = array(
+    get_string('quiztimeopen', 'local_assessfreq'),
     get_string('duedate', 'local_assessfreq'),
     get_string('activity', 'local_assessfreq'),
-    get_string('url', 'local_assessfreq'));
+    get_string('title', 'local_assessfreq'),
+    get_string('url', 'local_assessfreq')
+);
+
+if ($metric == 'students') {
+    $extrafields = get_extra_user_fields($context);
+    $fields[] = get_string('fullname');
+    $fields = array_merge($fields, $extrafields);
+} else {
+    $fields[] = get_string('students', 'local_assessfreq');
+}
 
 $frequency = new \local_assessfreq\frequency();
 $data = $frequency->get_download_data($year, $metric, $modules);
