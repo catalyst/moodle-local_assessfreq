@@ -1298,7 +1298,14 @@ class frequency {
         // Format the data ready for download.
         foreach ($events as $event) {
             $row = array();
-            $context = \context::instance_by_id($event->contextid);
+
+            // Catch exception when context does not exist because assessfreq tables are out of sync.
+            try {
+                $context = \context::instance_by_id($event->contextid);
+            } catch (\dml_missing_record_exception $ex) {
+                continue;
+            }
+
             $activity = get_string('modulename', $event->module);
             $startdate = userdate($event->timestart, get_string('strftimedatetimeshort', 'langconfig'));
             $duedate = userdate($event->timeend, get_string('strftimedatetimeshort', 'langconfig'));
