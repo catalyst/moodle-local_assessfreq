@@ -1031,6 +1031,10 @@ class frequency_testcase extends advanced_testcase {
 
         $this->assertRegexp('/mod\/assign\/view/', $result[0][4]);
         $this->assertRegexp('/mod\/assign\/view/', $result[1][4]);
+
+        // Test number of students for each assessment.
+        $this->assertEquals(2, $result[0][5]);
+        $this->assertEquals(2, $result[1][5]);
     }
 
     /**
