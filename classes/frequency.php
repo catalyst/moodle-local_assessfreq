@@ -1264,6 +1264,8 @@ class frequency {
      * @return array $data The data for the download file.
      */
     public function get_download_data(int $year, string $metric, array $modules) : array {
+        global $DB;
+
         $data = array();
         $events = array();
         $from = mktime(0, 0, 0, 1, 1, $year);
@@ -1296,12 +1298,38 @@ class frequency {
         // Format the data ready for download.
         foreach ($events as $event) {
             $row = array();
+
+            // Catch exception when context does not exist because assessfreq tables are out of sync.
+            try {
+                $context = \context::instance_by_id($event->contextid);
+            } catch (\dml_missing_record_exception $ex) {
+                continue;
+            }
+
             $activity = get_string('modulename', $event->module);
-            $date = userdate($event->timeend, get_string('strftimedatetimeshort', 'langconfig'));
-            $context = \context::instance_by_id($event->contextid);
+            $startdate = userdate($event->timestart, get_string('strftimedatetimeshort', 'langconfig'));
+            $duedate = userdate($event->timeend, get_string('strftimedatetimeshort', 'langconfig'));
+            $name = $context->get_context_name();
             $url = $context->get_url()->out(false);
 
-            $row = array($date, $activity, $url);
+            if ($metric == 'assess') {
+                $usercount = count($this->get_event_users($event->contextid, $event->module));
+                $row = array($startdate, $duedate, $activity, $name, $url, $usercount);
+            } else if ($metric == 'students') {
+                $selects = get_extra_user_fields_sql($context);
+
+                $sql = "SELECT CONCAT(firstname, ' ', lastname) $selects
+                          FROM {user}
+                         WHERE id = ?";
+                $params = [$event->userid];
+                $userfields = $DB->get_record_sql($sql, $params);
+
+                $row = array($startdate, $duedate, $activity, $name, $url);
+
+                foreach ($userfields as $userfield) {
+                    $row[] = $userfield;
+                }
+            }
             $data[] = $row;
         }
 
