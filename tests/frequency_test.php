@@ -138,7 +138,7 @@ class frequency_testcase extends advanced_testcase {
 
         foreach ($result as $record) {
             $this->assertEquals($this->course->id, $record->course);
-            $this->assertContains($record->contextid, $contextids);
+            $this->assertContains(intval($record->contextid), $contextids);
             $this->assertEquals('assign', $record->name);
         }
         $result->close();
@@ -1029,8 +1029,8 @@ class frequency_testcase extends advanced_testcase {
 
         $result = $frequency->get_download_data($year, $metric, $modules);
 
-        $this->assertRegexp('/mod\/assign\/view/', $result[0][4]);
-        $this->assertRegexp('/mod\/assign\/view/', $result[1][4]);
+        $this->assertMatchesRegularExpression('/mod\/assign\/view/', $result[0][4]);
+        $this->assertMatchesRegularExpression('/mod\/assign\/view/', $result[1][4]);
 
         // Test number of students for each assessment.
         $this->assertEquals(2, $result[0][5]);
