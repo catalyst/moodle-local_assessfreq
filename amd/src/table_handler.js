@@ -26,63 +26,71 @@ define([
     'core/fragment',
     'core/notification',
     'core/templates',
-    'local_assessfreq/user_preferences',
-    'local_assessfreq/override_modal',
     'local_assessfreq/debouncer',
-], function(Ajax, Fragment, Notification, Templates, UserPreference, OverrideModal, Debouncer) {
+    'local_assessfreq/override_modal',
+    'local_assessfreq/user_preferences'
+], function(Ajax, Fragment, Notification, Templates, Debouncer, OverrideModal, UserPreference) {
 
     /**
      * Module level variables.
      */
     var TableHandler = {};
-    var quizId;
+
+    var cardElement;
     var contextId;
     var elementId;
-    var cardElement;
-    var SearchElement;
-    var rowPreference;
-    var dashboardType;
     var fragmentValue;
     var hoursFilter;
+    var quizId = 0;
+    var rowPreference;
     var sortValue;
+    var searchElement;
 
     /**
      * Display the table that contains all the students in the exam as well as their attempts.
      *
+     * @param {int} quiz The Quiz Id.
+     * @param {array|null} hours Array with hour ahead or behind preference.
+     * @param {string|null} sortValueTable Sort preference.
+     * @param {int|string} page Page number.
      */
-    TableHandler.getTable = function(page) {
+    TableHandler.getTable = function(quiz, hours = null, sortValueTable = null, page) {
         if (typeof page === "undefined") {
             page = 0;
         }
 
-        let search = document.getElementById(SearchElement).value.trim();
+        let search = document.getElementById(searchElement).value.trim();
         let tableElement = document.getElementById(elementId);
         let spinner = tableElement.getElementsByClassName('overlay-icon-container')[0];
         let tableBody = tableElement.getElementsByClassName('table-body')[0];
         let values = {'search': search, 'page': page};
 
         // Add values to Object depending on dashboard type.
-        if (dashboardType === 'inprogress') {
-            let sortarray = sortValue.split('_');
-            let sorton = sortarray[0];
-            let direction = sortarray[1];
-            values.sorton = sorton;
-            values.direction = direction;
-            values.hoursahead = hoursFilter[0];
-            values.hoursbehind = hoursFilter[1];
-        } else if (dashboardType === 'quiz') {
+        if (quiz > 0) {
+            quizId = quiz;
             values.quiz = quizId;
-        } else if (dashboardType === 'student') {
+        }
+        if (hours) {
+            hoursFilter = hours;
             values.hoursahead = hoursFilter[0];
             values.hoursbehind = hoursFilter[1];
         }
+        if (sortValueTable) {
+            sortValue = sortValueTable;
+            let sortArray = sortValue.split('_');
+            let sortOn = sortArray[0];
+            let direction = sortArray[1];
+            values.sorton = sortOn;
+            values.direction = direction;
+        }
+
         let params = {'data': JSON.stringify(values)};
 
         spinner.classList.remove('hide'); // Show spinner if not already shown.
         Fragment.loadFragment('local_assessfreq', fragmentValue, contextId, params)
             .done((response, js) => {
                 tableBody.innerHTML = response;
-                if (dashboardType === 'inprogress') {
+                if (js) {
                     Templates.runTemplateJS(js); // Magic call the initialises JS from template included in response template HTML.
                 }
                 spinner.classList.add('hide');
@@ -99,7 +107,7 @@ define([
      *
      */
     const debounceTable = Debouncer.debouncer(() => {
-        TableHandler.getTable();
+        TableHandler.getTable(quizId, hoursFilter, sortValue);
     }, 750);
 
     /**
@@ -131,7 +139,7 @@ define([
                 values: JSON.stringify(sortArray)
             },
         }])[0].then(() => {
-            TableHandler.getTable(); // Reload the table.
+            TableHandler.getTable(quizId, hoursFilter, sortValue); // Reload the table.
         });
 
     };
@@ -188,7 +196,7 @@ define([
                 values: JSON.stringify(hideArray)
             },
         }])[0].then(() => {
-            TableHandler.getTable(); // Reload the table.
+            TableHandler.getTable(quizId, hoursFilter, sortValue); // Reload the table.
         });
 
     };
@@ -210,7 +218,7 @@ define([
                 values: JSON.stringify({})
             },
         }])[0].then(() => {
-            TableHandler.getTable(); // Reload the table.
+            TableHandler.getTable(quizId, hoursFilter, sortValue); // Reload the table.
         });
 
     };
@@ -234,10 +242,10 @@ define([
      *
      */
     TableHandler.tableSearchReset = function() {
-        let tableSearchInputElement = document.getElementById(SearchElement);
+        let tableSearchInputElement = document.getElementById(searchElement);
         tableSearchInputElement.value = '';
         tableSearchInputElement.focus();
-        TableHandler.getTable();
+        TableHandler.getTable(quizId, hoursFilter, sortValue);
     };
 
     /**
@@ -251,7 +259,7 @@ define([
             let rows = event.target.dataset.metric;
             UserPreference.setUserPreference(rowPreference, rows)
                 .then(() => {
-                    TableHandler.getTable(); // Reload the table.
+                    TableHandler.getTable(quizId, hoursFilter, sortValue); // Reload the table.
                 })
                 .fail(() => {
                     Notification.exception(new Error('Failed to update user preference: rows'));
@@ -271,7 +279,7 @@ define([
         const page = linkUrl.searchParams.get('page');
 
         if (page) {
-            TableHandler.getTable(page);
+            TableHandler.getTable(quizId, hoursFilter, sortValue, page);
         }
     };
 
@@ -308,42 +316,35 @@ define([
      */
     TableHandler.tableEventListeners = function() {
         const tableElement = document.getElementById(elementId);
-        let tableNavElement;
+        const tableCardElement = document.getElementById(cardElement);
+        const links = tableElement.querySelectorAll('a');
+        const resetLink = tableElement.getElementsByClassName('resettable');
+        const overrideLinks = tableElement.getElementsByClassName('action-icon override');
+        const disabledLinks = tableElement.getElementsByClassName('action-icon disabled');
+        const tableNavElement = tableCardElement.querySelectorAll('nav'); // There are two nav paging elements per table.
 
-        if (dashboardType === 'inprogress') {
-            // Quiz in progress dashboard only requires to get the navigation element.
-            tableNavElement = tableElement.querySelectorAll('nav'); // There are two nav paging elements per table.
-        } else if (dashboardType === 'quiz' || dashboardType === 'student') {
-            const tableCardElement = document.getElementById(cardElement);
-            const links = tableElement.querySelectorAll('a');
-            const resetlink = tableElement.getElementsByClassName('resettable');
-            const overrideLinks = tableElement.getElementsByClassName('action-icon override');
-            const disabledLinks = tableElement.getElementsByClassName('action-icon disabled');
-            tableNavElement = tableCardElement.querySelectorAll('nav'); // There are two nav paging elements per table.
-
-            for (let i = 0; i < links.length; i++) {
-                let linkUrl = new URL(links[i].href);
-                if (linkUrl.search.indexOf('thide') !== -1 || linkUrl.search.indexOf('tshow') !== -1) {
-                    links[i].addEventListener('click', TableHandler.tableHide);
-                } else if (linkUrl.search.indexOf('tsort') !== -1) {
-                    links[i].addEventListener('click', TableHandler.tableSort);
-                }
-
+        for (let i = 0; i < links.length; i++) {
+            let linkUrl = new URL(links[i].href);
+            if (linkUrl.search.indexOf('thide') !== -1 || linkUrl.search.indexOf('tshow') !== -1) {
+                links[i].addEventListener('click', TableHandler.tableHide);
+            } else if (linkUrl.search.indexOf('tsort') !== -1) {
+                links[i].addEventListener('click', TableHandler.tableSort);
             }
 
-            if (resetlink.length > 0) {
-                resetlink[0].addEventListener('click', TableHandler.tableReset);
-            }
+        }
 
-            for (let i = 0; i < overrideLinks.length; i++) {
-                overrideLinks[i].addEventListener('click', TableHandler.triggerOverrideModal);
-            }
+        if (resetLink.length > 0) {
+            resetLink[0].addEventListener('click', TableHandler.tableReset);
+        }
 
-            for (let i = 0; i < disabledLinks.length; i++) {
-                disabledLinks[i].addEventListener('click', (event) => {
-                    event.preventDefault();
-                });
-            }
+        for (let i = 0; i < overrideLinks.length; i++) {
+            overrideLinks[i].addEventListener('click', TableHandler.triggerOverrideModal);
+        }
+
+        for (let i = 0; i < disabledLinks.length; i++) {
+            disabledLinks[i].addEventListener('click', (event) => {
+                event.preventDefault();
+            });
         }
 
         tableNavElement.forEach((navElement) => {
@@ -368,35 +369,26 @@ define([
      *
      * @param {int} quiz The quiz id.
      * @param {int} context The context id.
-     * @param {string} tableDashboardType The dashboard type to handle (inprogress, quiz or student).
-     * @param {string} tableElementId The table element id.
      * @param {string} tableCardElement The table card element.
-     * @param {string} tableSearchElement The table search element.
-     * @param {string} tableRowPreference The table row preference.
+     * @param {string} tableElementId The table element id.
      * @param {string} tableFragmentValue The table fragment value.
-     * @param {array|null} tableHoursFilter Array with hour ahead or behind preference.
-     * @param {string|null} tableSortValue The table sort preference.
+     * @param {string} tableRowPreference The table row preference.
+     * @param {string} tableSearchElement The table search element.
      */
     TableHandler.init = function(quiz,
                                  context,
-                                 tableDashboardType,
-                                 tableElementId,
                                  tableCardElement,
-                                 tableSearchElement,
-                                 tableRowPreference,
+                                 tableElementId,
                                  tableFragmentValue,
-                                 tableHoursFilter = null,
-                                 tableSortValue = null) {
+                                 tableRowPreference,
+                                 tableSearchElement) {
         quizId = quiz;
         contextId = context;
-        dashboardType = tableDashboardType;
-        elementId = tableElementId;
         cardElement = tableCardElement;
-        SearchElement = tableSearchElement;
-        rowPreference = tableRowPreference;
+        elementId = tableElementId;
         fragmentValue = tableFragmentValue;
-        hoursFilter = tableHoursFilter;
-        sortValue = tableSortValue;
+        rowPreference = tableRowPreference;
+        searchElement = tableSearchElement;
     };
 
     return TableHandler;
