@@ -226,7 +226,9 @@ define([
             'local-assessfreq-quiz-table',
             'get_student_table',
             'local_assessfreq_quiz_table_rows_preference',
-            'local-assessfreq-quiz-student-table-search'
+            'local-assessfreq-quiz-student-table-search',
+            'local_assessfreq_student_table',
+            'local_assessfreq_set_table_preference'
         );
         ChartData.init(cards, context, 'get_quiz_chart', 'local_assessfreq/chart');
         Str.get_string('loadingquiztitle', 'local_assessfreq').then((str) => {

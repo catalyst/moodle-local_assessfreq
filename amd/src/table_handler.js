@@ -42,9 +42,24 @@ define([
     var fragmentValue;
     var hoursFilter;
     var quizId = 0;
+    var overridden = false;
     var rowPreference;
     var sortValue;
     var searchElement;
+
+    /**
+     * Table id variable.
+     *
+     * @type {string}
+     */
+    var id;
+
+    /**
+     * Table method name variable.
+     *
+     * @type {string}
+     */
+    var methodName;
 
     /**
      * Display the table that contains all the students in the exam as well as their attempts.
@@ -52,12 +67,14 @@ define([
      * @param {int} quiz The Quiz Id.
      * @param {array|null} hours Array with hour ahead or behind preference.
      * @param {string|null} sortValueTable Sort preference.
-     * @param {int|string} page Page number.
+     * @param {int|string|null} page Page number.
      */
     TableHandler.getTable = function(quiz, hours = null, sortValueTable = null, page) {
-        if (typeof page === "undefined") {
+        if (typeof page === "undefined" || overridden === true) {
             page = 0;
         }
+
+        overridden = false;
 
         let search = document.getElementById(searchElement).value.trim();
         let tableElement = document.getElementById(elementId);
@@ -132,9 +149,9 @@ define([
 
         // Set option via ajax.
         Ajax.call([{
-            methodname: 'local_assessfreq_set_table_preference',
+            methodname: methodName,
             args: {
-                tableid: 'local_assessfreq_student_table',
+                tableid: id,
                 preference: 'sortby',
                 values: JSON.stringify(sortArray)
             },
@@ -189,9 +206,9 @@ define([
 
         // Set option via ajax.
         Ajax.call([{
-            methodname: 'local_assessfreq_set_table_preference',
+            methodname: methodName,
             args: {
-                tableid: 'local_assessfreq_student_table',
+                tableid: id,
                 preference: 'collapse',
                 values: JSON.stringify(hideArray)
             },
@@ -202,7 +219,7 @@ define([
     };
 
     /**
-     * Process the reset click event from the student table.
+     * Process the reset click event from the table.
      *
      * @param {Event} event The triggered event for the element.
      */
@@ -211,9 +228,9 @@ define([
 
         // Set option via ajax.
         Ajax.call([{
-            methodname: 'local_assessfreq_set_table_preference',
+            methodname: methodName,
             args: {
-                tableid: 'local_assessfreq_student_table',
+                tableid: id,
                 preference: 'reset',
                 values: JSON.stringify({})
             },
@@ -364,9 +381,14 @@ define([
      */
     TableHandler.triggerOverrideModal = function(event) {
         event.preventDefault();
-        const userid = event.target.closest('a').id.substring(25);
+        let userid = event.target.closest('a').id.substring(25);
+        if (userid.includes('-')) {
+            let elements = userid.split('-');
+            quizId = elements.pop();
+            userid = elements.pop();
+        }
 
-        OverrideModal.displayModalForm(quizId, userid);
+        OverrideModal.displayModalForm(quizId, userid, hoursFilter);
     };
 
     /**
@@ -379,6 +401,8 @@ define([
      * @param {string} tableFragmentValue The table fragment value.
      * @param {string} tableRowPreference The table row preference.
      * @param {string} tableSearchElement The table search element.
+     * @param {string|null} tableId The table id.
+     * @param {string|null} tableMethodName The table method name.
      */
     TableHandler.init = function(quiz,
                                  context,
@@ -386,7 +410,9 @@ define([
                                  tableElementId,
                                  tableFragmentValue,
                                  tableRowPreference,
-                                 tableSearchElement) {
+                                 tableSearchElement,
+                                 tableId = null,
+                                 tableMethodName = null) {
         quizId = quiz;
         contextId = context;
         cardElement = tableCardElement;
@@ -394,6 +420,8 @@ define([
         fragmentValue = tableFragmentValue;
         rowPreference = tableRowPreference;
         searchElement = tableSearchElement;
+        id = tableId;
+        methodName = tableMethodName;
     };
 
     return TableHandler;
