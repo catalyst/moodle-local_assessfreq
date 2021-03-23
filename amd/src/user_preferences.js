@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @module     local_assessfreq/user_preferences
  */
-define(['core/ajax'], function(Ajax) {
+define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
 
     return {
         /**
@@ -39,7 +39,10 @@ define(['core/ajax'], function(Ajax) {
                 }
             };
 
-            return Ajax.call([request])[0];
+            return Ajax.call([request])[0]
+            .fail(() => {
+                Notification.exception(new Error('Failed to update user preference'));
+            });
         },
 
         /**
