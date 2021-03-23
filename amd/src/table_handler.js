@@ -316,35 +316,40 @@ define([
      */
     TableHandler.tableEventListeners = function() {
         const tableElement = document.getElementById(elementId);
-        const tableCardElement = document.getElementById(cardElement);
-        const links = tableElement.querySelectorAll('a');
-        const resetLink = tableElement.getElementsByClassName('resettable');
-        const overrideLinks = tableElement.getElementsByClassName('action-icon override');
-        const disabledLinks = tableElement.getElementsByClassName('action-icon disabled');
-        const tableNavElement = tableCardElement.querySelectorAll('nav'); // There are two nav paging elements per table.
+        let tableNavElement;
+        if (cardElement) {
+            const tableCardElement = document.getElementById(cardElement);
+            const links = tableElement.querySelectorAll('a');
+            const resetLink = tableElement.getElementsByClassName('resettable');
+            const overrideLinks = tableElement.getElementsByClassName('action-icon override');
+            const disabledLinks = tableElement.getElementsByClassName('action-icon disabled');
+            tableNavElement = tableCardElement.querySelectorAll('nav'); // There are two nav paging elements per table.
 
-        for (let i = 0; i < links.length; i++) {
-            let linkUrl = new URL(links[i].href);
-            if (linkUrl.search.indexOf('thide') !== -1 || linkUrl.search.indexOf('tshow') !== -1) {
-                links[i].addEventListener('click', TableHandler.tableHide);
-            } else if (linkUrl.search.indexOf('tsort') !== -1) {
-                links[i].addEventListener('click', TableHandler.tableSort);
+            for (let i = 0; i < links.length; i++) {
+                let linkUrl = new URL(links[i].href);
+                if (linkUrl.search.indexOf('thide') !== -1 || linkUrl.search.indexOf('tshow') !== -1) {
+                    links[i].addEventListener('click', TableHandler.tableHide);
+                } else if (linkUrl.search.indexOf('tsort') !== -1) {
+                    links[i].addEventListener('click', TableHandler.tableSort);
+                }
+
             }
 
-        }
+            if (resetLink.length > 0) {
+                resetLink[0].addEventListener('click', TableHandler.tableReset);
+            }
 
-        if (resetLink.length > 0) {
-            resetLink[0].addEventListener('click', TableHandler.tableReset);
-        }
+            for (let i = 0; i < overrideLinks.length; i++) {
+                overrideLinks[i].addEventListener('click', TableHandler.triggerOverrideModal);
+            }
 
-        for (let i = 0; i < overrideLinks.length; i++) {
-            overrideLinks[i].addEventListener('click', TableHandler.triggerOverrideModal);
-        }
-
-        for (let i = 0; i < disabledLinks.length; i++) {
-            disabledLinks[i].addEventListener('click', (event) => {
-                event.preventDefault();
-            });
+            for (let i = 0; i < disabledLinks.length; i++) {
+                disabledLinks[i].addEventListener('click', (event) => {
+                    event.preventDefault();
+                });
+            }
+        } else {
+            tableNavElement = tableElement.querySelectorAll('nav');
         }
 
         tableNavElement.forEach((navElement) => {
