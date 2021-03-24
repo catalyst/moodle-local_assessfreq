@@ -33,6 +33,7 @@ function($,Str, ModalFactory, ModalEvents, Fragment, Ajax) {
     var callback;
     var quizid;
     var userid;
+    var hoursFilter;
 
     const spinner = '<p class="text-center">'
         + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
@@ -131,7 +132,11 @@ function($,Str, ModalFactory, ModalEvents, Fragment, Ajax) {
             // For submission succeeded.
             modalObj.setBody(spinner);
             modalObj.hide();
-            callback(quizid);
+            if (hoursFilter) {
+                callback(quizid, hoursFilter);
+            } else {
+                callback(quizid);
+            }
         }).fail(() => {
             // Form submission failed server side, redisplay with errors.
             updateModalBody(quizid, userid, overrideform);
@@ -141,9 +146,10 @@ function($,Str, ModalFactory, ModalEvents, Fragment, Ajax) {
     /**
      * Display the Modal form.
      */
-    OverrideModal.displayModalForm = function(quiz, user) {
+    OverrideModal.displayModalForm = function(quiz, user, hours = null) {
         quizid = quiz;
         userid = user;
+        hoursFilter = hours;
         updateModalBody(quiz, user);
         modalObj.show();
     };
@@ -151,9 +157,10 @@ function($,Str, ModalFactory, ModalEvents, Fragment, Ajax) {
     /**
      * Initialise method for quiz dashboard rendering.
      */
-    OverrideModal.init = function(context, callbackFunction) {
+    OverrideModal.init = function(context, callbackFunction, hours = null) {
         contextid = context;
         callback = callbackFunction;
+        hoursFilter = hours;
         createModal();
     };
 
