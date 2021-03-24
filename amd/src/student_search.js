@@ -22,13 +22,12 @@
  */
 
 define([
-    'core/ajax',
-    'core/fragment',
+    'jquery',
     'core/notification',
     'local_assessfreq/override_modal',
     'local_assessfreq/table_handler',
     'local_assessfreq/user_preferences',
-    ], function(Ajax, Fragment, Notification, OverrideModal, TableHandler, UserPreference) {
+    ], function($, Notification, OverrideModal, TableHandler, UserPreference) {
 
     /**
      * Module level variables.
@@ -173,24 +172,25 @@ define([
         tableSearchBehindElement.addEventListener('click', tableSearchBehindSet);
         refreshElement.addEventListener('click', refreshAction);
 
-        UserPreference.getUserPreference('local_assessfreq_student_search_table_hoursahead_preference')
+        $.when(
+            UserPreference.getUserPreference('local_assessfreq_student_search_table_hoursahead_preference')
             .then((response) => {
                 hoursAhead = response.preferences[0].value ? response.preferences[0].value : 4;
             })
             .fail(() => {
                 Notification.exception(new Error('Failed to get use preference: hoursahead'));
-            });
-
-        UserPreference.getUserPreference('local_assessfreq_student_search_table_hoursbehind_preference')
+            }),
+            UserPreference.getUserPreference('local_assessfreq_student_search_table_hoursbehind_preference')
             .then((response) => {
                 hoursBehind = response.preferences[0].value ? response.preferences[0].value : 1;
-                // Render the student search table.
-                TableHandler.getTable(0, [hoursAhead, hoursBehind], null);
-                OverrideModal.init(context, TableHandler.getTable, [hoursAhead, hoursBehind]);
             })
             .fail(() => {
-                Notification.exception(new Error('Failed to get use preference: hoursbehind'));
-            });
+                Notification.exception(new Error('Failed to get use preference: hoursahead'));
+            })
+        ).done(function() {
+            TableHandler.getTable(0, [hoursAhead, hoursBehind], null);
+            OverrideModal.init(context, TableHandler.getTable, [hoursAhead, hoursBehind]);
+        });
     };
 
     return StudentSearch;
