@@ -14,34 +14,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * User preferences JS module.
+ * Debounce JS module.
  *
+ * @module     local_assessfreq/debouncer
  * @package    local_assessfreq
  * @copyright  2020 Guillermo Gomez <guillermogomez@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @module     local_assessfreq/debouncer
+ *
  */
-define([], function() {
 
-    return {
-        /**
-         * Quick and dirty debounce method for the settings.
-         * This stops the ajax method that updates the table from being updated
-         * while the user is still checking options.
-         *
-         */
-        debouncer: function(func, wait) {
-            let timeout;
+/**
+ * Quick and dirty debounce method for the settings.
+ * This stops the ajax method that updates the table from being updated
+ * while the user is still checking options.
+ *
+ * @method debouncer
+ * @param {function} func The function we want to keep calling.
+ * @param {number} wait Our timeout.
+ * @return {function}
+ */
+export const debouncer = (func, wait) => {
+    let timeout;
 
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
 
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
     };
-});
+};
