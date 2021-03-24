@@ -16,50 +16,51 @@
 /**
  * User preferences JS module.
  *
+ * @module     local_assessfreq/user_preferences
  * @package    local_assessfreq
  * @copyright  2020 Guillermo Gomez <guillermogomez@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @module     local_assessfreq/user_preferences
  */
-define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
 
-    return {
-        /**
-         * Generic handler to persist user preferences.
-         *
-         * @param {string} type The name of the attribute you're updating
-         * @param {string} value The value of the attribute you're updating
-         * @return {object} jQuery promise
-         */
-        setUserPreference: function(type, value) {
-            var request = {
-                methodname: 'core_user_update_user_preferences',
-                args: {
-                    preferences: [{type: type, value: value}]
-                }
-            };
+import Ajax from 'core/ajax';
+import Notification from 'core/notification';
 
-            return Ajax.call([request])[0]
-            .fail(() => {
-                Notification.exception(new Error('Failed to update user preference'));
-            });
-        },
-
-        /**
-         * Generic handler to get user preference.
-         *
-         * @param {string} name The name of the attribute you're getting.
-         * @return {object} jQuery promise
-         */
-        getUserPreference: function(name) {
-            var request = {
-                methodname: 'core_user_get_user_preferences',
-                args: {
-                    'name': name
-                }
-            };
-
-            return Ajax.call([request])[0];
+/**
+ * Generic handler to persist user preferences.
+ *
+ * @method setUserPreference
+ * @param {string} type The name of the attribute you're updating
+ * @param {string} value The value of the attribute you're updating
+ * @return {promise} jQuery promise
+ */
+export const setUserPreference = (type, value) => {
+    const request = {
+        methodname: 'core_user_update_user_preferences',
+        args: {
+            preferences: [{type: type, value: value}]
         }
     };
-});
+
+    return Ajax.call([request])[0]
+    .fail(() => {
+        Notification.exception(new Error('Failed to update user preference'));
+    });
+};
+
+/**
+ * Generic handler to get user preference.
+ *
+ * @method getUserPreference
+ * @param {string} name The name of the attribute you're getting.
+ * @return {promise} jQuery promise
+ */
+export const getUserPreference = (name) => {
+    const request = {
+        methodname: 'core_user_get_user_preferences',
+        args: {
+            'name': name
+        }
+    };
+
+    return Ajax.call([request])[0];
+};
