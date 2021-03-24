@@ -16,102 +16,102 @@
 /**
  * Chart data JS module.
  *
+ * @module     local_assessfreq/char_data
  * @package    local_assessfreq
  * @copyright  2020 Guillermo Gomez <guillermogomez@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @module     local_assessfreq/char_data
  */
-define(['core/fragment', 'core/notification', 'core/str', 'core/templates'], function(Fragment, Notification, Str, Templates) {
-    /**
-     * Module level variables.
-     */
-    let ChartData = {};
 
-    let cards;
-    let contextId;
-    let fragment;
-    let template;
+import Fragment from 'core/fragment';
+import Notification from 'core/notification';
+import * as Str from 'core/str';
+import Templates from 'core/templates';
 
-    /**
-     * For each of the cards on the dashboard get their corresponding chart data.
-     * Data is based on the year variable from the corresponding dropdown.
-     * Chart data is loaded via ajax.
-     *
-     * @param {int|null} quizId The quiz Id.
-     * @param {array|null} hoursFilter Array with hour ahead or behind preference.
-     * @param {int|null} yearSelect Year selected.
-     */
-    ChartData.getCardCharts = function(quizId, hoursFilter, yearSelect) {
-        cards.forEach((cardData) => {
-            let cardElement = document.getElementById(cardData.cardId);
-            let spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
-            let chartBody = cardElement.getElementsByClassName('chart-body')[0];
-            let values = {'call': cardData.call};
-            // Add values to Object depending on dashboard type.
-            if (hoursFilter) {
-                values.hoursahead = hoursFilter[0];
-                values.hoursbehind = hoursFilter[1];
-            }
-            if (quizId) {
-                values.quiz = quizId;
-            }
-            if (yearSelect) {
-                values.year = yearSelect;
-            }
-            let params = {'data': JSON.stringify(values)};
+/**
+ * Module level variables.
+ */
+let cards;
+let contextId;
+let fragment;
+let template;
 
-            spinner.classList.remove('hide'); // Show sinner if not already shown.
-            Fragment.loadFragment('local_assessfreq', fragment, contextId, params)
-                .done((response) => {
-                    let resObj = JSON.parse(response);
-                    if (resObj.hasdata === true) {
-                        let context = {
-                            'withtable': true, 'chartdata': JSON.stringify(resObj.chart)
-                        };
-                        if (typeof cardData.aspect !== 'undefined') {
-                            context.aspect = cardData.aspect;
-                        }
-                        Templates.render(template, context).done((html, js) => {
-                            spinner.classList.add('hide'); // Hide spinner if not already hidden.
-                            // Load card body.
-                            Templates.replaceNodeContents(chartBody, html, js);
-                        }).fail(() => {
-                            Notification.exception(new Error('Failed to load chart template.'));
-                            return;
-                        });
-                        return;
-                    } else {
-                        Str.get_string('nodata', 'local_assessfreq').then((str) => {
-                            const noDatastr = document.createElement('h3');
-                            noDatastr.innerHTML = str;
-                            chartBody.innerHTML = noDatastr.outerHTML;
-                            spinner.classList.add('hide'); // Hide spinner if not already hidden.
-                            return;
-                        }).catch(() => {
-                            Notification.exception(new Error('Failed to load string: nodata'));
-                        });
+/**
+ * For each of the cards on the dashboard get their corresponding chart data.
+ * Data is based on the year variable from the corresponding dropdown.
+ * Chart data is loaded via ajax.
+ *
+ * @param {int|null} quizId The quiz Id.
+ * @param {array|null} hoursFilter Array with hour ahead or behind preference.
+ * @param {int|null} yearSelect Year selected.
+ */
+export const getCardCharts = (quizId, hoursFilter, yearSelect) => {
+    cards.forEach((cardData) => {
+        let cardElement = document.getElementById(cardData.cardId);
+        let spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
+        let chartBody = cardElement.getElementsByClassName('chart-body')[0];
+        let values = {'call': cardData.call};
+        // Add values to Object depending on dashboard type.
+        if (hoursFilter) {
+            values.hoursahead = hoursFilter[0];
+            values.hoursbehind = hoursFilter[1];
+        }
+        if (quizId) {
+            values.quiz = quizId;
+        }
+        if (yearSelect) {
+            values.year = yearSelect;
+        }
+        let params = {'data': JSON.stringify(values)};
+
+        spinner.classList.remove('hide'); // Show sinner if not already shown.
+        Fragment.loadFragment('local_assessfreq', fragment, contextId, params)
+            .done((response) => {
+                let resObj = JSON.parse(response);
+                if (resObj.hasdata === true) {
+                    let context = {
+                        'withtable': true, 'chartdata': JSON.stringify(resObj.chart)
+                    };
+                    if (typeof cardData.aspect !== 'undefined') {
+                        context.aspect = cardData.aspect;
                     }
-                }).fail(() => {
-                Notification.exception(new Error('Failed to load card.'));
-                return;
-            });
+                    Templates.render(template, context).done((html, js) => {
+                        spinner.classList.add('hide'); // Hide spinner if not already hidden.
+                        // Load card body.
+                        Templates.replaceNodeContents(chartBody, html, js);
+                    }).fail(() => {
+                        Notification.exception(new Error('Failed to load chart template.'));
+                        return;
+                    });
+                    return;
+                } else {
+                    Str.get_string('nodata', 'local_assessfreq').then((str) => {
+                        const noDatastr = document.createElement('h3');
+                        noDatastr.innerHTML = str;
+                        chartBody.innerHTML = noDatastr.outerHTML;
+                        spinner.classList.add('hide'); // Hide spinner if not already hidden.
+                        return;
+                    }).catch(() => {
+                        Notification.exception(new Error('Failed to load string: nodata'));
+                    });
+                }
+            }).fail(() => {
+            Notification.exception(new Error('Failed to load card.'));
+            return;
         });
-    };
+    });
+};
 
-    /**
-     * Initialise method for table handler.
-     *
-     * @param {array} cardsArray Cards array.
-     * @param {int} contextIdChart The context id.
-     * @param {string} fragmentChart Fragment name.
-     * @param {string} templateChart Template name.
-     */
-    ChartData.init = function(cardsArray, contextIdChart, fragmentChart, templateChart) {
-        cards = cardsArray;
-        contextId = contextIdChart;
-        fragment = fragmentChart;
-        template = templateChart;
-    };
-
-    return ChartData;
-});
+/**
+ * Initialise method for table handler.
+ *
+ * @param {array} cardsArray Cards array.
+ * @param {int} contextIdChart The context id.
+ * @param {string} fragmentChart Fragment name.
+ * @param {string} templateChart Template name.
+ */
+export const init = (cardsArray, contextIdChart, fragmentChart, templateChart) => {
+    cards = cardsArray;
+    contextId = contextIdChart;
+    fragment = fragmentChart;
+    template = templateChart;
+};
