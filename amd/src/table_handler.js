@@ -44,9 +44,24 @@ define([
     var fragmentValue;
     var hoursFilter;
     var quizId = 0;
+    var overridden = false;
     var rowPreference;
     var sortValue;
     var searchElement;
+
+    /**
+     * Table id variable.
+     *
+     * @type {string}
+     */
+    var id;
+
+    /**
+     * Table method name variable.
+     *
+     * @type {string}
+     */
+    var methodName;
 
     /**
      * Display the table that contains all the students in the exam as well as their attempts.
@@ -54,12 +69,14 @@ define([
      * @param {int} quiz The Quiz Id.
      * @param {array|null} hours Array with hour ahead or behind preference.
      * @param {string|null} sortValueTable Sort preference.
-     * @param {int|string} page Page number.
+     * @param {int|string|null} page Page number.
      */
     TableHandler.getTable = function(quiz, hours = null, sortValueTable = null, page) {
-        if (typeof page === "undefined") {
+        if (typeof page === "undefined" || overridden === true) {
             page = 0;
         }
+
+        overridden = false;
 
         let search = document.getElementById(searchElement).value.trim();
         let tableElement = document.getElementById(elementId);
@@ -135,9 +152,9 @@ define([
 
         // Set option via ajax.
         Ajax.call([{
-            methodname: 'local_assessfreq_set_table_preference',
+            methodname: methodName,
             args: {
-                tableid: 'local_assessfreq_student_table',
+                tableid: id,
                 preference: 'sortby',
                 values: JSON.stringify(sortArray)
             },
@@ -192,9 +209,9 @@ define([
 
         // Set option via ajax.
         Ajax.call([{
-            methodname: 'local_assessfreq_set_table_preference',
+            methodname: methodName,
             args: {
-                tableid: 'local_assessfreq_student_table',
+                tableid: id,
                 preference: 'collapse',
                 values: JSON.stringify(hideArray)
             },
@@ -205,7 +222,7 @@ define([
     };
 
     /**
-     * Process the reset click event from the student table.
+     * Process the reset click event from the table.
      *
      * @param {Event} event The triggered event for the element.
      */
@@ -214,9 +231,9 @@ define([
 
         // Set option via ajax.
         Ajax.call([{
-            methodname: 'local_assessfreq_set_table_preference',
+            methodname: methodName,
             args: {
-                tableid: 'local_assessfreq_student_table',
+                tableid: id,
                 preference: 'reset',
                 values: JSON.stringify({})
             },
@@ -328,35 +345,40 @@ define([
      */
     TableHandler.tableEventListeners = function() {
         const tableElement = document.getElementById(elementId);
-        const tableCardElement = document.getElementById(cardElement);
-        const links = tableElement.querySelectorAll('a');
-        const resetLink = tableElement.getElementsByClassName('resettable');
-        const overrideLinks = tableElement.getElementsByClassName('action-icon override');
-        const disabledLinks = tableElement.getElementsByClassName('action-icon disabled');
-        const tableNavElement = tableCardElement.querySelectorAll('nav'); // There are two nav paging elements per table.
+        let tableNavElement;
+        if (cardElement) {
+            const tableCardElement = document.getElementById(cardElement);
+            const links = tableElement.querySelectorAll('a');
+            const resetLink = tableElement.getElementsByClassName('resettable');
+            const overrideLinks = tableElement.getElementsByClassName('action-icon override');
+            const disabledLinks = tableElement.getElementsByClassName('action-icon disabled');
+            tableNavElement = tableCardElement.querySelectorAll('nav'); // There are two nav paging elements per table.
 
-        for (let i = 0; i < links.length; i++) {
-            let linkUrl = new URL(links[i].href);
-            if (linkUrl.search.indexOf('thide') !== -1 || linkUrl.search.indexOf('tshow') !== -1) {
-                links[i].addEventListener('click', TableHandler.tableHide);
-            } else if (linkUrl.search.indexOf('tsort') !== -1) {
-                links[i].addEventListener('click', TableHandler.tableSort);
+            for (let i = 0; i < links.length; i++) {
+                let linkUrl = new URL(links[i].href);
+                if (linkUrl.search.indexOf('thide') !== -1 || linkUrl.search.indexOf('tshow') !== -1) {
+                    links[i].addEventListener('click', TableHandler.tableHide);
+                } else if (linkUrl.search.indexOf('tsort') !== -1) {
+                    links[i].addEventListener('click', TableHandler.tableSort);
+                }
+
             }
 
-        }
+            if (resetLink.length > 0) {
+                resetLink[0].addEventListener('click', TableHandler.tableReset);
+            }
 
-        if (resetLink.length > 0) {
-            resetLink[0].addEventListener('click', TableHandler.tableReset);
-        }
+            for (let i = 0; i < overrideLinks.length; i++) {
+                overrideLinks[i].addEventListener('click', TableHandler.triggerOverrideModal);
+            }
 
-        for (let i = 0; i < overrideLinks.length; i++) {
-            overrideLinks[i].addEventListener('click', TableHandler.triggerOverrideModal);
-        }
-
-        for (let i = 0; i < disabledLinks.length; i++) {
-            disabledLinks[i].addEventListener('click', (event) => {
-                event.preventDefault();
-            });
+            for (let i = 0; i < disabledLinks.length; i++) {
+                disabledLinks[i].addEventListener('click', (event) => {
+                    event.preventDefault();
+                });
+            }
+        } else {
+            tableNavElement = tableElement.querySelectorAll('nav');
         }
 
         tableNavElement.forEach((navElement) => {
@@ -371,9 +393,14 @@ define([
      */
     TableHandler.triggerOverrideModal = function(event) {
         event.preventDefault();
-        const userid = event.target.closest('a').id.substring(25);
+        let userid = event.target.closest('a').id.substring(25);
+        if (userid.includes('-')) {
+            let elements = userid.split('-');
+            quizId = elements.pop();
+            userid = elements.pop();
+        }
 
-        OverrideModal.displayModalForm(quizId, userid);
+        OverrideModal.displayModalForm(quizId, userid, hoursFilter);
     };
 
     /**
@@ -386,6 +413,8 @@ define([
      * @param {string} tableFragmentValue The table fragment value.
      * @param {string} tableRowPreference The table row preference.
      * @param {string} tableSearchElement The table search element.
+     * @param {string|null} tableId The table id.
+     * @param {string|null} tableMethodName The table method name.
      * @param {string} tableActiveOptions The table active option element.
      */
     TableHandler.init = function(quiz,
@@ -395,6 +424,8 @@ define([
                                  tableFragmentValue,
                                  tableRowPreference,
                                  tableSearchElement,
+                                 tableId = null,
+                                 tableMethodName = null,
                                  tableActiveOptions = null) {
         quizId = quiz;
         contextId = context;
@@ -403,6 +434,8 @@ define([
         fragmentValue = tableFragmentValue;
         rowPreference = tableRowPreference;
         searchElement = tableSearchElement;
+        id = tableId;
+        methodName = tableMethodName;
         activeOptionsElement = tableActiveOptions;
     };
 

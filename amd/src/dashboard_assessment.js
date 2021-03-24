@@ -22,8 +22,8 @@
  */
 
 define(['jquery', 'core/ajax', 'core/fragment', 'core/templates', 'core/notification', 'local_assessfreq/calendar', 'core/str',
-    'local_assessfreq/zoom_modal', 'local_assessfreq/dayview'],
-function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, Dayview) {
+    'local_assessfreq/zoom_modal', 'local_assessfreq/dayview', 'local_assessfreq/user_preferences', 'local_assessfreq/chart_data'],
+function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, Dayview, UserPreference, ChartData) {
 
     /**
      * Module level variables.
@@ -44,72 +44,6 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
     ];
 
     /**
-     * Generic handler to persist user preferences
-     *
-     * @param {string} type The name of the attribute you're updating
-     * @param {string} value The value of the attribute you're updating
-     */
-    const updateUserPreferences = function(type, value) {
-        var request = {
-            methodname: 'core_user_update_user_preferences',
-            args: {
-                preferences: [{type: type, value: value}]
-            }
-        };
-
-        Ajax.call([request])[0]
-        .fail(() => {
-            Notification.exception(new Error('Failed to update user preference'));
-        });
-    };
-
-    /**
-     * For each of the cards on the dashbaord get their corresponding chart data.
-     * Data is based on the year variable from the corresponding dropdown.
-     * Chart data is loaded via ajax.
-     *
-     */
-    const getCardCharts = function() {
-        cards.forEach((cardData) => {
-            let cardElement = document.getElementById(cardData.cardId);
-            let spinner = cardElement.getElementsByClassName('overlay-icon-container')[0];
-            let chartbody = cardElement.getElementsByClassName('chart-body')[0];
-            let params = {'data': JSON.stringify({'year' : yearselect, 'call': cardData.call})};
-
-            spinner.classList.remove('hide'); // Show sinner if not already shown.
-            Fragment.loadFragment('local_assessfreq', 'get_chart', contextid, params)
-            .done((response) => {
-                let resObj = JSON.parse(response);
-                if (resObj.hasdata == true) {
-                    var context = { 'withtable' : true, 'chartdata' : JSON.stringify(resObj.chart) };
-                    Templates.render('core/chart', context).done((html, js) => {
-                        spinner.classList.add('hide'); // Hide sinner if not already hidden.
-                        // Load card body.
-                        Templates.replaceNodeContents(chartbody, html, js);
-                    }).fail(() => {
-                        Notification.exception(new Error('Failed to load chart template.'));
-                        return;
-                    });
-                    return;
-                } else {
-                    Str.get_string('nodata', 'local_assessfreq').then((str) => {
-                        const noDatastr = document.createElement('h3');
-                        noDatastr.innerHTML = str;
-                        chartbody.innerHTML = noDatastr.outerHTML;
-                        spinner.classList.add('hide'); // Hide spinner if not already hidden.
-                        return;
-                    }).catch(() => {
-                        Notification.exception(new Error('Failed to load string: nodata'));
-                    });
-                }
-            }).fail(() => {
-                Notification.exception(new Error('Failed to load card year filter'));
-                return;
-            });
-        });
-    };
-
-    /**
      * Get and process the selected year from the dropdown,
      * and update the corresponding user perference.
      *
@@ -119,7 +53,7 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
         event.preventDefault();
         var element = event.target;
 
-        if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselect) { // Only act on certain elements.
+        if (element.tagName.toLowerCase() === 'a' && element.dataset.year !== yearselect) { // Only act on certain elements.
             yearselect = element.dataset.year;
             let activeoptions = document.getElementById('local-assessfreq-cards-year-filter').getElementsByClassName('active');
 
@@ -130,14 +64,14 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
             element.classList.add('active');
 
             // Save selection as a user preference.
-            updateUserPreferences('local_assessfreq_overview_year_preference', yearselect);
+            UserPreference.setUserPreference('local_assessfreq_overview_year_preference', yearselect);
 
             // Update card data based on selected year.
             var yeartitle = document.getElementById('local-assessfreq-report-overview')
                 .getElementsByClassName('local-assessfreq-year')[0];
             yeartitle.innerHTML = yearselect;
 
-            getCardCharts(); // Process loading for the assessment cards.
+            ChartData.getCardCharts(0, null, yearselect); // Process loading for the assessment cards.
         }
     };
 
@@ -153,11 +87,13 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
     };
 
     /**
+     * Display heatmap calendar.
      *
+     * @param {event} event The triggered event for the element.
      */
     const detailView = function(event) {
         let element = event.target;
-        if (element.tagName.toLowerCase() === 'td' && element.dataset.event == 'true') { // Only act on certain elements.
+        if (element.tagName.toLowerCase() === 'td' && element.dataset.event === 'true') { // Only act on certain elements.
             Dayview.display(element.dataset.date);
         }
     };
@@ -200,7 +136,7 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
         let formElements = downloadForm.elements;
         let toRemove = new Array();
 
-        if (modules.length == 0) {
+        if (modules.length === 0) {
             modules = ['all'];
         }
 
@@ -209,19 +145,19 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
                 continue;
             }
             // Update year field.
-            if((formElements[i].type === 'hidden') && (formElements[i].name === 'year')) {
+            if ((formElements[i].type === 'hidden') && (formElements[i].name === 'year')) {
                 formElements[i].value = year;
                 continue;
             }
 
             // Update metric field.
-            if((formElements[i].type === 'hidden') && (formElements[i].name === 'metric')) {
+            if ((formElements[i].type === 'hidden') && (formElements[i].name === 'metric')) {
                 formElements[i].value = metric;
                 continue;
             }
 
             // Update module fields.
-            if((formElements[i].type === 'hidden') && (formElements[i].name.startsWith('modules'))) {
+            if ((formElements[i].type === 'hidden') && (formElements[i].name.startsWith('modules'))) {
                 toRemove.push(formElements[i]);
                 continue;
             }
@@ -261,19 +197,19 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
         // Save selection as a user preference.
         if (modulesJson !== JSON.stringify(modules)) {
             modulesJson = JSON.stringify(modules);
-            updateUserPreferences('local_assessfreq_heatmap_modules_preference', modulesJson);
+            UserPreference.setUserPreference('local_assessfreq_heatmap_modules_preference', modulesJson);
         }
 
         // Build settings object.
         var optionsObj = {
-            'year' : yearselectheatmap,
-            'metric' : metricselectheatmap,
-            'modules' : modules
+            'year': yearselectheatmap,
+            'metric': metricselectheatmap,
+            'modules': modules
         };
 
         var optionsJson = JSON.stringify(optionsObj);
 
-        if(optionsJson !== heatmapOptionsJson) { // Compare to global to see if there are any changes.
+        if (optionsJson !== heatmapOptionsJson) { // Compare to global to see if there are any changes.
             // If list has changed fetch heatmap and update user preference.
             heatmapOptionsJson = optionsJson;
             generateHeatmap();
@@ -285,7 +221,7 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
 
     /**
      * Get and process the selected year from the dropdown for the heatmap display,
-     * and update the corresponding user perference.
+     * and update the corresponding user preference.
      *
      * @param {event} event The triggered event for the element.
      */
@@ -293,7 +229,7 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
         event.preventDefault();
         var element = event.target;
 
-        if (element.tagName.toLowerCase() === 'a' && element.dataset.year != yearselectheatmap) { // Only act on certain elements.
+        if (element.tagName.toLowerCase() === 'a' && element.dataset.year !== yearselectheatmap) { // Only act on certain elements.
             yearselectheatmap = element.dataset.year;
             let activeoptions = document.getElementById('local-assessfreq-cards-year-heat-filter').getElementsByClassName('active');
 
@@ -304,7 +240,7 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
             element.classList.add('active');
 
             // Save selection as a user preference.
-            updateUserPreferences('local_assessfreq_heatmap_year_preference', yearselectheatmap);
+            UserPreference.setUserPreference('local_assessfreq_heatmap_year_preference', yearselectheatmap);
 
             // Update card data based on selected year.
             var yeartitle = document.getElementById('local-assessfreq-report-heatmap')
@@ -317,7 +253,7 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
 
     /**
      * Get and process the selected assessment metric from the dropdown for the heatmap display,
-     * and update the corresponding user perference.
+     * and update the corresponding user preference.
      *
      * @param {event} event The triggered event for the element.
      */
@@ -326,7 +262,7 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
         var element = event.target;
         let activeoptions = document.getElementById('local-assessfreq-heatmap-metrics-filter').getElementsByClassName('active');
 
-        if (element.tagName.toLowerCase() === 'a' && element.dataset.metric != metricselectheatmap) {
+        if (element.tagName.toLowerCase() === 'a' && element.dataset.metric !== metricselectheatmap) {
             metricselectheatmap = element.dataset.metric;
 
             // Fix active classes.
@@ -336,7 +272,7 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
             element.classList.add('active');
 
             // Save selection as a user preference.
-            updateUserPreferences('local_assessfreq_heatmap_metric_preference', metricselectheatmap);
+            UserPreference.setUserPreference('local_assessfreq_heatmap_metric_preference', metricselectheatmap);
 
             updateHeatmapDebounce(); // Call function to update heatmap.
         }
@@ -394,7 +330,7 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
      */
     const triggerZoomGraph = function(event) {
         let call = event.target.closest('div').dataset.call;
-        let params = {'data': JSON.stringify({'year' : yearselect, 'call': call})};
+        let params = {'data': JSON.stringify({'year': yearselect, 'call': call})};
         let method = 'get_chart';
 
         ZoomModal.zoomGraph(event, params, method);
@@ -443,8 +379,11 @@ function($, Ajax, Fragment, Templates, Notification, Calendar, Str, ZoomModal, D
         // Setup the dayview modal.
         Dayview.init();
 
+        // Setup the chart data for each card.
+        ChartData.init(cards, contextid, 'get_chart', 'core/chart');
+
         // Process loading for the assessment cards.
-        getCardCharts();
+        ChartData.getCardCharts(0, null, yearselect);
 
         // Get the data for the heatmap.
         updateHeatmap();
