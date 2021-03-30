@@ -585,9 +585,13 @@ class frequency {
 
             // Delete user events.
             if (!empty($userevents)) {
-                list($insql, $inparams) = $DB->get_in_or_equal($userevents);
-                $inselect = "eventid $insql";
-                $DB->delete_records_select('local_assessfreq_user', $inselect, $inparams);
+                $chunks = array_chunk($userevents, 30000);
+                foreach ($chunks as $usereventschunk) {
+                    list($insql, $inparams) = $DB->get_in_or_equal($usereventschunk);
+                    $inselect = "eventid $insql";
+                    $DB->delete_records_select('local_assessfreq_user', $inselect, $inparams);
+                }
+
             }
 
             $transaction->allow_commit();
