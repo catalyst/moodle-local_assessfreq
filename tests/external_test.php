@@ -78,6 +78,12 @@ class external_test extends \advanced_testcase {
 
     /**
      *
+     * @var stdClass Third test quiz, with dates not set.
+     */
+    protected $quiz3;
+
+    /**
+     *
      * @var stdClass First test user.
      */
     protected $user1;
@@ -140,6 +146,12 @@ class external_test extends \advanced_testcase {
             'timeclose' => 1594004400,
             'timelimit' => 7200
         ));
+        $this->quiz3 = $generator->create_module('quiz', array(
+            'course' => $course->id,
+            'timeopen' => null,
+            'timeclose' => null,
+            'timelimit' => 7200
+        ));
 
         // Create some users.
         $user1 = $generator->create_user();
@@ -192,6 +204,13 @@ class external_test extends \advanced_testcase {
         $override2->timeopen = 1593997200;
         $override2->timeclose = 1594005000;  // End late.
         $override2->timelimit = 7200;
+
+        $override3 = new stdClass();
+        $override3->quiz = $this->quiz3->id;
+        $override3->userid = $user2->id;
+        $override3->timeopen = null;
+        $override3->timeclose = null;
+        $override3->timelimit = 7200;
 
         $overriderecords = array($override1, $override2);
         $DB->insert_records('quiz_overrides', $overriderecords);
@@ -341,7 +360,7 @@ class external_test extends \advanced_testcase {
         $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_quizzes_returns(), $returnvalue);
         $eventarr = json_decode($returnjson, true);
 
-        $this->assertCount(4, $eventarr);
+        $this->assertCount(5, $eventarr);
     }
 
     /**
@@ -363,6 +382,38 @@ class external_test extends \advanced_testcase {
         $this->assertEquals(2, $eventarr['overrideparticipants']);
         $this->assertEquals(2, $eventarr['typecount']);
         $this->assertEquals(6, $eventarr['questioncount']);
+    }
+
+    /**
+     * Test getting of quiz data with dates not available.
+     */
+    public function test_get_quiz_data_dates_na() {
+        $this->setAdminUser();
+
+        $quizid = $this->quiz3->id;
+
+        $returnvalue = local_assessfreq_external::get_quiz_data($quizid);
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_quiz_data_returns(), $returnvalue);
+        $eventarr = json_decode($returnjson, true);
+
+        $this->assertEquals(get_string('na', 'local_assessfreq'), $eventarr['timeopen']);
+        $this->assertEquals(get_string('na', 'local_assessfreq'), $eventarr['timeclose']);
+    }
+
+    /**
+     * Test getting of quiz data with dates not available.
+     */
+    public function test_get_quiz_data_overrides_na() {
+        $this->setAdminUser();
+
+        $quizid = $this->quiz3->id;
+
+        $returnvalue = local_assessfreq_external::get_quiz_data($quizid);
+        $returnjson = external_api::clean_returnvalue(local_assessfreq_external::get_quiz_data_returns(), $returnvalue);
+        $eventarr = json_decode($returnjson, true);
+
+        $this->assertEquals(get_string('na', 'local_assessfreq'), $eventarr['earlyopen']);
+        $this->assertEquals(get_string('na', 'local_assessfreq'), $eventarr['lateclose']);
     }
 
     /**

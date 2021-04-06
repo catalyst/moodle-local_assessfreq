@@ -1322,7 +1322,7 @@ class frequency {
                 $usercount = count($this->get_event_users($event->contextid, $event->module));
                 $row = array($startdate, $duedate, $activity, $name, $url, $usercount);
             } else if ($metric == 'students') {
-                $extrafields = \core\user_fields::for_identity($context, false);
+                $extrafields = \core_user\fields::for_identity($context, false);
                 $selects = $extrafields->get_sql()->selects;
 
                 $sql = "SELECT CONCAT(firstname, ' ', lastname) $selects

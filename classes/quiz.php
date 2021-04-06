@@ -223,10 +223,26 @@ class quiz {
         $overrideinfo = $this->get_quiz_override_info($quizid, $context);
         $questions = $this->get_quiz_questions($quizid);
         $frequency = new frequency();
-        $timesopen = userdate($quizrecord->timeopen, get_string('strftimedatetime', 'langconfig'));
-        $timeclose = userdate($quizrecord->timeclose, get_string('strftimedatetime', 'langconfig'));
-        $overrideinfostart = userdate($overrideinfo->start, get_string('strftimedatetime', 'langconfig'));
-        $overrideinfoend = userdate($overrideinfo->end, get_string('strftimedatetime', 'langconfig'));
+        if (!empty($quizrecord->timeopen)) {
+            $timesopen = userdate($quizrecord->timeopen, get_string('strftimedatetime', 'langconfig'));
+        } else {
+            $timesopen = get_string('na', 'local_assessfreq');
+        }
+        if (!empty($quizrecord->timeclose)) {
+            $timeclose = userdate($quizrecord->timeclose, get_string('strftimedatetime', 'langconfig'));
+        } else {
+            $timeclose = get_string('na', 'local_assessfreq');
+        }
+        if (!empty($overrideinfo->start)) {
+            $overrideinfostart = userdate($overrideinfo->start, get_string('strftimedatetime', 'langconfig'));
+        } else {
+            $overrideinfostart = get_string('na', 'local_assessfreq');
+        }
+        if (!empty($overrideinfo->end)) {
+            $overrideinfoend = userdate($overrideinfo->end, get_string('strftimedatetime', 'langconfig'));
+        } else {
+            $overrideinfoend = get_string('na', 'local_assessfreq');
+        }
 
         // Handle override start.
         if ($overrideinfo->start != 0 && $overrideinfo->start < $quizrecord->timeopen) {
