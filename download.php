@@ -44,7 +44,7 @@ $fields = array(
 );
 
 if ($metric == 'students') {
-    $extrafields = \core\user_fields::get_identity_fields($context, false);
+    $extrafields = \core_user\fields::get_identity_fields($context, false);
     $fields[] = get_string('fullname');
     $fields = array_merge($fields, $extrafields);
 } else {
