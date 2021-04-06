@@ -255,7 +255,7 @@ class quiz {
         // Dashboard link.
         $dashboardlink = new \moodle_url('/local/assessfreq/dashboard_quiz.php', array('id' => $quizid));
 
-        $quizdata->name = $quizrecord->name;
+        $quizdata->name = format_string($quizrecord->name, true, ["context" => $context, "escape" => true]);
         $quizdata->timeopen = $timesopen;
         $quizdata->timeclose = $timeclose;
         $quizdata->timelimit = format_time($quizrecord->timelimit);
@@ -271,7 +271,7 @@ class quiz {
         $quizdata->questioncount = $questions->questioncount;
         $quizdata->resultlink = $resultlink->out(false);
         $quizdata->overridelink = $overrridelink->out(false);
-        $quizdata->coursefullname = $course->fullname;
+        $quizdata->coursefullname = format_string($course->fullname, true, ["context" => $context, "escape" => true]);
         $quizdata->courseshortname = $course->shortname;
         $quizdata->courselink = $courseurl->out(false);
         $quizdata->participantlink = $participantlink->out(false);
