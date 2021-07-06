@@ -107,9 +107,9 @@ class student_search_table extends table_sql implements renderable {
         $headers[] = get_string('fullname');
         $columns[] = 'fullname';
 
-        $extrafields = \core\user_fields::get_identity_fields($context, false);
+        $extrafields = \core_user\fields::get_identity_fields($context, false);
         foreach ($extrafields as $field) {
-            $headers[] = \core\user_fields::get_display_name($field);
+            $headers[] = \core_user\fields::get_display_name($field);
             $columns[] = $field;
         }
 
