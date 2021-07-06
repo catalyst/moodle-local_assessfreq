@@ -715,11 +715,12 @@ class frequency {
     /**
      * Get all events that are ending on a given date.
      *
-     * @param string $module The module to get events for or all events.
      * @param string $date The end date for the event.
+     * @param string $module The module to get events for or all events.
+     *
      * @return array $events An array of site events
      */
-    public function get_day_ending_events(string $module='all', string $date): array {
+    public function get_day_ending_events(string $date, string $module='all'): array {
         global $DB;
         $events = array();
 
@@ -1139,14 +1140,14 @@ class frequency {
 
         // Get the raw events.
         if (in_array('all', $modules)) {
-            $events = $this->get_day_ending_events('all', $date);
+            $events = $this->get_day_ending_events($date, 'all');
         } else {
             // Work through the event array.
             foreach ($modules as $module) {
                 if ($module == 'all') {
                     continue;
                 } else {
-                    $events = array_merge($events, $this->get_day_ending_events($module, $date));
+                    $events = array_merge($events, $this->get_day_ending_events($date, $module));
                 }
             }
         }
