@@ -66,6 +66,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: pgsql, mysqli, zip, gd, xmlrpc, soap
           coverage: none
+          ini-values: max_input_vars=5000
 
       - name: Initialise moodle-plugin-ci
         run: |
