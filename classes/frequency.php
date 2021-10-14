@@ -876,59 +876,44 @@ class frequency {
      * @param string $module The module to get events for or all events.
      * @param int $from The timestamp to get events from.
      * @param int $to The timestamp to get events to.
-     * @param bool $cache If false cache won't be used fresh data will be retrieved from DB.
      * @return array $events An array of site events
      */
-    public function get_user_events_all(string $module='all', int $from=0, int $to=0, bool $cache=true) : array {
+    public function get_user_events_all(string $module='all', int $from=0, int $to=0) : Iterable {
         global $DB;
-        $events = array();
-        $cachekey = $module . '_' . (string)$from . '_' . (string)$to;
 
-        // Try to get value from cache.
-        $usercache = cache::make('local_assessfreq', 'usereventsall');
-        $data = $usercache->get($cachekey);
+        $rowkey = $DB->sql_concat('s.id', "'_'", 'u.userid');
+        $sql = "SELECT $rowkey as row, u.userid, s.*
+                 FROM {local_assessfreq_site} s
+           INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id
+           INNER JOIN {course} c ON s.courseid = c.id";
 
-        if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
-            // Only return data for chosen range.
-            $events = $data->events;
-        } else {  // Not valid cache data.
+        // Get data from database.
+        if ($module == 'all') {
+            $modules = $this->get_process_modules();
+            list($insql, $params) = $DB->get_in_or_equal($modules);
+            $sql .= " WHERE s.module $insql";
 
-            $rowkey = $DB->sql_concat('s.id', "'_'", 'u.userid');
-            $sql = "SELECT $rowkey as row, u.userid, s.*
-                      FROM {local_assessfreq_site} s
-                INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id
-                INNER JOIN {course} c ON s.courseid = c.id";
-
-            // Get data from database.
-            if ($module == 'all') {
-                $modules = $this->get_process_modules();
-                list($insql, $params) = $DB->get_in_or_equal($modules);
-                $sql .= " WHERE s.module $insql";
-
-            } else {
-                $params = array($module);
-                $sql .= ' WHERE s.module = ?';
-            }
-
-            $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
-            if (!$includehiddencourses) {
-                $params[] = 1;
-                $sql .= " AND c.visible = ?";
-            }
-
-            $rawevents = $DB->get_recordset_sql($sql, $params);
-            $events = $this->filter_event_data($rawevents, $from, $to);
-            $rawevents->close();
-
-            // Update cache.
-            if (!empty($events)) {
-                $expiry = time() + $this->expiryperiod;
-                $data = new \stdClass();
-                $data->expiry = $expiry;
-                $data->events = $events;
-                $usercache->set($cachekey, $data);
-            }
+        } else {
+            $params = array($module);
+            $sql .= ' WHERE s.module = ?';
         }
+
+        $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
+        if (!$includehiddencourses) {
+            $params[] = 1;
+            $sql .= " AND c.visible = ?";
+        }
+
+        // If an explicit to date was not defined default to a year from now.
+        if ($to === 0) {
+            $to = time() + YEARSECS;
+        }
+
+        $params[] = $from;
+        $params[] = $to;
+        $sql .= " AND s.timeend >= ? AND s.timeend < ?";
+
+        $events = $DB->get_recordset_sql($sql, $params);
 
         return $events;
     }
@@ -1208,10 +1193,18 @@ class frequency {
         $events = array();
         $from = mktime(0, 0, 0, 1, 1, $year);
         $to = mktime(23, 59, 59, 12, 31, $year);
+        $userfreqarraycache = cache::make('local_assessfreq', 'usereventsallfrequencyarray');
+        sort($modules);
+        $cachekey = implode("_", $modules) . '_' . (string)$from . '_' . (string)$to;
 
         if ($metric == 'assess') {
             $functionname = 'get_site_events';
         } else if ($metric == 'students') {
+            $data = $userfreqarraycache->get($cachekey);
+            if ($data && $metric == 'students' && (time() < $data->expiry)) {
+                return $data->freqarray;
+            }
+
             $functionname = 'get_user_events_all';
         }
 
@@ -1225,11 +1218,7 @@ class frequency {
         } else {
             // Work through the event array.
             foreach ($modules as $module) {
-                if ($module == 'all') {
-                    continue;
-                } else {
-                    $events = array_merge($events, $this->$functionname($module, $from, $to));
-                }
+                $events = array_merge($events, $this->$functionname($module, $from, $to));
             }
         }
 
@@ -1252,7 +1241,20 @@ class frequency {
             } else {
                 $freqarray[$year][$month][$day][$module]++;
             }
+        }
 
+        /*
+         * On large sites, the number of rows returned by get_user_events_all
+         * can go in to the millions. So caching the events isn't reasonable
+         * (and the time to reconstruct the frequency array will still be slow).
+         * Instead, cache the result of computing the frequency array.
+         */
+        if ($functionname == 'get_user_events_all') {
+            $expiry = time() + $this->expiryperiod;
+            $data = new \stdClass();
+            $data->expiry = $expiry;
+            $data->freqarray = $freqarray;
+            $userfreqarraycache->set($cachekey, $data);
         }
 
         return $freqarray;
