@@ -44,7 +44,7 @@ $definitions = [
         'simplekeys' => true,
         'simpledata' => false
     ],
-    'usereventsall' => [
+    'usereventsallfrequencyarray' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
