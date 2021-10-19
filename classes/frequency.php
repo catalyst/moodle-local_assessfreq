@@ -1365,7 +1365,7 @@ class frequency {
      *
      * @param string $name Name of the setting change that invoked the purge.
      */
-    static public function purge_caches($name): void {
+    public static function purge_caches($name): void {
         global $CFG;
 
         // Get plugin cache definitions.
