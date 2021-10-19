@@ -708,5 +708,4 @@ class local_assessfreq_external extends external_api {
     public static function get_inprogress_counts_returns() {
         return new external_value(PARAM_RAW, 'JSON quiz count data');
     }
-
 }
