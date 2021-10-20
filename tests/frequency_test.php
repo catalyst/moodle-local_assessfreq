@@ -476,27 +476,16 @@ class frequency_testcase extends advanced_testcase {
         $frequency->process_site_events($duedate);
         $frequency->process_user_events($duedate);
 
-        $usercache = cache::make('local_assessfreq', 'usereventsall');
-        $cachekey = 'all_0_0';
-        $data = $usercache->get($cachekey);
-        $this->assertEmpty($data);
-
         $result = $frequency->get_user_events_all('all', 0, 0, false);
         $this->assertCount(4, $result);
 
-        $data = $usercache->get($cachekey);
-        $this->assertCount(4, $data->events);
-
-        $result = $frequency->get_user_events_all('forum', 0, 0, true);
+        $result = iterator_to_array($frequency->get_user_events_all('forum', 0, 0, true));
         $this->assertEmpty($result);
-
-        $data = $usercache->get('forum');
-        $this->assertEmpty($data);
 
         $this->course->visible = 0;
         $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
 
-        $result = $frequency->get_user_events_all('all', 0, 0, false);
+        $result = iterator_to_array($frequency->get_user_events_all('all', 0, 0, false));
         $this->assertEmpty($result);
 
         set_config('hiddencourses', '1', 'local_assessfreq');
@@ -1006,11 +995,22 @@ class frequency_testcase extends advanced_testcase {
         $this->assertEquals(1, $result[2020][3][28]['assign']);
 
         $metric = 'students';
+        $freqarraycache = cache::make('local_assessfreq', 'usereventsallfrequencyarray');
+        $cachekey = 'all_1577808000_1609430399';
+        $data = $freqarraycache->get($cachekey);
+        $this->assertEmpty($data);
+
         $result = $frequency->get_frequency_array($year, $metric, $modules);
         $this->assertEquals(2, $result[2020][3][29]['number']);
         $this->assertEquals(2, $result[2020][3][28]['number']);
         $this->assertEquals(2, $result[2020][3][29]['assign']);
         $this->assertEquals(2, $result[2020][3][28]['assign']);
+
+        $data = $freqarraycache->get($cachekey)->freqarray;
+        $this->assertEquals(2, $data[2020][3][29]['number']);
+        $this->assertEquals(2, $data[2020][3][28]['number']);
+        $this->assertEquals(2, $data[2020][3][29]['assign']);
+        $this->assertEquals(2, $data[2020][3][28]['assign']);
 
     }
 
