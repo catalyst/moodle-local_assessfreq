@@ -647,13 +647,28 @@ class quiz {
 
         $frequency = new frequency();
         $quizzes = $this->get_tracked_quizzes_with_overrides($now);
+        $quizusersbyquizid = [];
+        $contextsbyquizid = [];
         $count = 0;
+
+        foreach ($quizzes as $quiz) {
+            $contextid = $this->get_quiz_context($quiz->id)->id;
+            $quizusersbyquizid[$quiz->id] = array_column($frequency->get_event_users_raw(
+                $contextid,
+                'quiz'
+            ), 'id');
+
+            $contextsbyquizid[$quiz->id] = $contextid;
+        }
+
+        $loggedinusers = $this->get_loggedin_users(
+            array_unique(array_reduce($quizusersbyquizid, 'array_merge', []))
+        );
 
         // For each quiz get the list of users who are elligble to do the quiz.
         foreach ($quizzes as $quiz) {
-            $context = $this->get_quiz_context($quiz->id);
-            $quizusers = array_keys($frequency->get_event_users_raw($context->id, 'quiz'));
-            $loggedinusers = $this->get_loggedin_users($quizusers);
+            $context = $contextsbyquizid[$quiz->id];
+            $quizusers = $quizusersbyquizid[$quiz->id];
             $attemptusers = $this->get_quiz_attempts($quiz->id);
             $loggedout = 0;
             $loggedin = 0;
