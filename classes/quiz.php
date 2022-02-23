@@ -24,6 +24,8 @@
 
 namespace local_assessfreq;
 
+use mod_quiz\question\bank\qbank_helper;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -171,13 +173,7 @@ class quiz {
         $types = array();
         $questioncount = 0;
 
-        $params = array($quizid);
-        $sql = 'SELECT q.id, q.name, q.qtype
-                  FROM {question} q
-            INNER JOIN {quiz_slots} qs ON q.id = qs.questionid
-                 WHERE quizid = ?';
-
-        $questionsrecords = $DB->get_records_sql($sql, $params);
+        $questionsrecords = qbank_helper::get_question_structure($quizid);
 
         foreach ($questionsrecords as $questionrecord) {
             $types[] = get_string('pluginname', 'qtype_' . $questionrecord->qtype);
