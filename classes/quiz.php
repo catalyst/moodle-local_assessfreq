@@ -172,8 +172,9 @@ class quiz {
         $questions = new \stdClass();
         $types = array();
         $questioncount = 0;
+        $context = $this->get_quiz_context($quizid);
 
-        $questionsrecords = qbank_helper::get_question_structure($quizid);
+        $questionsrecords = qbank_helper::get_question_structure($quizid, $context);
 
         foreach ($questionsrecords as $questionrecord) {
             $types[] = get_string('pluginname', 'qtype_' . $questionrecord->qtype);
