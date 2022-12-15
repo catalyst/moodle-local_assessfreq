@@ -22,18 +22,19 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_assessfreq\output;
 
-use local_assessfreq\output\assess_by_month;
+use stdClass;
 
 /**
  * This file contains the class that handles testing of the assess by month class.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_assessfreq\output\assess_by_month
  */
-class assess_by_month_testcase extends advanced_testcase {
+class assess_by_month_test extends \advanced_testcase {
 
     /**
      *
@@ -82,7 +83,7 @@ class assess_by_month_testcase extends advanced_testcase {
                 continue;
             }
 
-            $record = new \stdClass();
+            $record = new stdClass();
             $record->module = 'quiz';
             $record->instanceid = $i;
             $record->courseid = $this->course->id;

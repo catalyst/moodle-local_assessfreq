@@ -22,18 +22,19 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_assessfreq\output;
 
-use local_assessfreq\output\participant_summary;
+use stdClass;
 
 /**
  * This file contains the class that handles testing of the participant summary class.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_assessfreq\output\participant_summary
  */
-class participant_summary_testcase extends advanced_testcase {
+class participant_summary_test extends \advanced_testcase {
 
     /**
      *
@@ -50,7 +51,7 @@ class participant_summary_testcase extends advanced_testcase {
         global $DB;
         $now = 1594788000;
 
-        $track1 = new \stdClass();
+        $track1 = new stdClass();
         $track1->assessid = 123;
         $track1->notloggedin = 5;
         $track1->loggedin = 0;
@@ -58,7 +59,7 @@ class participant_summary_testcase extends advanced_testcase {
         $track1->finished = 0;
         $track1->timecreated = $now + (60 * 1);
 
-        $track2 = new \stdClass();
+        $track2 = new stdClass();
         $track2->assessid = 123;
         $track2->notloggedin = 4;
         $track2->loggedin = 1;
@@ -66,7 +67,7 @@ class participant_summary_testcase extends advanced_testcase {
         $track2->finished = 0;
         $track2->timecreated = $now + (60 * 2);
 
-        $track3 = new \stdClass();
+        $track3 = new stdClass();
         $track3->assessid = 123;
         $track3->notloggedin = 3;
         $track3->loggedin = 2;
@@ -74,7 +75,7 @@ class participant_summary_testcase extends advanced_testcase {
         $track3->finished = 0;
         $track3->timecreated = $now + (60 * 3);
 
-        $track4 = new \stdClass();
+        $track4 = new stdClass();
         $track4->assessid = 123;
         $track4->notloggedin = 2;
         $track4->loggedin = 3;
@@ -82,7 +83,7 @@ class participant_summary_testcase extends advanced_testcase {
         $track4->finished = 0;
         $track4->timecreated = $now + (60 * 4);
 
-        $track5 = new \stdClass();
+        $track5 = new stdClass();
         $track5->assessid = 123;
         $track5->notloggedin = 1;
         $track5->loggedin = 4;

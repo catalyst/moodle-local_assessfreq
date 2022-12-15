@@ -22,18 +22,19 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_assessfreq\output;
 
-use local_assessfreq\output\assess_by_activity;
+use stdClass;
 
 /**
  * This file contains the class that handles testing of the assess by activity class.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_assessfreq\output\assess_by_activity
  */
-class assess_by_activity_testcase extends advanced_testcase {
+class assess_by_activity_test extends \advanced_testcase {
 
     /**
      *
@@ -75,7 +76,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         // Every even month should have two entries and every odd month one entry.
         $records = array();
 
-        $lasrecord1 = new \stdClass();
+        $lasrecord1 = new stdClass();
         $lasrecord1->module = 'quiz';
         $lasrecord1->instanceid = 1;
         $lasrecord1->courseid = $this->course->id;
@@ -86,7 +87,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord1->endmonth = 4;
         $lasrecord1->endday = 2;
 
-        $lasrecord2 = new \stdClass();
+        $lasrecord2 = new stdClass();
         $lasrecord2->module = 'assign';
         $lasrecord2->instanceid = 2;
         $lasrecord2->courseid = $this->course->id;
@@ -97,7 +98,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord2->endmonth = 4;
         $lasrecord2->endday = 3;
 
-        $lasrecord3 = new \stdClass();
+        $lasrecord3 = new stdClass();
         $lasrecord3->module = 'assign';
         $lasrecord3->instanceid = 3;
         $lasrecord3->courseid = $this->course->id;
@@ -108,7 +109,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord3->endmonth = 4;
         $lasrecord3->endday = 5;
 
-        $lasrecord4 = new \stdClass();
+        $lasrecord4 = new stdClass();
         $lasrecord4->module = 'scorm';
         $lasrecord4->instanceid = 4;
         $lasrecord4->courseid = $this->course->id;
@@ -119,7 +120,7 @@ class assess_by_activity_testcase extends advanced_testcase {
         $lasrecord4->endmonth = 4;
         $lasrecord4->endday = 6;
 
-        $lasrecord5 = new \stdClass();
+        $lasrecord5 = new stdClass();
         $lasrecord5->module = 'scorm';
         $lasrecord5->instanceid = 5;
         $lasrecord5->courseid = $this->course->id;

@@ -22,9 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_assessfreq\output;
 
-use local_assessfreq\output\student_search_table;
+use question_engine;
+use quiz_attempt;
+use context_system;
+use stdClass;
 
 /**
  * This file contains the class that handles testing of the block assess frequency class.
@@ -32,8 +35,9 @@ use local_assessfreq\output\student_search_table;
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_assessfreq\output\student_search_table
  */
-class student_search_table_testcase extends advanced_testcase {
+class student_search_table_test extends \advanced_testcase {
     /**
      *
      * @var stdClass $course Test course.
@@ -260,14 +264,14 @@ class student_search_table_testcase extends advanced_testcase {
         $generator->enrol_user($user6->id, $course->id, 'student');
 
         // Set up a couple of overrides.
-        $override1 = new \stdClass();
+        $override1 = new stdClass();
         $override1->quiz = $this->quiz1->id;
         $override1->userid = $user3->id;
         $override1->timeopen = 1593996000; // Open early.
         $override1->timeclose = 1594004400;
         $override1->timelimit = 7200;
 
-        $override2 = new \stdClass();
+        $override2 = new stdClass();
         $override2->quiz = $this->quiz1->id;
         $override2->userid = $user4->id;
         $override2->timeopen = 1593997200;
@@ -275,7 +279,7 @@ class student_search_table_testcase extends advanced_testcase {
         $override2->timelimit = 7200;
 
         // Start is more than one hour in the past, but end is in the future. (Should return).
-        $override3 = new \stdClass();
+        $override3 = new stdClass();
         $override3->quiz = 3; // OK to use fake id for this.
         $override3->userid = 5; // OK to use fake id for this.
         $override3->timeopen = ($now - (3600 * 2));
@@ -283,7 +287,7 @@ class student_search_table_testcase extends advanced_testcase {
         $override3->timelimit = 3600;
 
         // Start is less than one hour in the past, but end is in the future. (Should return).
-        $override4 = new \stdClass();
+        $override4 = new stdClass();
         $override4->quiz = 4; // OK to use fake id for this.
         $override4->userid = 6; // OK to use fake id for this.
         $override4->timeopen = ($now - (3600 * 0.5));
@@ -291,7 +295,7 @@ class student_search_table_testcase extends advanced_testcase {
         $override4->timelimit = 3600;
 
         // Start is less than one hour in the future, end is more than one hour in the future. (Should return).
-        $override5 = new \stdClass();
+        $override5 = new stdClass();
         $override5->quiz = 5; // OK to use fake id for this.
         $override5->userid = 7; // OK to use fake id for this.
         $override5->timeopen = ($now + (3600 * 0.5));
@@ -299,7 +303,7 @@ class student_search_table_testcase extends advanced_testcase {
         $override5->timelimit = 3600;
 
         // Start is less than one hour in the future, end is less that one hour in the future. (Should return).
-        $override6 = new \stdClass();
+        $override6 = new stdClass();
         $override6->quiz = 6; // OK to use fake id for this.
         $override6->userid = 8; // OK to use fake id for this.
         $override6->timeopen = ($now + (3600 * 0.25));
@@ -307,7 +311,7 @@ class student_search_table_testcase extends advanced_testcase {
         $override6->timelimit = 1800;
 
         // Start is more than one hour in the future, end is more than one hour in the future. (Should not return).
-        $override7 = new \stdClass();
+        $override7 = new stdClass();
         $override7->quiz = 7; // OK to use fake id for this.
         $override7->userid = 9; // OK to use fake id for this.
         $override7->timeopen = ($now + (3600 * 2));
@@ -315,7 +319,7 @@ class student_search_table_testcase extends advanced_testcase {
         $override7->timelimit = 3600;
 
         // Start and end date of override is more than one hour in the past. (Should not be returned).
-        $override8 = new \stdClass();
+        $override8 = new stdClass();
         $override8->quiz = 1; // OK to use fake id for this.
         $override8->userid = 3; // OK to use fake id for this.
         $override8->timeopen = ($now - (3600 * 3));
@@ -323,7 +327,7 @@ class student_search_table_testcase extends advanced_testcase {
         $override8->timelimit = 3600;
 
         // Start is more than one hour in the past, but end is less than one hour in the past. (Should return).
-        $override9 = new \stdClass();
+        $override9 = new stdClass();
         $override9->quiz = 2; // OK to use fake id for this.
         $override9->userid = 4; // OK to use fake id for this.
         $override9->timeopen = ($now - (3600 * 2));
@@ -345,7 +349,7 @@ class student_search_table_testcase extends advanced_testcase {
 
         $CFG->sessiontimeout = 60 * 10;  // Short time out for test.
 
-        $record1 = new \stdClass();
+        $record1 = new stdClass();
         $record1->state = 0;
         $record1->sid = md5('sid1');
         $record1->sessdata = null;
@@ -355,7 +359,7 @@ class student_search_table_testcase extends advanced_testcase {
         $record1->firstip = '10.0.0.1';
         $record1->lastip = '10.0.0.1';
 
-        $record2 = new \stdClass();
+        $record2 = new stdClass();
         $record2->state = 0;
         $record2->sid = md5('sid2');
         $record2->sessdata = null;
@@ -365,7 +369,7 @@ class student_search_table_testcase extends advanced_testcase {
         $record2->firstip = '10.0.0.1';
         $record2->lastip = '10.0.0.1';
 
-        $record3 = new \stdClass();
+        $record3 = new stdClass();
         $record3->state = 0;
         $record3->sid = md5('sid3');
         $record3->sessdata = null;
@@ -375,7 +379,7 @@ class student_search_table_testcase extends advanced_testcase {
         $record3->firstip = '10.0.0.1';
         $record3->lastip = '10.0.0.1';
 
-        $record4 = new \stdClass();
+        $record4 = new stdClass();
         $record4->state = 0;
         $record4->sid = md5('sid4');
         $record4->sessdata = null;
@@ -385,7 +389,7 @@ class student_search_table_testcase extends advanced_testcase {
         $record4->firstip = '10.0.0.1';
         $record4->lastip = '10.0.0.1';
 
-        $record5 = new \stdClass();
+        $record5 = new stdClass();
         $record5->state = 0;
         $record5->sid = md5('sid5');
         $record5->sessdata = null;
@@ -395,7 +399,7 @@ class student_search_table_testcase extends advanced_testcase {
         $record5->firstip = '10.0.0.1';
         $record5->lastip = '10.0.0.1';
 
-        $record6 = new \stdClass();
+        $record6 = new stdClass();
         $record6->state = 0;
         $record6->sid = md5('sid6');
         $record6->sessdata = null;

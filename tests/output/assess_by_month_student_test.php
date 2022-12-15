@@ -22,18 +22,19 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_assessfreq\output;
 
-use local_assessfreq\output\assess_by_month_student;
+use stdClass;
 
 /**
  * This file contains the class that handles testing of the assess by month class.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_assessfreq\output\assess_by_month_student
  */
-class assess_by_month_student_testcase extends advanced_testcase {
+class assess_by_month_student_test extends \advanced_testcase {
 
     /**
      *
@@ -75,7 +76,7 @@ class assess_by_month_student_testcase extends advanced_testcase {
         // Make some records to put in the database;
         // Every month should have an increasing ammount of users.
         for ($i = 1; $i <= 12; $i++) {
-            $record = new \stdClass();
+            $record = new stdClass();
             $record->module = 'quiz';
             $record->instanceid = $i;
             $record->courseid = $this->course->id;
@@ -89,7 +90,7 @@ class assess_by_month_student_testcase extends advanced_testcase {
             $eventid = $DB->insert_record('local_assessfreq_site', $record, true);
 
             for ($j = 1; $j <= $i; $j++) {
-                $userrecord = new \stdClass();
+                $userrecord = new stdClass();
                 $userrecord->userid = $j;
                 $userrecord->eventid = $eventid;
 

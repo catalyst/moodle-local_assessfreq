@@ -22,9 +22,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_assessfreq\output;
 
-use local_assessfreq\output\quiz_user_table;
+use context_system;
+use quiz_attempt;
+use stdClass;
 
 /**
  * This file contains the class that handles testing of the block assess frequency class.
@@ -32,8 +34,9 @@ use local_assessfreq\output\quiz_user_table;
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_assessfreq\output\quiz_user_table
  */
-class quiz_user_table_testcase extends advanced_testcase {
+class quiz_user_table_test extends \advanced_testcase {
 
     /**
      *
@@ -123,14 +126,14 @@ class quiz_user_table_testcase extends advanced_testcase {
         $generator->enrol_user($user4->id, $course->id, 'student');
 
         // Set up a couple of overrides.
-        $override1 = new \stdClass();
+        $override1 = new stdClass();
         $override1->quiz = $this->quiz1->id;
         $override1->userid = $user3->id;
         $override1->timeopen = 1593996000; // Open early.
         $override1->timeclose = 1594004400;
         $override1->timelimit = 7200;
 
-        $override2 = new \stdClass();
+        $override2 = new stdClass();
         $override2->quiz = $this->quiz1->id;
         $override2->userid = $user4->id;
         $override2->timeopen = 1593997200;
@@ -148,7 +151,7 @@ class quiz_user_table_testcase extends advanced_testcase {
 
         $CFG->sessiontimeout = 60 * 10;  // Short time out for test.
 
-        $record4 = new \stdClass();
+        $record4 = new stdClass();
         $record4->state = 0;
         $record4->sid = md5('sid4');
         $record4->sessdata = null;

@@ -22,9 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_assessfreq\output;
 
-use local_assessfreq\output\upcomming_quizzes;
+use stdClass;
 
 /**
  * This file contains the class that handles testing of the upcomming quizzes class.
@@ -32,8 +32,9 @@ use local_assessfreq\output\upcomming_quizzes;
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @covers     \local_assessfreq\output\upcomming_quizzes
  */
-class upcomming_quizzes_test extends advanced_testcase {
+class upcomming_quizzes_test extends \advanced_testcase {
 
     /**
      *
@@ -181,14 +182,14 @@ class upcomming_quizzes_test extends advanced_testcase {
         $generator->enrol_user($user6->id, $course->id, 'student');
 
         // Set up a couple of overrides.
-        $override1 = new \stdClass();
+        $override1 = new stdClass();
         $override1->quiz = $this->quiz3->id;
         $override1->userid = $user3->id;
         $override1->timeopen = 1593996000; // Open early.
         $override1->timeclose = 1594004400;
         $override1->timelimit = 7200;
 
-        $override2 = new \stdClass();
+        $override2 = new stdClass();
         $override2->quiz = $this->quiz4->id;
         $override2->userid = $user4->id;
         $override2->timeopen = 1593997200;
