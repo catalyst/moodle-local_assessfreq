@@ -9,5 +9,5 @@ jobs:
     # Required if you plan to publish (uncomment the below)
     # secrets:
       # moodle_org_token: ${{ secrets.MOODLE_ORG_TOKEN }}
-    with:
+    # with:
       # Any further options in this section
