@@ -1110,6 +1110,48 @@ class frequency {
     }
 
     /**
+     * Get last trend during an assessment.
+     *
+     * @param int $assessid The assessment id.
+     * @param bool $cache Fetch events from cache.
+     * @return \stdClass $trend Last trend during an assessment.
+     */
+    public function get_last_trend_by_assessid(int $assessid, bool $cache=true): \stdClass {
+        global $DB;
+        $trend = new \stdClass;
+        $cachekey = (string)$assessid;
+
+        // Try to get value from cache.
+        $trendcache = cache::make('local_assessfreq', 'trendassess');
+        $data = $trendcache->get($cachekey);
+
+        if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
+            $trend = $data->trend;
+        } else {  // Not valid cache data.
+            $sql = "SELECT *
+                      FROM {local_assessfreq_trend}
+                     WHERE assessid = ?
+                  ORDER BY id DESC
+                     LIMIT 1";
+
+            $trend = $DB->get_record_sql($sql, [$assessid]);
+        }
+
+        // Update cache.
+        if (!empty($trend)) {
+            $expiry = time() + $this->expiryperiod;
+            $data = new \stdClass();
+            $data->expiry = $expiry;
+            $data->trend = $trend;
+            $trendcache->set($cachekey, $data);
+        } else {
+            $trend = new \stdClass;
+        }
+
+        return $trend;
+    }
+
+    /**
      * Get all events on a particular day.
      *
      * @param string $date A string representations of the date to get events for.
@@ -1152,6 +1194,12 @@ class frequency {
                 if ($event->module == 'quiz') {
                     $dashurl = new \moodle_url('/local/assessfreq/dashboard_quiz.php', array('id' => $event->instanceid));
                     $event->dashurl = $dashurl->out();
+
+                    if ($attempts = $this->get_last_trend_by_assessid($event->instanceid)) {
+                        $event->attempts = $attempts->inprogress + $attempts->finished;
+                    }
+                } else {
+                    $event->attempts = get_string('na', 'local_assessfreq');
                 }
 
                 $event->courseshortname = $course->shortname;

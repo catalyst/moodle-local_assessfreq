@@ -36,6 +36,7 @@ $string['assessbymonth'] = 'Assessments due by month';
 $string['assessbymonthstudents'] = 'Students with assessments due by month';
 $string['assessheatmap'] = 'Assessment heatmap for year:';
 $string['assessoverview'] = 'Assessment overviews for year:';
+$string['attempts'] = 'Attempts';
 $string['cachedef_eventsdueactivity'] = 'Events due by activity cache';
 $string['cachedef_eventsduemonth'] = 'Events due by month cache';
 $string['cachedef_eventusers'] = 'Users for month cache';
