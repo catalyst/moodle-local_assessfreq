@@ -22,12 +22,19 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  */
 
+namespace local_assessfreq;
+
 defined('MOODLE_INTERNAL') || die();
+
+use assign;
+use context_module;
+use external_api;
+use local_assessfreq_external;
+use question_engine;
+use stdClass;
 
 global $CFG;
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
-
-use local_assessfreq\frequency;
 
 /**
  * This file contains the class that handles testing of the local assess webservice class.
@@ -35,8 +42,9 @@ use local_assessfreq\frequency;
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @covers     \local_assessfreq_external
  */
-class external_testcase extends advanced_testcase {
+class external_test extends \advanced_testcase {
 
     /**
      *
@@ -171,14 +179,14 @@ class external_testcase extends advanced_testcase {
         }
 
         // Set up a couple of overrides.
-        $override1 = new \stdClass();
+        $override1 = new stdClass();
         $override1->quiz = $this->quiz1->id;
         $override1->userid = $user3->id;
         $override1->timeopen = 1593996000; // Open early.
         $override1->timeclose = 1594004400;
         $override1->timelimit = 7200;
 
-        $override2 = new \stdClass();
+        $override2 = new stdClass();
         $override2->quiz = $this->quiz1->id;
         $override2->userid = $user4->id;
         $override2->timeopen = 1593997200;
@@ -204,7 +212,7 @@ class external_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $duedate = 0;
-        $data = new \stdClass;
+        $data = new stdClass;
         $data->year  = 2020;
         $data->metric = 'assess'; // Can be assess or students.
         $data->modules = array('all');
@@ -281,7 +289,7 @@ class external_testcase extends advanced_testcase {
         $frequency->process_site_events(0);
         $frequency->process_user_events(0);
 
-        $data = new \stdClass;
+        $data = new stdClass;
         $data->date  = '2020-03-28';
         $data->modules = array('all');
 

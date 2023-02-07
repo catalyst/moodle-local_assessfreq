@@ -7,14 +7,13 @@ Advanced assessment reporting for the Moodle LMS.
 ## Branches ##
 The following maps the plugin version to use depending on your Moodle version.
 
-| Moodle verion     | Branch      |
-| ----------------- | ----------- |
-| Moodle 3.5 to 3.8 | MOODLE_35   |
-| Moodle 3.9        | MOODLE_39   |
-| Moodle 3.10       | MOODLE_310  |
-| Moodle 3.11+      | MOODLE_311_STABLE  |
-| Moodle 4.0 and higher | MOODLE_400_STABLE  |
-
+| Moodle verion         | Branch            |
+| ----------------------| ------------------|
+| Moodle 3.5 to 3.8     | MOODLE_35         |
+| Moodle 3.9            | MOODLE_39         |
+| Moodle 3.10           | MOODLE_310        |
+| Moodle 3.11           | MOODLE_311_STABLE |
+| Moodle 4.0 and higher | MOODLE_400_STABLE |
 
 ## Plugin Installation ##
 The following steps will help you install this plugin into your Moodle instance.

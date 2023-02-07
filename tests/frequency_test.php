@@ -22,12 +22,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_assessfreq;
+
 defined('MOODLE_INTERNAL') || die();
+
+use assign;
+use cache;
+use context_module;
+use ReflectionMethod;
+use stdClass;
 
 global $CFG;
 require_once($CFG->dirroot . '/calendar/tests/helpers.php');
-
-use local_assessfreq\frequency;
 
 /**
  * This file contains the class that handles testing of the block assess frequency class.
@@ -35,8 +41,9 @@ use local_assessfreq\frequency;
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_assessfreq\frequency
  */
-class frequency_testcase extends advanced_testcase {
+class frequency_test extends \advanced_testcase {
 
     /**
      *
@@ -500,7 +507,7 @@ class frequency_testcase extends advanced_testcase {
         global $DB;
 
         // Setup records in DB.
-        $lasrecord1 = new \stdClass();
+        $lasrecord1 = new stdClass();
         $lasrecord1->module = 'quiz';
         $lasrecord1->instanceid = 1;
         $lasrecord1->courseid = 2;
@@ -511,7 +518,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord1->endmonth = 4;
         $lasrecord1->endday = 2;
 
-        $lasrecord2 = new \stdClass();
+        $lasrecord2 = new stdClass();
         $lasrecord2->module = 'quiz';
         $lasrecord2->instanceid = 2;
         $lasrecord2->courseid = 2;
@@ -522,7 +529,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord2->endmonth = 4;
         $lasrecord2->endday = 3;
 
-        $lasrecord3 = new \stdClass();
+        $lasrecord3 = new stdClass();
         $lasrecord3->module = 'quiz';
         $lasrecord3->instanceid = 3;
         $lasrecord3->courseid = 2;
@@ -533,7 +540,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord3->endmonth = 4;
         $lasrecord3->endday = 5;
 
-        $lasrecord4 = new \stdClass();
+        $lasrecord4 = new stdClass();
         $lasrecord4->module = 'quiz';
         $lasrecord4->instanceid = 4;
         $lasrecord4->courseid = 2;
@@ -544,7 +551,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord4->endmonth = 4;
         $lasrecord4->endday = 6;
 
-        $lasrecord5 = new \stdClass();
+        $lasrecord5 = new stdClass();
         $lasrecord5->module = 'quiz';
         $lasrecord5->instanceid = 5;
         $lasrecord5->courseid = 2;
@@ -555,7 +562,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord5->endmonth = 4;
         $lasrecord5->endday = 7;
 
-        $lasrecord6 = new \stdClass();
+        $lasrecord6 = new stdClass();
         $lasrecord6->module = 'assign';
         $lasrecord6->instanceid = 6;
         $lasrecord6->courseid = 2;
@@ -566,7 +573,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord6->endmonth = 4;
         $lasrecord6->endday = 6;
 
-        $lasrecord7 = new \stdClass();
+        $lasrecord7 = new stdClass();
         $lasrecord7->module = 'quiz';
         $lasrecord7->instanceid = 7;
         $lasrecord7->courseid = 2;
@@ -597,7 +604,7 @@ class frequency_testcase extends advanced_testcase {
                     if ($userid == 789 && $record->instanceid == 3) {
                         continue;
                     }
-                    $userrecord = new \stdClass();
+                    $userrecord = new stdClass();
                     $userrecord->userid = $userid;
                     $userrecord->eventid = $eventid;
                     $DB->insert_record('local_assessfreq_user', $userrecord);
@@ -646,7 +653,7 @@ class frequency_testcase extends advanced_testcase {
                 continue;
             }
 
-            $record = new \stdClass();
+            $record = new stdClass();
             $record->module = 'quiz';
             $record->instanceid = $i;
             $record->courseid = $this->course->id;
@@ -726,7 +733,7 @@ class frequency_testcase extends advanced_testcase {
         // Every even month should have two entries and every odd month one entry.
         $records = array();
 
-        $lasrecord1 = new \stdClass();
+        $lasrecord1 = new stdClass();
         $lasrecord1->module = 'quiz';
         $lasrecord1->instanceid = 1;
         $lasrecord1->courseid = 2;
@@ -737,7 +744,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord1->endmonth = 4;
         $lasrecord1->endday = 2;
 
-        $lasrecord2 = new \stdClass();
+        $lasrecord2 = new stdClass();
         $lasrecord2->module = 'quiz';
         $lasrecord2->instanceid = 2;
         $lasrecord2->courseid = 2;
@@ -748,7 +755,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord2->endmonth = 4;
         $lasrecord2->endday = 3;
 
-        $lasrecord3 = new \stdClass();
+        $lasrecord3 = new stdClass();
         $lasrecord3->module = 'quiz';
         $lasrecord3->instanceid = 3;
         $lasrecord3->courseid = 2;
@@ -759,7 +766,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord3->endmonth = 4;
         $lasrecord3->endday = 5;
 
-        $lasrecord4 = new \stdClass();
+        $lasrecord4 = new stdClass();
         $lasrecord4->module = 'quiz';
         $lasrecord4->instanceid = 4;
         $lasrecord4->courseid = 2;
@@ -823,7 +830,7 @@ class frequency_testcase extends advanced_testcase {
         // Every even month should have two entries and every odd month one entry.
         $records = array();
 
-        $lasrecord1 = new \stdClass();
+        $lasrecord1 = new stdClass();
         $lasrecord1->module = 'quiz';
         $lasrecord1->instanceid = 1;
         $lasrecord1->courseid = $this->course->id;
@@ -834,7 +841,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord1->endmonth = 4;
         $lasrecord1->endday = 2;
 
-        $lasrecord2 = new \stdClass();
+        $lasrecord2 = new stdClass();
         $lasrecord2->module = 'assign';
         $lasrecord2->instanceid = 2;
         $lasrecord2->courseid = $this->course->id;
@@ -845,7 +852,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord2->endmonth = 4;
         $lasrecord2->endday = 3;
 
-        $lasrecord3 = new \stdClass();
+        $lasrecord3 = new stdClass();
         $lasrecord3->module = 'assign';
         $lasrecord3->instanceid = 3;
         $lasrecord3->courseid = $this->course->id;
@@ -856,7 +863,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord3->endmonth = 4;
         $lasrecord3->endday = 5;
 
-        $lasrecord4 = new \stdClass();
+        $lasrecord4 = new stdClass();
         $lasrecord4->module = 'forum';
         $lasrecord4->instanceid = 4;
         $lasrecord4->courseid = $this->course->id;
@@ -867,7 +874,7 @@ class frequency_testcase extends advanced_testcase {
         $lasrecord4->endmonth = 4;
         $lasrecord4->endday = 6;
 
-        $lasrecord5 = new \stdClass();
+        $lasrecord5 = new stdClass();
         $lasrecord5->module = 'forum';
         $lasrecord5->instanceid = 5;
         $lasrecord5->courseid = $this->course->id;
@@ -920,7 +927,7 @@ class frequency_testcase extends advanced_testcase {
         // Make some records to put in the database;
         // Every month should have an increasing ammount of users.
         for ($i = 1; $i <= 12; $i++) {
-            $record = new \stdClass();
+            $record = new stdClass();
             $record->module = 'quiz';
             $record->instanceid = $i;
             $record->courseid = $this->course->id;
@@ -934,7 +941,7 @@ class frequency_testcase extends advanced_testcase {
             $eventid = $DB->insert_record('local_assessfreq_site', $record, true);
 
             for ($j = 1; $j <= $i; $j++) {
-                $userrecord = new \stdClass();
+                $userrecord = new stdClass();
                 $userrecord->userid = $j;
                 $userrecord->eventid = $eventid;
 
