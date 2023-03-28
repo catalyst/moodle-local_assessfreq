@@ -602,12 +602,14 @@ class quiz {
         $finishedusers = array();
 
         $sql = 'SELECT userid, state
-                   FROM {quiz_attempts}
-                  WHERE id IN (
-                        SELECT MAX(id)
-                          FROM {quiz_attempts}
-                         WHERE quiz = ?
-                      GROUP BY userid)';
+                  FROM {quiz_attempts} qa
+                  JOIN (
+                      SELECT MAX(id) id
+                      FROM {quiz_attempts}
+                      WHERE quiz = ?
+                      GROUP BY userid)
+                    AS qb
+                    ON qa.id = qb.id';
 
         $params = array($quizid);
 
