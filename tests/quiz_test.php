@@ -25,7 +25,7 @@
 namespace local_assessfreq;
 
 use question_engine;
-use quiz_attempt;
+use \mod_quiz\quiz_attempt;
 use stdClass;
 
 /**
@@ -221,7 +221,7 @@ class quiz_test extends \advanced_testcase {
         ));
 
         // Add questions to quiz.
-        $quizobj = \quiz::create($this->quiz1->id);
+        $quizobj = \mod_quiz\quiz_settings::create($this->quiz1->id);
         $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 

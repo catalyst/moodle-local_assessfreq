@@ -154,7 +154,7 @@ class external_test extends \advanced_testcase {
         $generator->enrol_user($user4->id, $course->id, 'student');
 
         // Add questions to quiz.
-        $quizobj = \quiz::create($this->quiz1->id);
+        $quizobj = \mod_quiz\quiz_settings::create($this->quiz1->id);
         $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 
@@ -199,7 +199,7 @@ class external_test extends \advanced_testcase {
         $this->user1 = $user1;
         $this->user2 = $user2;
         $this->user3 = $user3;
-        $this->user3 = $user4;
+        $this->user4 = $user4;
 
         set_config('modules', 'quiz,assign,scorm,choice', 'local_assessfreq');
     }
@@ -207,6 +207,8 @@ class external_test extends \advanced_testcase {
 
     /**
      * Test ajax getting of event data.
+     *
+     * @runInSeparateProcess
      */
     public function test_get_frequency() {
         $this->setAdminUser();
@@ -248,6 +250,8 @@ class external_test extends \advanced_testcase {
 
     /**
      * Test ajax getting of event data.
+     *
+     * @runInSeparateProcess
      */
     public function test_get_process_modules() {
         global $DB;
@@ -281,6 +285,8 @@ class external_test extends \advanced_testcase {
 
     /**
      * Test ajax getting of day event data.
+     *
+     * @runInSeparateProcess
      */
     public function test_get_day_events() {
         $this->setAdminUser();
@@ -308,6 +314,8 @@ class external_test extends \advanced_testcase {
 
     /**
      * Test ajax getting of course names.
+     *
+     * @runInSeparateProcess
      */
     public function test_get_courses() {
         $this->setAdminUser();
@@ -323,6 +331,8 @@ class external_test extends \advanced_testcase {
 
     /**
      * Test ajax getting of quiz names.
+     *
+     * @runInSeparateProcess
      */
     public function test_get_quizzes() {
         $this->setAdminUser();
@@ -346,6 +356,8 @@ class external_test extends \advanced_testcase {
 
     /**
      * Test ajax getting of quiz names.
+     *
+     * @runInSeparateProcess
      */
     public function test_get_quiz_data() {
         $this->setAdminUser();
@@ -367,6 +379,8 @@ class external_test extends \advanced_testcase {
 
     /**
      * Test setting table preferences.
+     *
+     * @runInSeparateProcess
      */
     public function test_set_table_preference() {
         global $SESSION;
@@ -389,6 +403,8 @@ class external_test extends \advanced_testcase {
 
     /**
      * Test ajax getting of in progress quiz counts.
+     *
+     * @runInSeparateProcess
      */
     public function test_get_inprogress_counts() {
         $this->setAdminUser();

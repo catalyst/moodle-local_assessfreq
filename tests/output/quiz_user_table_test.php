@@ -25,7 +25,7 @@
 namespace local_assessfreq\output;
 
 use context_system;
-use quiz_attempt;
+use \mod_quiz\quiz_attempt;
 use stdClass;
 
 /**
