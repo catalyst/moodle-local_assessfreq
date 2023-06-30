@@ -883,7 +883,7 @@ class frequency {
         global $DB;
 
         $rowkey = $DB->sql_concat('s.id', "'_'", 'u.userid');
-        $sql = "SELECT $rowkey as row, u.userid, s.*
+        $sql = "SELECT $rowkey as myrow, u.userid, s.*
                  FROM {local_assessfreq_site} s
            INNER JOIN {local_assessfreq_user} u ON u.eventid = s.id
            INNER JOIN {course} c ON s.courseid = c.id";
