@@ -242,7 +242,13 @@ class local_assessfreq_external extends external_api {
         $params = array('fullname' => '%' . $DB->sql_like_escape($query) . '%');
         $courses = $DB->get_records_sql($sql, $params, 0, 11);
 
-        return json_encode(array_values($courses));
+        $data = [];
+        foreach ($courses as $course) {
+            $data[$course->id] = ["id" => $course->id, "fullname" => format_string($course->fullname,
+                true, ["context" => $context, "escape" => false])];
+        }
+
+        return json_encode(array_values($data));
     }
 
     /**
@@ -289,7 +295,13 @@ class local_assessfreq_external extends external_api {
         $params = array('course' => $query);
         $quizzes = $DB->get_records('quiz', $params, 'name ASC', 'id, name');
 
-        return json_encode(array_values($quizzes));
+        $data = [];
+        foreach ($quizzes as $quiz) {
+            $data[$quiz->id] = ["id" => $quiz->id, "name" => format_string($quiz->name,
+                true, ["context" => $context, "escape" => false])];
+        }
+
+        return json_encode(array_values($data));
     }
 
     /**

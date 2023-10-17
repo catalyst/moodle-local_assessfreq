@@ -190,7 +190,7 @@ class student_search_table extends table_sql implements renderable {
     public function col_quizname($row) {
 
         $quizurl = new \moodle_url('/mod/quiz/view.php', array('id' => $row->quizinstance));
-        $quizlink = \html_writer::link($quizurl, $row->quizname);
+        $quizlink = \html_writer::link($quizurl, format_string($row->quizname, true));
 
         return $quizlink;
     }
