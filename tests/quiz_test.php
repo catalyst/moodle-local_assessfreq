@@ -25,7 +25,6 @@
 namespace local_assessfreq;
 
 use question_engine;
-use quiz_attempt;
 use stdClass;
 
 /**
@@ -221,7 +220,7 @@ class quiz_test extends \advanced_testcase {
         ));
 
         // Add questions to quiz.
-        $quizobj = \quiz::create($this->quiz1->id);
+        $quizobj = \mod_quiz\quiz_settings::create($this->quiz1->id);
         $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 
@@ -420,35 +419,35 @@ class quiz_test extends \advanced_testcase {
         $fakeattempt->attempt = 3;
         $fakeattempt->sumgrades = 50;
         $fakeattempt->uniqueid = 13;
-        $fakeattempt->state = quiz_attempt::FINISHED;
+        $fakeattempt->state = \mod_quiz\quiz_attempt::FINISHED;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
         $fakeattempt->userid = $this->user1->id;
         $fakeattempt->attempt = 2;
         $fakeattempt->sumgrades = 50;
         $fakeattempt->uniqueid = 26;
-        $fakeattempt->state = quiz_attempt::IN_PROGRESS;
+        $fakeattempt->state = \mod_quiz\quiz_attempt::IN_PROGRESS;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
         $fakeattempt->userid = $this->user2->id;
         $fakeattempt->attempt = 1;
         $fakeattempt->sumgrades = 30;
         $fakeattempt->uniqueid = 52;
-        $fakeattempt->state = quiz_attempt::ABANDONED;
+        $fakeattempt->state = \mod_quiz\quiz_attempt::ABANDONED;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
         $fakeattempt->userid = $this->user3->id;
         $fakeattempt->attempt = 3;
         $fakeattempt->sumgrades = 50;
         $fakeattempt->uniqueid = 53;
-        $fakeattempt->state = quiz_attempt::FINISHED;
+        $fakeattempt->state = \mod_quiz\quiz_attempt::FINISHED;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
         $fakeattempt->attempt = 1;
         $fakeattempt->userid = $this->user5->id;
         $fakeattempt->sumgrades = 100;
         $fakeattempt->uniqueid = 65;
-        $fakeattempt->state = quiz_attempt::OVERDUE;
+        $fakeattempt->state = \mod_quiz\quiz_attempt::OVERDUE;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
     }

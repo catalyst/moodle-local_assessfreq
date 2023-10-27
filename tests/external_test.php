@@ -33,9 +33,6 @@ use local_assessfreq_external;
 use question_engine;
 use stdClass;
 
-global $CFG;
-require_once($CFG->dirroot . '/webservice/tests/helpers.php');
-
 /**
  * This file contains the class that handles testing of the local assess webservice class.
  *
@@ -43,6 +40,8 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  * @covers     \local_assessfreq_external
+ *
+ * @runTestsInSeparateProcesses
  */
 class external_test extends \advanced_testcase {
 
@@ -114,6 +113,8 @@ class external_test extends \advanced_testcase {
 
         global $CFG, $DB;
 
+        require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+
         // Create a course with activity.
         $generator = $this->getDataGenerator();
         $layout = '1,2,0,3,4,0,5,6,0';
@@ -166,7 +167,7 @@ class external_test extends \advanced_testcase {
         $generator->enrol_user($user4->id, $course->id, 'student');
 
         // Add questions to quiz.
-        $quizobj = \quiz::create($this->quiz1->id);
+        $quizobj = \mod_quiz\quiz_settings::create($this->quiz1->id);
         $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 

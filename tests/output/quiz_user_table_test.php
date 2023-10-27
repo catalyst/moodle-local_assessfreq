@@ -25,7 +25,6 @@
 namespace local_assessfreq\output;
 
 use context_system;
-use quiz_attempt;
 use stdClass;
 
 /**
@@ -172,21 +171,21 @@ class quiz_user_table_test extends \advanced_testcase {
         $fakeattempt->attempt = 1;
         $fakeattempt->sumgrades = 50;
         $fakeattempt->uniqueid = 13;
-        $fakeattempt->state = quiz_attempt::FINISHED;
+        $fakeattempt->state = \mod_quiz\quiz_attempt::FINISHED;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
         $fakeattempt->timestart = time() + 30;
         $fakeattempt->attempt = 2;
         $fakeattempt->sumgrades = 50;
         $fakeattempt->uniqueid = 26;
-        $fakeattempt->state = quiz_attempt::IN_PROGRESS;
+        $fakeattempt->state = \mod_quiz\quiz_attempt::IN_PROGRESS;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
         $fakeattempt->userid = $user2->id;
         $fakeattempt->attempt = 1;
         $fakeattempt->sumgrades = null;
         $fakeattempt->uniqueid = 39;
-        $fakeattempt->state = quiz_attempt::FINISHED;
+        $fakeattempt->state = \mod_quiz\quiz_attempt::FINISHED;
         $DB->insert_record('quiz_attempts', $fakeattempt);
 
     }
