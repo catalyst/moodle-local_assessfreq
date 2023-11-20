@@ -1219,7 +1219,10 @@ class frequency {
         } else {
             // Work through the event array.
             foreach ($modules as $module) {
-                $events = array_merge($events, $this->$functionname($module, $from, $to));
+                $records = $this->$functionname($module, $from, $to);
+                foreach ($records as $record) {
+                    $events[] = $record;
+                }
             }
         }
 
