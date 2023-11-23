@@ -49,7 +49,7 @@ if ($action === null) {
     $actionurl = new moodle_url('/local/assessfreq/history.php', array('action' => 'confirmed'));
     $cancelurl = new moodle_url('/local/assessfreq/history.php');
     echo $OUTPUT->confirm(get_string('confirmreprocess', 'local_assessfreq'),
-        new single_button($actionurl, get_string('continue'), 'post', true),
+        new single_button($actionurl, get_string('continue'), 'post', single_button::BUTTON_SECONDARY),
         new single_button($cancelurl, get_string('cancel'), 'get'));
 
 } else if ($action == 'confirmed') {
