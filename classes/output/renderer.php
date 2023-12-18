@@ -25,8 +25,6 @@ namespace local_assessfreq\output;
 
 use local_assessfreq\quiz;
 
-defined('MOODLE_INTERNAL') || die;
-
 use plugin_renderer_base;
 use local_assessfreq\frequency;
 

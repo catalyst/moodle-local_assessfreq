@@ -24,8 +24,6 @@
 
 namespace local_assessfreq\output;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Renderable for participant summary card.
  *

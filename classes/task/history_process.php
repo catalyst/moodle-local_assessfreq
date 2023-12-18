@@ -25,8 +25,6 @@ namespace local_assessfreq\task;
 
 use core\task\adhoc_task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Adhoc task to process historical data used in plugin.
  *

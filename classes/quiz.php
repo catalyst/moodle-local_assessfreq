@@ -26,8 +26,6 @@ namespace local_assessfreq;
 
 use mod_quiz\question\bank\qbank_helper;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Quiz data class.
  *

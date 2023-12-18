@@ -24,8 +24,6 @@
 
 namespace local_assessfreq;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Utils class.
  *

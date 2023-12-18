@@ -24,8 +24,6 @@
 
 namespace local_assessfreq\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Event class.
  *

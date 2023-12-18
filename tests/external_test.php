@@ -24,8 +24,6 @@
 
 namespace local_assessfreq;
 
-defined('MOODLE_INTERNAL') || die();
-
 use assign;
 use context_module;
 use external_api;

@@ -26,8 +26,6 @@ namespace local_assessfreq\output;
 
 use local_assessfreq\frequency;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Renderable for assessments due by month student card.
  *

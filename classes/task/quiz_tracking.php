@@ -25,8 +25,6 @@ namespace local_assessfreq\task;
 
 use core\task\scheduled_task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A scheduled task to track the process of quizzes in the system.
  *
