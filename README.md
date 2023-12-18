@@ -1,8 +1,32 @@
 ![Build Status](https://github.com/catalyst/moodle-local_assessfreq/actions/workflows/master.yml/badge.svg?branch=master)
 
-# Assessment frequency #
+# Assessment frequency
+Advanced assessment reporting for the Moodle LMS. It adds four new
+reports which can be accessed from
 
-Advanced assessment reporting for the Moodle LMS.
+youroodlesite/admin/category.php?category=local_assessfreq_reports
+
+### The new reports
+* Assessment dashboard
+* Quiz dashboard
+* Quizzes in progress dashboard
+* Student Search
+
+#### Assessment Dashboard
+The Assessment Dashboard displays a page divided into summary cards at the top and a heatmap
+calendar section below that. It can be used to identify “bunching” of
+assignment submission dates. The heatmap calendar shows colours to
+indicate the density of submissions required on each day.
+There is a year selector for both the summary and heatmap sections
+
+### Quiz dashboard
+The Quiz Dashboard shows a summary of quiz data after selecting a course and quiz.It displays a summary of the quiz e.g. open and closing times and participant count. Below that is a report on student attempts.
+
+### Quizzes in progress dashboard
+The Quizzes in progress dashboard shows a sitewide summary of quizzes in progress based on the open and closing dates.
+
+### Student search
+The Student search report shows student attempt status site wide with buttons for "hours behind" and "hours ahead.
 
 ## Branches ##
 The following maps the plugin version to use depending on your Moodle version.
@@ -28,7 +52,12 @@ Once the plugin is installed, next the Moodle setup needs to be performed.
 **Note:** It is recommended that installation be completed via the command line instead of the Moodle user interface.
 
 ## Moodle setup
-TODO: this
+This plugin creates two new scheduled tasks,
+\local_assessfreq\task\data_process
+\local_assessfreq\task\quiz_tracking
+Which can be viewed on yourmoodlesite.edu/admin/tool/task/scheduledtasks.php
+After installation Cron must be run to populate the tables that allow the reports to work.
+
 
 
 ## License ##
