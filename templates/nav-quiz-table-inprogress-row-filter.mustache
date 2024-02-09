@@ -15,12 +15,18 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_assessfreq/nav-year-filter
+    @template local_assessfreq/nav-quiz-table-inprogress-row-filter
 
     This template renders the day range selector for the timeline view.
 
     Example context (json):
-    {}
+    {
+        "rows": {
+            "rows5": true,
+            "rows10": false,
+            "rows20": false
+        }
+    }
 }}
 <div id="local-assessfreq-quiz-inprogress-table-rows" data-region="rows-filter">
     <button type="button" class="btn btn-secondary dropdown-toggle icon-no-margin"
