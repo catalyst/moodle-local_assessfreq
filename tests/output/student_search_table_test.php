@@ -147,78 +147,79 @@ class student_search_table_test extends \advanced_testcase {
         $generator = $this->getDataGenerator();
         $layout = '1,2,0,3,4,0,5,6,0';
         $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => 1),
-            array('createsections' => true));
-        $this->quiz1 = $generator->create_module('quiz', array(
+            ['format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1, ],
+            ['createsections' => true]
+        );
+        $this->quiz1 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => 1593910800,
             'timeclose' => 1593914400,
             'timelimit' => 3600,
-            'layout' => $layout
-        ));
-        $this->quiz2 = $generator->create_module('quiz', array(
+            'layout' => $layout,
+        ]);
+        $this->quiz2 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => 1593997200,
             'timeclose' => 1594004400,
-            'timelimit' => 7200
-        ));
+            'timelimit' => 7200,
+        ]);
 
         // Start is more than one hour in the past, but end is in the future. (Should return).
-        $this->quiz3 = $generator->create_module('quiz', array(
+        $this->quiz3 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 2)),
             'timeclose' => ($now + (3600 * 0.5)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is less than one hour in the past, but end is in the future. (Should return).
-        $this->quiz4 = $generator->create_module('quiz', array(
+        $this->quiz4 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 0.5)),
             'timeclose' => ($now + (3600 * 0.5)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is less than one hour in the future, end is more than one hour in the future. (Should return).
-        $this->quiz5 = $generator->create_module('quiz', array(
+        $this->quiz5 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 0.5)),
             'timeclose' => ($now + (3600 * 2)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is less than one hour in the future, end is less that one hour in the future. (Should return).
-        $this->quiz6 = $generator->create_module('quiz', array(
+        $this->quiz6 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 0.25)),
             'timeclose' => ($now + (3600 * 0.75)),
-            'timelimit' => 1800
-        ));
+            'timelimit' => 1800,
+        ]);
 
         // Start is more than one hour in the future, end is more than one hour in the future. (Should not return).
-        $this->quiz7 = $generator->create_module('quiz', array(
+        $this->quiz7 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 2)),
             'timeclose' => ($now + (3600 * 3)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start and end date of override is more than one hour in the past. (Should not be returned).
-        $this->quiz8 = $generator->create_module('quiz', array(
+        $this->quiz8 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 3)),
             'timeclose' => ($now - (3600 * 2)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is more than one hour in the past, but end is less than one hour in the past. (Should return).
-        $this->quiz9 = $generator->create_module('quiz', array(
+        $this->quiz9 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 2)),
             'timeclose' => ($now - (3600 * 0.5)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Add questions to quiz.
         $quizobj = \quiz::create($this->quiz1->id);
@@ -237,7 +238,6 @@ class student_search_table_test extends \advanced_testcase {
 
             if ($slot % 2 == 0) {
                 $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
-
             } else {
                 $question = $questiongenerator->create_question('essay', null, ['category' => $cat->id]);
             }
@@ -334,9 +334,9 @@ class student_search_table_test extends \advanced_testcase {
         $override9->timeclose = ($now - (3600 * 0.5));
         $override9->timelimit = 3600;
 
-        $overriderecords = array(
-            $override1, $override2, $override3, $override4, $override5, $override6, $override7, $override8, $override9
-        );
+        $overriderecords = [
+            $override1, $override2, $override3, $override4, $override5, $override6, $override7, $override8, $override9,
+        ];
 
         $DB->insert_records('quiz_overrides', $overriderecords);
 
@@ -409,7 +409,7 @@ class student_search_table_test extends \advanced_testcase {
         $record6->firstip = '10.0.0.1';
         $record6->lastip = '10.0.0.1';
 
-        $sessionrecords = array($record1, $record2, $record3, $record4, $record5, $record6);
+        $sessionrecords = [$record1, $record2, $record3, $record4, $record5, $record6];
         $DB->insert_records('sessions', $sessionrecords);
 
         $fakeattempt = new stdClass();
@@ -451,12 +451,11 @@ class student_search_table_test extends \advanced_testcase {
         $fakeattempt->uniqueid = 65;
         $fakeattempt->state = quiz_attempt::OVERDUE;
         $DB->insert_record('quiz_attempts', $fakeattempt);
-
     }
     /**
      * Test getting table data.
      */
-    public function test_get_table_data() {
+    public function test_get_table_data(): void {
         global $CFG;
 
         $baseurl = $CFG->wwwroot . '/local/assessfreq/dashboard_quiz.php';

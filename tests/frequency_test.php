@@ -44,7 +44,6 @@ require_once($CFG->dirroot . '/calendar/tests/helpers.php');
  * @covers     \local_assessfreq\frequency
  */
 class frequency_test extends \advanced_testcase {
-
     /**
      *
      * @var stdClass $course Test course.
@@ -86,17 +85,18 @@ class frequency_test extends \advanced_testcase {
         // Create a course with activity.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => 1),
-            array('createsections' => true));
-        $assignrow1 = $generator->create_module('assign', array(
+            ['format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1, ],
+            ['createsections' => true]
+        );
+        $assignrow1 = $generator->create_module('assign', [
             'course' => $course->id,
-            'duedate' => 1585359375
-        ));
-        $assignrow2 = $generator->create_module('assign', array(
+            'duedate' => 1585359375,
+        ]);
+        $assignrow2 = $generator->create_module('assign', [
             'course' => $course->id,
-            'duedate' => 1585445775
-        ));
+            'duedate' => 1585445775,
+        ]);
         $this->assign1 = new assign(context_module::instance($assignrow1->cmid), false, false);
         $this->assign2 = new assign(context_module::instance($assignrow2->cmid), false, false);
         $this->assign1->cmid = $assignrow1->cmid;
@@ -120,7 +120,7 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting a modules events.
      */
-    public function test_get_module_events() {
+    public function test_get_module_events(): void {
         $sql = 'SELECT cm.id, cm.course, m.name, cm.instance, c.id as contextid, a.duedate
                   FROM {course_modules} cm
             INNER JOIN {modules} m ON cm.module = m.id
@@ -132,7 +132,7 @@ class frequency_test extends \advanced_testcase {
                        AND a.duedate > ?
                        AND cm.visible = ?
                        AND course.visible = ?';
-        $params = array('assign', CONTEXT_MODULE, 0, 1, 1);
+        $params = ['assign', CONTEXT_MODULE, 0, 1, 1];
 
         $frequency = new frequency();
 
@@ -141,7 +141,7 @@ class frequency_test extends \advanced_testcase {
         $method->setAccessible(true); // Allow accessing of private method.
 
         $result = $method->invoke($frequency, $sql, $params);
-        $contextids = array($this->assign1->get_context()->id, $this->assign2->get_context()->id);
+        $contextids = [$this->assign1->get_context()->id, $this->assign2->get_context()->id];
 
         foreach ($result as $record) {
             $this->assertEquals($this->course->id, $record->course);
@@ -149,13 +149,12 @@ class frequency_test extends \advanced_testcase {
             $this->assertEquals('assign', $record->name);
         }
         $result->close();
-
     }
 
     /**
      * Test format time method.
      */
-    public function test_format_time() {
+    public function test_format_time(): void {
         $frequency = new frequency();
         $timestamp = 1585445775;
 
@@ -173,7 +172,7 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test process module events method.
      */
-    public function test_process_module_events() {
+    public function test_process_module_events(): void {
 
         global $DB;
         $frequency = new frequency();
@@ -189,7 +188,7 @@ class frequency_test extends \advanced_testcase {
                        AND a.duedate > ?
                        AND cm.visible = ?
                        AND course.visible = ?';
-        $params = array('assign', CONTEXT_MODULE, 0, 1, 1);
+        $params = ['assign', CONTEXT_MODULE, 0, 1, 1];
 
         // We're testing a private method, so we need to setup reflector magic.
         $method = new ReflectionMethod('\local_assessfreq\frequency', 'get_module_events');
@@ -205,8 +204,8 @@ class frequency_test extends \advanced_testcase {
         $this->assertEquals(2, $result); // Check the expected number of records inserted.
 
         // Check actual records in the DB.
-        $record1 = $DB->get_record('local_assessfreq_site', array('instanceid' => $this->assign1->get_course_module()->instance));
-        $record2 = $DB->get_record('local_assessfreq_site', array('instanceid' => $this->assign2->get_course_module()->instance));
+        $record1 = $DB->get_record('local_assessfreq_site', ['instanceid' => $this->assign1->get_course_module()->instance]);
+        $record2 = $DB->get_record('local_assessfreq_site', ['instanceid' => $this->assign2->get_course_module()->instance]);
 
         $this->assertEquals(28, $record1->endday);
         $this->assertEquals(29, $record2->endday);
@@ -216,13 +215,12 @@ class frequency_test extends \advanced_testcase {
         // In this case the cleanup task won't have deleted the records so we need to test it at process/update time.
         $recordset = $method->invoke($frequency, $sql, $params);
         $result = $method2->invoke($frequency, $recordset);
-
     }
 
     /**
      * Test process site events method.
      */
-    public function test_process_site_events() {
+    public function test_process_site_events(): void {
         global $DB;
 
         $now = 1585359400;
@@ -232,14 +230,14 @@ class frequency_test extends \advanced_testcase {
         $this->assertEquals(1, $result);
 
         // Check actual records in the DB.
-        $record = $DB->get_record('local_assessfreq_site', array('instanceid' => $this->assign2->get_course_module()->instance));
+        $record = $DB->get_record('local_assessfreq_site', ['instanceid' => $this->assign2->get_course_module()->instance]);
         $this->assertEquals(29, $record->endday);
     }
 
     /**
      * Test process site events method.
      */
-    public function test_delete_events() {
+    public function test_delete_events(): void {
         global $DB;
 
         $duedate = 0;
@@ -274,20 +272,19 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test process getting raw users for an event.
      */
-    public function test_get_event_users_raw() {
+    public function test_get_event_users_raw(): void {
         $frequency = new frequency();
 
         $result = $frequency->get_event_users_raw($this->assign1->get_context()->id, 'assign');
 
         $this->assertEquals($this->user1->id, $result[$this->user1->id]->id);
         $this->assertEquals($this->user2->id, $result[$this->user2->id]->id);
-
     }
 
     /**
      * Test process getting users for an event.
      */
-    public function test_get_event_users() {
+    public function test_get_event_users(): void {
         $duedate = 0;
         $frequency = new frequency();
         $frequency->process_site_events($duedate);
@@ -308,13 +305,12 @@ class frequency_test extends \advanced_testcase {
 
         $data = $eventuserscache->get($cachekey);
         $this->assertCount(2, $data->users);
-
     }
 
     /**
      * Test process processing user events.
      */
-    public function test_process_user_events() {
+    public function test_process_user_events(): void {
         global $DB;
 
         $duedate = 0;
@@ -326,8 +322,8 @@ class frequency_test extends \advanced_testcase {
         $this->assertEquals(4, $result);
 
         // Check the reocrds in the database.
-        $count1 = $DB->count_records('local_assessfreq_user', array('userid' => $this->user1->id));
-        $count2 = $DB->count_records('local_assessfreq_user', array('userid' => $this->user2->id));
+        $count1 = $DB->count_records('local_assessfreq_user', ['userid' => $this->user1->id]);
+        $count2 = $DB->count_records('local_assessfreq_user', ['userid' => $this->user2->id]);
 
         $this->assertEquals(2, $count1);
         $this->assertEquals(2, $count2);
@@ -336,7 +332,7 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test filtering event by dater events.
      */
-    public function test_filter_event_data() {
+    public function test_filter_event_data(): void {
         global $DB;
 
         $duedate = 0;
@@ -365,7 +361,7 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting site events and cache.
      */
-    public function test_get_site_events() {
+    public function test_get_site_events(): void {
         global $DB;
 
         $duedate = 0;
@@ -390,7 +386,7 @@ class frequency_test extends \advanced_testcase {
         $this->assertEmpty($data);
 
         $this->course->visible = 0;
-        $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+        $DB->set_field('course', 'visible', 0, ['id' => $this->course->id]);
 
         $result = $frequency->get_site_events('all', 0, 0, false);
         $this->assertEmpty($result);
@@ -398,13 +394,12 @@ class frequency_test extends \advanced_testcase {
         set_config('hiddencourses', '1', 'local_assessfreq');
         $result = $frequency->get_site_events('all', 0, 0, false);
         $this->assertCount(2, $result);
-
     }
 
     /**
      * Test getting course events and cache.
      */
-    public function test_get_course_events() {
+    public function test_get_course_events(): void {
         $duedate = 0;
         $frequency = new frequency();
         $frequency->process_site_events($duedate);
@@ -433,7 +428,7 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting user events and cache.
      */
-    public function test_get_user_events() {
+    public function test_get_user_events(): void {
         global $DB;
 
         $duedate = 0;
@@ -462,7 +457,7 @@ class frequency_test extends \advanced_testcase {
         $this->assertEmpty($data);
 
         $this->course->visible = 0;
-        $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+        $DB->set_field('course', 'visible', 0, ['id' => $this->course->id]);
 
         $result = $frequency->get_user_events($this->user1->id, 'all', 0, 0, false);
         $this->assertEmpty($result);
@@ -475,7 +470,7 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting all user events and cache.
      */
-    public function test_get_user_events_all() {
+    public function test_get_user_events_all(): void {
         global $DB;
 
         $duedate = 0;
@@ -490,7 +485,7 @@ class frequency_test extends \advanced_testcase {
         $this->assertEmpty($result);
 
         $this->course->visible = 0;
-        $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+        $DB->set_field('course', 'visible', 0, ['id' => $this->course->id]);
 
         $result = iterator_to_array($frequency->get_user_events_all('all', 0, 0, false));
         $this->assertEmpty($result);
@@ -503,7 +498,7 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting conflict data.
      */
-    public function test_get_conflicts() {
+    public function test_get_conflicts(): void {
         global $DB;
 
         // Setup records in DB.
@@ -593,9 +588,9 @@ class frequency_test extends \advanced_testcase {
         // Record 7 should not have any conflicts because it has no users.
 
         // Insert records in to database.
-        $records = array($lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4, $lasrecord5, $lasrecord6, $lasrecord7);
-        $userids = array(234, 456, 789);
-        $eventarray = array();
+        $records = [$lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4, $lasrecord5, $lasrecord6, $lasrecord7];
+        $userids = [234, 456, 789];
+        $eventarray = [];
         foreach ($records as $record) {
             $eventid = $DB->insert_record('local_assessfreq_site', $record);
             $eventarray[$record->instanceid] = $eventid;
@@ -610,7 +605,6 @@ class frequency_test extends \advanced_testcase {
                     $DB->insert_record('local_assessfreq_user', $userrecord);
                 }
             }
-
         }
 
         $frequency = new frequency();
@@ -638,18 +632,17 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting course events and cache.
      */
-    public function test_get_events_due_by_month() {
+    public function test_get_events_due_by_month(): void {
         global $DB;
         $year = 2020;
 
         // Make some records to put in the database;
         // Every even month should have two entries and every odd month one entry.
-        $records = array();
+        $records = [];
         $month = 1;
         for ($i = 1; $i <= 24; $i++) {
-
             if ($i > 12 && ($month % 2 != 0)) {
-                $month ++;
+                $month++;
                 continue;
             }
 
@@ -669,7 +662,7 @@ class frequency_test extends \advanced_testcase {
             if ($month == 12) {
                 $month = 0;
             }
-            $month ++;
+            $month++;
         }
 
         $DB->insert_records('local_assessfreq_site', $records);
@@ -691,7 +684,7 @@ class frequency_test extends \advanced_testcase {
         $this->assertCount(12, $data->events);
 
         $this->course->visible = 0;
-        $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+        $DB->set_field('course', 'visible', 0, ['id' => $this->course->id]);
 
         $result = $frequency->get_events_due_by_month($year, false);
         $this->assertEmpty($result);
@@ -705,7 +698,7 @@ class frequency_test extends \advanced_testcase {
      * Test getting course events and cache.
      * Check behavior if there is no data.
      */
-    public function test_get_events_due_by_month_no_data() {
+    public function test_get_events_due_by_month_no_data(): void {
         $year = 2020;
 
         // Cache should be initially empty.
@@ -726,12 +719,12 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test years that have events.
      */
-    public function test_get_years_has_events() {
+    public function test_get_years_has_events(): void {
         global $DB;
 
         // Make some records to put in the database;
         // Every even month should have two entries and every odd month one entry.
-        $records = array();
+        $records = [];
 
         $lasrecord1 = new stdClass();
         $lasrecord1->module = 'quiz';
@@ -777,7 +770,7 @@ class frequency_test extends \advanced_testcase {
         $lasrecord4->endmonth = 4;
         $lasrecord4->endday = 6;
 
-        $records = array($lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4);
+        $records = [$lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4];
 
         $DB->insert_records('local_assessfreq_site', $records);
 
@@ -803,7 +796,7 @@ class frequency_test extends \advanced_testcase {
      * Test years that have events.
      * Check behavior if there is no data.
      */
-    public function test_get_years_has_events_no_data() {
+    public function test_get_years_has_events_no_data(): void {
         // Cache should be initially empty.
         $yeareventscache = cache::make('local_assessfreq', 'yearevents');
         $cachekey = 'yearevents';
@@ -822,13 +815,13 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting activities that have events.
      */
-    public function test_get_events_due_by_activity() {
+    public function test_get_events_due_by_activity(): void {
         global $DB;
         $year = 2020;
 
         // Make some records to put in the database;
         // Every even month should have two entries and every odd month one entry.
-        $records = array();
+        $records = [];
 
         $lasrecord1 = new stdClass();
         $lasrecord1->module = 'quiz';
@@ -885,7 +878,7 @@ class frequency_test extends \advanced_testcase {
         $lasrecord5->endmonth = 4;
         $lasrecord5->endday = 6;
 
-        $records = array($lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4, $lasrecord5);
+        $records = [$lasrecord1, $lasrecord2, $lasrecord3, $lasrecord4, $lasrecord5];
 
         $DB->insert_records('local_assessfreq_site', $records);
 
@@ -907,7 +900,7 @@ class frequency_test extends \advanced_testcase {
         $this->assertCount(3, $data->events);
 
         $this->course->visible = 0;
-        $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+        $DB->set_field('course', 'visible', 0, ['id' => $this->course->id]);
 
         $result = $frequency->get_events_due_by_activity($year, false);
         $this->assertEmpty($result);
@@ -920,7 +913,7 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting user events and cache.
      */
-    public function test_get_events_due_monthly_by_user() {
+    public function test_get_events_due_monthly_by_user(): void {
         global $DB;
         $year = 2020;
 
@@ -947,7 +940,6 @@ class frequency_test extends \advanced_testcase {
 
                 $DB->insert_record('local_assessfreq_user', $userrecord, true);
             }
-
         }
 
         // Cache should be initially empty.
@@ -972,7 +964,7 @@ class frequency_test extends \advanced_testcase {
          $this->assertCount(12, $data->events);
 
          $this->course->visible = 0;
-         $DB->set_field('course', 'visible', 0, array('id' => $this->course->id));
+         $DB->set_field('course', 'visible', 0, ['id' => $this->course->id]);
 
          $result = $frequency->get_events_due_monthly_by_user($year, false);
          $this->assertEmpty($result);
@@ -985,10 +977,10 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting the frequency array.
      */
-    public function test_get_frequency_array() {
+    public function test_get_frequency_array(): void {
         $year = 2020;
         $metric = 'assess'; // Can be assess or students.
-        $modules = array('all');
+        $modules = ['all'];
 
         $duedate = 0;
         $frequency = new frequency();
@@ -1018,16 +1010,15 @@ class frequency_test extends \advanced_testcase {
         $this->assertEquals(2, $data[2020][3][28]['number']);
         $this->assertEquals(2, $data[2020][3][29]['assign']);
         $this->assertEquals(2, $data[2020][3][28]['assign']);
-
     }
 
     /**
      * Test getting the download data.
      */
-    public function test_get_download_data() {
+    public function test_get_download_data(): void {
         $year = 2020;
         $metric = 'assess'; // Can be assess or students.
-        $modules = array('all');
+        $modules = ['all'];
 
         $duedate = 0;
         $frequency = new frequency();
@@ -1047,7 +1038,7 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting heat colors.
      */
-    public function test_get_heat_colors() {
+    public function test_get_heat_colors(): void {
         $frequency = new frequency();
         $result = $frequency->get_heat_colors();
 
@@ -1066,11 +1057,11 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting modules to process.
      */
-    public function test_get_process_modules() {
+    public function test_get_process_modules(): void {
         global $DB;
 
-        $DB->set_field('modules', 'visible', '0', array('name' => 'scorm'));
-        $DB->set_field('modules', 'visible', '0', array('name' => 'choice'));
+        $DB->set_field('modules', 'visible', '0', ['name' => 'scorm']);
+        $DB->set_field('modules', 'visible', '0', ['name' => 'choice']);
 
         set_config('modules', 'quiz,assign,scorm,choice', 'local_assessfreq');
         set_config('disabledmodules', '0', 'local_assessfreq');
@@ -1084,7 +1075,8 @@ class frequency_test extends \advanced_testcase {
         $this->assertNotContains('choice', $result);
 
         set_config('disabledmodules', '1', 'local_assessfreq');
-        $result = $frequency->get_process_modules();;
+        $result = $frequency->get_process_modules();
+        ;
 
         $this->assertContains('quiz', $result);
         $this->assertContains('assign', $result);
@@ -1095,9 +1087,9 @@ class frequency_test extends \advanced_testcase {
     /**
      * Test getting day event information.
      */
-    public function test_get_day_events() {
+    public function test_get_day_events(): void {
         $date = '2020-3-28';
-        $modules = array('all');
+        $modules = ['all'];
 
         $frequency = new frequency();
         $frequency->process_site_events(0);
@@ -1110,15 +1102,14 @@ class frequency_test extends \advanced_testcase {
         $this->assertEquals(2020, $result[0]->endyear);
         $this->assertEquals(3, $result[0]->endmonth);
         $this->assertEquals(28, $result[0]->endday);
-
     }
 
     /**
      * Test getting day event information with the case that an event has been deleted since the data was gathered.
      */
-    public function test_get_day_events_deleted() {
+    public function test_get_day_events_deleted(): void {
         $date = '2020-3-28';
-        $modules = array('all');
+        $modules = ['all'];
 
         $frequency = new frequency();
         $frequency->process_site_events(0);
@@ -1128,42 +1119,42 @@ class frequency_test extends \advanced_testcase {
         $result = $frequency->get_day_events($date, $modules);
 
         $this->assertEmpty($result);
-
     }
 
     /**
      * Test getting sorted day event information.
      */
-    public function test_get_day_events_sorting() {
+    public function test_get_day_events_sorting(): void {
         // Create some extra data to sort.
         $generator = $this->getDataGenerator();
         $course2 = $generator->create_course(
-                array('format' => 'topics', 'numsections' => 3, 'enablecompletion' => 1, 'shortname' => 'zzz'),
-                array('createsections' => true));
-        $assignrow3 = $generator->create_module('assign', array(
+            ['format' => 'topics', 'numsections' => 3, 'enablecompletion' => 1, 'shortname' => 'zzz'],
+            ['createsections' => true]
+        );
+        $assignrow3 = $generator->create_module('assign', [
                 'course' => $this->course->id,
                 'duedate' => 1585359375,
                 'allowsubmissionsfromdate' => 100,
-                'name' => 'zzzz assign'
-        ));
-        $assignrow4 = $generator->create_module('assign', array(
-                'course' => $course2->id,
-                'duedate' => 1585359375,
-                'allowsubmissionsfromdate' => 100
-        ));
-        $assignrow5 = $generator->create_module('assign', array(
+                'name' => 'zzzz assign',
+        ]);
+        $assignrow4 = $generator->create_module('assign', [
                 'course' => $course2->id,
                 'duedate' => 1585359375,
                 'allowsubmissionsfromdate' => 100,
-                'name' => 'zzzz assign'
-        ));
+        ]);
+        $assignrow5 = $generator->create_module('assign', [
+                'course' => $course2->id,
+                'duedate' => 1585359375,
+                'allowsubmissionsfromdate' => 100,
+                'name' => 'zzzz assign',
+        ]);
 
         $assign3 = new assign(context_module::instance($assignrow3->cmid), false, false);
         $assign4 = new assign(context_module::instance($assignrow4->cmid), false, false);
         new assign(context_module::instance($assignrow5->cmid), false, false);
 
         $date = '2020-3-28';
-        $modules = array('all');
+        $modules = ['all'];
 
         $frequency = new frequency();
         $frequency->process_site_events(0);

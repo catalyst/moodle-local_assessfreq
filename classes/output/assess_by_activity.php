@@ -26,8 +26,6 @@ namespace local_assessfreq\output;
 
 use local_assessfreq\frequency;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Renderable for assessments by activity card.
  *
@@ -36,7 +34,6 @@ defined('MOODLE_INTERNAL') || die;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class assess_by_activity {
-
     /**
      * Generate the markup for the process summary chart,
      * used in the smart media dashboard.
@@ -50,10 +47,10 @@ class assess_by_activity {
         $frequency = new frequency();
         $modules = $frequency->get_process_modules();
         $activitydata = $frequency->get_events_due_by_activity($year);
-        $seriesdata = array();
-        $labels = array();
+        $seriesdata = [];
+        $labels = [];
         $charttitle = get_string('assessbyactivity', 'local_assessfreq');
-        $result = array();
+        $result = [];
 
         if (empty($modules[0])) {
             $result['hasdata'] = false;

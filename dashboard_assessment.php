@@ -27,8 +27,13 @@ require_once($CFG->libdir . '/adminlib.php');
 $baseurl = $CFG->wwwroot . "/local/assessfreq/dashboard_assessment.php";
 
 // Calls require_login and performs permissions checks for admin pages.
-admin_externalpage_setup('local_assessfreq_assessment', '', null, '',
-    array('pagelayout' => 'admin'));
+admin_externalpage_setup(
+    'local_assessfreq_assessment',
+    '',
+    null,
+    '',
+    ['pagelayout' => 'admin']
+);
 
 $title = get_string('dashboard:assessment', 'local_assessfreq');
 $url = new moodle_url($baseurl);
@@ -38,7 +43,7 @@ $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
-$PAGE->requires->js_call_amd('local_assessfreq/dashboard_assessment', 'init', array($context->id));
+$PAGE->requires->js_call_amd('local_assessfreq/dashboard_assessment', 'init', [$context->id]);
 
 $output = $PAGE->get_renderer('local_assessfreq');
 

@@ -26,8 +26,6 @@ namespace local_assessfreq\output;
 
 use local_assessfreq\quiz;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Renderable for upcomming quizzes card.
  *
@@ -36,7 +34,6 @@ defined('MOODLE_INTERNAL') || die;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class upcomming_quizzes {
-
     /**
      * Generate the markup for the upcomming quizzes chart,
      * used in the in progress quizzes dashboard.
@@ -50,14 +47,14 @@ class upcomming_quizzes {
         $quiz = new quiz();
         $quizzes = $quiz->get_quiz_summaries($now);
 
-        $labels = array();
+        $labels = [];
         $quizseriestitle = get_string('quizzes', 'local_assessfreq');
         $participantseries = get_string('students', 'local_assessfreq');
-        $result = array();
+        $result = [];
         $result['hasdata'] = true;
 
-        $quizseriesdata = array();
-        $participantseriesdata = array();
+        $quizseriesdata = [];
+        $participantseriesdata = [];
 
         foreach ($quizzes['upcomming'] as $timestamp => $upcomming) {
             $quizcount = 0;

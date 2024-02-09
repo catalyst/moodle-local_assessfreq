@@ -26,8 +26,6 @@ namespace local_assessfreq\output;
 
 use local_assessfreq\frequency;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Renderable for assessments due by month card.
  *
@@ -36,7 +34,6 @@ defined('MOODLE_INTERNAL') || die;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class assess_by_month {
-
     /**
      * Generate the markup for the process summary chart,
      * used in the smart media dashboard.
@@ -49,9 +46,9 @@ class assess_by_month {
         // Get events for the supplied year.
         $frequency = new frequency();
         $yeardata = $frequency->get_events_due_by_month($year);
-        $seriesdata = array();
+        $seriesdata = [];
         $charttitle = get_string('assessbymonth', 'local_assessfreq');
-        $result = array();
+        $result = [];
 
         // There is always 12 months in a year,
         // even if we don't have data for them all.
@@ -65,7 +62,7 @@ class assess_by_month {
 
         // Create chart object.
         $events = new \core\chart_series($charttitle, $seriesdata);
-        $labels = array(
+        $labels = [
             get_string('jan', 'local_assessfreq'),
             get_string('feb', 'local_assessfreq'),
             get_string('mar', 'local_assessfreq'),
@@ -78,7 +75,7 @@ class assess_by_month {
             get_string('oct', 'local_assessfreq'),
             get_string('nov', 'local_assessfreq'),
             get_string('dec', 'local_assessfreq'),
-        );
+        ];
 
         $chart = new \core\chart_bar();
         $chart->add_series($events);

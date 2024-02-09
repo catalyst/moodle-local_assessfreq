@@ -28,8 +28,8 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/tablelib.php');
 
-use \table_sql;
-use \renderable;
+use table_sql;
+use renderable;
 
 /**
  * Renderable table for quiz dashboard users.
@@ -39,7 +39,6 @@ use \renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class student_search_table extends table_sql implements renderable {
-
     /**
      * Ammount of time in hours for lookahead values.
      *
@@ -86,7 +85,14 @@ class student_search_table extends table_sql implements renderable {
      * @throws \coding_exception
      */
     public function __construct(
-        string $baseurl, int $contextid, string $search, int $hoursahead, int $hoursbehind, int $now, int $page=0) {
+        string $baseurl,
+        int $contextid,
+        string $search,
+        int $hoursahead,
+        int $hoursbehind,
+        int $now,
+        int $page = 0
+    ) {
         parent::__construct('local_assessfreq_student_search_table');
 
         $this->search = $search;
@@ -144,8 +150,7 @@ class student_search_table extends table_sql implements renderable {
         // Setup pagination.
         $this->currpage = $page;
         $this->sortable(true);
-        $this->column_nosort = array('actions');
-
+        $this->column_nosort = ['actions'];
     }
 
     /**
@@ -158,7 +163,7 @@ class student_search_table extends table_sql implements renderable {
     public function col_fullname($row) {
         global $OUTPUT;
 
-        return $OUTPUT->user_picture($row, array('size' => 35, 'includefullname' => true));
+        return $OUTPUT->user_picture($row, ['size' => 35, 'includefullname' => true]);
     }
 
     /**
@@ -189,7 +194,7 @@ class student_search_table extends table_sql implements renderable {
      */
     public function col_quizname($row) {
 
-        $quizurl = new \moodle_url('/mod/quiz/view.php', array('id' => $row->quizinstance));
+        $quizurl = new \moodle_url('/mod/quiz/view.php', ['id' => $row->quizinstance]);
         $quizlink = \html_writer::link($quizurl, format_string($row->quizname, true));
 
         return $quizlink;
@@ -316,7 +321,7 @@ class student_search_table extends table_sql implements renderable {
             $color = 'background: ' . get_config('local_assessfreq', 'finishedcolor');
         }
 
-        $content = \html_writer::span('', 'local-assessfreq-status-icon', array('style' => $color));
+        $content = \html_writer::span('', 'local-assessfreq-status-icon', ['style' => $color]);
         $content .= get_string($row->state, 'local_assessfreq');
 
         return $content;
@@ -335,58 +340,60 @@ class student_search_table extends table_sql implements renderable {
         $manage = '';
 
         $icon = $OUTPUT->render(new \pix_icon('i/duration', ''));
-        $manage .= \html_writer::link('#', $icon, array(
+        $manage .= \html_writer::link('#', $icon, [
             'class' => 'action-icon override',
             'id' => 'tool-assessfreq-override-' . $row->id . '-' . $row->quiz,
             'data-toggle' => 'tooltip',
             'data-placement' => 'top',
-            'title' => get_string('useroverride', 'local_assessfreq')
-        ));
+            'title' => get_string('useroverride', 'local_assessfreq'),
+        ]);
 
-        if ($row->state == 'finished'
+        if (
+            $row->state == 'finished'
                 || $row->state == 'inprogress'
                 || $row->state == 'uploadpending'
                 || $row->state == 'abandoned'
-                || $row->state == 'overdue') {
+                || $row->state == 'overdue'
+        ) {
             $classes = 'action-icon';
-            $attempturl = new \moodle_url('/mod/quiz/review.php', array('attempt' => $row->attemptid));
-            $attributes = array(
+            $attempturl = new \moodle_url('/mod/quiz/review.php', ['attempt' => $row->attemptid]);
+            $attributes = [
                 'class' => $classes,
                 'id' => 'tool-assessfreq-attempt-' . $row->id,
                 'data-toggle' => 'tooltip',
                 'data-placement' => 'top',
-                'title' => get_string('userattempt', 'local_assessfreq')
-            );
+                'title' => get_string('userattempt', 'local_assessfreq'),
+            ];
         } else {
             $classes = 'action-icon disabled';
             $attempturl = '#';
-            $attributes = array(
+            $attributes = [
                 'class' => $classes,
                 'id' => 'tool-assessfreq-attempt-' . $row->id,
-            );
+            ];
         }
         $icon = $OUTPUT->render(new \pix_icon('i/search', ''));
         $manage .= \html_writer::link($attempturl, $icon, $attributes);
 
-        $profileurl = new \moodle_url('/user/profile.php', array('id' => $row->id));
+        $profileurl = new \moodle_url('/user/profile.php', ['id' => $row->id]);
         $icon = $OUTPUT->render(new \pix_icon('i/completion_self', ''));
-        $manage .= \html_writer::link($profileurl, $icon, array(
+        $manage .= \html_writer::link($profileurl, $icon, [
             'class' => 'action-icon',
             'id' => 'tool-assessfreq-profile-' . $row->id,
             'data-toggle' => 'tooltip',
             'data-placement' => 'top',
-            'title' => get_string('userprofile', 'local_assessfreq')
-            ));
+            'title' => get_string('userprofile', 'local_assessfreq'),
+            ]);
 
-        $logurl = new \moodle_url('/report/log/user.php', array('id' => $row->id, 'course' => 1, 'mode' => 'all'));
+        $logurl = new \moodle_url('/report/log/user.php', ['id' => $row->id, 'course' => 1, 'mode' => 'all']);
         $icon = $OUTPUT->render(new \pix_icon('i/report', ''));
-        $manage .= \html_writer::link($logurl, $icon, array(
+        $manage .= \html_writer::link($logurl, $icon, [
             'class' => 'action-icon',
             'id' => 'tool-assessfreq-log-' . $row->id,
             'data-toggle' => 'tooltip',
             'data-placement' => 'top',
-            'title' => get_string('userlogs', 'local_assessfreq')
-        ));
+            'title' => get_string('userlogs', 'local_assessfreq'),
+        ]);
 
         return $manage;
     }
@@ -397,9 +404,9 @@ class student_search_table extends table_sql implements renderable {
      * @param array $quizzes Array of quizzes to sort.
      * @return array $quizzes the sorted quizzes.
      */
-    public function sort_quizzes(array $quizzes):array {
+    public function sort_quizzes(array $quizzes): array {
         // Comparisons are performed according to PHP's usual type comparison rules.
-        uasort($quizzes, function($a, $b) {
+        uasort($quizzes, function ($a, $b) {
 
             $sort = $this->get_sql_sort();
             $sortobj = explode(' ', $sort);
@@ -423,7 +430,6 @@ class student_search_table extends table_sql implements renderable {
                     return $b->{$sorton} <=> $a->{$sorton};
                 }
             }
-
         });
 
         return $quizzes;
@@ -452,8 +458,8 @@ class student_search_table extends table_sql implements renderable {
         $allquizzes = $quiz->get_quiz_summaries($this->now);
 
         $inprogressquizzes = $allquizzes['inprogress'];
-        $upcommingquizzes = array();
-        $finishedquizzes = array();
+        $upcommingquizzes = [];
+        $finishedquizzes = [];
 
         foreach ($allquizzes['upcomming'] as $upcomming) {
             foreach ($upcomming as $quizobj) {
@@ -469,12 +475,12 @@ class student_search_table extends table_sql implements renderable {
 
         $quizzes = array_merge($inprogressquizzes, $upcommingquizzes, $finishedquizzes);
 
-        $allrecords = array();
+        $allrecords = [];
 
         foreach ($quizzes as $quizobj) {
             $context = $quiz->get_quiz_context($quizobj->assessid);
 
-            list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
+            [$joins, $wheres, $params] = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
             $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid,
                               qa_a.timestart as timestart, qa_a.timefinish as timefinish
                          FROM {quiz_attempts} qa_a
@@ -501,15 +507,14 @@ class student_search_table extends table_sql implements renderable {
 
             // If a quiz has overrides, get only students that are in the window time.
             if ($quizobj->isoverride) {
-                $userids = array();
+                $userids = [];
                 foreach ($quizobj->overrides as $override) {
                     $userids[] = $override->userid;
                 }
 
-                list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
+                [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
                 $finaljoin->wheres = $finaljoin->wheres . " AND u.id " .  $insql;
                 $params = array_merge($params, $inparams);
-
             }
 
             $sql = "SELECT u.*,
@@ -555,7 +560,7 @@ class student_search_table extends table_sql implements renderable {
         }
 
         $pagesize = get_user_preferences('local_assessfreq_student_search_table_rows_preference', 20);
-        $data = array();
+        $data = [];
         $offset = $this->currpage * $pagesize;
         $offsetcount = 0;
         $recordcount = 0;
@@ -566,14 +571,13 @@ class student_search_table extends table_sql implements renderable {
                 // Because we are using COALESCE and CASE for state we can't use SQL WHERE so we need to filter in PHP land.
                 // Also because we need to do some filtering in PHP land, we'll do it all here.
                 $searchcount = -1;
-                $searchfields = array_merge($this->extrafields, array('firstname', 'lastname', 'state', 'quiz'));
+                $searchfields = array_merge($this->extrafields, ['firstname', 'lastname', 'state', 'quiz']);
 
                 foreach ($searchfields as $searchfield) {
                     if (stripos($record->{$searchfield}, $this->search) !== false) {
                         $searchcount++;
                     }
                 }
-
             }
 
             if ($searchcount > -1 && $offsetcount >= $offset && $recordcount < $pagesize) {
@@ -585,9 +589,8 @@ class student_search_table extends table_sql implements renderable {
             }
 
             if ($searchcount > -1) {
-                $offsetcount ++;
+                $offsetcount++;
             }
-
         }
 
         $this->pagesize($pagesize, $offsetcount);

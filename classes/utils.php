@@ -24,8 +24,6 @@
 
 namespace local_assessfreq;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Utils class.
  *
@@ -44,9 +42,9 @@ class utils {
      * @param string $direction The direction to sort in.
      * @return array $inputarray the sorted arrays.
      */
-    public static function sort(array $inputarray, string $sorton, string $direction):array {
+    public static function sort(array $inputarray, string $sorton, string $direction): array {
 
-        uasort($inputarray, function($a, $b) use ($direction, $sorton) {
+        uasort($inputarray, function ($a, $b) use ($direction, $sorton) {
             if ($direction == 'asc') {
                 if (gettype($a->{$sorton}) == 'string') {
                     return strcasecmp($a->{$sorton}, $b->{$sorton});
@@ -64,7 +62,6 @@ class utils {
                     return $b->{$sorton} <=> $a->{$sorton};
                 }
             }
-
         });
 
         return $inputarray;
@@ -77,11 +74,11 @@ class utils {
      * @param array $sorton Associative array to sort by in the format field => direction.
      * @return array $inputarray the sorted array.
      */
-    public static function multi_sort(array $inputarray, array $sorton):array {
+    public static function multi_sort(array $inputarray, array $sorton): array {
         // Convert to an array of arrays if required.
         $element = reset($inputarray);
         if (gettype($element) == 'object') {
-            $makearray = array();
+            $makearray = [];
             foreach ($inputarray as $object) {
                 $makearray[] = (array)$object;
             }
@@ -89,7 +86,7 @@ class utils {
         }
 
         // Take sort on array and format it for passing to array_multisort.
-        $sortvariables = array();
+        $sortvariables = [];
         foreach ($sorton as $sort => $direction) {
             $sortvariables[] = array_column($inputarray, $sort);
 
@@ -109,7 +106,7 @@ class utils {
 
         // Convert back to an array of objects if needed.
         if (gettype($element) == 'object') {
-            $makeobject = array();
+            $makeobject = [];
             foreach ($inputarray as $object) {
                 $makeobject[] = (object)$object;
             }

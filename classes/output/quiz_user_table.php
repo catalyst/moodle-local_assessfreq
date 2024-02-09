@@ -28,8 +28,8 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/tablelib.php');
 
-use \table_sql;
-use \renderable;
+use table_sql;
+use renderable;
 
 /**
  * Renderable table for quiz dashboard users.
@@ -39,7 +39,6 @@ use \renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz_user_table extends table_sql implements renderable {
-
     /**
      * @var integer $quizid The ID of the braodcast to get the acknowledgements for.
      */
@@ -85,7 +84,7 @@ class quiz_user_table extends table_sql implements renderable {
         $this->downloadable = false;
         $this->define_baseurl($baseurl);
 
-        $quizrecord = $DB->get_record('quiz', array('id' => $this->quizid), 'timeopen, timeclose, timelimit');
+        $quizrecord = $DB->get_record('quiz', ['id' => $this->quizid], 'timeopen, timeclose, timelimit');
         $this->timeopen = $quizrecord->timeopen;
         $this->timeclose = $quizrecord->timeclose;
         $this->timelimit = $quizrecord->timelimit;
@@ -133,8 +132,7 @@ class quiz_user_table extends table_sql implements renderable {
         // Setup pagination.
         $this->currpage = $page;
         $this->sortable(true);
-        $this->column_nosort = array('actions');
-
+        $this->column_nosort = ['actions'];
     }
 
     /**
@@ -147,7 +145,7 @@ class quiz_user_table extends table_sql implements renderable {
     public function col_fullname($row) {
         global $OUTPUT;
 
-        return $OUTPUT->user_picture($row, array('size' => 35, 'includefullname' => true));
+        return $OUTPUT->user_picture($row, ['size' => 35, 'includefullname' => true]);
     }
 
     /**
@@ -291,7 +289,7 @@ class quiz_user_table extends table_sql implements renderable {
             $color = 'background: ' . get_config('local_assessfreq', 'finishedcolor');
         }
 
-        $content = \html_writer::span('', 'local-assessfreq-status-icon', array('style' => $color));
+        $content = \html_writer::span('', 'local-assessfreq-status-icon', ['style' => $color]);
         $content .= get_string($row->state, 'local_assessfreq');
 
         return $content;
@@ -310,58 +308,60 @@ class quiz_user_table extends table_sql implements renderable {
         $manage = '';
 
         $icon = $OUTPUT->render(new \pix_icon('i/duration', ''));
-        $manage .= \html_writer::link('#', $icon, array(
+        $manage .= \html_writer::link('#', $icon, [
             'class' => 'action-icon override',
             'id' => 'tool-assessfreq-override-' . $row->id,
             'data-toggle' => 'tooltip',
             'data-placement' => 'top',
-            'title' => get_string('useroverride', 'local_assessfreq')
-        ));
+            'title' => get_string('useroverride', 'local_assessfreq'),
+        ]);
 
-        if ($row->state == 'finished'
+        if (
+            $row->state == 'finished'
                 || $row->state == 'inprogress'
                 || $row->state == 'uploadpending'
                 || $row->state == 'abandoned'
-                || $row->state == 'overdue') {
+                || $row->state == 'overdue'
+        ) {
             $classes = 'action-icon';
-            $attempturl = new \moodle_url('/mod/quiz/review.php', array('attempt' => $row->attemptid));
-            $attributes = array(
+            $attempturl = new \moodle_url('/mod/quiz/review.php', ['attempt' => $row->attemptid]);
+            $attributes = [
                 'class' => $classes,
                 'id' => 'tool-assessfreq-attempt-' . $row->id,
                 'data-toggle' => 'tooltip',
                 'data-placement' => 'top',
-                'title' => get_string('userattempt', 'local_assessfreq')
-            );
+                'title' => get_string('userattempt', 'local_assessfreq'),
+            ];
         } else {
             $classes = 'action-icon disabled';
             $attempturl = '#';
-            $attributes = array(
+            $attributes = [
                 'class' => $classes,
                 'id' => 'tool-assessfreq-attempt-' . $row->id,
-            );
+            ];
         }
         $icon = $OUTPUT->render(new \pix_icon('i/search', ''));
         $manage .= \html_writer::link($attempturl, $icon, $attributes);
 
-        $profileurl = new \moodle_url('/user/profile.php', array('id' => $row->id));
+        $profileurl = new \moodle_url('/user/profile.php', ['id' => $row->id]);
         $icon = $OUTPUT->render(new \pix_icon('i/completion_self', ''));
-        $manage .= \html_writer::link($profileurl, $icon, array(
+        $manage .= \html_writer::link($profileurl, $icon, [
             'class' => 'action-icon',
             'id' => 'tool-assessfreq-profile-' . $row->id,
             'data-toggle' => 'tooltip',
             'data-placement' => 'top',
-            'title' => get_string('userprofile', 'local_assessfreq')
-            ));
+            'title' => get_string('userprofile', 'local_assessfreq'),
+            ]);
 
-        $logurl = new \moodle_url('/report/log/user.php', array('id' => $row->id, 'course' => 1, 'mode' => 'all'));
+        $logurl = new \moodle_url('/report/log/user.php', ['id' => $row->id, 'course' => 1, 'mode' => 'all']);
         $icon = $OUTPUT->render(new \pix_icon('i/report', ''));
-        $manage .= \html_writer::link($logurl, $icon, array(
+        $manage .= \html_writer::link($logurl, $icon, [
             'class' => 'action-icon',
             'id' => 'tool-assessfreq-log-' . $row->id,
             'data-toggle' => 'tooltip',
             'data-placement' => 'top',
-            'title' => get_string('userlogs', 'local_assessfreq')
-        ));
+            'title' => get_string('userlogs', 'local_assessfreq'),
+        ]);
 
         return $manage;
     }
@@ -388,7 +388,7 @@ class quiz_user_table extends table_sql implements renderable {
         $capabilities = $frequency->get_module_capabilities('quiz');
         $context = $quiz->get_quiz_context($this->quizid);
 
-        list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
+        [$joins, $wheres, $params] = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
         $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid,
                               qa_a.timestart as timestart, qa_a.timefinish as timefinish
                          FROM {quiz_attempts} qa_a
@@ -435,7 +435,7 @@ class quiz_user_table extends table_sql implements renderable {
         }
 
         $records = $DB->get_recordset_sql($sql, $params);
-        $data = array();
+        $data = [];
         $offset = $this->currpage * $pagesize;
         $offsetcount = 0;
         $recordcount = 0;
@@ -446,14 +446,13 @@ class quiz_user_table extends table_sql implements renderable {
                 // Because we are using COALESE and CASE for state we can't use SQL WHERE so we need to filter in PHP land.
                 // Also because we need to do some filtering in PHP land, we'll do it all here.
                 $searchcount = -1;
-                $searchfields = array_merge($this->extrafields, array('firstname', 'lastname', 'state'));
+                $searchfields = array_merge($this->extrafields, ['firstname', 'lastname', 'state']);
 
                 foreach ($searchfields as $searchfield) {
                     if (stripos($record->{$searchfield}, $this->search) !== false) {
                         $searchcount++;
                     }
                 }
-
             }
 
             if ($searchcount > -1 && $offsetcount >= $offset && $recordcount < $pagesize) {
@@ -465,9 +464,8 @@ class quiz_user_table extends table_sql implements renderable {
             }
 
             if ($searchcount > -1) {
-                $offsetcount ++;
+                $offsetcount++;
             }
-
         }
 
         $records->close();

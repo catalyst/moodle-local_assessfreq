@@ -26,8 +26,6 @@ namespace local_assessfreq;
 
 use mod_quiz\question\bank\qbank_helper;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Quiz data class.
  *
@@ -38,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz {
-
     /**
      * Ammount of time in hours for lookahead values.
      * Defaults to 12.
@@ -75,7 +72,7 @@ class quiz {
      * @param int $hoursahead
      * @param int $hoursbehind
      */
-    public function __construct(int $hoursahead=12, int $hoursbehind=1) {
+    public function __construct(int $hoursahead = 12, int $hoursbehind = 1) {
         $this->hoursahead = $hoursahead;
         $this->hoursbehind = $hoursbehind;
     }
@@ -89,7 +86,7 @@ class quiz {
     public function get_quiz_context(int $quizid): \context_module {
         global $DB;
 
-        $params = array('module' => 'quiz', 'quiz' => $quizid);
+        $params = ['module' => 'quiz', 'quiz' => $quizid];
         $sql = 'SELECT cm.id
                   FROM {course_modules} cm
             INNER JOIN {modules} m ON cm.module = m.id
@@ -100,7 +97,6 @@ class quiz {
         $context = \context_module::instance($cmid);
 
         return $context;
-
     }
 
     /**
@@ -117,20 +113,19 @@ class quiz {
     private function get_quiz_override_info(int $quizid, \context_module $context): \stdClass {
         global $DB;
 
-        $capabilities = array('mod/quiz:attempt', 'mod/quiz:view');
+        $capabilities = ['mod/quiz:attempt', 'mod/quiz:view'];
         $overrideinfo = new \stdClass();
-        $users = array();
+        $users = [];
         $start = 0;
         $end = 0;
 
         $sql = 'SELECT id, userid, COALESCE(timeopen, 0) AS timeopen, COALESCE(timeclose, 0) AS timeclose
                   FROM {quiz_overrides}
                  WHERE  quiz = ?';
-        $params = array($quizid);
+        $params = [$quizid];
         $overrides = $DB->get_records_sql($sql, $params);
 
         foreach ($overrides as $override) {
-
             if (!has_all_capabilities($capabilities, $context, $override->userid)) {
                 continue; // Don't count users who can't access the quiz.
             }
@@ -170,7 +165,7 @@ class quiz {
     private function get_quiz_questions(int $quizid): \stdClass {
         global $DB;
         $questions = new \stdClass();
-        $types = array();
+        $types = [];
         $questioncount = 0;
         $context = $this->get_quiz_context($quizid);
 
@@ -181,9 +176,9 @@ class quiz {
             $questioncount++;
         }
 
-        $typeswithcounts = array();
+        $typeswithcounts = [];
         foreach (array_count_values($types) as $type => $count) {
-            $typeswithcounts[] = array('type' => $type, 'count' => $count);
+            $typeswithcounts[] = ['type' => $type, 'count' => $count];
         }
 
         $questions->types = $typeswithcounts;
@@ -216,9 +211,9 @@ class quiz {
         $quizdata = new \stdClass();
         $context = $this->get_quiz_context($quizid);
 
-        $quizrecord = $DB->get_record('quiz', array('id' => $quizid), 'name, timeopen, timeclose, timelimit, course');
+        $quizrecord = $DB->get_record('quiz', ['id' => $quizid], 'name, timeopen, timeclose, timelimit, course');
         $course = get_course($quizrecord->course);
-        $courseurl = new \moodle_url('/course/view.php', array('id' => $quizrecord->course));
+        $courseurl = new \moodle_url('/course/view.php', ['id' => $quizrecord->course]);
 
         $overrideinfo = $this->get_quiz_override_info($quizid, $context);
         $questions = $this->get_quiz_questions($quizid);
@@ -263,13 +258,13 @@ class quiz {
         }
 
         // Quiz result link.
-        $resultlink = new \moodle_url('/mod/quiz/report.php', array('id' => $context->instanceid, 'mode' => 'overview'));
+        $resultlink = new \moodle_url('/mod/quiz/report.php', ['id' => $context->instanceid, 'mode' => 'overview']);
         // Override link.
-        $overrridelink = new \moodle_url('/mod/quiz/overrides.php', array('cmid' => $context->instanceid, 'mode' => 'user'));
+        $overrridelink = new \moodle_url('/mod/quiz/overrides.php', ['cmid' => $context->instanceid, 'mode' => 'user']);
         // Participant link.
-        $participantlink = new \moodle_url('/user/index.php', array('id' => $quizrecord->course));
+        $participantlink = new \moodle_url('/user/index.php', ['id' => $quizrecord->course]);
         // Dashboard link.
-        $dashboardlink = new \moodle_url('/local/assessfreq/dashboard_quiz.php', array('id' => $quizid));
+        $dashboardlink = new \moodle_url('/local/assessfreq/dashboard_quiz.php', ['id' => $quizid]);
 
         $quizdata->name = format_string($quizrecord->name, true, ["context" => $context, "escape" => true]);
         $quizdata->timeopen = $timesopen;
@@ -317,11 +312,11 @@ class quiz {
                   FROM {quiz_overrides}
                  WHERE (timeopen > 0 AND timeopen < :starttime)
                        AND (timeclose > :endtime OR timeclose > :now)';
-        $params = array(
+        $params = [
             'starttime' => $starttime,
             'endtime' => $endtime,
-            'now' => $now
-        );
+            'now' => $now,
+        ];
 
         $quizzes = $DB->get_records_sql($sql, $params);
 
@@ -348,11 +343,11 @@ class quiz {
                   FROM {quiz}
                  WHERE (timeopen > 0 AND timeopen < :starttime)
                        AND (timeclose > :endtime OR timeclose > :now)';
-        $params = array(
+        $params = [
             'starttime' => $starttime,
             'endtime' => $endtime,
-            'now' => $now
-        );
+            'now' => $now,
+        ];
 
         $quizzes = $DB->get_records_sql($sql, $params);
 
@@ -369,7 +364,7 @@ class quiz {
      * @param int $lookbehind The number of seconds from the provided now value to look behind when getting quizzes.
      * @return array $quizzes The quizzes.
      */
-    private function get_tracked_quizzes_with_overrides(int $now, int $lookahead=HOURSECS, int $lookbehind=HOURSECS): array {
+    private function get_tracked_quizzes_with_overrides(int $now, int $lookahead = HOURSECS, int $lookbehind = HOURSECS): array {
         global $DB;
 
         $quizzes = $this->get_tracked_quizzes($now, $lookahead, $lookbehind);
@@ -380,9 +375,9 @@ class quiz {
             $sql = 'SELECT id, timeopen, timeclose, timelimit
                       FROM {quiz}
                      WHERE id = :id';
-            $params = array(
+            $params = [
                 'id' => $override->quiz,
-            );
+            ];
 
             $quizzesoverride = $DB->get_record_sql($sql, $params);
 
@@ -416,10 +411,10 @@ class quiz {
         // Get tracked quizzes.
         $trackedquizzes = $this->get_tracked_quizzes_with_overrides($now, 0, 0);
 
-        $counts = array(
+        $counts = [
             'assessments' => 0,
             'participants' => 0,
-        );
+        ];
 
         foreach ($trackedquizzes as $quiz) {
             $counts['assessments']++;
@@ -448,21 +443,21 @@ class quiz {
         $trackedquizzes = $this->get_tracked_quizzes_with_overrides($now, $lookahead, $lookbehind);
 
         // Set up array to hold quizzes and data.
-        $quizzes = array(
-            'finished' => array(),
-            'inprogress' => array(),
-            'upcomming' => array(),
-        );
+        $quizzes = [
+            'finished' => [],
+            'inprogress' => [],
+            'upcomming' => [],
+        ];
 
         // Itterate through the hours, processing in progress and upcomming quizzes.
         for ($hour = 0; $hour <= $this->hoursahead; $hour++) {
             $time = $now + (HOURSECS * $hour);
 
             if ($hour == 0) {
-                $quizzes['inprogress'] = array();
+                $quizzes['inprogress'] = [];
             }
 
-            $quizzes['upcomming'][$time] = array();
+            $quizzes['upcomming'][$time] = [];
 
             // Seperate out inprogress and upcomming quizzes, then get data for each quiz.
             foreach ($trackedquizzes as $quiz) {
@@ -521,14 +516,13 @@ class quiz {
                     }
                 }
             }
-
         }
 
         // Iterate through the hours, processing finished quizzes.
         for ($hour = 1; $hour <= $this->hoursbehind; $hour++) {
             $time = $now - (HOURSECS * $hour);
 
-            $quizzes['finished'][$time] = array();
+            $quizzes['finished'][$time] = [];
 
             // Get data for each finished quiz.
             foreach ($trackedquizzes as $quiz) {
@@ -551,7 +545,6 @@ class quiz {
                     unset($trackedquizzes[$quiz->id]);
                 }
             }
-
         }
 
         return $quizzes;
@@ -573,11 +566,11 @@ class quiz {
 
         $loggedin = 0; // Count of logged in users.
         $loggedout = 0; // Count of not loggedin users.
-        $loggedinusers = array();
-        $loggedoutusers = array();
+        $loggedinusers = [];
+        $loggedoutusers = [];
 
         foreach ($userchunks as $userchunk) {
-            list($insql, $inparams) = $DB->get_in_or_equal($userchunk);
+            [$insql, $inparams] = $DB->get_in_or_equal($userchunk);
             $inparams[] = $timedout;
 
             $sql = "SELECT DISTINCT(userid)
@@ -600,7 +593,6 @@ class quiz {
         $usercounts->loggedoutusers = $loggedoutusers;
 
         return $usercounts;
-
     }
 
     /**
@@ -614,8 +606,8 @@ class quiz {
 
         $inprogress = 0;
         $finished = 0;
-        $inprogressusers = array();
-        $finishedusers = array();
+        $inprogressusers = [];
+        $finishedusers = [];
 
         $sql = 'SELECT userid, state
                   FROM {quiz_attempts} qa
@@ -627,7 +619,7 @@ class quiz {
                     AS qb
                     ON qa.id = qb.id';
 
-        $params = array($quizid);
+        $params = [$quizid];
 
         $usersattempts = $DB->get_records_sql($sql, $params);
 
@@ -648,7 +640,6 @@ class quiz {
         $attemptcounts->finishedusers = $finishedusers;
 
         return $attemptcounts;
-
     }
 
     /**
@@ -730,7 +721,7 @@ class quiz {
     public function get_quiz_tracking(int $quizid): array {
         global $DB;
 
-        $tracking = $DB->get_records('local_assessfreq_trend', array('assessid' => $quizid), 'timecreated ASC');
+        $tracking = $DB->get_records('local_assessfreq_trend', ['assessid' => $quizid], 'timecreated ASC');
 
         return $tracking;
     }
@@ -745,8 +736,8 @@ class quiz {
      * @return array $result Array containing list of filtered quizzes and total of how many quizzes matched the filter.
      */
     public function filter_quizzes(array $quizzes, string $search, int $page, int $pagesize): array {
-        $filtered = array();
-        $searchfields = array('name', 'coursefullname');
+        $filtered = [];
+        $searchfields = ['name', 'coursefullname'];
         $offset = $page * $pagesize;
         $offsetcount = 0;
         $recordcount = 0;
@@ -771,11 +762,11 @@ class quiz {
             }
 
             if ($searchcount > -1) {
-                $offsetcount ++;
+                $offsetcount++;
             }
         }
 
-        $result = array($filtered, $offsetcount);
+        $result = [$filtered, $offsetcount];
 
         return $result;
     }

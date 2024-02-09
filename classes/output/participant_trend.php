@@ -26,8 +26,6 @@ namespace local_assessfreq\output;
 
 use local_assessfreq\quiz;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Renderable for participant trend card.
  *
@@ -36,7 +34,6 @@ defined('MOODLE_INTERNAL') || die;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class participant_trend {
-
     /**
      * Generate the markup for the trend chart,
      * used in the quiz dashboard.
@@ -48,12 +45,12 @@ class participant_trend {
 
         $quizdata = new quiz();
         $allparticipantdata = $quizdata->get_quiz_tracking($quizid);
-        $notloggedin = array();
-        $loggedin = array();
-        $inprogress = array();
-        $finished = array();
-        $labels = array();
-        $result = array();
+        $notloggedin = [];
+        $loggedin = [];
+        $inprogress = [];
+        $finished = [];
+        $labels = [];
+        $result = [];
 
         if (empty($allparticipantdata)) {
             $result['hasdata'] = false;

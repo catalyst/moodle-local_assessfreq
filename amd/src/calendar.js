@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notification, Ajax) {
+define(['core/str', 'core/notification', 'core/ajax'], function (Str, Notification, Ajax) {
 
     /**
      * Module level variables.
@@ -93,7 +93,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @param {Number} month The month to get the number of days for.
      * @param {Number} year The year to get the number of days for.
      */
-    const daysInMonth = function(month, year) {
+    const daysInMonth = function (month, year) {
         return 32 - new Date(year, month, 32).getDate();
     };
 
@@ -102,15 +102,15 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      *
      * @method getHeatColors
      */
-    const getHeatColors = function() {
+    const getHeatColors = function () {
         return new Promise((resolve, reject) => {
             Ajax.call([{
                 methodname: 'local_assessfreq_get_heat_colors',
                 args: {},
-            }], true, false)[0].done(function(response) {
+            }], true, false)[0].done(function (response) {
                 colorArray = JSON.parse(response);
                 resolve(colorArray);
-            }).fail(function() {
+            }).fail(function () {
                 reject(new Error('Failed to get heat colors'));
             });
         });
@@ -121,15 +121,15 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      *
      * @method getProcessEvents
      */
-    const getProcessModules = function() {
+    const getProcessModules = function () {
         return new Promise((resolve, reject) => {
             Ajax.call([{
                 methodname: 'local_assessfreq_get_process_modules',
                 args: {},
-            }], true, false)[0].done(function(response) {
+            }], true, false)[0].done(function (response) {
                 processModules = JSON.parse(response);
                 resolve(processModules);
-            }).fail(function() {
+            }).fail(function () {
                 reject(new Error('Failed to get process events'));
             });
         });
@@ -142,7 +142,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @param {Object} eventArray All the event count for the heatmap.
      * @param {Object} dateObj Date details.
      */
-    const calcHeatRange = function(eventArray, dateObj) {
+    const calcHeatRange = function (eventArray, dateObj) {
         return new Promise((resolve) => {
 
             // Resolve early if there are no events.
@@ -155,7 +155,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
             // If scheduled tasks have not run yet we may not have any data.
             let eventArrayLength = Object.keys(eventArray).length;
             if ((eventArrayLength > 0) && (eventArray[dateObj.year] !== "undefined")) {
-
                 let eventcount = new Array;
                 let year = eventArray[dateObj.year];
 
@@ -191,7 +190,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @param {Number} eventCount The count to get the heat value.
      * @return {Number} heat The heat value.
      */
-    const getHeat = function(eventCount) {
+    const getHeat = function (eventCount) {
         let scaleMin = 1;
 
         if (eventCount == heatRangeMin) {
@@ -224,7 +223,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @param {Array} modules Array of the modules to get.
      * @return {Promise}
      */
-    const getEvents = function({year, metric, modules}) {
+    const getEvents = function ({year, metric, modules}) {
         return new Promise((resolve, reject) => {
             let args = {
                 year: year,
@@ -255,7 +254,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @param {Number} month The month to get the number of days for.
      * @return {Array} monthevents The events for the supplied month.
      */
-    const getMonthEvents = function(year, month) {
+    const getMonthEvents = function (year, month) {
         let monthevents;
 
         if ((typeof eventArray[year] !== "undefined") && (typeof eventArray[year][month] !== "undefined")) {
@@ -273,7 +272,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @param {Number} endMonth The month to generate the tables to.
      * @return {Promise}
      */
-    const createTables = function({year, startMonth, endMonth}) {
+    const createTables = function ({year, startMonth, endMonth}) {
         return new Promise((resolve, reject) => {
             let calendarContainer = document.createElement('div');
             let month = startMonth;
@@ -337,7 +336,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @param {Object} dayArray The details of the events for that day/
      * @return {String} tipHTML The HTML for the tooltip.
      */
-    const getTooltip = function(dayArray) {
+    const getTooltip = function (dayArray) {
         let tipHTML = '';
 
         for (let [key, value] of Object.entries(dayArray)) {
@@ -354,7 +353,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @param {Number} year The year to generate calendar for.
      * @param {Number} month The monthe to generate calendar for.
      */
-    const populateCalendarDays = function(table, year, month) {
+    const populateCalendarDays = function (table, year, month) {
         let firstDay = (new Date(year, month)).getDay();  // Get the starting day of the month.
         let monthEvents = getMonthEvents(year, (month + 1));  // We add one due to month diferences between PHP and JS.
         let date = 1;  // Creating all cells.
@@ -368,7 +367,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                     var cell = document.createElement("td");
                     var cellText = document.createTextNode("");
                     cell.dataset.event = 'false';
-
                 } else if (date > daysInMonth(month, year)) { // Break if we have generated all the days for this month.
                     break;
                 } else {
@@ -391,7 +389,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
                         cell.dataset.date = year + '-' + (month + 1) + '-' + date;
                         cell.title = getTooltip(monthEvents[date]);
                         cell.style.cursor = "pointer";
-
                     }
                     date++;
                 }
@@ -411,7 +408,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @param {Number} startMonth The month to start generation from.
      * @return {Promise}
      */
-    const populateCalendar = function({calendarContainer, year, startMonth}) {
+    const populateCalendar = function ({calendarContainer, year, startMonth}) {
         return new Promise((resolve, reject) => {
             // Get the table boodies.
             let tables = calendarContainer.getElementsByTagName("tbody");
@@ -437,7 +434,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      *
      * @method createHeatScale
      */
-    Calendar.createHeatScale = function() {
+    Calendar.createHeatScale = function () {
         return new Promise((resolve) => {
             let table = document.createElement('table');
             let tbody = document.createElement('tbody');
@@ -454,7 +451,6 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
 
                     trow.appendChild(cell);
                 }
-
             }
 
             tbody.appendChild(trow);
@@ -477,7 +473,7 @@ define(['core/str', 'core/notification', 'core/ajax'], function(Str, Notificatio
      * @param {Array} modules The modules to display in the heatamp.
      * @return {Promise}
      */
-    Calendar.generate = function(year, startMonth, endMonth, metric, modules) {
+    Calendar.generate = function (year, startMonth, endMonth, metric, modules) {
         return new Promise((resolve, reject) => {
             const dateObj = {
                 year : year,
