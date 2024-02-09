@@ -29,8 +29,13 @@ $quizid = optional_param('id', 0, PARAM_INT);
 $baseurl = $CFG->wwwroot . "/local/assessfreq/dashboard_quiz.php";
 
 // Calls require_login and performs permissions checks for admin pages.
-admin_externalpage_setup('local_assessfreq_quiz', '', null, '',
-    array('pagelayout' => 'admin'));
+admin_externalpage_setup(
+    'local_assessfreq_quiz',
+    '',
+    null,
+    '',
+    ['pagelayout' => 'admin']
+);
 
 $title = get_string('dashboard:quiz', 'local_assessfreq');
 $url = new moodle_url($baseurl);
@@ -40,7 +45,7 @@ $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
-$PAGE->requires->js_call_amd('local_assessfreq/dashboard_quiz', 'init', array($context->id, $quizid));
+$PAGE->requires->js_call_amd('local_assessfreq/dashboard_quiz', 'init', [$context->id, $quizid]);
 
 $output = $PAGE->get_renderer('local_assessfreq');
 

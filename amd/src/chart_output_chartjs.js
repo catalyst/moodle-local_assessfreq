@@ -20,7 +20,7 @@
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['core/chart_output_chartjs'], function(Output) {
+define(['core/chart_output_chartjs'], function (Output) {
 
     /**
      * Module level variables.
@@ -36,7 +36,7 @@ define(['core/chart_output_chartjs'], function(Output) {
      * @param {module:core/chart_axis} axis The axis.
      * @return {Object} The axis config.
      */
-    Output.prototype._makeConfig = function() {
+    Output.prototype._makeConfig = function () {
         var config = {
             type: this._getChartType(),
             data: {
@@ -56,11 +56,11 @@ define(['core/chart_output_chartjs'], function(Output) {
         }
 
         // Override legend options with those provided at run time.
-        if (rtLegendoptions)  {
+        if (rtLegendoptions) {
             config.options.legend = rtLegendoptions;
         }
 
-        this._chart.getXAxes().forEach(function(axis, i) {
+        this._chart.getXAxes().forEach(function (axis, i) {
             var axisLabels = axis.getLabels();
 
             config.options.scales = config.options.scales || {};
@@ -68,14 +68,14 @@ define(['core/chart_output_chartjs'], function(Output) {
             config.options.scales.xAxes[i] = this._makeAxisConfig(axis, 'x', i);
 
             if (axisLabels !== null) {
-                config.options.scales.xAxes[i].ticks.callback = function(value, index) {
+                config.options.scales.xAxes[i].ticks.callback = function (value, index) {
                     return axisLabels[index] || '';
                 };
             }
             config.options.scales.xAxes[i].stacked = this._isStacked();
         }.bind(this));
 
-        this._chart.getYAxes().forEach(function(axis, i) {
+        this._chart.getYAxes().forEach(function (axis, i) {
             var axisLabels = axis.getLabels();
 
             config.options.scales = config.options.scales || {};
@@ -83,7 +83,7 @@ define(['core/chart_output_chartjs'], function(Output) {
             config.options.scales.yAxes[i] = this._makeAxisConfig(axis, 'y', i);
 
             if (axisLabels !== null) {
-                config.options.scales.yAxes[i].ticks.callback = function(value) {
+                config.options.scales.yAxes[i].ticks.callback = function (value) {
                     return axisLabels[parseInt(value, 10)] || '';
                 };
             }
@@ -104,7 +104,7 @@ define(['core/chart_output_chartjs'], function(Output) {
     /**
      * Get the aspect ratio setting and initialise the chart.
      */
-    ChartOutput.init = function(chartImage, ChartInst, aspect, legend) {
+    ChartOutput.init = function (chartImage, ChartInst, aspect, legend) {
         aspectRatio = aspect;
         rtLegendoptions = legend;
         new Output(chartImage, ChartInst);

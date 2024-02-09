@@ -35,13 +35,13 @@ $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 
 $dataformat = 'csv';
-$fields = array(
+$fields = [
     get_string('quiztimeopen', 'local_assessfreq'),
     get_string('duedate', 'local_assessfreq'),
     get_string('activity', 'local_assessfreq'),
     get_string('title', 'local_assessfreq'),
-    get_string('url', 'local_assessfreq')
-);
+    get_string('url', 'local_assessfreq'),
+];
 
 if ($metric == 'students') {
     $extrafields = \core_user\fields::get_identity_fields($context, false);

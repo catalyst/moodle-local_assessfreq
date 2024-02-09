@@ -33,9 +33,8 @@ import * as TableHandler from 'local_assessfreq/table_handler';
 import * as UserPreference from 'local_assessfreq/user_preferences';
 import * as ZoomModal from 'local_assessfreq/zoom_modal';
 
-/**
- * Module level variables.
- */
+// Module level variables.
+
 var selectQuizStr = '';
 var contextid;
 var quizId = 0;

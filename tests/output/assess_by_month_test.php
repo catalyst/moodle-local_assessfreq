@@ -35,7 +35,6 @@ use stdClass;
  * @covers     \local_assessfreq\output\assess_by_month
  */
 class assess_by_month_test extends \advanced_testcase {
-
     /**
      *
      * @var stdClass $course Test course.
@@ -51,9 +50,10 @@ class assess_by_month_test extends \advanced_testcase {
         // Create a course.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => 1),
-            array('createsections' => true));
+            ['format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1, ],
+            ['createsections' => true]
+        );
         $this->course = $course;
 
         $version = get_config('moodle', 'version');
@@ -68,18 +68,17 @@ class assess_by_month_test extends \advanced_testcase {
     /**
      * Test gett assess due by month chart method.
      */
-    public function test_get_assess_due_chart() {
+    public function test_get_assess_due_chart(): void {
         global $DB;
         $year = 2020;
 
         // Make some records to put in the database;
         // Every even month should have two entries and every odd month one entry.
-        $records = array();
+        $records = [];
         $month = 1;
         for ($i = 1; $i <= 24; $i++) {
-
             if ($i > 12 && ($month % 2 != 0)) {
-                $month ++;
+                $month++;
                 continue;
             }
 
@@ -99,7 +98,7 @@ class assess_by_month_test extends \advanced_testcase {
             if ($month == 12) {
                 $month = 0;
             }
-            $month ++;
+            $month++;
         }
 
         $DB->insert_records('local_assessfreq_site', $records);

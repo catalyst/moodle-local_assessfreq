@@ -27,8 +27,13 @@ require_once($CFG->libdir . '/adminlib.php');
 $baseurl = $CFG->wwwroot . "/local/assessfreq/student_search.php";
 
 // Calls require_login and performs permissions checks for admin pages.
-admin_externalpage_setup('local_assessfreq_student_search', '', null, '',
-    array('pagelayout' => 'admin'));
+admin_externalpage_setup(
+    'local_assessfreq_student_search',
+    '',
+    null,
+    '',
+    ['pagelayout' => 'admin']
+);
 
 $title = get_string('student_search', 'local_assessfreq');
 $url = new moodle_url($baseurl);
@@ -38,7 +43,7 @@ $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
-$PAGE->requires->js_call_amd('local_assessfreq/student_search', 'init', array($context->id));
+$PAGE->requires->js_call_amd('local_assessfreq/student_search', 'init', [$context->id]);
 
 $output = $PAGE->get_renderer('local_assessfreq');
 

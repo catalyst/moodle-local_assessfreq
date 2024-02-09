@@ -24,8 +24,6 @@
 
 namespace local_assessfreq\output;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Renderable for participant summary card.
  *
@@ -34,7 +32,6 @@ defined('MOODLE_INTERNAL') || die;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class inprogress_participant_summary {
-
     /**
      * Generate the markup for the summary chart,
      * used in the quiz dashboard.
@@ -44,26 +41,26 @@ class inprogress_participant_summary {
      */
     public function get_inprogress_participant_summary_chart(\stdClass $participants): \core\chart_pie {
 
-        $seriesdata = array(
+        $seriesdata = [
             $participants->notloggedin,
             $participants->loggedin,
             $participants->inprogress,
-            $participants->finished
-        );
+            $participants->finished,
+        ];
 
-        $labels = array(
+        $labels = [
             get_string('notloggedin', 'local_assessfreq'),
             get_string('loggedin', 'local_assessfreq'),
             get_string('inprogress', 'local_assessfreq'),
-            get_string('finished', 'local_assessfreq')
-        );
+            get_string('finished', 'local_assessfreq'),
+        ];
 
-        $colors = array(
+        $colors = [
             get_config('local_assessfreq', 'notloggedincolor'),
             get_config('local_assessfreq', 'loggedincolor'),
             get_config('local_assessfreq', 'inprogresscolor'),
-            get_config('local_assessfreq', 'finishedcolor')
-        );
+            get_config('local_assessfreq', 'finishedcolor'),
+        ];
 
         // Create chart object.
         $chart = new \core\chart_pie();

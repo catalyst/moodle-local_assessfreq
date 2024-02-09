@@ -37,21 +37,21 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('clearhistory', 'local_assessfreq'));
 
 // Page content. (This feels like the lazy way to do things).
-$url = new \moodle_url('/local/assessfreq/history.php', array('action' => 'deleteall'));
+$url = new \moodle_url('/local/assessfreq/history.php', ['action' => 'deleteall']);
 
 if ($action === null) {
     echo $OUTPUT->box_start();
     echo $OUTPUT->container(get_string('reprocessall_desc', 'local_assessfreq'));
     echo $OUTPUT->single_button($url, get_string('reprocessall', 'local_assessfreq'), 'get');
     echo $OUTPUT->box_end();
-
 } else if ($action == 'deleteall') {
-    $actionurl = new moodle_url('/local/assessfreq/history.php', array('action' => 'confirmed'));
+    $actionurl = new moodle_url('/local/assessfreq/history.php', ['action' => 'confirmed']);
     $cancelurl = new moodle_url('/local/assessfreq/history.php');
-    echo $OUTPUT->confirm(get_string('confirmreprocess', 'local_assessfreq'),
+    echo $OUTPUT->confirm(
+        get_string('confirmreprocess', 'local_assessfreq'),
         new single_button($actionurl, get_string('continue'), 'post', single_button::BUTTON_SECONDARY),
-        new single_button($cancelurl, get_string('cancel'), 'get'));
-
+        new single_button($cancelurl, get_string('cancel'), 'get')
+    );
 } else if ($action == 'confirmed') {
     // Create an adhoc task that will process all historical event data.
     $task = new \local_assessfreq\task\history_process();

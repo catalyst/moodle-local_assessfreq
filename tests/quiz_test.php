@@ -36,7 +36,6 @@ use stdClass;
  * @covers     \local_assessfreq\quiz
  */
 class quiz_test extends \advanced_testcase {
-
     /**
      *
      * @var stdClass $course Test course.
@@ -146,78 +145,79 @@ class quiz_test extends \advanced_testcase {
         $generator = $this->getDataGenerator();
         $layout = '1,2,0,3,4,0,5,6,0';
         $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => 1),
-            array('createsections' => true));
-        $this->quiz1 = $generator->create_module('quiz', array(
+            ['format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1, ],
+            ['createsections' => true]
+        );
+        $this->quiz1 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => 1593910800,
             'timeclose' => 1593914400,
             'timelimit' => 3600,
-            'layout' => $layout
-        ));
-        $this->quiz2 = $generator->create_module('quiz', array(
+            'layout' => $layout,
+        ]);
+        $this->quiz2 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => 1593997200,
             'timeclose' => 1594004400,
-            'timelimit' => 7200
-        ));
+            'timelimit' => 7200,
+        ]);
 
         // Start is more than one hour in the past, but end is in the future. (Should return).
-        $this->quiz3 = $generator->create_module('quiz', array(
+        $this->quiz3 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 2)),
             'timeclose' => ($now + (3600 * 0.5)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is less than one hour in the past, but end is in the future. (Should return).
-        $this->quiz4 = $generator->create_module('quiz', array(
+        $this->quiz4 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 0.5)),
             'timeclose' => ($now + (3600 * 0.5)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is less than one hour in the future, end is more than one hour in the future. (Should return).
-        $this->quiz5 = $generator->create_module('quiz', array(
+        $this->quiz5 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 0.5)),
             'timeclose' => ($now + (3600 * 2)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is less than one hour in the future, end is less that one hour in the future. (Should return).
-        $this->quiz6 = $generator->create_module('quiz', array(
+        $this->quiz6 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 0.25)),
             'timeclose' => ($now + (3600 * 0.75)),
-            'timelimit' => 1800
-        ));
+            'timelimit' => 1800,
+        ]);
 
         // Start is more than one hour in the future, end is more than one hour in the future. (Should not return).
-        $this->quiz7 = $generator->create_module('quiz', array(
+        $this->quiz7 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 2)),
             'timeclose' => ($now + (3600 * 3)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start and end date of override is more than one hour in the past. (Should not be returned).
-        $this->quiz8 = $generator->create_module('quiz', array(
+        $this->quiz8 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 3)),
             'timeclose' => ($now - (3600 * 2)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is more than one hour in the past, but end is less than one hour in the past. (Should return).
-        $this->quiz9 = $generator->create_module('quiz', array(
+        $this->quiz9 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 2)),
             'timeclose' => ($now - (3600 * 0.5)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Add questions to quiz.
         $quizobj = \mod_quiz\quiz_settings::create($this->quiz1->id);
@@ -236,7 +236,6 @@ class quiz_test extends \advanced_testcase {
 
             if ($slot % 2 == 0) {
                 $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
-
             } else {
                 $question = $questiongenerator->create_question('essay', null, ['category' => $cat->id]);
             }
@@ -333,9 +332,9 @@ class quiz_test extends \advanced_testcase {
         $override9->timeclose = ($now - (3600 * 0.5));
         $override9->timelimit = 3600;
 
-        $overriderecords = array(
-            $override1, $override2, $override3, $override4, $override5, $override6, $override7, $override8, $override9
-        );
+        $overriderecords = [
+            $override1, $override2, $override3, $override4, $override5, $override6, $override7, $override8, $override9,
+        ];
 
         $DB->insert_records('quiz_overrides', $overriderecords);
 
@@ -408,7 +407,7 @@ class quiz_test extends \advanced_testcase {
         $record6->firstip = '10.0.0.1';
         $record6->lastip = '10.0.0.1';
 
-        $sessionrecords = array($record1, $record2, $record3, $record4, $record5, $record6);
+        $sessionrecords = [$record1, $record2, $record3, $record4, $record5, $record6];
         $DB->insert_records('sessions', $sessionrecords);
 
         $fakeattempt = new stdClass();
@@ -449,7 +448,6 @@ class quiz_test extends \advanced_testcase {
         $fakeattempt->uniqueid = 65;
         $fakeattempt->state = \mod_quiz\quiz_attempt::OVERDUE;
         $DB->insert_record('quiz_attempts', $fakeattempt);
-
     }
 
     /**
@@ -502,15 +500,15 @@ class quiz_test extends \advanced_testcase {
         $track5->timecreated = $now + (60 * 5);
 
         // Insert out of order.
-        $trackrecords = array($track1, $track5, $track3, $track2, $track4);
+        $trackrecords = [$track1, $track5, $track3, $track2, $track4];
 
         $DB->insert_records('local_assessfreq_trend', $trackrecords);
     }
 
     public function setup_mock_quiz_data(): array {
-        $quizzes = array (
+        $quizzes = [
             208002 =>
-            (object)array(
+            (object)[
                 'name' => 'very SPECIAL Quiz 3',
                 'timeopen' => '15 July 2020, 10:40 AM',
                 'timeclose' => '15 July 2020, 1:10 PM',
@@ -521,8 +519,8 @@ class quiz_test extends \advanced_testcase {
                 'overrideparticipants' => 0,
                 'url' => 'https://www.example.com/moodle/mod/quiz/view.php?id=354002',
                 'types' =>
-                array (
-                ),
+                 [
+                ],
                 'typecount' => 0,
                 'questioncount' => 0,
                 'resultlink' => 'https://www.example.com/moodle/mod/quiz/report.php?id=354002&mode=overview',
@@ -535,7 +533,7 @@ class quiz_test extends \advanced_testcase {
                 'timestampopen' => '1594780800',
                 'timestampclose' => '1594789800',
                 'tracking' =>
-                (object)array(
+                (object)[
                     'id' => '314001',
                     'assessid' => '208002',
                     'notloggedin' => '1',
@@ -543,10 +541,10 @@ class quiz_test extends \advanced_testcase {
                     'inprogress' => '3',
                     'finished' => '1',
                     'timecreated' => '1594788300',
-                ),
-            ),
+                ],
+            ],
             208003 =>
-            (object)array(
+            (object)[
                 'name' => 'Independent Quiz 4',
                 'timeopen' => '15 July 2020, 12:10 PM',
                 'timeclose' => '15 July 2020, 1:10 PM',
@@ -557,8 +555,8 @@ class quiz_test extends \advanced_testcase {
                 'overrideparticipants' => 0,
                 'url' => 'https://www.example.com/moodle/mod/quiz/view.php?id=354003',
                 'types' =>
-                array (
-                ),
+                 [
+                ],
                 'typecount' => 0,
                 'questioncount' => 0,
                 'resultlink' => 'https://www.example.com/moodle/mod/quiz/report.php?id=354003&mode=overview',
@@ -571,7 +569,7 @@ class quiz_test extends \advanced_testcase {
                 'timestampopen' => '1594786200',
                 'timestampclose' => '1594789800',
                 'tracking' =>
-                (object)array(
+                (object)[
                     'id' => '314006',
                     'assessid' => '208003',
                     'notloggedin' => '1',
@@ -579,9 +577,9 @@ class quiz_test extends \advanced_testcase {
                     'inprogress' => '3',
                     'finished' => '1',
                     'timecreated' => '1594788300',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         return $quizzes;
     }
@@ -589,7 +587,7 @@ class quiz_test extends \advanced_testcase {
     /**
      * Test getting quiz override info.
      */
-    public function test_get_quiz_override_info() {
+    public function test_get_quiz_override_info(): void {
         $quizdata = new quiz();
         $context = \context_module::instance($this->quiz1->cmid);
 
@@ -602,13 +600,12 @@ class quiz_test extends \advanced_testcase {
         $this->assertEquals(1593996000, $result->start);
         $this->assertEquals(1594005000, $result->end);
         $this->assertEquals(2, $result->users);
-
     }
 
     /**
      * Test getting quiz question information.
      */
-    public function test_get_quiz_questions() {
+    public function test_get_quiz_questions(): void {
         $quizdata = new quiz();
 
         // We're testing a private method, so we need to setup reflector magic.
@@ -619,13 +616,12 @@ class quiz_test extends \advanced_testcase {
 
         $this->assertEquals(2, $result->typecount);
         $this->assertEquals(6, $result->questioncount);
-
     }
 
     /**
      * Test getting quiz data.
      */
-    public function test_get_quiz_data() {
+    public function test_get_quiz_data(): void {
 
         $quizdata = new quiz();
         $result = $quizdata->get_quiz_data($this->quiz1->id);
@@ -637,13 +633,12 @@ class quiz_test extends \advanced_testcase {
         $this->assertEquals(2, $result->overrideparticipants);
         $this->assertEquals(2, $result->typecount);
         $this->assertEquals(6, $result->questioncount);
-
     }
 
     /**
      * Test quiz override tracking.
      */
-    public function test_get_tracked_overrides() {
+    public function test_get_tracked_overrides(): void {
         $quizdata = new quiz();
         $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_tracked_overrides');
         $method->setAccessible(true); // Allow accessing of private method.
@@ -662,7 +657,7 @@ class quiz_test extends \advanced_testcase {
     /**
      * Test quiz tracking.
      */
-    public function test_get_tracked_quizzes() {
+    public function test_get_tracked_quizzes(): void {
         $quizdata = new quiz();
         $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_tracked_quizzes');
         $method->setAccessible(true); // Allow accessing of private method.
@@ -681,7 +676,7 @@ class quiz_test extends \advanced_testcase {
     /**
      * Test quiz tracking with overrides.
      */
-    public function test_get_tracked_quizzes_with_overrides() {
+    public function test_get_tracked_quizzes_with_overrides(): void {
         global $DB;
         $now = 1594788000;
 
@@ -715,20 +710,19 @@ class quiz_test extends \advanced_testcase {
         $this->assertEquals(($now + (3600 * 0.5)), $result[$this->quiz4->id]->timeclose);
 
         $this->assertCount(5, $result);
-
     }
 
     /**
      * Test getting logged in users.
      */
-    public function test_get_loggedin_users() {
-        $userids = array(
+    public function test_get_loggedin_users(): void {
+        $userids = [
             $this->user1->id,
             $this->user2->id,
             $this->user3->id,
             $this->user4->id,
             ($this->user4->id + 123),
-        );
+        ];
 
         $quizdata = new quiz();
         $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_loggedin_users');
@@ -743,7 +737,7 @@ class quiz_test extends \advanced_testcase {
     /**
      * Test quiz tracking with overrides.
      */
-    public function test_get_quiz_attempts() {
+    public function test_get_quiz_attempts(): void {
 
         $quizdata = new quiz();
         $method = new \ReflectionMethod('\local_assessfreq\quiz', 'get_quiz_attempts');
@@ -758,7 +752,7 @@ class quiz_test extends \advanced_testcase {
     /**
      * Test processing quiz tracking.
      */
-    public function test_process_quiz_tracking() {
+    public function test_process_quiz_tracking(): void {
         global $DB;
         $now = 1594788000;
 
@@ -784,7 +778,7 @@ class quiz_test extends \advanced_testcase {
     /**
      * Test processing quiz tracking .
      */
-    public function test_get_quiz_tracking() {
+    public function test_get_quiz_tracking(): void {
         $now = 1594788000;
         $this->setup_quiz_tracking($now, $this->quiz1->id);
 
@@ -796,13 +790,12 @@ class quiz_test extends \advanced_testcase {
         $this->assertEquals($now + (60 * 3), array_pop($trackingdata)->timecreated);
         $this->assertEquals($now + (60 * 2), array_pop($trackingdata)->timecreated);
         $this->assertEquals($now + (60 * 1), array_pop($trackingdata)->timecreated);
-
     }
 
     /**
      * Test getting in progress quiz counts.
      */
-    public function test_get_inprogress_counts() {
+    public function test_get_inprogress_counts(): void {
         $now = 1594788000;
         $this->setup_quiz_tracking($now, $this->quiz3->id);
         $this->setup_quiz_tracking($now, $this->quiz4->id);
@@ -812,26 +805,24 @@ class quiz_test extends \advanced_testcase {
 
         $this->assertEquals(2, $result['assessments']);
         $this->assertEquals(6, $result['participants']);
-
     }
 
     /**
      * Test getting finished quizzes.
      */
-    public function test_get_quizzes_finished() {
+    public function test_get_quizzes_finished(): void {
         $quizdata = new quiz();
 
         $now = 1594788000;
         $result = $quizdata->get_quiz_summaries($now);
 
         $this->assertCount(1, $result['finished'][$now - HOURSECS]);
-
     }
 
     /**
      * Test getting in progress quizzes.
      */
-    public function test_get_quizzes_inprogress() {
+    public function test_get_quizzes_inprogress(): void {
         $now = 1594788000;
         $this->setup_quiz_tracking($now, $this->quiz3->id);
         $this->setup_quiz_tracking($now, $this->quiz4->id);
@@ -844,13 +835,12 @@ class quiz_test extends \advanced_testcase {
         $this->assertGreaterThan($now, $result['inprogress'][$this->quiz3->id]->timestampclose);
         $this->assertLessThan($now, $result['inprogress'][$this->quiz4->id]->timestampopen);
         $this->assertGreaterThan($now, $result['inprogress'][$this->quiz4->id]->timestampclose);
-
     }
 
     /**
      * Test getting upcomming quizzes.
      */
-    public function test_get_quizzes_upcomming() {
+    public function test_get_quizzes_upcomming(): void {
         $quizdata = new quiz();
 
         $now = 1594780800;
@@ -868,13 +858,12 @@ class quiz_test extends \advanced_testcase {
         $this->assertCount(0, $result['upcomming'][$now + HOURSECS]);
         $this->assertCount(1, $result['upcomming'][$now + (HOURSECS * 2)]);
         $this->assertCount(0, $result['upcomming'][$now + (HOURSECS * 3)]);
-
     }
 
     /**
      * Test filtering quizzes.
      */
-    public function test_filter_quizzes() {
+    public function test_filter_quizzes(): void {
         // Mock data.
         $quizzes = $this->setup_mock_quiz_data();
 
@@ -894,7 +883,7 @@ class quiz_test extends \advanced_testcase {
     /**
      * Test filtering quizzes with pages.
      */
-    public function test_filter_quizzes_paging() {
+    public function test_filter_quizzes_paging(): void {
         // Mock data.
         $quizzes = $this->setup_mock_quiz_data();
 
@@ -916,7 +905,7 @@ class quiz_test extends \advanced_testcase {
     /**
      * Test filtering quizzes with pages.
      */
-    public function test_sort_quizzes() {
+    public function test_sort_quizzes(): void {
         // Mock data.
         $quizzes = $this->setup_mock_quiz_data();
 
@@ -936,6 +925,5 @@ class quiz_test extends \advanced_testcase {
 
         $sorted = \local_assessfreq\utils::sort($quizzes, $sorton, 'desc');
         $this->assertEquals('Test course 1', $sorted[208002]->coursefullname);
-
     }
 }

@@ -30,55 +30,54 @@ $definitions = [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false
+        'simpledata' => false,
     ],
     'courseevents' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false
+        'simpledata' => false,
     ],
     'userevents' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false
+        'simpledata' => false,
     ],
     'usereventsallfrequencyarray' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false
+        'simpledata' => false,
     ],
     'eventsduemonth' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false
+        'simpledata' => false,
     ],
     'yearevents' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false
+        'simpledata' => false,
     ],
     'eventsdueactivity' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false
+        'simpledata' => false,
     ],
     'monthlyuser' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false
+        'simpledata' => false,
     ],
     'eventusers' => [
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
         'simplekeys' => true,
-        'simpledata' => false
+        'simpledata' => false,
     ],
 ];
-
