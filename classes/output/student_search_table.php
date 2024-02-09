@@ -513,28 +513,41 @@ class student_search_table extends table_sql implements renderable {
             }
 
             $sql = "SELECT u.*,
-                       COALESCE(qo.timeopen, $quizobj->timestampopen) AS timeopen,
-                       COALESCE(qo.timeclose, $quizobj->timestampclose) AS timeclose,
-                       COALESCE(qo.timelimit, $quizobj->timestamplimit) AS timelimit,
-                       COALESCE(qa.state, (CASE
-                                              WHEN us.userid > 0 THEN 'loggedin'
-                                              ELSE 'notloggedin'
-                                           END)) AS state,
+                       qo.timeopen AS timeopen,
+                       qo.timeclose AS timeclose,
+                       qo.timelimit AS timelimit,
+                       COALESCE(
+                           qa.state,
+                           (
+                               CASE
+                               WHEN us.userid > 0 THEN 'loggedin'
+                               ELSE 'notloggedin'
+                               END
+                           )
+                       ) AS state,
                        qa.attemptid,
                        qa.timestart,
-                       qa.timefinish,
-                       $quizobj->assessid AS quiz,
-                       $context->instanceid as quizinstance,
-                       $quizobj->timestampopen AS quiztimeopen,
-                       $quizobj->timestampclose AS quiztimeclose,
-                       $quizobj->timestamplimit AS quiztimelimit,
-                       '$quizobj->name' AS quizname
+                       qa.timefinish
                   FROM {user} u
                        $finaljoin->joins
                  WHERE $finaljoin->wheres";
 
-             $records = $DB->get_records_sql($sql, $params);
-             $allrecords = array_merge($allrecords, $records);
+            $records = $DB->get_records_sql($sql, $params);
+            $quizdata = [
+                'quiz' => $quizobj->assessid,
+                'quizinstance' => $context->instanceid,
+                'quiztimeopen' => $quizobj->timestampopen,
+                'quiztimeclose' => $quizobj->timestampclose,
+                'quiztimelimit' => $quizobj->timestamplimit,
+                'quizname' => $quizobj->name,
+            ];
+            foreach ($records as &$record) {
+                $record->timeopen ??= $quizobj->timestampopen;
+                $record->timeclose ??= $quizobj->timestampclose;
+                $record->timelimit ??= $quizobj->timestampopen;
+                $record = (object)array_merge((array)$record, $quizdata);
+            }
+            $allrecords = array_merge($allrecords, $records);
         }
 
         if (!empty($this->get_sql_sort())) {
