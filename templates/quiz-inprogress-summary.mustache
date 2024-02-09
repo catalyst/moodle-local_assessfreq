@@ -15,13 +15,14 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_assessfreq/report-cards
+    @template local_assessfreq/quiz-inprogress-summary
 
     Report Summary template.
 
     Example context (json):
     {
-
+        "quizids": 1,
+        "context": 1
     }
 }}
 <div id="local-assessfreq-quiz-inprogress-table-paging-top">
@@ -38,7 +39,7 @@
             <td>
               <a href='{{{url}}}'>{{{name}}}</a>
               &nbsp;
-              |&nbsp;<a href='{{{dashboardlink}}}' 
+              |&nbsp;<a href='{{{dashboardlink}}}'
                         data-toggle="tooltip" title="{{#str}} dashboard:assessment, local_assessfreq {{/str}}">
                 {{#pix}} i/report, core{{/pix}}
               </a>
