@@ -39,6 +39,8 @@ use renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz_user_table extends table_sql implements renderable {
+    use dashboard_table;
+
     /**
      * @var integer $quizid The ID of the braodcast to get the acknowledgements for.
      */
@@ -104,48 +106,14 @@ class quiz_user_table extends table_sql implements renderable {
             $columns[] = $field;
         }
 
-        $headers[] = get_string('quiztimeopen', 'local_assessfreq');
-        $columns[] = 'timeopen';
-
-        $headers[] = get_string('quiztimeclose', 'local_assessfreq');
-        $columns[] = 'timeclose';
-
-        $headers[] = get_string('quiztimelimit', 'local_assessfreq');
-        $columns[] = 'timelimit';
-
-        $headers[] = get_string('quiztimestart', 'local_assessfreq');
-        $columns[] = 'timestart';
-
-        $headers[] = get_string('quiztimefinish', 'local_assessfreq');
-        $columns[] = 'timefinish';
-
-        $headers[] = get_string('status', 'local_assessfreq');
-        $columns[] = 'state';
-
-        $headers[] = get_string('actions', 'local_assessfreq');
-        $columns[] = 'actions';
-
-        $this->define_columns($columns);
-        $this->define_headers($headers);
+        $this->define_columns(array_merge($columns, $this->get_common_columns()));
+        $this->define_headers(array_merge($headers, $this->get_common_headers()));
         $this->extrafields = $extrafields;
 
         // Setup pagination.
         $this->currpage = $page;
         $this->sortable(true);
         $this->column_nosort = ['actions'];
-    }
-
-    /**
-     * Get content for title column.
-     *
-     * @param \stdClass $row
-     * @return string html used to display the video field.
-     * @throws \moodle_exception
-     */
-    public function col_fullname($row) {
-        global $OUTPUT;
-
-        return $OUTPUT->user_picture($row, ['size' => 35, 'includefullname' => true]);
     }
 
     /**
@@ -226,76 +194,6 @@ class quiz_user_table extends table_sql implements renderable {
     }
 
     /**
-     * Get content for time start column.
-     * Displays the user attempt start time.
-     *
-     * @param \stdClass $row
-     * @return string html used to display the field.
-     */
-    public function col_timestart($row) {
-        if ($row->timestart == 0) {
-            $content = \html_writer::span(get_string('na', 'local_assessfreq'));
-        } else {
-            $datetime = userdate($row->timestart, get_string('trenddatetime', 'local_assessfreq'));
-            $content = \html_writer::span($datetime);
-        }
-
-        return $content;
-    }
-
-    /**
-     * Get content for time finish column.
-     * Displays the user attempt finish time.
-     *
-     * @param \stdClass $row
-     * @return string html used to display the field.
-     */
-    public function col_timefinish($row) {
-        if ($row->timefinish == 0 && $row->timestart == 0) {
-            $content = \html_writer::span(get_string('na', 'local_assessfreq'));
-        } else if ($row->timefinish == 0 && $row->timestart > 0) {
-            $time = $row->timestart + $row->timelimit;
-            $datetime = userdate($time, get_string('trenddatetime', 'local_assessfreq'));
-            $content = \html_writer::span($datetime, 'local-assessfreq-disabled');
-        } else {
-            $datetime = userdate($row->timefinish, get_string('trenddatetime', 'local_assessfreq'));
-            $content = \html_writer::span($datetime);
-        }
-
-        return $content;
-    }
-
-    /**
-     * Get content for state column.
-     * Displays the users state in the quiz.
-     *
-     * @param \stdClass $row
-     * @return string html used to display the field.
-     */
-    public function col_state($row) {
-        if ($row->state == 'notloggedin') {
-            $color = 'background: ' . get_config('local_assessfreq', 'notloggedincolor');
-        } else if ($row->state == 'loggedin') {
-            $color = 'background: ' . get_config('local_assessfreq', 'loggedincolor');
-        } else if ($row->state == 'inprogress') {
-            $color = 'background: ' . get_config('local_assessfreq', 'inprogresscolor');
-        } else if ($row->state == 'uploadpending') {
-            $color = 'background: ' . get_config('local_assessfreq', 'inprogresscolor');
-        } else if ($row->state == 'finished') {
-            $color = 'background: ' . get_config('local_assessfreq', 'finishedcolor');
-        } else if ($row->state == 'abandoned') {
-            $color = 'background: ' . get_config('local_assessfreq', 'finishedcolor');
-        } else if ($row->state == 'overdue') {
-            $color = 'background: ' . get_config('local_assessfreq', 'finishedcolor');
-        }
-
-        $content = \html_writer::span('', 'local-assessfreq-status-icon', ['style' => $color]);
-        $content .= get_string($row->state, 'local_assessfreq');
-
-        return $content;
-    }
-
-    /**
      * Get content for actions column.
      * Displays the actions for the user.
      *
@@ -316,52 +214,7 @@ class quiz_user_table extends table_sql implements renderable {
             'title' => get_string('useroverride', 'local_assessfreq'),
         ]);
 
-        if (
-            $row->state == 'finished'
-                || $row->state == 'inprogress'
-                || $row->state == 'uploadpending'
-                || $row->state == 'abandoned'
-                || $row->state == 'overdue'
-        ) {
-            $classes = 'action-icon';
-            $attempturl = new \moodle_url('/mod/quiz/review.php', ['attempt' => $row->attemptid]);
-            $attributes = [
-                'class' => $classes,
-                'id' => 'tool-assessfreq-attempt-' . $row->id,
-                'data-toggle' => 'tooltip',
-                'data-placement' => 'top',
-                'title' => get_string('userattempt', 'local_assessfreq'),
-            ];
-        } else {
-            $classes = 'action-icon disabled';
-            $attempturl = '#';
-            $attributes = [
-                'class' => $classes,
-                'id' => 'tool-assessfreq-attempt-' . $row->id,
-            ];
-        }
-        $icon = $OUTPUT->render(new \pix_icon('i/search', ''));
-        $manage .= \html_writer::link($attempturl, $icon, $attributes);
-
-        $profileurl = new \moodle_url('/user/profile.php', ['id' => $row->id]);
-        $icon = $OUTPUT->render(new \pix_icon('i/completion_self', ''));
-        $manage .= \html_writer::link($profileurl, $icon, [
-            'class' => 'action-icon',
-            'id' => 'tool-assessfreq-profile-' . $row->id,
-            'data-toggle' => 'tooltip',
-            'data-placement' => 'top',
-            'title' => get_string('userprofile', 'local_assessfreq'),
-            ]);
-
-        $logurl = new \moodle_url('/report/log/user.php', ['id' => $row->id, 'course' => 1, 'mode' => 'all']);
-        $icon = $OUTPUT->render(new \pix_icon('i/report', ''));
-        $manage .= \html_writer::link($logurl, $icon, [
-            'class' => 'action-icon',
-            'id' => 'tool-assessfreq-log-' . $row->id,
-            'data-toggle' => 'tooltip',
-            'data-placement' => 'top',
-            'title' => get_string('userlogs', 'local_assessfreq'),
-        ]);
+        $manage .= $this->get_common_column_actions($row);
 
         return $manage;
     }
