@@ -28,5 +28,5 @@ $plugin->component = 'local_assessfreq';
 $plugin->release = '2023102700';
 $plugin->version = 2023102700;
 $plugin->requires = 2023042400; // Requires 4.2.
-$plugin->supports = [402, 402];
+$plugin->supported = [402, 402];
 $plugin->maturity = MATURITY_STABLE;
