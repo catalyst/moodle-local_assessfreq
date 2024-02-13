@@ -32,7 +32,7 @@
 #local-assessfreq-report-summary .local-assessfreq-zoom,
 #local-assessfreq-quiz-dashboard-cards-deck .local-assessfreq-zoom,
 #local-assessfreq-quiz-dashboard-participant-trend-deck .local-assessfreq-zoom,
-#local-assessfreq-quiz-dashboard-inprogress-cards .local-assessfreq-zoom  {
+#local-assessfreq-quiz-dashboard-inprogress-cards .local-assessfreq-zoom {
     margin-left: auto;
 }
 
@@ -48,7 +48,7 @@
 #local-assessfreq-quiz-dashboard-cards-deck .local-assessfreq-zoom i:hover,
 #local-assessfreq-quiz-summary-trend .local-assessfreq-zoom i:hover,
 #local-assessfreq-quiz-dashboard-inprogress-cards .local-assessfreq-zoom i:hover {
-    color: #111111;
+    color: #111;
     cursor: pointer;
 }
 
@@ -79,13 +79,12 @@
 
 .local-assessfreq-day-period {
     height: 40px;
-    background-color: #875692;
     display: flex;
     justify-content: space-between;
     border-radius: 3px;
-    box-shadow: 0 3px 4px rgba(0,0,0,.3);
+    box-shadow: 0 3px 4px rgba(0, 0, 0, .3);
     border-top: 1px solid #ab72ac;
-    background: linear-gradient(#a66db3;, #875692);
+    background: #875692 linear-gradient(#a66db3, #875692);
 }
 
 .local-assessfreq-flex-row {
@@ -134,12 +133,12 @@
     margin-right: 5px;
     margin-top: 2px;
     border-radius: 3px;
-    box-shadow: 0 3px 4px rgba(0,0,0,.3);
+    box-shadow: 0 3px 4px rgba(0, 0, 0, .3);
 }
 
 .local-assessfreq-override-status {
     font-weight: 600;
-    text-shadow: 0 1px 1px rgba(0,0,0,.3);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
 }
 
 .local-assessfreq-disabled {
