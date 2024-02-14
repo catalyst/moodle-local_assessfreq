@@ -41,14 +41,13 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class frequency {
-
     /**
      * The due date databse field differs between module types.
      * This map provides the translation.
      *
      * @var array $modduefield
      */
-    private $moduleendfield = array (
+    private $moduleendfield = [
         'assign' => 'duedate',
         'choice' => 'timeclose',
         'data' => 'timeavailableto',
@@ -57,8 +56,8 @@ class frequency {
         'lesson' => 'deadline',
         'quiz' => 'timeclose',
         'scorm' => 'timeclose',
-        'workshop' => 'submissionend'
-    );
+        'workshop' => 'submissionend',
+    ];
 
     /**
      * The start date databse field differs between module types.
@@ -66,7 +65,7 @@ class frequency {
      *
      * @var array $modduefield
      */
-    private $modulestartfield = array (
+    private $modulestartfield = [
         'assign' => 'allowsubmissionsfromdate',
         'choice' => 'timeopen',
         'data' => 'timeavailablefrom',
@@ -75,8 +74,8 @@ class frequency {
         'lesson' => 'available',
         'quiz' => 'timeopen',
         'scorm' => 'timeopen',
-        'workshop' => 'submissionstart'
-    );
+        'workshop' => 'submissionstart',
+    ];
 
     /**
      * The time limit databse field differs between module types and only some support it.
@@ -84,11 +83,11 @@ class frequency {
      *
      * @var array $moduletimelimit
      */
-    private $moduletimelimit = array (
+    private $moduletimelimit = [
         'leesson' => 'timelimit',
         'quiz' => 'timelimit',
 
-    );
+    ];
 
 
     /**
@@ -97,18 +96,18 @@ class frequency {
      *
      * @var array $capabilitymap
      */
-    private $capabilitymap = array (
-        'assign' => array('mod/assign:submit', 'mod/assign:view'),
-        'choice' => array('mod/choice:choose', 'mod/choice:view'),
-        'data' => array('mod/data:writeentry', 'mod/data:viewentry', 'mod/data:view'),
-        'feedback' => array('mod/feedback:complete', 'mod/feedback:viewanalysepage', 'mod/feedback:view'),
-        'forum' => array(
-            'mod/forum:startdiscussion', 'mod/forum:createattachment', 'mod/forum:replypost', 'mod/forum:viewdiscussion'),
-        'lesson' => array('mod/lesson:view'),
-        'quiz' => array('mod/quiz:attempt', 'mod/quiz:view'),
-        'scorm' => array('mod/scorm:savetrack', 'mod/scorm:viewscores'),
-        'workshop' => array('mod/workshop:submit', 'mod/workshop:view')
-    );
+    private $capabilitymap = [
+        'assign' => ['mod/assign:submit', 'mod/assign:view'],
+        'choice' => ['mod/choice:choose', 'mod/choice:view'],
+        'data' => ['mod/data:writeentry', 'mod/data:viewentry', 'mod/data:view'],
+        'feedback' => ['mod/feedback:complete', 'mod/feedback:viewanalysepage', 'mod/feedback:view'],
+        'forum' => [
+            'mod/forum:startdiscussion', 'mod/forum:createattachment', 'mod/forum:replypost', 'mod/forum:viewdiscussion', ],
+        'lesson' => ['mod/lesson:view'],
+        'quiz' => ['mod/quiz:attempt', 'mod/quiz:view'],
+        'scorm' => ['mod/scorm:savetrack', 'mod/scorm:viewscores'],
+        'workshop' => ['mod/workshop:submit', 'mod/workshop:view'],
+    ];
 
     /**
      * Expiry period for caches.
@@ -130,15 +129,15 @@ class frequency {
      *
      * @return array $modules The enabled modules.
      */
-    public function get_modules() : array {
+    public function get_modules(): array {
         $version = get_config('moodle', 'version');
 
         // Start with a hardcoded list of modules. As there is not a good way to get a list of suppoerted modules.
         // Different versions of Moodle have different supported modules. This is an anti pattern, but yeah...
         if ($version < 2019052000) { // Versions less than 3.7 don't support forum due dates.
-            $availablemodules = array ('assign', 'choice', 'data', 'feedback', 'lesson', 'quiz', 'scorm', 'workshop');
+            $availablemodules = ['assign', 'choice', 'data', 'feedback', 'lesson', 'quiz', 'scorm', 'workshop'];
         } else {
-            $availablemodules = array ('assign', 'choice', 'data', 'feedback', 'forum', 'lesson', 'quiz', 'scorm', 'workshop');
+            $availablemodules = ['assign', 'choice', 'data', 'feedback', 'forum', 'lesson', 'quiz', 'scorm', 'workshop'];
         }
 
         return $availablemodules;
@@ -163,7 +162,7 @@ class frequency {
     public function get_enabled_modules(): array {
         global $DB;
 
-        $modules = $DB->get_records_menu('modules', array(), '', 'name, visible');
+        $modules = $DB->get_records_menu('modules', [], '', 'name, visible');
 
         return $modules;
     }
@@ -201,7 +200,7 @@ class frequency {
      * @param string $module Activity module to get data for.
      * @return string $sql The generated SQL.
      */
-    private function get_sql_query(string $module) : string {
+    private function get_sql_query(string $module): string {
         $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
 
         $duedate = $this->moduleendfield[$module];
@@ -242,7 +241,7 @@ class frequency {
      * @param array $params
      * @return \moodle_recordset
      */
-    private function get_module_events(string $sql, array $params) : \moodle_recordset {
+    private function get_module_events(string $sql, array $params): \moodle_recordset {
         global $DB;
 
         $recordset = $DB->get_recordset_sql($sql, $params);
@@ -257,12 +256,12 @@ class frequency {
      * @param int $timestamp The unix timestamp to split.
      * @return array $timeelements Array of split time.
      */
-    private function format_time(int $timestamp) : array {
-        $timeelements = array(
+    private function format_time(int $timestamp): array {
+        $timeelements = [
             'endyear' => date('Y', $timestamp),
             'endmonth' => date('m', $timestamp),
             'endday' => date('d', $timestamp),
-        );
+        ];
 
         return $timeelements;
     }
@@ -277,14 +276,13 @@ class frequency {
     private function cleanup_record(\stdClass $record): void {
         global $DB;
 
-        $params = array('module' => $record->module, 'instanceid' => $record->instanceid);
+        $params = ['module' => $record->module, 'instanceid' => $record->instanceid];
         $id = $DB->get_field('local_assessfreq_site', 'id', $params);
 
         if ($id) {
-            $DB->delete_records('local_assessfreq_site', array('id' => $id));
-            $DB->delete_records('local_assessfreq_user', array('eventid' => $id));
+            $DB->delete_records('local_assessfreq_site', ['id' => $id]);
+            $DB->delete_records('local_assessfreq_user', ['eventid' => $id]);
         }
-
     }
 
     /**
@@ -294,13 +292,12 @@ class frequency {
      * @param \moodle_recordset $recordset
      * @return array
      */
-    private function process_module_events(\moodle_recordset $recordset) : int {
+    private function process_module_events(\moodle_recordset $recordset): int {
         global $DB;
         $recordsprocessed = 0;
-        $toinsert = array();
+        $toinsert = [];
 
         foreach ($recordset as $record) {
-
             if (empty($record->startdate)) {
                 $record->startdate = 0;
             }
@@ -330,7 +327,7 @@ class frequency {
             if (count($toinsert) == $this->batchsize) {
                 // Insert in database.
                 $DB->insert_records('local_assessfreq_site', $toinsert);
-                $toinsert = array(); // Reset array.
+                $toinsert = []; // Reset array.
                 $recordsprocessed += count($toinsert);
             }
         }
@@ -353,7 +350,7 @@ class frequency {
      * @param int $duedate The timestamp to start processing from.
      * @return int $recordsprocessed The number of records processed.
      */
-    public function process_site_events(int $duedate) : int {
+    public function process_site_events(int $duedate): int {
         $recordsprocessed = 0;
         $enabledmods = $this->get_process_modules();
         $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
@@ -363,9 +360,9 @@ class frequency {
             foreach ($enabledmods as $module) {
                 $sql = $this->get_sql_query($module);
                 if ($includehiddencourses) {
-                    $params = array($module, CONTEXT_MODULE, $duedate, 1);
+                    $params = [$module, CONTEXT_MODULE, $duedate, 1];
                 } else {
-                    $params = array($module, CONTEXT_MODULE, $duedate, 1, 1);
+                    $params = [$module, CONTEXT_MODULE, $duedate, 1, 1];
                 }
 
                 $moduleevents = $this->get_module_events($sql, $params); // Get all events for module.
@@ -387,8 +384,8 @@ class frequency {
      */
     public function generate_enrolled_wheres_joins_params(\context $context, array $capabilities): array {
         $uid = 'u.id';
-        $joins = array();
-        $wheres = array();
+        $joins = [];
+        $wheres = [];
 
         $enrolledjoin = get_enrolled_join($context, $uid, true);
         $joins[] = $enrolledjoin->joins;
@@ -404,7 +401,7 @@ class frequency {
         $wheres[] = "u.deleted = 0";
         $wheres = implode(" AND ", $wheres);
 
-        $wherejoin = array($joins, $wheres, $params);
+        $wherejoin = [$joins, $wheres, $params];
 
         return $wherejoin;
     }
@@ -420,7 +417,7 @@ class frequency {
     private function get_enrolled_users(\context $context, array $capabilities): array {
         global $DB;
 
-        list($joins, $wheres, $params) = $this->generate_enrolled_wheres_joins_params($context, $capabilities);
+        [$joins, $wheres, $params] = $this->generate_enrolled_wheres_joins_params($context, $capabilities);
 
         $finaljoin = new \core\dml\sql_join($joins, $wheres, $params);
 
@@ -461,9 +458,9 @@ class frequency {
      * @param bool $cache If false cache won't be used fresh data will be retrieved from DB.
      * @return array $users Array of user ids.
      */
-    public function get_event_users(int $contextid, string $module, bool $cache=true): array {
+    public function get_event_users(int $contextid, string $module, bool $cache = true): array {
         global $DB;
-        $users = array();
+        $users = [];
         $cachekey = (string)$contextid . '_' . $module;
 
         // Try to get value from cache.
@@ -479,7 +476,7 @@ class frequency {
                 INNER JOIN {local_assessfreq_site} s ON u.eventid = s.id
                      WHERE s.contextid = ?
                            AND s.module = ?';
-            $params = array($contextid, $module);
+            $params = [$contextid, $module];
 
             $users = $DB->get_records_sql($sql, $params);
 
@@ -502,17 +499,18 @@ class frequency {
      * @param int $duedate The duedate to get events from.
      * @return \moodle_recordset Recordset of event info.
      */
-    private function get_stored_events(int $duedate) : \moodle_recordset {
+    private function get_stored_events(int $duedate): \moodle_recordset {
         global $DB;
 
         $select = 'timeend >= ?';
-        $params = array($duedate);
+        $params = [$duedate];
         $recordset = $DB->get_recordset_select(
             'local_assessfreq_site',
             $select,
             $params,
             'timeend DESC',
-            'id, contextid, module');
+            'id, contextid, module'
+        );
 
         return $recordset;
     }
@@ -525,8 +523,8 @@ class frequency {
      * @param int $eventid The related event id.
      * @return array $userrecords Array of objects ready to store in database.
      */
-    private function prepare_user_event_records(array $users, int $eventid) : array {
-        $userrecords = array();
+    private function prepare_user_event_records(array $users, int $eventid): array {
+        $userrecords = [];
         foreach ($users as $user) {
             $record = new \stdClass();
             $record->userid = $user->id;
@@ -545,7 +543,7 @@ class frequency {
      * @param int $duedate The timestamp to start processing from.
      * @return int $recordsprocessed The number of records processed.
      */
-    public function process_user_events(int $duedate) : int {
+    public function process_user_events(int $duedate): int {
         global $DB;
         $recordsprocessed = 0;
 
@@ -571,30 +569,29 @@ class frequency {
      *
      * @param int $duedate The unix timestamp to delete events from.
      */
-    public function delete_events(int $duedate) : void {
+    public function delete_events(int $duedate): void {
         global $DB;
         $select = 'timeend >= ?';
 
         // We do the following in a transaction to maintain data consistency.
         try {
             $transaction = $DB->start_delegated_transaction();
-            $userevents = $DB->get_fieldset_select('local_assessfreq_site', 'id', $select, array($duedate));
+            $userevents = $DB->get_fieldset_select('local_assessfreq_site', 'id', $select, [$duedate]);
 
             // Delete site events.
-            $DB->delete_records_select('local_assessfreq_site', $select, array($duedate));
+            $DB->delete_records_select('local_assessfreq_site', $select, [$duedate]);
 
             // Delete user events.
             if (!empty($userevents)) {
                 $chunks = array_chunk($userevents, 30000);
                 foreach ($chunks as $usereventschunk) {
-                    list($insql, $inparams) = $DB->get_in_or_equal($usereventschunk);
+                    [$insql, $inparams] = $DB->get_in_or_equal($usereventschunk);
                     $inselect = "eventid $insql";
                     $DB->delete_records_select('local_assessfreq_user', $inselect, $inparams);
                 }
             }
 
             $transaction->allow_commit();
-
         } catch (\Exception $e) {
             $transaction->rollback($e);
         }
@@ -613,11 +610,10 @@ class frequency {
             $transaction = $DB->start_delegated_transaction();
 
             // Delete site events.
-            $DB->delete_records('local_assessfreq_site', array('id' => $event->id));
-            $DB->delete_records('local_assessfreq_user', array('eventid' => $event->id));
+            $DB->delete_records('local_assessfreq_site', ['id' => $event->id]);
+            $DB->delete_records('local_assessfreq_user', ['eventid' => $event->id]);
 
             $transaction->allow_commit();
-
         } catch (\Exception $e) {
             $transaction->rollback($e);
         }
@@ -632,8 +628,8 @@ class frequency {
      * @param int $to Timestamp to fiter to.
      * @return array $filteredevents The list of filtered events.
      */
-    private function filter_event_data($events, int $from, int $to=0) : array {
-        $filteredevents = array();
+    private function filter_event_data($events, int $from, int $to = 0): array {
+        $filteredevents = [];
 
         // If an explicit to date was not defined default to a year from now.
         if ($to == 0) {
@@ -642,7 +638,6 @@ class frequency {
 
         // Filter events.
         foreach ($events as $event) {
-
             if (($event->timeend >= $from) && ($event->timeend < $to)) {
                 $filteredevents[] = $event;
             }
@@ -661,9 +656,9 @@ class frequency {
      * @param bool $cache If false cache won't be used fresh data will be retrieved from DB.
      * @return array $events An array of site events
      */
-    public function get_site_events(string $module='all', int $from=0, int $to=0, bool $cache=true) : array {
+    public function get_site_events(string $module = 'all', int $from = 0, int $to = 0, bool $cache = true): array {
         global $DB;
-        $events = array();
+        $events = [];
 
         // Try to get value from cache.
         $sitecache = cache::make('local_assessfreq', 'siteevents');
@@ -673,7 +668,6 @@ class frequency {
             // Only return data for chosen range.
             $events = $this->filter_event_data($data->events, $from, $to);
         } else {  // Not valid cache data.
-
             $sql = "SELECT s.*
                           FROM {local_assessfreq_site} s
                      LEFT JOIN {course} c ON s.courseid = c.id";
@@ -681,11 +675,10 @@ class frequency {
             // Get data from database.
             if ($module == 'all') {
                 $modules = $this->get_process_modules();
-                list($insql, $params) = $DB->get_in_or_equal($modules);
+                [$insql, $params] = $DB->get_in_or_equal($modules);
                 $sql .= " WHERE s.module $insql";
-
             } else {
-                $params = array($module);
+                $params = [$module];
                 $sql .= " WHERE s.module = ?";
             }
 
@@ -720,14 +713,14 @@ class frequency {
      *
      * @return array $events An array of site events
      */
-    public function get_day_ending_events(string $date, string $module='all'): array {
+    public function get_day_ending_events(string $date, string $module = 'all'): array {
         global $DB;
-        $events = array();
+        $events = [];
 
         // TODO: Think about some caching here.
         // TODO: Improve unit test coverage for this.
 
-        list($year, $month, $day) = explode('-', $date);
+        [$year, $month, $day] = explode('-', $date);
         $from = 0;
         $tostart = mktime(0, 0, 0, $month, $day, $year);
         $toend = mktime(23, 59, 59, $month, $day, $year);
@@ -739,12 +732,12 @@ class frequency {
         // Get data from database.
         if ($module == 'all') {
             $modules = $this->get_process_modules();
-            list ($insql, $params) = $DB->get_in_or_equal($modules);
+             [$insql, $params] = $DB->get_in_or_equal($modules);
             $sql .= " WHERE s.module $insql";
         } else {
-            $params = array(
-                $module
-            );
+            $params = [
+                $module,
+            ];
             $sql .= " WHERE s.module = ?";
         }
 
@@ -777,9 +770,15 @@ class frequency {
      * @param bool $cache If false cache won't be used fresh data will be retrieved from DB.
      * @return array $events An array of site events
      */
-    public function get_course_events(int $courseid, string $module='all', int $from=0, int $to=0, bool $cache=true) : array {
+    public function get_course_events(
+        int $courseid,
+        string $module = 'all',
+        int $from = 0,
+        int $to = 0,
+        bool $cache = true
+    ): array {
         global $DB;
-        $events = array();
+        $events = [];
         $cachekey = (string)$courseid . '_' . $module;
 
         // Try to get value from cache.
@@ -790,12 +789,11 @@ class frequency {
             // Only return data for chosen range.
             $events = $this->filter_event_data($data->events, $from, $to);
         } else {  // Not valid cache data.
-
             // Get data from database.
             if ($module == 'all') {
-                $rawevents = $DB->get_records('local_assessfreq_site', array('courseid' => $courseid));
+                $rawevents = $DB->get_records('local_assessfreq_site', ['courseid' => $courseid]);
             } else {
-                $rawevents = $DB->get_records('local_assessfreq_site', array('module' => $module, 'courseid' => $courseid));
+                $rawevents = $DB->get_records('local_assessfreq_site', ['module' => $module, 'courseid' => $courseid]);
             }
 
             $events = $this->filter_event_data($rawevents, $from, $to);
@@ -823,9 +821,9 @@ class frequency {
      * @param bool $cache If false cache won't be used fresh data will be retrieved from DB.
      * @return array $events An array of site events
      */
-    public function get_user_events(int $userid, string $module='all', int $from=0, int $to=0, bool $cache=true) : array {
+    public function get_user_events(int $userid, string $module = 'all', int $from = 0, int $to = 0, bool $cache = true): array {
         global $DB;
-        $events = array();
+        $events = [];
         $cachekey = (string)$userid . '_' . $module;
 
         // Try to get value from cache.
@@ -843,9 +841,9 @@ class frequency {
                      WHERE u.userid = ?';
             // Get data from database.
             if ($module == 'all') {
-                $params = array($userid);
+                $params = [$userid];
             } else {
-                $params = array($userid, $module);
+                $params = [$userid, $module];
                 $sql .= ' AND s.module = ?';
             }
 
@@ -879,7 +877,7 @@ class frequency {
      * @param int $to The timestamp to get events to.
      * @return array $events An array of site events
      */
-    public function get_user_events_all(string $module='all', int $from=0, int $to=0) : Iterable {
+    public function get_user_events_all(string $module = 'all', int $from = 0, int $to = 0): iterable {
         global $DB;
 
         $rowkey = $DB->sql_concat('s.id', "'_'", 'u.userid');
@@ -891,11 +889,10 @@ class frequency {
         // Get data from database.
         if ($module == 'all') {
             $modules = $this->get_process_modules();
-            list($insql, $params) = $DB->get_in_or_equal($modules);
+            [$insql, $params] = $DB->get_in_or_equal($modules);
             $sql .= " WHERE s.module $insql";
-
         } else {
-            $params = array($module);
+            $params = [$module];
             $sql .= ' WHERE s.module = ?';
         }
 
@@ -926,9 +923,9 @@ class frequency {
      * @param bool $cache Fetch events from cache.
      * @return array $events The events.
      */
-    public function get_events_due_by_month(int $year, bool $cache=true): array {
+    public function get_events_due_by_month(int $year, bool $cache = true): array {
         global $DB;
-        $events = array();
+        $events = [];
         $cachekey = (string)$year;
 
         // Try to get value from cache.
@@ -939,7 +936,7 @@ class frequency {
             $events = $data->events;
         } else {  // Not valid cache data.
             $modules = $this->get_process_modules();
-            list($insql, $params) = $DB->get_in_or_equal($modules);
+            [$insql, $params] = $DB->get_in_or_equal($modules);
             $params[] = $year;
             $sql = "SELECT s.endmonth, COUNT(s.id) as count
                       FROM {local_assessfreq_site} s
@@ -978,9 +975,9 @@ class frequency {
      * @param bool $cache Fetch events from cache.
      * @return array $events The events.
      */
-    public function get_events_due_monthly_by_user(int $year, bool $cache=true): array {
+    public function get_events_due_monthly_by_user(int $year, bool $cache = true): array {
         global $DB;
-        $events = array();
+        $events = [];
         $cachekey = (string)$year;
 
         // Try to get value from cache.
@@ -991,7 +988,7 @@ class frequency {
             $events = $data->events;
         } else {  // Not valid cache data.
             $modules = $this->get_process_modules();
-            list($insql, $params) = $DB->get_in_or_equal($modules);
+            [$insql, $params] = $DB->get_in_or_equal($modules);
             $params[] = $year;
             $sql = "SELECT s.endmonth, COUNT(u.id) as count
                       FROM {local_assessfreq_site} s
@@ -1031,9 +1028,9 @@ class frequency {
      * @param bool $cache Fetch events from cache.
      * @return array $events The events.
      */
-    public function get_events_due_by_activity(int $year, bool $cache=true): array {
+    public function get_events_due_by_activity(int $year, bool $cache = true): array {
         global $DB;
-        $events = array();
+        $events = [];
         $cachekey = (string)$year . '_activity';
 
         // Try to get value from cache.
@@ -1043,7 +1040,7 @@ class frequency {
         if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
             $events = $data->events;
         } else { // Not valid cache data.
-            $params = array($year);
+            $params = [$year];
             $sql = 'SELECT s.module, COUNT(s.id) as count
                       FROM {local_assessfreq_site} s
                  LEFT JOIN {course} c ON s.courseid = c.id
@@ -1079,9 +1076,9 @@ class frequency {
      * @param bool $cache Fetch events from cache.
      * @return array $years The years with events.
      */
-    public function get_years_has_events(bool $cache=true): array {
+    public function get_years_has_events(bool $cache = true): array {
         global $DB;
-        $years = array();
+        $years = [];
         $cachekey = 'yearevents';
 
         // Try to get value from cache.
@@ -1117,10 +1114,10 @@ class frequency {
      * @return array $dayevents The list of events that day.
      */
     public function get_day_events(string $date, array $modules): array {
-        $dayevents = array();
+        $dayevents = [];
 
         if (empty($modules)) {
-            $modules = array('all');
+            $modules = ['all'];
         }
 
         // Get the raw events.
@@ -1150,7 +1147,7 @@ class frequency {
                     ($event->timelimit == 0) ? get_string('na', 'local_assessfreq') : round(($event->timelimit / 60));
 
                 if ($event->module == 'quiz') {
-                    $dashurl = new \moodle_url('/local/assessfreq/dashboard_quiz.php', array('id' => $event->instanceid));
+                    $dashurl = new \moodle_url('/local/assessfreq/dashboard_quiz.php', ['id' => $event->instanceid]);
                     $event->dashurl = $dashurl->out();
                 }
 
@@ -1166,11 +1163,11 @@ class frequency {
 
         // Sort results if we have more than one.
         if (count($dayevents) > 1) {
-            $sorton = array(
+            $sorton = [
                     'timestart' => 'ASC',
                     'courseshortname' => 'ASC',
-                    'name' => 'ASC'
-            );
+                    'name' => 'ASC',
+            ];
             $dayevents = \local_assessfreq\utils::multi_sort($dayevents, $sorton);
 
             $dayevents = array_values($dayevents);
@@ -1189,9 +1186,9 @@ class frequency {
      * @param array $modules List of modules to get events for.
      * @return array $freqarray The array of even frequencies.
      */
-    public function get_frequency_array(int $year, string $metric, array $modules) : array {
-        $freqarray = array();
-        $events = array();
+    public function get_frequency_array(int $year, string $metric, array $modules): array {
+        $freqarray = [];
+        $events = [];
         $from = mktime(0, 0, 0, 1, 1, $year);
         $to = mktime(23, 59, 59, 12, 31, $year);
         $userfreqarraycache = cache::make('local_assessfreq', 'usereventsallfrequencyarray');
@@ -1210,7 +1207,7 @@ class frequency {
         }
 
         if (empty($modules)) {
-            $modules = array('all');
+            $modules = ['all'];
         }
 
         // Get the raw events.
@@ -1231,7 +1228,7 @@ class frequency {
 
             // Construct the multidimensional array.
             if (empty($freqarray[$year][$month][$day])) {
-                $freqarray[$year][$month][$day] = array('number' => 1);
+                $freqarray[$year][$month][$day] = ['number' => 1];
             } else {
                 $freqarray[$year][$month][$day]['number']++;
             }
@@ -1269,11 +1266,11 @@ class frequency {
      * @param array $modules The modules to get.
      * @return array $data The data for the download file.
      */
-    public function get_download_data(int $year, string $metric, array $modules) : array {
+    public function get_download_data(int $year, string $metric, array $modules): array {
         global $DB;
 
-        $data = array();
-        $events = array();
+        $data = [];
+        $events = [];
         $from = mktime(0, 0, 0, 1, 1, $year);
         $to = mktime(23, 59, 59, 12, 31, $year);
 
@@ -1284,7 +1281,7 @@ class frequency {
         }
 
         if (empty($modules)) {
-            $modules = array('all');
+            $modules = ['all'];
         }
 
         // Get the raw events.
@@ -1303,7 +1300,7 @@ class frequency {
 
         // Format the data ready for download.
         foreach ($events as $event) {
-            $row = array();
+            $row = [];
 
             // Catch exception when context does not exist because assessfreq tables are out of sync.
             try {
@@ -1320,7 +1317,7 @@ class frequency {
 
             if ($metric == 'assess') {
                 $usercount = count($this->get_event_users($event->contextid, $event->module));
-                $row = array($startdate, $duedate, $activity, $name, $url, $usercount);
+                $row = [$startdate, $duedate, $activity, $name, $url, $usercount];
             } else if ($metric == 'students') {
                 $extrafields = \core_user\fields::for_identity($context, false);
                 $selects = $extrafields->get_sql()->selects;
@@ -1331,7 +1328,7 @@ class frequency {
                 $params = [$event->userid];
                 $userfields = $DB->get_record_sql($sql, $params);
 
-                $row = array($startdate, $duedate, $activity, $name, $url);
+                $row = [$startdate, $duedate, $activity, $name, $url];
 
                 foreach ($userfields as $userfield) {
                     $row[] = $userfield;
@@ -1351,14 +1348,14 @@ class frequency {
     public function get_heat_colors(): array {
         $config = get_config('local_assessfreq');
 
-        $heatcolors = array(
+        $heatcolors = [
             1 => $config->heat1,
             2 => $config->heat2,
             3 => $config->heat3,
             4 => $config->heat4,
             5 => $config->heat5,
-            6 => $config->heat6
-        );
+            6 => $config->heat6,
+        ];
 
         return $heatcolors;
     }
@@ -1373,7 +1370,7 @@ class frequency {
         global $CFG;
 
         // Get plugin cache definitions.
-        $definitions = array();
+        $definitions = [];
         include($CFG->dirroot . '/local/assessfreq/db/caches.php');
         $definitionnames = array_keys($definitions);
 
@@ -1390,9 +1387,9 @@ class frequency {
      * @param int $now The timestamp to get the conflicts for.
      * @return array $conflicts The conflict data.
      */
-    private function get_conflicts(int $now) : array {
+    private function get_conflicts(int $now): array {
         global $DB;
-        $conflicts = array();
+        $conflicts = [];
 
         // A conflict is an overlapping date range for two or more quizzes where the quiz has at least one common student.
         $eventsql = 'SELECT lasa.id as eventid, lasb.id as conflictid
@@ -1403,7 +1400,7 @@ class frequency {
                       WHERE lasa.module = ?
                             AND lasb.module = ?
                             AND lasa.timestart > ?';
-        $eventparams = array('quiz', 'quiz', $now, $now);
+        $eventparams = ['quiz', 'quiz', $now, $now];
         $recordset = $DB->get_recordset_sql($eventsql, $eventparams);
 
         foreach ($recordset as $record) {
@@ -1413,7 +1410,7 @@ class frequency {
                          WHERE laua.eventid = ?
                                AND laub.eventid = ?';
 
-            $userparams = array($record->eventid, $record->conflictid);
+            $userparams = [$record->eventid, $record->conflictid];
             $users = $DB->get_fieldset_sql($usersql, $userparams);
 
             if (!empty($users)) {
@@ -1435,21 +1432,20 @@ class frequency {
      *
      * @return array $conflicts Conflict data.
      */
-    public function process_conflicts() : array {
+    public function process_conflicts(): array {
 
         // Final result should look like this.
-        $conflicts['eventid'] = array(
-            array(
+        $conflicts['eventid'] = [
+            [
                 'conflicteventid' => 123,
-                'effecteduserids' => array(1, 2, 3)
-            ),
-            array(
+                'effecteduserids' => [1, 2, 3],
+            ],
+            [
                 'conflicteventid' => 456,
-                'effecteduserids' => array(4, 5, 6)
-            ),
-        );
+                'effecteduserids' => [4, 5, 6],
+            ],
+        ];
 
         return $conflicts;
     }
-
 }

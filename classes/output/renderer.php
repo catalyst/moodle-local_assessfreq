@@ -24,9 +24,6 @@
 namespace local_assessfreq\output;
 
 use local_assessfreq\quiz;
-
-defined('MOODLE_INTERNAL') || die;
-
 use plugin_renderer_base;
 use local_assessfreq\frequency;
 
@@ -38,7 +35,6 @@ use local_assessfreq\frequency;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends plugin_renderer_base {
-
     /**
      * Render the html for the report cards.
      * Most content is loaded by ajax
@@ -54,7 +50,7 @@ class renderer extends plugin_renderer_base {
         $years = $frequency->get_years_has_events();
 
         if (empty($years)) {
-            $years = array($currentyear);
+            $years = [$currentyear];
         }
 
         // Add current year to the selection of years if missing.
@@ -62,18 +58,18 @@ class renderer extends plugin_renderer_base {
             $years[] = $currentyear;
         }
 
-        $context = array('years' => array(), 'currentyear' => $preferenceyear);
+        $context = ['years' => [], 'currentyear' => $preferenceyear];
 
         if (!empty($years)) {
             foreach ($years as $year) {
                 if ($year == $preferenceyear) {
-                    $context['years'][] = array('year' => array('val' => $year, 'active' => 'true'));
+                    $context['years'][] = ['year' => ['val' => $year, 'active' => 'true']];
                 } else {
-                    $context['years'][] = array('year' => array('val' => $year));
+                    $context['years'][] = ['year' => ['val' => $year]];
                 }
             }
         } else {
-            $context['years'][] = array('year' => array('val' => $preferenceyear, 'active' => 'true'));
+            $context['years'][] = ['year' => ['val' => $preferenceyear, 'active' => 'true']];
         }
 
         return $this->render_from_template('local_assessfreq/report-cards', $context);
@@ -113,7 +109,14 @@ class renderer extends plugin_renderer_base {
      * @return string $output HTML for the table.
      */
     public function render_student_search_table(
-        string $baseurl, int $contextid, string $search, int $hoursahead, int $hoursbehind, int $now, int $page=0): string {
+        string $baseurl,
+        int $contextid,
+        string $search,
+        int $hoursahead,
+        int $hoursbehind,
+        int $now,
+        int $page = 0
+    ): string {
 
         $renderable = new student_search_table($baseurl, $contextid, $search, $hoursahead, $hoursbehind, $now, $page);
         $perpage = 50;
@@ -139,8 +142,14 @@ class renderer extends plugin_renderer_base {
      * @param int $hoursbehind Amount of time in hours to look behind for quizzes starting.
      * @return string $output HTML for the table.
      */
-    public function render_quizzes_inprogress_table(string $search, int $page, string $sorton, string $direction,
-                                                    int $hoursahead = 0, int $hoursbehind = 0): string {
+    public function render_quizzes_inprogress_table(
+        string $search,
+        int $page,
+        string $sorton,
+        string $direction,
+        int $hoursahead = 0,
+        int $hoursbehind = 0
+    ): string {
         $context = \context_system::instance(); // TODO: pass the actual context in from the caller.
         $now = time();
         $quiz = new quiz($hoursahead, $hoursbehind);
@@ -163,18 +172,18 @@ class renderer extends plugin_renderer_base {
             }
         }
 
-        list($filtered, $totalrows) = $quiz->filter_quizzes($inprogressquizzes, $search, $page, $pagesize);
+        [$filtered, $totalrows] = $quiz->filter_quizzes($inprogressquizzes, $search, $page, $pagesize);
         $sortedquizzes = \local_assessfreq\utils::sort($filtered, $sorton, $direction);
 
         $pagingbar = new \paging_bar($totalrows, $page, $pagesize, '/');
         $pagingoutput = $this->render($pagingbar);
 
-        $context = array(
+        $context = [
             'quizzes' => array_values($sortedquizzes),
             'quizids' => json_encode(array_keys($sortedquizzes)),
             'context' => $context->id,
-            'pagingbar' => $pagingoutput
-        );
+            'pagingbar' => $pagingoutput,
+        ];
 
         $output = $this->render_from_template('local_assessfreq/quiz-inprogress-summary', $context);
 
@@ -195,20 +204,20 @@ class renderer extends plugin_renderer_base {
         $frequency = new frequency();
 
         // Initial context setup.
-        $context = array(
-            'years' => array(),
+        $context = [
+            'years' => [],
             'currentyear' => $preferenceyear,
-            'modules' => array(),
-            'metrics' => array(),
+            'modules' => [],
+            'metrics' => [],
             'sesskey' => sesskey(),
-            'downloadmetric' => $preferencemetric
-        );
+            'downloadmetric' => $preferencemetric,
+        ];
 
         // Get years that have events and load into context.
         $years = $frequency->get_years_has_events();
 
         if (empty($years)) {
-            $years = array($currentyear);
+            $years = [$currentyear];
         }
 
         // Add current year to the selection of years if missing.
@@ -219,38 +228,38 @@ class renderer extends plugin_renderer_base {
         if (!empty($years)) {
             foreach ($years as $year) {
                 if ($year == $preferenceyear) {
-                    $context['years'][] = array('year' => array('val' => $year, 'active' => 'true'));
+                    $context['years'][] = ['year' => ['val' => $year, 'active' => 'true']];
                     $context['downloadyear'] = $year;
                 } else {
-                    $context['years'][] = array('year' => array('val' => $year));
+                    $context['years'][] = ['year' => ['val' => $year]];
                 }
             }
         } else {
-            $context['years'][] = array('year' => array('val' => $preferenceyear, 'active' => 'true'));
+            $context['years'][] = ['year' => ['val' => $preferenceyear, 'active' => 'true']];
             $context['downloadyear'] = $preferenceyear;
         }
 
         // Get modules for filters and load into context.
         $modules = $frequency->get_process_modules();
-        if (empty($preferencemodules) || $preferencemodules === array('all')) {
-            $context['modules'][] = array('module' => array('val' => 'all', 'name' => get_string('all'),  'active' => 'true'));
+        if (empty($preferencemodules) || $preferencemodules === ['all']) {
+            $context['modules'][] = ['module' => ['val' => 'all', 'name' => get_string('all'), 'active' => 'true']];
         } else {
-            $context['modules'][] = array('module' => array('val' => 'all', 'name' => get_string('all')));
+            $context['modules'][] = ['module' => ['val' => 'all', 'name' => get_string('all')]];
         }
 
         if (!empty($modules[0])) {
             foreach ($modules as $module) {
                 $modulename = get_string('modulename', $module);
                 if (in_array($module, $preferencemodules)) {
-                    $context['modules'][] = array('module' => array('val' => $module, 'name' => $modulename,  'active' => 'true'));
+                    $context['modules'][] = ['module' => ['val' => $module, 'name' => $modulename, 'active' => 'true']];
                 } else {
-                    $context['modules'][] = array('module' => array('val' => $module, 'name' => $modulename));
+                    $context['modules'][] = ['module' => ['val' => $module, 'name' => $modulename]];
                 }
             }
         }
 
         // Get metric details and load into context.
-        $context['metrics'] = array($preferencemetric => 'true');
+        $context['metrics'] = [$preferencemetric => 'true'];
 
         return $this->render_from_template('local_assessfreq/report-heatmap', $context);
     }
@@ -261,7 +270,7 @@ class renderer extends plugin_renderer_base {
      * @param string $baseurl the base url to render this report on.
      * @return string $html the html to display.
      */
-    public function render_dashboard_assessment(string $baseurl) : string {
+    public function render_dashboard_assessment(string $baseurl): string {
         $html = '';
         $html .= $this->header();
         $html .= $this->render_report_cards();
@@ -278,18 +287,18 @@ class renderer extends plugin_renderer_base {
      */
     private function render_quiz_select_refresh_button(): string {
         $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
-        $refreshminutes = array(
+        $refreshminutes = [
             60 => 'minuteone',
             120 => 'minutetwo',
             300 => 'minutefive',
             600 => 'minuteten',
-        );
+        ];
 
-        $context = array(
+        $context = [
             'refreshinitial' => get_string($refreshminutes[$preferencerefresh], 'local_assessfreq'),
-            'refresh' => array($refreshminutes[$preferencerefresh] => 'true'),
-            'hide' => true
-        );
+            'refresh' => [$refreshminutes[$preferencerefresh] => 'true'],
+            'hide' => true,
+        ];
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-controls', $context);
     }
@@ -304,26 +313,26 @@ class renderer extends plugin_renderer_base {
         $preferencehoursahead = get_user_preferences('local_assessfreq_quizzes_inprogress_table_hoursahead_preference', 0);
         $preferencehoursbehind = get_user_preferences('local_assessfreq_quizzes_inprogress_table_hoursbehind_preference', 0);
 
-        $refreshminutes = array(
+        $refreshminutes = [
             60 => 'minuteone',
             120 => 'minutetwo',
             300 => 'minutefive',
             600 => 'minuteten',
-        );
+        ];
 
-        $hours = array(
+        $hours = [
             0 => 'hours0',
             1 => 'hours1',
             4 => 'hours4',
             8 => 'hours8',
-        );
+        ];
 
-        $context = array(
+        $context = [
             'refreshinitial' => get_string($refreshminutes[$preferencerefresh], 'local_assessfreq'),
-            'refresh' => array($refreshminutes[$preferencerefresh] => 'true'),
-            'hoursahead' => array($hours[$preferencehoursahead] => 'true'),
-            'hoursbehind' => array($hours[$preferencehoursbehind] => 'true'),
-        );
+            'refresh' => [$refreshminutes[$preferencerefresh] => 'true'],
+            'hoursahead' => [$hours[$preferencehoursahead] => 'true'],
+            'hoursbehind' => [$hours[$preferencehoursbehind] => 'true'],
+        ];
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-controls', $context);
     }
@@ -335,15 +344,15 @@ class renderer extends plugin_renderer_base {
      */
     private function render_quiz_dashboard_cards(): string {
         $preferencerows = get_user_preferences('local_assessfreq_quiz_table_rows_preference', 20);
-        $rows = array(
+        $rows = [
             20 => 'rows20',
             50 => 'rows50',
             100 => 'rows100',
-        );
+        ];
 
-        $context = array(
-            'rows' => array($rows[$preferencerows] => 'true'),
-        );
+        $context = [
+            'rows' => [$rows[$preferencerows] => 'true'],
+        ];
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-cards', $context);
     }
@@ -356,16 +365,16 @@ class renderer extends plugin_renderer_base {
     private function render_quiz_dashboard_inprogress_cards(): string {
         $preferencerows = get_user_preferences('local_assessfreq_quiz_table_inprogress_preference', 10);
         $preferencesort = get_user_preferences('local_assessfreq_quiz_table_inprogress_sort_preference', 'name_asc');
-        $rows = array(
+        $rows = [
             5 => 'rows5',
             10 => 'rows10',
             20 => 'rows20',
-        );
+        ];
 
-        $context = array(
-            'rows' => array($rows[$preferencerows] => 'true'),
-            'sort' => array($preferencesort => 'true')
-        );
+        $context = [
+            'rows' => [$rows[$preferencerows] => 'true'],
+            'sort' => [$preferencesort => 'true'],
+        ];
 
         return $this->render_from_template('local_assessfreq/quiz-dashboard-inprogress-cards', $context);
     }
@@ -381,41 +390,41 @@ class renderer extends plugin_renderer_base {
         $preferencehoursbehind = get_user_preferences('local_assessfreq_student_search_table_hoursbehind_preference', 1);
         $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
 
-        $refreshminutes = array(
+        $refreshminutes = [
             60 => 'minuteone',
             120 => 'minutetwo',
             300 => 'minutefive',
             600 => 'minuteten',
-        );
+        ];
 
-        $rows = array(
+        $rows = [
             20 => 'rows20',
             50 => 'rows50',
             100 => 'rows100',
-        );
+        ];
 
-        $hours = array(
+        $hours = [
             0 => 'hours0',
             1 => 'hours1',
             4 => 'hours4',
             8 => 'hours8',
-        );
+        ];
 
         $preferencerefresh = get_user_preferences('local_assessfreq_quiz_refresh_preference', 60);
-        $refreshminutes = array(
+        $refreshminutes = [
             60 => 'minuteone',
             120 => 'minutetwo',
             300 => 'minutefive',
             600 => 'minuteten',
-        );
+        ];
 
-        $context = array(
-            'rows' => array($rows[$preferencerows] => 'true'),
-            'hoursahead' => array($hours[$preferencehoursahead] => 'true'),
-            'hoursbehind' => array($hours[$preferencehoursbehind] => 'true'),
+        $context = [
+            'rows' => [$rows[$preferencerows] => 'true'],
+            'hoursahead' => [$hours[$preferencehoursahead] => 'true'],
+            'hoursbehind' => [$hours[$preferencehoursbehind] => 'true'],
             'refreshinitial' => get_string($refreshminutes[$preferencerefresh], 'local_assessfreq'),
-            'refresh' => array($refreshminutes[$preferencerefresh] => 'true')
-        );
+            'refresh' => [$refreshminutes[$preferencerefresh] => 'true'],
+        ];
 
         return $this->render_from_template('local_assessfreq/student-search', $context);
     }
@@ -426,7 +435,7 @@ class renderer extends plugin_renderer_base {
      * @param string $baseurl the base url to render this report on.
      * @return string $html the html to display.
      */
-    public function render_dashboard_quiz(string $baseurl) : string {
+    public function render_dashboard_quiz(string $baseurl): string {
         $html = '';
         $html .= $this->header();
         $html .= $this->render_quiz_select_refresh_button();
@@ -442,7 +451,7 @@ class renderer extends plugin_renderer_base {
      * @param string $baseurl the base url to render this report on.
      * @return string $html the html to display.
      */
-    public function render_dashboard_quiz_inprogress(string $baseurl) : string {
+    public function render_dashboard_quiz_inprogress(string $baseurl): string {
         $html = '';
         $html .= $this->header();
         $html .= $this->render_quiz_refresh_button();
@@ -457,7 +466,7 @@ class renderer extends plugin_renderer_base {
      *
      * @return string $html the html to display.
      */
-    public function render_student_search() : string {
+    public function render_student_search(): string {
         $html = '';
         $html .= $this->header();
         $html .= $this->render_student_table_cards();

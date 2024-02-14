@@ -36,7 +36,6 @@ require_once("$CFG->libdir/formslib.php");
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz_search_form extends \moodleform {
-
     /**
      * Build form for the broadcast message.
      *
@@ -48,32 +47,36 @@ class quiz_search_form extends \moodleform {
         $mform->disable_form_change_checker();
 
         // Form heading.
-        $mform->addElement('html',
-            \html_writer::div(get_string('searchquizform', 'local_assessfreq'), 'form-description mb-3'));
+        $mform->addElement(
+            'html',
+            \html_writer::div(get_string('searchquizform', 'local_assessfreq'), 'form-description mb-3')
+        );
 
-        $courseoptions = array(
+        $courseoptions = [
             'multiple' => false,
             'placeholder' => get_string('entercourse', 'local_assessfreq'),
             'noselectionstring' => get_string('nocourse', 'local_assessfreq'),
             'ajax' => 'local_assessfreq/course_selector',
-            'casesensitive' => false
-        );
-        $mform->addElement('autocomplete', 'courses', get_string('course', 'local_assessfreq'), array(), $courseoptions);
+            'casesensitive' => false,
+        ];
+        $mform->addElement('autocomplete', 'courses', get_string('course', 'local_assessfreq'), [], $courseoptions);
 
         $mform->addElement('hidden', 'coursechoice', '0');
         $mform->setType('coursechoice', PARAM_INT);
 
-        $selectoptions = array(
+        $selectoptions = [
             0 => get_string('selectcourse', 'local_assessfreq'),
             -1 => get_string('loadingquiz', 'local_assessfreq'),
-        );
-        $mform->addElement('select', 'quiz',
+        ];
+        $mform->addElement(
+            'select',
+            'quiz',
             get_string('quiz', 'local_assessfreq'),
-            $selectoptions);
+            $selectoptions
+        );
         $mform->disabledIf('quiz', 'coursechoice', 'eq', '0');
 
         $btnstring = get_string('selectquiz', 'local_assessfreq');
         $this->add_action_buttons(true, $btnstring);
-
     }
 }

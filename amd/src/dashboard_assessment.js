@@ -272,7 +272,7 @@ const moduleListChildrenEvents = (element) => {
         let module = links[i].dataset.module;
 
         if (module.toLowerCase() === 'all') {
-            links[i].addEventListener('click', function(event){
+            links[i].addEventListener('click', function (event) {
                 event.preventDefault();
                 // Remove active class from all other links.
                 for (var j = 0; j < links.length; j++) {
@@ -281,7 +281,7 @@ const moduleListChildrenEvents = (element) => {
                 updateHeatmapDebounce(); // Call function to update heatmap.
             });
         } else if (module.toLowerCase() === 'close') {
-            links[i].addEventListener('click', function(event){
+            links[i].addEventListener('click', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
 
@@ -290,9 +290,8 @@ const moduleListChildrenEvents = (element) => {
 
                 updateHeatmapDebounce(); // Call function to update heatmap.
             });
-
         } else {
-            links[i].addEventListener('click', function(event){
+            links[i].addEventListener('click', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
 
@@ -302,7 +301,6 @@ const moduleListChildrenEvents = (element) => {
                 updateHeatmapDebounce();
             });
         }
-
     }
 };
 

@@ -27,7 +27,7 @@ namespace local_assessfreq\form;
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
-require_once($CFG->dirroot.'/mod/quiz/override_form.php');
+require_once($CFG->dirroot . '/mod/quiz/override_form.php');
 
 /**
  * Form to add override for quiz.
@@ -37,7 +37,6 @@ require_once($CFG->dirroot.'/mod/quiz/override_form.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz_override_form extends \quiz_override_form {
-
     /**
      * Constructor.
      * @param object $cm course module object.
@@ -46,7 +45,7 @@ class quiz_override_form extends \quiz_override_form {
      * @param object $override the override being edited, if it already exists.
      * @param null|object $submitteddata The data submitted to the form via ajax.
      */
-    public function __construct($cm, $quiz, $context, $override, $submitteddata=null) {
+    public function __construct($cm, $quiz, $context, $override, $submitteddata = null) {
 
         $this->cm = $cm;
         $this->quiz = $quiz;
@@ -56,7 +55,6 @@ class quiz_override_form extends \quiz_override_form {
         $this->userid = empty($override->userid) ? 0 : $override->userid;
 
         \moodleform::__construct(null, null, 'post', '', ['class' => 'ignoredirty'], true, $submitteddata);
-
     }
 
     /**
@@ -72,5 +70,4 @@ class quiz_override_form extends \quiz_override_form {
         $mform->removeElement('buttonbar');
         $this->add_action_buttons();
     }
-
 }

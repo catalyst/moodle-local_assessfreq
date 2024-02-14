@@ -99,5 +99,5 @@ Feature: Assessment frequency
      | Forum: Test forum 1           |
      | Lesson: Test lesson 1         |
      | Quiz: Test quiz 1             |
-     | SCORM package: test scorm 1   |
+     | SCORM package: Test scorm 1   |
      | Workshop: Test workshop 1     |

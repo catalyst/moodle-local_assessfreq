@@ -24,8 +24,6 @@
 
 namespace local_assessfreq\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\approved_contextlist;
@@ -40,17 +38,14 @@ use core_privacy\local\request\userlist;
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements
-\core_privacy\local\metadata\provider,
-\core_privacy\local\request\data_provider {
-
+class provider implements \core_privacy\local\request\data_provider, \core_privacy\local\metadata\provider {
     /**
      * Returns metadata about this plugin's privacy policy.
      *
      * @param   collection $collection The initialised collection to add items to.
      * @return  collection     A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
             'local_assessfreq_user',
             [
@@ -59,7 +54,7 @@ class provider implements
                 'eventid' => 'privacy:metadata:local_assessfreq_user:eventid',
             ],
             'privacy:metadata:local_assessfreq_user'
-            );
+        );
         $collection->add_database_table(
             'local_assessfreq_conf_user',
             [
@@ -68,7 +63,7 @@ class provider implements
                 'conflictid' => 'privacy:metadata:local_assessfreq_conf_user:conflictid',
             ],
             'privacy:metadata:local_assessfreq_conf_user'
-            );
+        );
 
         return $collection;
     }
@@ -79,7 +74,7 @@ class provider implements
      * @param int $userid the userid to search.
      * @return contextlist the contexts in which data is contained.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new \core_privacy\local\request\contextlist();
         $contextlist->add_user_context($userid);
         $contextlist->add_system_context();
@@ -98,12 +93,12 @@ class provider implements
             $sql = "
             SELECT *
             FROM {local_assessfreq_user}";
-            $userlist->add_from_sql('userid', $sql, array());
+            $userlist->add_from_sql('userid', $sql, []);
 
             $sql = "
             SELECT *
             FROM {local_assessfreq_conf_user}";
-            $userlist->add_from_sql('userid', $sql, array());
+            $userlist->add_from_sql('userid', $sql, []);
         }
     }
 
@@ -116,14 +111,12 @@ class provider implements
         global $DB;
         $userid = $contextlist->get_user()->id;
         foreach ($contextlist as $context) {
-
             // If not in system context, exit loop.
             if ($context->contextlevel == CONTEXT_SYSTEM) {
-
-                $parentclass = array();
+                $parentclass = [];
 
                 // Get records for user ID.
-                $rows = $DB->get_records('local_assessfreq_user', array('userid' => $userid));
+                $rows = $DB->get_records('local_assessfreq_user', ['userid' => $userid]);
 
                 if (count($rows) > 0) {
                     $i = 0;
@@ -134,7 +127,7 @@ class provider implements
                     }
                 }
 
-                $rows = $DB->get_records('local_assessfreq_conf_user', array('userid' => $userid));
+                $rows = $DB->get_records('local_assessfreq_conf_user', ['userid' => $userid]);
 
                 if (count($rows) > 0) {
                     foreach ($rows as $row) {
@@ -146,7 +139,8 @@ class provider implements
 
                 writer::with_context($context)->export_data(
                     [get_string('privacy:metadata:local_assessfreq', 'local_assessfreq')],
-                    (object) $parentclass);
+                    (object) $parentclass
+                );
             }
         }
     }
@@ -187,13 +181,13 @@ class provider implements
                         FROM {local_assessfreq_user} mfa
                         WHERE mfa.userid = :userid";
 
-                $DB->execute($sql, array('userid' => $userid));
+                $DB->execute($sql, ['userid' => $userid]);
 
                 $sql = "DELETE
                         FROM {local_assessfreq_conf_user} mfa
                         WHERE mfa.userid = :userid";
 
-                $DB->execute($sql, array('userid' => $userid));
+                $DB->execute($sql, ['userid' => $userid]);
             }
         }
     }
@@ -207,7 +201,7 @@ class provider implements
         $users = $userlist->get_users();
         foreach ($users as $user) {
             // Create contextlist.
-            $contextlist = new approved_contextlist($user, 'local_assessfreq', array(CONTEXT_SYSTEM));
+            $contextlist = new approved_contextlist($user, 'local_assessfreq', [CONTEXT_SYSTEM]);
             // Call delete data.
             self::delete_data_for_user($contextlist);
         }

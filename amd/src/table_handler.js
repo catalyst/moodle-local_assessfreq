@@ -111,8 +111,8 @@ export const getTable = (quiz, hours = null, sortValueTable = null, page) => {
             tableEventListeners(); // Re-add table event listeners.
 
         }).fail(() => {
-        Notification.exception(new Error('Failed to update table.'));
-    });
+            Notification.exception(new Error('Failed to update table.'));
+        });
 };
 
 /**
@@ -196,7 +196,6 @@ const tableHide = (event) => {
         if (action === 'show') {
             hideArray[column] = 1;
         }
-
     }
 
     hideArray[targetColumn] = (targetAction === 'hide') ? 1 : 0; // We want to flip the clicked column.
@@ -321,7 +320,6 @@ export const tableSortButtonAction = (event) => {
         UserPreference.setUserPreference('local_assessfreq_quiz_table_inprogress_sort_preference', sortValue);
 
         debounceTable(); // Call function to update table.
-
     }
 };
 
@@ -346,7 +344,6 @@ const tableEventListeners = () => {
             } else if (linkUrl.search.indexOf('tsort') !== -1) {
                 links[i].addEventListener('click', tableSort);
             }
-
         }
 
         if (resetLink.length > 0) {
@@ -410,13 +407,13 @@ export const init = (quiz,
                      tableSearchElement,
                      tableId = null,
                      tableMethodName = null) => {
-    quizId = quiz;
-    contextId = context;
-    cardElement = tableCardElement;
-    elementId = tableElementId;
-    fragmentValue = tableFragmentValue;
-    rowPreference = tableRowPreference;
-    searchElement = tableSearchElement;
-    id = tableId;
-    methodName = tableMethodName;
-};
+                            quizId = quiz;
+                            contextId = context;
+                            cardElement = tableCardElement;
+                            elementId = tableElementId;
+                            fragmentValue = tableFragmentValue;
+                            rowPreference = tableRowPreference;
+                            searchElement = tableSearchElement;
+                            id = tableId;
+                            methodName = tableMethodName;
+                        };

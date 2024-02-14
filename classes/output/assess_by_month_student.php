@@ -26,8 +26,6 @@ namespace local_assessfreq\output;
 
 use local_assessfreq\frequency;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Renderable for assessments due by month student card.
  *
@@ -36,6 +34,7 @@ defined('MOODLE_INTERNAL') || die;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class assess_by_month_student {
+    use generate_assess_by_month_chart;
 
     /**
      * Generate the markup for the process summary chart,
@@ -49,44 +48,8 @@ class assess_by_month_student {
         // Get events for the supplied year.
         $frequency = new frequency();
         $yeardata = $frequency->get_events_due_monthly_by_user($year);
-        $seriesdata = array();
         $charttitle = get_string('assessbymonthstudents', 'local_assessfreq');
-        $result = array();
 
-        // There is always 12 months in a year,
-        // even if we don't have data for them all.
-        for ($i = 1; $i <= 12; $i++) {
-            if (!empty($yeardata[$i])) {
-                $seriesdata[] = $yeardata[$i]->count;
-            } else {
-                $seriesdata[] = 0;
-            }
-        }
-
-        // Create chart object.
-        $events = new \core\chart_series($charttitle, $seriesdata);
-        $labels = array(
-            get_string('jan', 'local_assessfreq'),
-            get_string('feb', 'local_assessfreq'),
-            get_string('mar', 'local_assessfreq'),
-            get_string('apr', 'local_assessfreq'),
-            get_string('may', 'local_assessfreq'),
-            get_string('jun', 'local_assessfreq'),
-            get_string('jul', 'local_assessfreq'),
-            get_string('aug', 'local_assessfreq'),
-            get_string('sep', 'local_assessfreq'),
-            get_string('oct', 'local_assessfreq'),
-            get_string('nov', 'local_assessfreq'),
-            get_string('dec', 'local_assessfreq'),
-        );
-
-        $chart = new \core\chart_bar();
-        $chart->add_series($events);
-        $chart->set_labels($labels);
-
-        $result['hasdata'] = true;
-        $result['chart'] = $chart;
-
-        return $result;
+        return $this->generate_chart($yeardata, $charttitle);
     }
 }

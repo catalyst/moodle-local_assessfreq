@@ -39,7 +39,6 @@ require_once($CFG->libdir . '/form/static.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scheduler_form_element extends MoodleQuickForm_static implements templatable {
-
     /**
      * Form element scheduler.
      *
@@ -47,9 +46,9 @@ class scheduler_form_element extends MoodleQuickForm_static implements templatab
      * @param string $elementlabel (optional) text field label.
      * @param string $text (optional) Text to put in text field.
      */
-    public function __construct($elementname=null, $elementlabel=null, $text=null) {
+    public function __construct($elementname = null, $elementlabel = null, $text = null) {
         global $OUTPUT;
-        $text = $OUTPUT->render_from_template('local_assessfreq/scheduler_form_element', array('foo' => $text));
+        $text = $OUTPUT->render_from_template('local_assessfreq/scheduler_form_element', ['foo' => $text]);
 
         parent::__construct($elementname, $elementlabel, $text);
     }

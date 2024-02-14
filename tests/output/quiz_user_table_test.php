@@ -37,7 +37,6 @@ use stdClass;
  * @covers     \local_assessfreq\output\quiz_user_table
  */
 class quiz_user_table_test extends \advanced_testcase {
-
     /**
      *
      * @var stdClass $course Test course.
@@ -93,23 +92,24 @@ class quiz_user_table_test extends \advanced_testcase {
         $generator = $this->getDataGenerator();
         $layout = '1,2,0,3,4,0,5,6,0';
         $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => 1),
-            array('createsections' => true));
+            ['format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1, ],
+            ['createsections' => true]
+        );
 
-        $this->quiz1 = $generator->create_module('quiz', array(
+        $this->quiz1 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => 1593910800,
             'timeclose' => 1593914400,
             'timelimit' => 3600,
-            'layout' => $layout
-        ));
-        $this->quiz2 = $generator->create_module('quiz', array(
+            'layout' => $layout,
+        ]);
+        $this->quiz2 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => 1593997200,
             'timeclose' => 1594004400,
-            'timelimit' => 7200
-        ));
+            'timelimit' => 7200,
+        ]);
 
         $this->course = $course;
 
@@ -140,7 +140,7 @@ class quiz_user_table_test extends \advanced_testcase {
         $override2->timeclose = 1594005000;  // End late.
         $override2->timelimit = 7200;
 
-        $overriderecords = array($override1, $override2);
+        $overriderecords = [$override1, $override2];
 
         $DB->insert_records('quiz_overrides', $overriderecords);
 
@@ -161,7 +161,7 @@ class quiz_user_table_test extends \advanced_testcase {
         $record4->firstip = '10.0.0.1';
         $record4->lastip = '10.0.0.1';
 
-        $sessionrecords = array($record4);
+        $sessionrecords = [$record4];
         $DB->insert_records('sessions', $sessionrecords);
 
         $fakeattempt = new stdClass();
@@ -188,13 +188,12 @@ class quiz_user_table_test extends \advanced_testcase {
         $fakeattempt->uniqueid = 39;
         $fakeattempt->state = quiz_attempt::FINISHED;
         $DB->insert_record('quiz_attempts', $fakeattempt);
-
     }
 
     /**
      * Test getting table data.
      */
-    public function test_get_table_data() {
+    public function test_get_table_data(): void {
         global $CFG;
 
         $baseurl = $CFG->wwwroot . '/local/assessfreq/dashboard_quiz.php';
@@ -231,7 +230,5 @@ class quiz_user_table_test extends \advanced_testcase {
         $this->assertEquals(1594005000, $rawdata[$this->user4->id]->timeclose);
         $this->assertEquals(7200, $rawdata[$this->user4->id]->timelimit);
         $this->assertEquals('loggedin', $rawdata[$this->user4->id]->state);
-
     }
-
 }

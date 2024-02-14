@@ -28,8 +28,8 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/tablelib.php');
 
-use \table_sql;
-use \renderable;
+use table_sql;
+use renderable;
 
 /**
  * Renderable table for quiz dashboard users.
@@ -39,6 +39,7 @@ use \renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz_user_table extends table_sql implements renderable {
+    use dashboard_table;
 
     /**
      * @var integer $quizid The ID of the braodcast to get the acknowledgements for.
@@ -85,7 +86,7 @@ class quiz_user_table extends table_sql implements renderable {
         $this->downloadable = false;
         $this->define_baseurl($baseurl);
 
-        $quizrecord = $DB->get_record('quiz', array('id' => $this->quizid), 'timeopen, timeclose, timelimit');
+        $quizrecord = $DB->get_record('quiz', ['id' => $this->quizid], 'timeopen, timeclose, timelimit');
         $this->timeopen = $quizrecord->timeopen;
         $this->timeclose = $quizrecord->timeclose;
         $this->timelimit = $quizrecord->timelimit;
@@ -105,49 +106,14 @@ class quiz_user_table extends table_sql implements renderable {
             $columns[] = $field;
         }
 
-        $headers[] = get_string('quiztimeopen', 'local_assessfreq');
-        $columns[] = 'timeopen';
-
-        $headers[] = get_string('quiztimeclose', 'local_assessfreq');
-        $columns[] = 'timeclose';
-
-        $headers[] = get_string('quiztimelimit', 'local_assessfreq');
-        $columns[] = 'timelimit';
-
-        $headers[] = get_string('quiztimestart', 'local_assessfreq');
-        $columns[] = 'timestart';
-
-        $headers[] = get_string('quiztimefinish', 'local_assessfreq');
-        $columns[] = 'timefinish';
-
-        $headers[] = get_string('status', 'local_assessfreq');
-        $columns[] = 'state';
-
-        $headers[] = get_string('actions', 'local_assessfreq');
-        $columns[] = 'actions';
-
-        $this->define_columns($columns);
-        $this->define_headers($headers);
+        $this->define_columns(array_merge($columns, $this->get_common_columns()));
+        $this->define_headers(array_merge($headers, $this->get_common_headers()));
         $this->extrafields = $extrafields;
 
         // Setup pagination.
         $this->currpage = $page;
         $this->sortable(true);
-        $this->column_nosort = array('actions');
-
-    }
-
-    /**
-     * Get content for title column.
-     *
-     * @param \stdClass $row
-     * @return string html used to display the video field.
-     * @throws \moodle_exception
-     */
-    public function col_fullname($row) {
-        global $OUTPUT;
-
-        return $OUTPUT->user_picture($row, array('size' => 35, 'includefullname' => true));
+        $this->column_nosort = ['actions'];
     }
 
     /**
@@ -228,76 +194,6 @@ class quiz_user_table extends table_sql implements renderable {
     }
 
     /**
-     * Get content for time start column.
-     * Displays the user attempt start time.
-     *
-     * @param \stdClass $row
-     * @return string html used to display the field.
-     */
-    public function col_timestart($row) {
-        if ($row->timestart == 0) {
-            $content = \html_writer::span(get_string('na', 'local_assessfreq'));
-        } else {
-            $datetime = userdate($row->timestart, get_string('trenddatetime', 'local_assessfreq'));
-            $content = \html_writer::span($datetime);
-        }
-
-        return $content;
-    }
-
-    /**
-     * Get content for time finish column.
-     * Displays the user attempt finish time.
-     *
-     * @param \stdClass $row
-     * @return string html used to display the field.
-     */
-    public function col_timefinish($row) {
-        if ($row->timefinish == 0 && $row->timestart == 0) {
-            $content = \html_writer::span(get_string('na', 'local_assessfreq'));
-        } else if ($row->timefinish == 0 && $row->timestart > 0) {
-            $time = $row->timestart + $row->timelimit;
-            $datetime = userdate($time, get_string('trenddatetime', 'local_assessfreq'));
-            $content = \html_writer::span($datetime, 'local-assessfreq-disabled');
-        } else {
-            $datetime = userdate($row->timefinish, get_string('trenddatetime', 'local_assessfreq'));
-            $content = \html_writer::span($datetime);
-        }
-
-        return $content;
-    }
-
-    /**
-     * Get content for state column.
-     * Displays the users state in the quiz.
-     *
-     * @param \stdClass $row
-     * @return string html used to display the field.
-     */
-    public function col_state($row) {
-        if ($row->state == 'notloggedin') {
-            $color = 'background: ' . get_config('local_assessfreq', 'notloggedincolor');
-        } else if ($row->state == 'loggedin') {
-            $color = 'background: ' . get_config('local_assessfreq', 'loggedincolor');
-        } else if ($row->state == 'inprogress') {
-            $color = 'background: ' . get_config('local_assessfreq', 'inprogresscolor');
-        } else if ($row->state == 'uploadpending') {
-            $color = 'background: ' . get_config('local_assessfreq', 'inprogresscolor');
-        } else if ($row->state == 'finished') {
-            $color = 'background: ' . get_config('local_assessfreq', 'finishedcolor');
-        } else if ($row->state == 'abandoned') {
-            $color = 'background: ' . get_config('local_assessfreq', 'finishedcolor');
-        } else if ($row->state == 'overdue') {
-            $color = 'background: ' . get_config('local_assessfreq', 'finishedcolor');
-        }
-
-        $content = \html_writer::span('', 'local-assessfreq-status-icon', array('style' => $color));
-        $content .= get_string($row->state, 'local_assessfreq');
-
-        return $content;
-    }
-
-    /**
      * Get content for actions column.
      * Displays the actions for the user.
      *
@@ -310,58 +206,15 @@ class quiz_user_table extends table_sql implements renderable {
         $manage = '';
 
         $icon = $OUTPUT->render(new \pix_icon('i/duration', ''));
-        $manage .= \html_writer::link('#', $icon, array(
+        $manage .= \html_writer::link('#', $icon, [
             'class' => 'action-icon override',
             'id' => 'tool-assessfreq-override-' . $row->id,
             'data-toggle' => 'tooltip',
             'data-placement' => 'top',
-            'title' => get_string('useroverride', 'local_assessfreq')
-        ));
+            'title' => get_string('useroverride', 'local_assessfreq'),
+        ]);
 
-        if ($row->state == 'finished'
-                || $row->state == 'inprogress'
-                || $row->state == 'uploadpending'
-                || $row->state == 'abandoned'
-                || $row->state == 'overdue') {
-            $classes = 'action-icon';
-            $attempturl = new \moodle_url('/mod/quiz/review.php', array('attempt' => $row->attemptid));
-            $attributes = array(
-                'class' => $classes,
-                'id' => 'tool-assessfreq-attempt-' . $row->id,
-                'data-toggle' => 'tooltip',
-                'data-placement' => 'top',
-                'title' => get_string('userattempt', 'local_assessfreq')
-            );
-        } else {
-            $classes = 'action-icon disabled';
-            $attempturl = '#';
-            $attributes = array(
-                'class' => $classes,
-                'id' => 'tool-assessfreq-attempt-' . $row->id,
-            );
-        }
-        $icon = $OUTPUT->render(new \pix_icon('i/search', ''));
-        $manage .= \html_writer::link($attempturl, $icon, $attributes);
-
-        $profileurl = new \moodle_url('/user/profile.php', array('id' => $row->id));
-        $icon = $OUTPUT->render(new \pix_icon('i/completion_self', ''));
-        $manage .= \html_writer::link($profileurl, $icon, array(
-            'class' => 'action-icon',
-            'id' => 'tool-assessfreq-profile-' . $row->id,
-            'data-toggle' => 'tooltip',
-            'data-placement' => 'top',
-            'title' => get_string('userprofile', 'local_assessfreq')
-            ));
-
-        $logurl = new \moodle_url('/report/log/user.php', array('id' => $row->id, 'course' => 1, 'mode' => 'all'));
-        $icon = $OUTPUT->render(new \pix_icon('i/report', ''));
-        $manage .= \html_writer::link($logurl, $icon, array(
-            'class' => 'action-icon',
-            'id' => 'tool-assessfreq-log-' . $row->id,
-            'data-toggle' => 'tooltip',
-            'data-placement' => 'top',
-            'title' => get_string('userlogs', 'local_assessfreq')
-        ));
+        $manage .= $this->get_common_column_actions($row);
 
         return $manage;
     }
@@ -388,7 +241,7 @@ class quiz_user_table extends table_sql implements renderable {
         $capabilities = $frequency->get_module_capabilities('quiz');
         $context = $quiz->get_quiz_context($this->quizid);
 
-        list($joins, $wheres, $params) = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
+        [$joins, $wheres, $params] = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
         $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid,
                               qa_a.timestart as timestart, qa_a.timefinish as timefinish
                          FROM {quiz_attempts} qa_a
@@ -435,7 +288,7 @@ class quiz_user_table extends table_sql implements renderable {
         }
 
         $records = $DB->get_recordset_sql($sql, $params);
-        $data = array();
+        $data = [];
         $offset = $this->currpage * $pagesize;
         $offsetcount = 0;
         $recordcount = 0;
@@ -446,14 +299,13 @@ class quiz_user_table extends table_sql implements renderable {
                 // Because we are using COALESE and CASE for state we can't use SQL WHERE so we need to filter in PHP land.
                 // Also because we need to do some filtering in PHP land, we'll do it all here.
                 $searchcount = -1;
-                $searchfields = array_merge($this->extrafields, array('firstname', 'lastname', 'state'));
+                $searchfields = array_merge($this->extrafields, ['firstname', 'lastname', 'state']);
 
                 foreach ($searchfields as $searchfield) {
                     if (stripos($record->{$searchfield}, $this->search) !== false) {
                         $searchcount++;
                     }
                 }
-
             }
 
             if ($searchcount > -1 && $offsetcount >= $offset && $recordcount < $pagesize) {
@@ -465,9 +317,8 @@ class quiz_user_table extends table_sql implements renderable {
             }
 
             if ($searchcount > -1) {
-                $offsetcount ++;
+                $offsetcount++;
             }
-
         }
 
         $records->close();

@@ -35,7 +35,6 @@ use stdClass;
  * @covers     \local_assessfreq\output\assess_by_month_student
  */
 class assess_by_month_student_test extends \advanced_testcase {
-
     /**
      *
      * @var stdClass $course Test course.
@@ -51,9 +50,10 @@ class assess_by_month_student_test extends \advanced_testcase {
         // Create a course.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => 1),
-            array('createsections' => true));
+            ['format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1, ],
+            ['createsections' => true]
+        );
         $this->course = $course;
 
         $version = get_config('moodle', 'version');
@@ -69,7 +69,7 @@ class assess_by_month_student_test extends \advanced_testcase {
     /**
      * Test gett assess due by month chart method.
      */
-    public function test_get_assess_due_chart() {
+    public function test_get_assess_due_chart(): void {
         global $DB;
         $year = 2020;
 
@@ -96,7 +96,6 @@ class assess_by_month_student_test extends \advanced_testcase {
 
                 $DB->insert_record('local_assessfreq_user', $userrecord, true);
             }
-
         }
 
         $assessbymonthstudent = new assess_by_month_student();

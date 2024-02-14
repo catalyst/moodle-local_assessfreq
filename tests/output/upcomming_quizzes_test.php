@@ -35,7 +35,6 @@ use stdClass;
  * @covers     \local_assessfreq\output\upcomming_quizzes
  */
 class upcomming_quizzes_test extends \advanced_testcase {
-
     /**
      *
      * @var stdClass $course Test course.
@@ -121,49 +120,50 @@ class upcomming_quizzes_test extends \advanced_testcase {
         $generator = $this->getDataGenerator();
         $layout = '1,2,0,3,4,0,5,6,0';
         $course = $generator->create_course(
-            array('format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => 1),
-            array('createsections' => true));
+            ['format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1, ],
+            ['createsections' => true]
+        );
 
         // Start is more than one hour in the past, but end is in the future. (Should return).
-        $this->quiz3 = $generator->create_module('quiz', array(
+        $this->quiz3 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 2)),
             'timeclose' => ($now + (3600 * 0.5)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is less than one hour in the past, but end is in the future. (Should return).
-        $this->quiz4 = $generator->create_module('quiz', array(
+        $this->quiz4 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now - (3600 * 0.5)),
             'timeclose' => ($now + (3600 * 0.5)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is less than one hour in the future, end is more than one hour in the future. (Should return).
-        $this->quiz5 = $generator->create_module('quiz', array(
+        $this->quiz5 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 0.5)),
             'timeclose' => ($now + (3600 * 2)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Start is less than one hour in the future, end is less that one hour in the future. (Should return).
-        $this->quiz6 = $generator->create_module('quiz', array(
+        $this->quiz6 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 0.25)),
             'timeclose' => ($now + (3600 * 0.75)),
-            'timelimit' => 1800
-        ));
+            'timelimit' => 1800,
+        ]);
 
         // Start is more than one hour in the future, end is more than one hour in the future. (Should not return).
-        $this->quiz7 = $generator->create_module('quiz', array(
+        $this->quiz7 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => ($now + (3600 * 2)),
             'timeclose' => ($now + (3600 * 3)),
-            'timelimit' => 3600
-        ));
+            'timelimit' => 3600,
+        ]);
 
         // Create some users.
         $user1 = $generator->create_user();
@@ -196,7 +196,7 @@ class upcomming_quizzes_test extends \advanced_testcase {
         $override2->timeclose = 1594005000;  // End late.
         $override2->timelimit = 7200;
 
-        $overriderecords = array($override1, $override2);
+        $overriderecords = [$override1, $override2];
 
         $DB->insert_records('quiz_overrides', $overriderecords);
 
@@ -206,13 +206,12 @@ class upcomming_quizzes_test extends \advanced_testcase {
         $this->user4 = $user4;
         $this->user5 = $user5;
         $this->user6 = $user6;
-
     }
 
     /**
      * Test get upcomming quiz chart.
      */
-    public function test_get_upcomming_quizzes_chart() {
+    public function test_get_upcomming_quizzes_chart(): void {
         $now = 1594780800;
         $upcomming = new upcomming_quizzes();
         $result = $upcomming->get_upcomming_quizzes_chart($now);
@@ -233,6 +232,5 @@ class upcomming_quizzes_test extends \advanced_testcase {
         $this->assertEquals(0, $participantvalues[3]);
         $this->assertEquals(6, $participantvalues[4]);
         $this->assertEquals(0, $participantvalues[5]);
-
     }
 }
