@@ -24,8 +24,6 @@
 
 namespace local_assessfreq;
 
-defined('MOODLE_INTERNAL') || die();
-
 use assign;
 use context_module;
 use external_api;
@@ -44,7 +42,6 @@ use stdClass;
  * @runTestsInSeparateProcesses
  */
 class external_test extends \advanced_testcase {
-
     /**
      *
      * @var stdClass $course Test course.
@@ -119,40 +116,41 @@ class external_test extends \advanced_testcase {
         $generator = $this->getDataGenerator();
         $layout = '1,2,0,3,4,0,5,6,0';
         $course = $generator->create_course(
-            array('fullname' => 'blue course', 'format' => 'topics', 'numsections' => 3,
-                'enablecompletion' => 1),
-            array('createsections' => true));
-        $assignrow1 = $generator->create_module('assign', array(
+            ['fullname' => 'blue course', 'format' => 'topics', 'numsections' => 3,
+                'enablecompletion' => 1, ],
+            ['createsections' => true]
+        );
+        $assignrow1 = $generator->create_module('assign', [
             'course' => $course->id,
-            'duedate' => 1585359375
-        ));
-        $assignrow2 = $generator->create_module('assign', array(
+            'duedate' => 1585359375,
+        ]);
+        $assignrow2 = $generator->create_module('assign', [
             'course' => $course->id,
-            'duedate' => 1585445775
-        ));
+            'duedate' => 1585445775,
+        ]);
         $this->assign1 = new assign(context_module::instance($assignrow1->cmid), false, false);
         $this->assign2 = new assign(context_module::instance($assignrow2->cmid), false, false);
         $this->course = $course;
 
-        $this->quiz1 = $generator->create_module('quiz', array(
+        $this->quiz1 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => 1593910800,
             'timeclose' => 1593914400,
             'timelimit' => 3600,
-            'layout' => $layout
-        ));
-        $this->quiz2 = $generator->create_module('quiz', array(
+            'layout' => $layout,
+        ]);
+        $this->quiz2 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => 1593997200,
             'timeclose' => 1594004400,
-            'timelimit' => 7200
-        ));
-        $this->quiz3 = $generator->create_module('quiz', array(
+            'timelimit' => 7200,
+        ]);
+        $this->quiz3 = $generator->create_module('quiz', [
             'course' => $course->id,
             'timeopen' => null,
             'timeclose' => null,
-            'timelimit' => 7200
-        ));
+            'timelimit' => 7200,
+        ]);
 
         // Create some users.
         $user1 = $generator->create_user();
@@ -183,7 +181,6 @@ class external_test extends \advanced_testcase {
 
             if ($slot % 2 == 0) {
                 $question = $questiongenerator->create_question('shortanswer', null, ['category' => $cat->id]);
-
             } else {
                 $question = $questiongenerator->create_question('essay', null, ['category' => $cat->id]);
             }
@@ -213,7 +210,7 @@ class external_test extends \advanced_testcase {
         $override3->timeclose = null;
         $override3->timelimit = 7200;
 
-        $overriderecords = array($override1, $override2);
+        $overriderecords = [$override1, $override2];
         $DB->insert_records('quiz_overrides', $overriderecords);
 
         $this->user1 = $user1;
@@ -228,14 +225,14 @@ class external_test extends \advanced_testcase {
     /**
      * Test ajax getting of event data.
      */
-    public function test_get_frequency() {
+    public function test_get_frequency(): void {
         $this->setAdminUser();
 
         $duedate = 0;
-        $data = new stdClass;
+        $data = new stdClass();
         $data->year  = 2020;
         $data->metric = 'assess'; // Can be assess or students.
-        $data->modules = array('all');
+        $data->modules = ['all'];
 
         $jsondata = json_encode($data);
 
@@ -269,11 +266,11 @@ class external_test extends \advanced_testcase {
     /**
      * Test ajax getting of event data.
      */
-    public function test_get_process_modules() {
+    public function test_get_process_modules(): void {
         global $DB;
 
-        $DB->set_field('modules', 'visible', '0', array('name' => 'scorm'));
-        $DB->set_field('modules', 'visible', '0', array('name' => 'choice'));
+        $DB->set_field('modules', 'visible', '0', ['name' => 'scorm']);
+        $DB->set_field('modules', 'visible', '0', ['name' => 'choice']);
 
         set_config('modules', 'quiz,assign,scorm,choice', 'local_assessfreq');
         set_config('disabledmodules', '0', 'local_assessfreq');
@@ -296,22 +293,21 @@ class external_test extends \advanced_testcase {
         $this->assertArrayHasKey('assign', $eventarr);
         $this->assertArrayHasKey('scorm', $eventarr);
         $this->assertArrayHasKey('choice', $eventarr);
-
     }
 
     /**
      * Test ajax getting of day event data.
      */
-    public function test_get_day_events() {
+    public function test_get_day_events(): void {
         $this->setAdminUser();
 
         $frequency = new frequency();
         $frequency->process_site_events(0);
         $frequency->process_user_events(0);
 
-        $data = new stdClass;
+        $data = new stdClass();
         $data->date  = '2020-03-28';
-        $data->modules = array('all');
+        $data->modules = ['all'];
 
         $jsondata = json_encode($data);
 
@@ -329,7 +325,7 @@ class external_test extends \advanced_testcase {
     /**
      * Test ajax getting of course names.
      */
-    public function test_get_courses() {
+    public function test_get_courses(): void {
         $this->setAdminUser();
 
         $query = 'blu';
@@ -344,16 +340,16 @@ class external_test extends \advanced_testcase {
     /**
      * Test ajax getting of quiz names.
      */
-    public function test_get_quizzes() {
+    public function test_get_quizzes(): void {
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
-        $generator->create_module('quiz', array(
-            'course' => $this->course->id
-        ));
-        $generator->create_module('quiz', array(
-            'course' => $this->course->id
-        ));
+        $generator->create_module('quiz', [
+            'course' => $this->course->id,
+        ]);
+        $generator->create_module('quiz', [
+            'course' => $this->course->id,
+        ]);
 
         $query = $this->course->id;
 
@@ -367,7 +363,7 @@ class external_test extends \advanced_testcase {
     /**
      * Test ajax getting of quiz names.
      */
-    public function test_get_quiz_data() {
+    public function test_get_quiz_data(): void {
         $this->setAdminUser();
 
         $quizid = $this->quiz1->id;
@@ -388,7 +384,7 @@ class external_test extends \advanced_testcase {
     /**
      * Test getting of quiz data with dates not available.
      */
-    public function test_get_quiz_data_dates_na() {
+    public function test_get_quiz_data_dates_na(): void {
         $this->setAdminUser();
 
         $quizid = $this->quiz3->id;
@@ -404,7 +400,7 @@ class external_test extends \advanced_testcase {
     /**
      * Test getting of quiz data with dates not available.
      */
-    public function test_get_quiz_data_overrides_na() {
+    public function test_get_quiz_data_overrides_na(): void {
         $this->setAdminUser();
 
         $quizid = $this->quiz3->id;
@@ -420,7 +416,7 @@ class external_test extends \advanced_testcase {
     /**
      * Test setting table preferences.
      */
-    public function test_set_table_preference() {
+    public function test_set_table_preference(): void {
         global $SESSION;
         $this->setAdminUser();
 
@@ -436,13 +432,12 @@ class external_test extends \advanced_testcase {
         $this->assertEquals(1, $SESSION->flextable[$tableid]['collapse']['username']);
         $this->assertEquals(0, $SESSION->flextable[$tableid]['collapse']['idnumber']);
         $this->assertEquals(0, $SESSION->flextable[$tableid]['collapse']['email']);
-
     }
 
     /**
      * Test ajax getting of in progress quiz counts.
      */
-    public function test_get_inprogress_counts() {
+    public function test_get_inprogress_counts(): void {
         $this->setAdminUser();
 
         $returnvalue = local_assessfreq_external::get_inprogress_counts();
@@ -452,5 +447,4 @@ class external_test extends \advanced_testcase {
         $this->assertEquals(0, $returnarr['assessments']);
         $this->assertEquals(0, $returnarr['participants']);
     }
-
 }

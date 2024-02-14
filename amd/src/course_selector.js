@@ -23,7 +23,7 @@
  * @licensehttp://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
+define(['core/ajax', 'core/notification'], function (Ajax, Notification) {
 
     /**
      * Module level variables.
@@ -38,7 +38,7 @@ define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
      * @param {Function} callback A callback function receiving an array of results.
      * @return {Void}
     */
-    CourseSelector.transport = function(selector, query, callback) {
+    CourseSelector.transport = function (selector, query, callback) {
         Ajax.call([{
             methodname: 'local_assessfreq_get_courses',
             args: {
@@ -59,7 +59,7 @@ define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
      * @param {Array} results An array or results.
      * @return {Array} New array of results.
      */
-    CourseSelector.processResults = function(selector, results) {
+    CourseSelector.processResults = function (selector, results) {
         let options = [];
         results.forEach((element) => {
             options.push({

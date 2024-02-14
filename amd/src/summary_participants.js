@@ -21,54 +21,56 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/fragment', 'core/templates', 'core/str', 'core/notification'],
-function(Fragment, Templates, Str, Notification) {
+define(
+    ['core/fragment', 'core/templates', 'core/str', 'core/notification'],
+    function (Fragment, Templates, Str, Notification) {
 
-    /**
-     * Module level variables.
-     */
-    var Summary = {};
+        /**
+         * Module level variables.
+         */
+        var Summary = {};
 
-    Summary.chart = function(assessids, contextid) {
-        assessids.forEach((assessid) => {
-            let chartElement = document.getElementById(assessid + '-summary-graph');
-            let params = {'data': JSON.stringify({'quiz' : assessid, 'call': 'participant_summary'})};
+        Summary.chart = function (assessids, contextid) {
+            assessids.forEach((assessid) => {
+                let chartElement = document.getElementById(assessid + '-summary-graph');
+                let params = {'data': JSON.stringify({'quiz' : assessid, 'call': 'participant_summary'})};
 
-            Fragment.loadFragment('local_assessfreq', 'get_quiz_chart', contextid, params)
-            .done((response) => {
-                let resObj = JSON.parse(response);
-                if (resObj.hasdata == true) {
-                    let legend = {position: 'left'};
-                    let context = {
-                        'withtable' : false,
-                        'chartdata' : JSON.stringify(resObj.chart),
-                        'aspect' : false,
-                        'legend' : JSON.stringify(legend)
-                    };
-                    Templates.render('local_assessfreq/chart', context).done((html, js) => {
-                        // Load card body.
-                        Templates.replaceNodeContents(chartElement, html, js);
-                    }).fail(() => {
-                        Notification.exception(new Error('Failed to load chart template.'));
+                Fragment.loadFragment('local_assessfreq', 'get_quiz_chart', contextid, params)
+                .done((response) => {
+                    let resObj = JSON.parse(response);
+                    if (resObj.hasdata == true) {
+                        let legend = {position: 'left'};
+                        let context = {
+                            'withtable' : false,
+                            'chartdata' : JSON.stringify(resObj.chart),
+                            'aspect' : false,
+                            'legend' : JSON.stringify(legend)
+                        };
+                        Templates.render('local_assessfreq/chart', context).done((html, js) => {
+                            // Load card body.
+                            Templates.replaceNodeContents(chartElement, html, js);
+                        }).fail(() => {
+                            Notification.exception(new Error('Failed to load chart template.'));
+                            return;
+                        });
                         return;
-                    });
+                    } else {
+                        Str.get_string('nodata', 'local_assessfreq').then((str) => {
+                            const noDatastr = document.createElement('h3');
+                            noDatastr.innerHTML = str;
+                            chartElement.innerHTML = noDatastr.outerHTML;
+                            return;
+                        }).catch(() => {
+                            Notification.exception(new Error('Failed to load string: nodata'));
+                        });
+                    }
+                }).fail(() => {
+                    Notification.exception(new Error('Failed to load card.'));
                     return;
-                } else {
-                    Str.get_string('nodata', 'local_assessfreq').then((str) => {
-                        const noDatastr = document.createElement('h3');
-                        noDatastr.innerHTML = str;
-                        chartElement.innerHTML = noDatastr.outerHTML;
-                        return;
-                    }).catch(() => {
-                        Notification.exception(new Error('Failed to load string: nodata'));
-                    });
-                }
-            }).fail(() => {
-                Notification.exception(new Error('Failed to load card.'));
-                return;
+                });
             });
-        });
-    };
+        };
 
-    return Summary;
-});
+        return Summary;
+    }
+);

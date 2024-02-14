@@ -33,16 +33,15 @@ require_once($CFG->libdir . "/externallib.php");
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_assessfreq_external extends external_api {
-
     /**
      * Returns description of method parameters.
      *
      * @return void
      */
     public static function get_frequency_parameters() {
-        return new external_function_parameters(array(
-            'jsondata' => new external_value(PARAM_RAW, 'The data encoded as a json array')
-        ));
+        return new external_function_parameters([
+            'jsondata' => new external_value(PARAM_RAW, 'The data encoded as a json array'),
+        ]);
     }
 
     /**
@@ -57,8 +56,8 @@ class local_assessfreq_external extends external_api {
         // Parameter validation.
         self::validate_parameters(
             self::get_frequency_parameters(),
-            array('jsondata' => $jsondata)
-            );
+            ['jsondata' => $jsondata]
+        );
 
         // Context validation and permission check.
         $context = context_system::instance();
@@ -87,9 +86,9 @@ class local_assessfreq_external extends external_api {
      * @return void
      */
     public static function get_heat_colors_parameters() {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             // If I had params they'd be here, but I don't, so they're not.
-        ));
+        ]);
     }
 
     /**
@@ -123,9 +122,9 @@ class local_assessfreq_external extends external_api {
      * @return void
      */
     public static function get_process_modules_parameters() {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             // If I had params they'd be here, but I don't, so they're not.
-        ));
+        ]);
     }
 
     /**
@@ -136,7 +135,7 @@ class local_assessfreq_external extends external_api {
     public static function get_process_modules() {
         \core\session\manager::write_close(); // Close session early this is a read op.
 
-        $modulesandstrings = array('number' => get_string('numberevents', 'local_assessfreq'));
+        $modulesandstrings = ['number' => get_string('numberevents', 'local_assessfreq')];
 
         // Execute API call.
         $frequency = new \local_assessfreq\frequency();
@@ -164,9 +163,9 @@ class local_assessfreq_external extends external_api {
      * @return void
      */
     public static function get_day_events_parameters() {
-        return new external_function_parameters(array(
-            'jsondata' => new external_value(PARAM_RAW, 'The data encoded as a json array')
-        ));
+        return new external_function_parameters([
+            'jsondata' => new external_value(PARAM_RAW, 'The data encoded as a json array'),
+        ]);
     }
 
     /**
@@ -181,8 +180,8 @@ class local_assessfreq_external extends external_api {
         // Parameter validation.
         self::validate_parameters(
             self::get_day_events_parameters(),
-            array('jsondata' => $jsondata)
-            );
+            ['jsondata' => $jsondata]
+        );
 
         // Context validation and permission check.
         $context = context_system::instance();
@@ -211,9 +210,9 @@ class local_assessfreq_external extends external_api {
      * @return void
      */
     public static function get_courses_parameters() {
-        return new external_function_parameters(array(
-            'query' => new external_value(PARAM_TEXT, 'The query to find')
-        ));
+        return new external_function_parameters([
+            'query' => new external_value(PARAM_TEXT, 'The query to find'),
+        ]);
     }
 
     /**
@@ -229,8 +228,8 @@ class local_assessfreq_external extends external_api {
         // Parameter validation.
         self::validate_parameters(
             self::get_courses_parameters(),
-            array('query' => $query)
-            );
+            ['query' => $query]
+        );
 
         // Context validation and permission check.
         $context = context_system::instance();
@@ -239,13 +238,16 @@ class local_assessfreq_external extends external_api {
 
         // Execute API call.
         $sql = 'SELECT id, fullname FROM {course} WHERE ' . $DB->sql_like('fullname', ':fullname', false) . ' AND id <> 1';
-        $params = array('fullname' => '%' . $DB->sql_like_escape($query) . '%');
+        $params = ['fullname' => '%' . $DB->sql_like_escape($query) . '%'];
         $courses = $DB->get_records_sql($sql, $params, 0, 11);
 
         $data = [];
         foreach ($courses as $course) {
-            $data[$course->id] = ["id" => $course->id, "fullname" => format_string($course->fullname,
-                true, ["context" => $context, "escape" => false])];
+            $data[$course->id] = ["id" => $course->id, "fullname" => format_string(
+                $course->fullname,
+                true,
+                ["context" => $context, "escape" => false]
+            ), ];
         }
 
         return json_encode(array_values($data));
@@ -265,9 +267,9 @@ class local_assessfreq_external extends external_api {
      * @return void
      */
     public static function get_quizzes_parameters() {
-        return new external_function_parameters(array(
-            'query' => new external_value(PARAM_INT, 'The query to find')
-        ));
+        return new external_function_parameters([
+            'query' => new external_value(PARAM_INT, 'The query to find'),
+        ]);
     }
 
     /**
@@ -283,8 +285,8 @@ class local_assessfreq_external extends external_api {
         // Parameter validation.
         self::validate_parameters(
             self::get_quizzes_parameters(),
-            array('query' => $query)
-            );
+            ['query' => $query]
+        );
 
         // Context validation and permission check.
         $context = context_system::instance();
@@ -292,13 +294,16 @@ class local_assessfreq_external extends external_api {
         has_capability('moodle/site:config', $context);
 
         // Execute API call.
-        $params = array('course' => $query);
+        $params = ['course' => $query];
         $quizzes = $DB->get_records('quiz', $params, 'name ASC', 'id, name');
 
         $data = [];
         foreach ($quizzes as $quiz) {
-            $data[$quiz->id] = ["id" => $quiz->id, "name" => format_string($quiz->name,
-                true, ["context" => $context, "escape" => false])];
+            $data[$quiz->id] = ["id" => $quiz->id, "name" => format_string(
+                $quiz->name,
+                true,
+                ["context" => $context, "escape" => false]
+            ), ];
         }
 
         return json_encode(array_values($data));
@@ -318,9 +323,9 @@ class local_assessfreq_external extends external_api {
      * @return void
      */
     public static function get_quiz_data_parameters() {
-        return new external_function_parameters(array(
-            'quizid' => new external_value(PARAM_INT, 'The quiz id to get data for')
-        ));
+        return new external_function_parameters([
+            'quizid' => new external_value(PARAM_INT, 'The quiz id to get data for'),
+        ]);
     }
 
     /**
@@ -335,8 +340,8 @@ class local_assessfreq_external extends external_api {
         // Parameter validation.
         self::validate_parameters(
             self::get_quiz_data_parameters(),
-            array('quizid' => $quizid)
-            );
+            ['quizid' => $quizid]
+        );
 
         // Context validation and permission check.
         $context = context_system::instance();
@@ -364,11 +369,11 @@ class local_assessfreq_external extends external_api {
      * @return void
      */
     public static function set_table_preference_parameters() {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             'tableid' => new external_value(PARAM_ALPHANUMEXT, 'The table id to set the preference for'),
             'preference' => new external_value(PARAM_ALPHAEXT, 'The table preference to set'),
             'values' => new external_value(PARAM_RAW, 'The values to set as JSON'),
-        ));
+        ]);
     }
 
     /**
@@ -385,8 +390,8 @@ class local_assessfreq_external extends external_api {
         // Parameter validation.
         self::validate_parameters(
             self::set_table_preference_parameters(),
-            array('tableid' => $tableid, 'preference' => $preference, 'values' => $values)
-            );
+            ['tableid' => $tableid, 'preference' => $preference, 'values' => $values]
+        );
 
         // Context validation and permission check.
         $context = context_system::instance();
@@ -397,24 +402,24 @@ class local_assessfreq_external extends external_api {
         if (isset($SESSION->flextable[$tableid])) {
             $prefs = $SESSION->flextable[$tableid];
         } else {
-            $prefs = array(
-                'collapse' => array(),
-                'sortby'   => array(),
+            $prefs = [
+                'collapse' => [],
+                'sortby'   => [],
                 'i_first'  => '',
                 'i_last'   => '',
-                'textsort' => array(),
-            );
+                'textsort' => [],
+            ];
         }
 
         // Set or reset the preferences.
         if ($preference == 'reset') {
-            $prefs = array(
-                'collapse' => array(),
-                'sortby'   => array(),
+            $prefs = [
+                'collapse' => [],
+                'sortby'   => [],
                 'i_first'  => '',
                 'i_last'   => '',
-                'textsort' => array(),
-            );
+                'textsort' => [],
+            ];
         } else {
             $prefs[$preference] = json_decode($values, true);
         }
@@ -439,11 +444,11 @@ class local_assessfreq_external extends external_api {
      */
     public static function process_override_form_parameters() {
         return new external_function_parameters(
-            array(
+            [
                 'jsonformdata' => new external_value(PARAM_RAW, 'The data from the create copy form, encoded as a json array'),
-                'quizid' => new external_value(PARAM_INT, 'The quiz id to processs the override for')
-            )
-            );
+                'quizid' => new external_value(PARAM_INT, 'The quiz id to processs the override for'),
+            ]
+        );
     }
 
     /**
@@ -463,12 +468,12 @@ class local_assessfreq_external extends external_api {
         // We always must pass webservice params through validate_parameters.
         $params = self::validate_parameters(
             self::process_override_form_parameters(),
-            array('jsonformdata' => $jsonformdata, 'quizid' => $quizid)
-            );
+            ['jsonformdata' => $jsonformdata, 'quizid' => $quizid]
+        );
 
         $formdata = json_decode($params['jsonformdata']);
 
-        $submitteddata = array();
+        $submitteddata = [];
         parse_str($formdata, $submitteddata);
 
         // Check access.
@@ -478,23 +483,23 @@ class local_assessfreq_external extends external_api {
         has_capability('mod/quiz:manageoverrides', $context);
 
         // Check if we have an existing override for this user.
-        $override = $DB->get_record('quiz_overrides', array('quiz' => $quizid, 'userid' => $submitteddata['userid']));
+        $override = $DB->get_record('quiz_overrides', ['quiz' => $quizid, 'userid' => $submitteddata['userid']]);
 
         // Submit the form data.
-        $quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
+        $quiz = $DB->get_record('quiz', ['id' => $quizid], '*', MUST_EXIST);
         $cm = get_course_and_cm_from_cmid($context->instanceid, 'quiz')[1];
         $mform = new \local_assessfreq\form\quiz_override_form($cm, $quiz, $context, $override, $submitteddata);
 
         $mdata = $mform->get_data();
 
         if ($mdata) {
-            $params = array(
+            $params = [
                 'context' => $context,
-                'other' => array(
-                    'quizid' => $quizid
-                ),
-                'relateduserid' => $mdata->userid
-            );
+                'other' => [
+                    'quizid' => $quizid,
+                ],
+                'relateduserid' => $mdata->userid,
+            ];
             $mdata->quiz = $quizid;
 
             if (!empty($override->id)) {
@@ -516,12 +521,11 @@ class local_assessfreq_external extends external_api {
                 // Trigger the override created event.
                 $event->trigger();
             }
-
         } else {
             throw new moodle_exception('submitoverridefail', 'local_assessfreq');
         }
 
-        return json_encode(array('overrideid' => $mdata->id));
+        return json_encode(['overrideid' => $mdata->id]);
     }
 
     /**
@@ -539,9 +543,9 @@ class local_assessfreq_external extends external_api {
      * @return void
      */
     public static function get_system_timezone_parameters() {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             // If I had params they'd be here, but I don't, so they're not.
-        ));
+        ]);
     }
 
     /**
@@ -556,7 +560,7 @@ class local_assessfreq_external extends external_api {
         global $DB;
 
         // Execute API call.
-        $timezone = $DB->get_field('config', 'value', array('name' => 'timezone'), MUST_EXIST);
+        $timezone = $DB->get_field('config', 'value', ['name' => 'timezone'], MUST_EXIST);
 
         return $timezone;
     }
@@ -576,9 +580,9 @@ class local_assessfreq_external extends external_api {
      * @return void
      */
     public static function get_inprogress_counts_parameters() {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             // If I had params they'd be here, but I don't, so they're not.
-        ));
+        ]);
     }
 
     /**

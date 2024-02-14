@@ -26,8 +26,6 @@ namespace local_assessfreq\output;
 
 use local_assessfreq\quiz;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Renderable for all participant summary card.
  *
@@ -36,7 +34,6 @@ defined('MOODLE_INTERNAL') || die;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class all_participants_inprogress {
-
     /**
      * Generate the markup for the summary chart,
      * used in the in progress quizzes dashboard.
@@ -80,10 +77,9 @@ class all_participants_inprogress {
                 $inprogress += $quizobj->tracking->inprogress;
                 $finished += $quizobj->tracking->finished;
             }
-
         }
 
-        $result = array();
+        $result = [];
 
         if (($notloggedin == 0) && ($loggedin == 0) && ($inprogress == 0) && ($finished == 0)) {
             $result['hasdata'] = false;
@@ -91,26 +87,26 @@ class all_participants_inprogress {
         } else {
             $result['hasdata'] = true;
 
-            $seriesdata = array(
+            $seriesdata = [
                 $notloggedin,
                 $loggedin,
                 $inprogress,
-                $finished
-            );
+                $finished,
+            ];
 
-            $labels = array(
+            $labels = [
                 get_string('notloggedin', 'local_assessfreq'),
                 get_string('loggedin', 'local_assessfreq'),
                 get_string('inprogress', 'local_assessfreq'),
-                get_string('finished', 'local_assessfreq')
-            );
+                get_string('finished', 'local_assessfreq'),
+            ];
 
-            $colors = array(
+            $colors = [
                 get_config('local_assessfreq', 'notloggedincolor'),
                 get_config('local_assessfreq', 'loggedincolor'),
                 get_config('local_assessfreq', 'inprogresscolor'),
-                get_config('local_assessfreq', 'finishedcolor')
-            );
+                get_config('local_assessfreq', 'finishedcolor'),
+            ];
 
             // Create chart object.
             $chart = new \core\chart_pie();

@@ -15,13 +15,17 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_assessfreq/assess-due-month
+    @template local_assessfreq/quiz-summary-inprogress-table
 
     Report Summary template.
 
     Example context (json):
     {
-
+        "rows": {
+            "rows5": true,
+            "rows10": false,
+            "rows20": false
+        }
     }
 }}
 
@@ -35,7 +39,7 @@
 	            <div class="input-group">
 	                <input id="local-assessfreq-quiz-inprogress-table-search" type="text" class="form-control"
 	                       placeholder="{{# str }} entersearchquiz, local_assessfreq {{/ str }}"
-	                       aria-label="{{# str }} entersearchquiz, local_assessfreq {{/ str }}" aria-describedby="basic-addon2">
+	                       aria-label="{{# str }} entersearchquiz, local_assessfreq {{/ str }}">
 	                <div class="input-group-append">
 	                    <button id="local-assessfreq-quiz-inprogress-table-search-reset"
 	                            class="btn btn-secondary" type="button">
@@ -51,7 +55,7 @@
 	        </div>
         </div>
         <div class="table-container">
-            <span id="local-assessfreq-spinner-{{uniqid}}" class="overlay-icon-container" data-region="overlay-icon-container">
+            <span class="overlay-icon-container" data-region="overlay-icon-container">
                 <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
             </span>
             <div class="table-body">

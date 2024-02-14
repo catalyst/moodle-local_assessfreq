@@ -185,7 +185,7 @@ export const init = (context) => {
         .fail(() => {
             Notification.exception(new Error('Failed to get use preference: hoursahead'));
         })
-    ).done(function() {
+    ).done(function () {
         TableHandler.getTable(0, [hoursAhead, hoursBehind], null);
         OverrideModal.init(context, TableHandler.getTable, [hoursAhead, hoursBehind]);
     });

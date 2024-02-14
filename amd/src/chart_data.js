@@ -95,9 +95,9 @@ export const getCardCharts = (quizId, hoursFilter, yearSelect) => {
                     });
                 }
             }).fail(() => {
-            Notification.exception(new Error('Failed to load card.'));
-            return;
-        });
+                Notification.exception(new Error('Failed to load card.'));
+                return;
+            });
     });
 };
 

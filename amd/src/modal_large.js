@@ -21,40 +21,42 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/notification', 'core/custom_interaction_events', 'core/modal', 'core/modal_registry'],
-function($, Notification, CustomEvents, Modal, ModalRegistry) {
+define(
+    ['jquery', 'core/notification', 'core/custom_interaction_events', 'core/modal', 'core/modal_registry'],
+    function ($, Notification, CustomEvents, Modal, ModalRegistry) {
 
-    var registered = false;
+        var registered = false;
 
-    /**
-     * Constructor for the Modal.
-     *
-     * @param {object} root The root jQuery element for the modal
-     */
-    var ModalLarge = function(root) {
-        Modal.call(this, root);
-    };
+        /**
+         * Constructor for the Modal.
+         *
+         * @param {object} root The root jQuery element for the modal
+         */
+        var ModalLarge = function (root) {
+            Modal.call(this, root);
+        };
 
-    ModalLarge.TYPE = 'local_assesfreq-large_modal';
-    ModalLarge.prototype = Object.create(Modal.prototype);
-    ModalLarge.prototype.constructor = ModalLarge;
+        ModalLarge.TYPE = 'local_assesfreq-large_modal';
+        ModalLarge.prototype = Object.create(Modal.prototype);
+        ModalLarge.prototype.constructor = ModalLarge;
 
-    /**
-     * Set up all of the event handling for the modal.
-     *
-     * @method registerEventListeners
-     */
-    ModalLarge.prototype.registerEventListeners = function() {
-        // Apply parent event listeners.
-        Modal.prototype.registerEventListeners.call(this);
-    };
+        /**
+         * Set up all of the event handling for the modal.
+         *
+         * @method registerEventListeners
+         */
+        ModalLarge.prototype.registerEventListeners = function () {
+            // Apply parent event listeners.
+            Modal.prototype.registerEventListeners.call(this);
+        };
 
-    // Automatically register with the modal registry the first time this module is imported so that you can create modals
-    // of this type using the modal factory.
-    if (!registered) {
-        ModalRegistry.register(ModalLarge.TYPE, ModalLarge, 'local_assessfreq/modal_large');
-        registered = true;
+        // Automatically register with the modal registry the first time this module is imported so that you can create modals
+        // of this type using the modal factory.
+        if (!registered) {
+            ModalRegistry.register(ModalLarge.TYPE, ModalLarge, 'local_assessfreq/modal_large');
+            registered = true;
+        }
+
+        return ModalLarge;
     }
-
-    return ModalLarge;
-});
+);

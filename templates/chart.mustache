@@ -22,7 +22,7 @@
     Example context (json):
     {
         "withtable": true,
-        "chartdata": "null"
+        "chartdata": "null",
         "aspect": true
     }
 }}
@@ -47,7 +47,8 @@ require([
     'core/chart_builder',
     'local_assessfreq/chart_output_chartjs',
     'core/chart_output_htmltable',
-], function($, Builder, Output, OutputTable) {
+    'core/notification',
+], function($, Builder, Output, OutputTable, Notification) {
     var data = {{{chartdata}}},
         uniqid = "{{uniqid}}",
         chartArea = $('#chart-area-' + uniqid),
@@ -55,11 +56,12 @@ require([
         chartTable = chartArea.find('.chart-table-data'),
         chartLink = chartArea.find('.chart-table-expand a'),
         aspect = (chartImage.attr('data-aspect') === 'true'),
-        rtLegendoptions = {{{legend}}} {{^legend}}''{{/legend}};
+        rtLegendoptions = {{{legend}}}{{^legend}}''{{/legend}};
     Builder.make(data).then(function(ChartInst) {
         new Output.init(chartImage, ChartInst, aspect, rtLegendoptions);
         new OutputTable(chartTable, ChartInst);
-    });
+        return ChartInst;
+    }).catch(Notification.exception);
 
     chartLink.on('click', function(e) {
         e.preventDefault();

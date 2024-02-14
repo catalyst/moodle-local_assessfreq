@@ -25,8 +25,6 @@ namespace local_assessfreq\task;
 
 use core\task\adhoc_task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Adhoc task to process historical data used in plugin.
  *
@@ -35,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class history_process extends adhoc_task {
-
     /**
      * Do the job.
      * Throw exceptions on errors (the job will be retried).
@@ -57,10 +54,10 @@ class history_process extends adhoc_task {
         $actionstart = time();
         $frequency->delete_events(0); // Delete ALL event records.
         $actionduration = time() - $actionstart;
-        $event = \local_assessfreq\event\event_processed::create(array(
+        $event = \local_assessfreq\event\event_processed::create([
             'context' => $context,
-            'other' => array('action' => 'delete', 'duration' => $actionduration)
-        ));
+            'other' => ['action' => 'delete', 'duration' => $actionduration],
+        ]);
         $event->trigger();
         mtrace('local_assessfreq: Deleting old event data finished in: ' . $actionduration . ' seconds');
 
@@ -68,10 +65,10 @@ class history_process extends adhoc_task {
         $actionstart = time();
         $frequency->process_site_events(1); // Process ALL records.
         $actionduration = time() - $actionstart;
-        $event = \local_assessfreq\event\event_processed::create(array(
+        $event = \local_assessfreq\event\event_processed::create([
             'context' => $context,
-            'other' => array('action' => 'site', 'duration' => $actionduration)
-        ));
+            'other' => ['action' => 'site', 'duration' => $actionduration],
+        ]);
         $event->trigger();
         mtrace('local_assessfreq: Processing site events finished in: ' . $actionduration . ' seconds');
 
@@ -79,10 +76,10 @@ class history_process extends adhoc_task {
         $actionstart = time();
         $frequency->process_user_events(1); // Process ALL user events.
         $actionduration = time() - $actionstart;
-        $event = \local_assessfreq\event\event_processed::create(array(
+        $event = \local_assessfreq\event\event_processed::create([
             'context' => $context,
-            'other' => array('action' => 'user', 'duration' => $actionduration)
-        ));
+            'other' => ['action' => 'user', 'duration' => $actionduration],
+        ]);
         $event->trigger();
         mtrace('local_assessfreq: Processing user events finished in: ' . $actionduration . ' seconds');
     }

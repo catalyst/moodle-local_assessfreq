@@ -22,9 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * Returns the name of the user preferences as well as the details this plugin uses.
  *
@@ -32,83 +29,83 @@ defined('MOODLE_INTERNAL') || die();
  */
 function local_assessfreq_user_preferences() {
 
-    $preferences['local_assessfreq_overview_year_preference'] = array(
+    $preferences['local_assessfreq_overview_year_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => date('Y'),
-        'type' => PARAM_INT
-    );
+        'type' => PARAM_INT,
+    ];
 
-    $preferences['local_assessfreq_heatmap_year_preference'] = array(
+    $preferences['local_assessfreq_heatmap_year_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => date('Y'),
-        'type' => PARAM_INT
-    );
+        'type' => PARAM_INT,
+    ];
 
-    $preferences['local_assessfreq_heatmap_metric_preference'] = array(
+    $preferences['local_assessfreq_heatmap_metric_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => 'assess',
-        'type' => PARAM_ALPHA
-    );
+        'type' => PARAM_ALPHA,
+    ];
 
-    $preferences['local_assessfreq_heatmap_modules_preference'] = array(
+    $preferences['local_assessfreq_heatmap_modules_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => '[]',
-        'type' => PARAM_RAW
-    );
+        'type' => PARAM_RAW,
+    ];
 
-    $preferences['local_assessfreq_quiz_refresh_preference'] = array(
+    $preferences['local_assessfreq_quiz_refresh_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => 60,
-        'type' => PARAM_INT
-    );
+        'type' => PARAM_INT,
+    ];
 
-    $preferences['local_assessfreq_quiz_table_rows_preference'] = array(
+    $preferences['local_assessfreq_quiz_table_rows_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => 20,
-        'type' => PARAM_INT
-    );
+        'type' => PARAM_INT,
+    ];
 
-    $preferences['local_assessfreq_student_search_table_rows_preference'] = array(
+    $preferences['local_assessfreq_student_search_table_rows_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => 20,
-        'type' => PARAM_INT
-    );
+        'type' => PARAM_INT,
+    ];
 
-    $preferences['local_assessfreq_student_search_table_hoursahead_preference'] = array(
+    $preferences['local_assessfreq_student_search_table_hoursahead_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => 4,
-        'type' => PARAM_INT
-    );
+        'type' => PARAM_INT,
+    ];
 
-    $preferences['local_assessfreq_student_search_table_hoursbehind_preference'] = array(
+    $preferences['local_assessfreq_student_search_table_hoursbehind_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => 1,
-        'type' => PARAM_INT
-    );
+        'type' => PARAM_INT,
+    ];
 
-    $preferences['local_assessfreq_quizzes_inprogress_table_hoursahead_preference'] = array(
+    $preferences['local_assessfreq_quizzes_inprogress_table_hoursahead_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => 0,
-        'type' => PARAM_INT
-    );
+        'type' => PARAM_INT,
+    ];
 
-    $preferences['local_assessfreq_quizzes_inprogress_table_hoursbehind_preference'] = array(
+    $preferences['local_assessfreq_quizzes_inprogress_table_hoursbehind_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => 0,
-        'type' => PARAM_INT
-    );
+        'type' => PARAM_INT,
+    ];
 
-    $preferences['local_assessfreq_quiz_table_inprogress_preference'] = array(
+    $preferences['local_assessfreq_quiz_table_inprogress_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => 20,
-        'type' => PARAM_INT
-    );
+        'type' => PARAM_INT,
+    ];
 
-    $preferences['local_assessfreq_quiz_table_inprogress_sort_preference'] = array(
+    $preferences['local_assessfreq_quiz_table_inprogress_sort_preference'] = [
         'null' => NULL_NOT_ALLOWED,
         'default' => 'name_asc',
-        'type' => PARAM_ALPHAEXT
-    );
+        'type' => PARAM_ALPHAEXT,
+    ];
 
     return $preferences;
 }
@@ -120,11 +117,11 @@ function local_assessfreq_user_preferences() {
  * @return string $chartdata The generated chart.
  */
 function local_assessfreq_output_fragment_get_chart($args): string {
-    $allowedcalls = array(
+    $allowedcalls = [
         'assess_by_month',
         'assess_by_activity',
-        'assess_by_month_student'
-    );
+        'assess_by_month_student',
+    ];
 
     $context = $args['context'];
     has_capability('moodle/site:config', $context);
@@ -151,10 +148,10 @@ function local_assessfreq_output_fragment_get_chart($args): string {
  * @return string $chartdata The generated chart.
  */
 function local_assessfreq_output_fragment_get_quiz_chart($args): string {
-    $allowedcalls = array(
+    $allowedcalls = [
         'participant_summary',
-        'participant_trend'
-    );
+        'participant_trend',
+    ];
 
     $context = $args['context'];
     has_capability('moodle/site:config', $context);
@@ -181,10 +178,10 @@ function local_assessfreq_output_fragment_get_quiz_chart($args): string {
  * @return string $chartdata The generated chart.
  */
 function local_assessfreq_output_fragment_get_quiz_inprogress_chart($args): string {
-    $allowedcalls = array(
+    $allowedcalls = [
         'upcomming_quizzes',
-        'all_participants_inprogress'
-    );
+        'all_participants_inprogress',
+    ];
 
     $context = $args['context'];
     has_capability('moodle/site:config', $context);
@@ -221,7 +218,7 @@ function local_assessfreq_output_fragment_new_base_form($args): string {
     $context = $args['context'];
     has_capability('moodle/site:config', $context);
 
-    $mform = new \local_assessfreq\form\quiz_search_form(null, null, 'post', '', array('class' => 'ignoredirty'));
+    $mform = new \local_assessfreq\form\quiz_search_form(null, null, 'post', '', ['class' => 'ignoredirty']);
 
     ob_start();
     $mform->display();
@@ -320,7 +317,7 @@ function local_assessfreq_output_fragment_new_override_form($args): string {
 
     $serialiseddata = json_decode($args['jsonformdata'], true);
 
-    $formdata = array();
+    $formdata = [];
 
     if (!empty($serialiseddata)) {
         parse_str($serialiseddata, $formdata);
@@ -330,12 +327,12 @@ function local_assessfreq_output_fragment_new_override_form($args): string {
     $quizid = $args['quizid'];
     $quizdata = new \local_assessfreq\quiz();
     $quizcontext = $quizdata->get_quiz_context($quizid);
-    $quiz = $DB->get_record('quiz', array('id' => $quizid), '*', MUST_EXIST);
+    $quiz = $DB->get_record('quiz', ['id' => $quizid], '*', MUST_EXIST);
 
     $cm = get_course_and_cm_from_cmid($quizcontext->instanceid, 'quiz')[1];
 
     // Check if we have an existing override for this user.
-    $override = $DB->get_record('quiz_overrides', array('quiz' => $quiz->id, 'userid' => $args['userid']));
+    $override = $DB->get_record('quiz_overrides', ['quiz' => $quiz->id, 'userid' => $args['userid']]);
 
     if ($override) {
         $data = clone $override;

@@ -35,7 +35,6 @@ use stdClass;
  * @covers     \local_assessfreq\output\participant_summary
  */
 class participant_summary_test extends \advanced_testcase {
-
     /**
      *
      * @var stdClass $course Test course.
@@ -92,16 +91,15 @@ class participant_summary_test extends \advanced_testcase {
         $track5->timecreated = $now + (60 * 5);
 
         // Insert out of order.
-        $trackrecords = array($track1, $track5, $track3, $track2, $track4);
+        $trackrecords = [$track1, $track5, $track3, $track2, $track4];
 
         $DB->insert_records('local_assessfreq_trend', $trackrecords);
-
     }
 
     /**
      * Test gett assess due by month chart method.
      */
-    public function test_get_assess_activity_chart() {
+    public function test_get_assess_activity_chart(): void {
 
         $participantsumamry = new participant_summary();
         $result = $participantsumamry->get_participant_summary_chart(123);
@@ -118,6 +116,5 @@ class participant_summary_test extends \advanced_testcase {
         $this->assertEquals('Logged in', $labels[1]);
         $this->assertEquals('In progress', $labels[2]);
         $this->assertEquals('Finished', $labels[3]);
-
     }
 }
