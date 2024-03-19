@@ -60,7 +60,7 @@ define(
                         modalObj.show();
                         return;
                     }).catch(() => {
-                        Notification.exception(new Error('Failed to load string: nodata'));
+                        return;
                     });
                 }
             }).fail(() => {

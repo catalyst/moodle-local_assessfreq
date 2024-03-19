@@ -91,7 +91,7 @@ export const getCardCharts = (quizId, hoursFilter, yearSelect) => {
                         spinner.classList.add('hide'); // Hide spinner if not already hidden.
                         return;
                     }).catch(() => {
-                        Notification.exception(new Error('Failed to load string: nodata'));
+                        return;
                     });
                 }
             }).fail(() => {
