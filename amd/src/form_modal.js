@@ -124,7 +124,7 @@ define(
                 });
                 return;
             }).catch(() => {
-                Notification.exception(new Error('Failed to load string: loading'));
+                return;
             });
         };
 
@@ -175,7 +175,7 @@ define(
 
                     return;
                 }).catch(() => {
-                    Notification.exception(new Error('Failed to load string: searchquiz'));
+                    return;
                 });
             });
         };
@@ -204,7 +204,7 @@ define(
 
                         return;
                     }).catch(() => {
-                        Notification.exception(new Error('Failed to load string: searchquiz'));
+                        return;
                     });
                 }
             } else {

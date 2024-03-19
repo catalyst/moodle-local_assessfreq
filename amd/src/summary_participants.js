@@ -61,7 +61,7 @@ define(
                             chartElement.innerHTML = noDatastr.outerHTML;
                             return;
                         }).catch(() => {
-                            Notification.exception(new Error('Failed to load string: nodata'));
+                            return;
                         });
                     }
                 }).fail(() => {
