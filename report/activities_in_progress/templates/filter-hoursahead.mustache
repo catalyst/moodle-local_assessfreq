@@ -1,0 +1,76 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_assessfreq/nav-quiz-table-hoursahead-filter
+
+    This template renders the day range selector for the timeline view.
+
+    Example context (json):
+    {}
+}}
+<div id="assessfreqreport-activities-in-progress-hoursahead" data-region="hoursahead-filter" class="mr-3">
+    <button type="button" class="btn btn-secondary dropdown-toggle icon-no-margin"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            aria-label="{{# str }} filter:hoursahead, assessfreqreport_activities_in_progress {{/ str }}" aria-controls="hoursaheadfilter">
+        {{#pix}} i/next {{/pix}} {{# str }} filter:hoursahead, assessfreqreport_activities_in_progress {{/ str }}
+        <span class="sr-only" data-active-item-text>
+                {{# str }} filter:hours0, assessfreqreport_activities_in_progress {{/ str }}
+                {{# str }} filter:hours1, assessfreqreport_activities_in_progress {{/ str }}
+                {{# str }} filter:hours4, assessfreqreport_activities_in_progress {{/ str }}
+                {{# str }} filter:hours8, assessfreqreport_activities_in_progress {{/ str }}
+        </span>
+    </button>
+    <div id="hoursaheadfilter" role="menu" class="dropdown-menu" data-show-active-item>
+        <h6 class="dropdown-header">{{# str }} filter:hoursahead, assessfreqreport_activities_in_progress {{/ str }}</h6>
+        <a
+            class="dropdown-item {{#filters.hoursahead}}{{#hours0}}active{{/hours0}}{{/filters.hoursahead}}"
+            href="#"
+            data-metric="0"
+            aria-label="{{# str }} filter:hours0, assessfreqreport_activities_in_progress {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} filter:hours0, assessfreqreport_activities_in_progress {{/ str }}
+        </a>
+        <a
+            class="dropdown-item {{#filters.hoursahead}}{{#hours1}}active{{/hours1}}{{/filters.hoursahead}}"
+            href="#"
+            data-metric="1"
+            aria-label="{{# str }} filter:hours1, assessfreqreport_activities_in_progress {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} filter:hours1, assessfreqreport_activities_in_progress {{/ str }}
+        </a>
+        <a
+            class="dropdown-item {{#filters.hoursahead}}{{#hours4}}active{{/hours4}}{{/filters.hoursahead}}"
+            href="#"
+            data-metric="4"
+            aria-label="{{# str }} filter:hours4, assessfreqreport_activities_in_progress {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} filter:hours4, assessfreqreport_activities_in_progress {{/ str }}
+        </a>
+        <a
+            class="dropdown-item {{#filters.hoursahead}}{{#hours8}}active{{/hours8}}{{/filters.hoursahead}}"
+            href="#"
+            data-metric="8"
+            aria-label="{{# str }} filter:hours8, assessfreqreport_activities_in_progress {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} filter:hours8, assessfreqreport_activities_in_progress {{/ str }}
+        </a>
+    </div>
+</div>

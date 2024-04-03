@@ -16,23 +16,24 @@
 /**
  * Javascript for large modal .
  *
- * @package    local_assessfreq
+ * @module     local_assessfreq/modal_large
+ * @package
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define(
     ['jquery', 'core/notification', 'core/custom_interaction_events', 'core/modal', 'core/modal_registry'],
-    function ($, Notification, CustomEvents, Modal, ModalRegistry) {
+    function($, Notification, CustomEvents, Modal, ModalRegistry) {
 
-        var registered = false;
+        let registered = false;
 
         /**
          * Constructor for the Modal.
          *
          * @param {object} root The root jQuery element for the modal
          */
-        var ModalLarge = function (root) {
+        let ModalLarge = function(root) {
             Modal.call(this, root);
         };
 

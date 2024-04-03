@@ -1,0 +1,6 @@
+{
+  "plugintypes": {
+    "assessfreqreport": "local/assessfreq/report",
+    "assessfreqsource": "local/assessfreq/source"
+  }
+}

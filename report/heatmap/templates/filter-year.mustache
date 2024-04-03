@@ -1,0 +1,50 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template assessfreqreport_heatmap/filter-year
+
+    This template renders the year filter.
+
+    Example context (json):
+    {}
+}}
+<span id="local-assessfreq-report-heatmap-fitler-year" data-region="year-filter" class="dropdown">
+    <button type="button" class="btn btn-secondary dropdown-toggle icon-no-margin"
+     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            aria-label="{{strselect}}" aria-controls="local-assessfreq-report-heatmap-filter-year-options">
+        {{#pix}} i/duration {{/pix}} {{# str }} filter:selectyear, assessfreqreport_heatmap {{/ str }}
+        <span class="sr-only" data-active-item-text>
+            {{#filters.years}}
+                {{#year}}{{val}}{{/year}}
+            {{/filters.years}}
+        </span>
+    </button>
+    <div id="local-assessfreq-report-heatmap-filter-year-options" role="menu" class="dropdown-menu" data-show-active-item>
+        <h6 class="dropdown-header">{{# str }} filter:selectyear, assessfreqreport_heatmap {{/ str }}</h6>
+        {{#filters.years}}
+        <a
+            class="local-assessfreq-report-heatmap-filter-year-option dropdown-item {{#year}}{{#active}}active{{/active}}{{/year}}"
+            href="#"
+            data-year="{{#year}}{{val}}{{/year}}"
+            aria-label="{{#year}}{{val}}{{/year}}"
+            role="menuitem"
+        >
+            {{#year}}{{val}}{{/year}}
+        </a>
+        {{/filters.years}}
+    </div>
+</span>

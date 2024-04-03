@@ -1,56 +1,84 @@
-.local-assessfreq.local-assessfreq-row {
-    display: flex;
-    flex-wrap: wrap;
+body #local-assessfreq-index {
+    font-family: Arial, serif;
 }
 
-.local-assessfreq.local-assessfreq-row-hidden {
+/* Style the tab */
+#local-assessfreq-index .tabs {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+#local-assessfreq-index .tabs a {
+    color: #000;
+    text-decoration: none;
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+.local-assessfreq-card {
+    margin-top: 10px;
+}
+
+.local-assessfreq-card .card-header {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-weight: 600;
+}
+
+.local-assessfreq-card .card-contents {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-top: 0;
+    text-align: left;
+}
+
+#local-assessfreq-index .chart-area .chart-image {
+    position: relative;
+    margin: auto;
+    height: 40vh;
+    width: 40vw;
+}
+/* Change background color of buttons on hover */
+#local-assessfreq-index .tabs a:hover {
+    text-decoration: none;
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+#local-assessfreq-index .tabs a.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+#local-assessfreq-index .tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+#local-assessfreq-index .dialog-data {
     display: none;
 }
 
-.local-assessfreq .local-assessfreq-month {
-    width: 270px;
+.filters > div {
+    padding: 0 20px 20px 0;
+    display: inline-block;
 }
 
-.local-assessfreq .local-assessfreq-month thead {
-    text-align: center;
+.filter-submit {
+    float: right;
 }
 
-.local-assessfreq .local-assessfreq-month td {
-    border: 1px solid #ddd;
-    width: 36px;
-    height: 36px;
-    text-align: center;
-}
-
-#local-assessfreq-report-summary .card-header,
-#local-assessfreq-quiz-dashboard-cards-deck .card-header,
-#local-assessfreq-quiz-dashboard-participant-trend-deck .card-header,
-#local-assessfreq-quiz-dashboard-inprogress-cards .card-header {
-    display: flex;
-}
-
-#local-assessfreq-report-summary .local-assessfreq-zoom,
-#local-assessfreq-quiz-dashboard-cards-deck .local-assessfreq-zoom,
-#local-assessfreq-quiz-dashboard-participant-trend-deck .local-assessfreq-zoom,
-#local-assessfreq-quiz-dashboard-inprogress-cards .local-assessfreq-zoom {
-    margin-left: auto;
-}
-
-#local-assessfreq-report-summary .local-assessfreq-zoom .icon,
-#local-assessfreq-quiz-dashboard-cards-deck .local-assessfreq-zoom .icon,
-#local-assessfreq-quiz-dashboard-participant-trend-deck .local-assessfreq-zoom .icon,
-#local-assessfreq-quiz-dashboard-inprogress-cards .local-assessfreq-zoom .icon {
-    font-size: 24px;
-    color: #6c757d;
-}
-
-#local-assessfreq-report-summary .local-assessfreq-zoom i:hover,
-#local-assessfreq-quiz-dashboard-cards-deck .local-assessfreq-zoom i:hover,
-#local-assessfreq-quiz-summary-trend .local-assessfreq-zoom i:hover,
-#local-assessfreq-quiz-dashboard-inprogress-cards .local-assessfreq-zoom i:hover {
-    color: #111;
-    cursor: pointer;
-}
 
 .modal-dialog.local-assessfreq-modal-large {
     max-width: 90%;
@@ -63,118 +91,4 @@
 
 .modal-dialog.local-assessfreq-modal-large .modal-body .chartjs-render-monitor {
     min-height: calc(100vh - 250px);
-}
-
-#local-assessfreq-report-dayview .dayview-firstcol {
-    width: 350px;
-}
-
-#local-assessfreq-report-dayview .dayview-midcol {
-    width: 70px;
-}
-
-#local-assessfreq-report-dayview table tbody tr td {
-    padding: .15rem;
-}
-
-.local-assessfreq-day-period {
-    height: 40px;
-    display: flex;
-    justify-content: space-between;
-    border-radius: 3px;
-    box-shadow: 0 3px 4px rgba(0, 0, 0, .3);
-    border-top: 1px solid #ab72ac;
-    background: #875692 linear-gradient(#a66db3, #875692);
-}
-
-.local-assessfreq-flex-row {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.local-assessfreq-quiz-summary-table tbody tr td {
-    width: 50%;
-    font-size: 1.08em;
-}
-
-.local-assessfreq-quiz-summary-table tbody tr td:first-child {
-    font-weight: 600;
-}
-
-#local-assessfreq-quiz-summary-card .card-body {
-    padding: 0.50rem;
-}
-
-#local-assessfreq-quiz-summary-trend .card-body .chartjs-render-monitor {
-    min-height: 400px;
-}
-
-.local-assessfreq-period-progress {
-    margin-right: 15px;
-    margin-left: 15px;
-}
-
-#local-assessfreq-report-heatmap-scale td {
-    border: 1px solid #ddd;
-    width: 36px;
-    height: 36px;
-    text-align: center;
-    font-weight: 400;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-.local-assessfreq-status-icon {
-    display: block;
-    float: left;
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-    margin-top: 2px;
-    border-radius: 3px;
-    box-shadow: 0 3px 4px rgba(0, 0, 0, .3);
-}
-
-.local-assessfreq-override-status {
-    font-weight: 600;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
-}
-
-.local-assessfreq-disabled {
-    font-weight: 200;
-    color: grey;
-}
-
-.local-assessfreq-day-coursename {
-    font-weight: 400;
-}
-
-.local-assessfreq-inprogress-summary {
-    font-size: 1.25rem;
-    font-weight: 400;
-}
-
-#local-assessfreq-quiz-inprogress-table .table-container {
-    min-height: 150px;
-}
-
-#local-assessfreq-quiz-student-table .table-container {
-    min-height: 150px;
-}
-
-#local-assessfreq-student-search-table .table-container {
-    min-height: 150px;
-}
-
-#local-assessfreq-quiz-inprogress-summary .summary-table {
-    width: 70%;
-}
-
-#local-assessfreq-quiz-inprogress-summary .summary-graph {
-    width: 30%;
-    border: 1px solid #dee2e6;
-    height: 210px;
-    padding-top: 25px;
-    padding-right: 10px;
 }

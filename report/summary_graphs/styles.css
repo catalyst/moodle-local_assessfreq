@@ -1,0 +1,27 @@
+#local-assessfreq-report-summary-graphs table {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#local-assessfreq-report-summary-graphs td,
+#local-assessfreq-report-summary-graphs th {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+#local-assessfreq-report-summary-graphs thead {
+    background-color: rgba(0, 0, 0, .03);
+}
+
+#local-assessfreq-report-summary-graphs tr:nth-of-type(2n) {
+    background-color: rgba(0, 0, 0, .03);
+}
+
+#local-assessfreq-report-summary-graphs .title {
+    font-weight: bold;
+}
+
+#local-assessfreq-report-summary-graphs tr.empty {
+    height: 20px;
+}

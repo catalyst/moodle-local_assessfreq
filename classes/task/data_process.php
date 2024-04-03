@@ -21,9 +21,14 @@
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace local_assessfreq\task;
 
+use context_system;
+use core\task\manager;
 use core\task\scheduled_task;
+use local_assessfreq\event\event_processed;
+use local_assessfreq\frequency;
 
 /**
  * A scheduled task to generate data used in plugin reports.
@@ -38,7 +43,7 @@ class data_process extends scheduled_task {
      *
      * @return string
      */
-    public function get_name() {
+    public function get_name() : string {
         return get_string('task:dataprocess', 'local_assessfreq');
     }
 
@@ -49,11 +54,11 @@ class data_process extends scheduled_task {
     public function execute() {
         mtrace('local_assessfreq: Processing event data');
         $now = time();
-        $frequency = new \local_assessfreq\frequency();
-        $context = \context_system::instance();
+        $frequency = new frequency();
+        $context = context_system::instance();
 
         // Only run scheduled task if there is not an ad-hoc task pending or processing historic data.
-        $adhoctask = \core\task\manager::get_adhoc_tasks(\local_assessfreq\task\history_process::class);
+        $adhoctask = manager::get_adhoc_tasks(history_process::class);
         if (!empty($adhoctask)) {
             mtrace('local_assessfreq: Stopping early historic processing task pending');
             return;
@@ -62,9 +67,9 @@ class data_process extends scheduled_task {
         // Due dates may have changed since we last ran report. So delete all events in DB later than now and replace them.
         mtrace('local_assessfreq: Deleting old event data');
         $actionstart = time();
-        $frequency->delete_events($now); // Delete event records greaer than now.
+        $frequency->delete_events($now); // Delete event records greater than now.
         $actionduration = time() - $actionstart;
-        $event = \local_assessfreq\event\event_processed::create([
+        $event = event_processed::create([
             'context' => $context,
             'other' => ['action' => 'delete', 'duration' => $actionduration],
         ]);
@@ -75,7 +80,7 @@ class data_process extends scheduled_task {
         $actionstart = time();
         $frequency->process_site_events($now); // Process records in the future.
         $actionduration = time() - $actionstart;
-        $event = \local_assessfreq\event\event_processed::create([
+        $event = event_processed::create([
             'context' => $context,
             'other' => ['action' => 'site', 'duration' => $actionduration],
         ]);
@@ -86,7 +91,7 @@ class data_process extends scheduled_task {
         $actionstart = time();
         $frequency->process_user_events($now); // Process user events.
         $actionduration = time() - $actionstart;
-        $event = \local_assessfreq\event\event_processed::create([
+        $event = event_processed::create([
             'context' => $context,
             'other' => ['action' => 'user', 'duration' => $actionduration],
         ]);

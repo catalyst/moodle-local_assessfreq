@@ -1,0 +1,76 @@
+#local-assessfreq-report-heatmap .month-table {
+    margin: 5px;
+    text-align: center;
+    width: 95%;
+}
+
+#local-assessfreq-report-heatmap .month-table td,
+#local-assessfreq-report-heatmap .scales-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    width: 36px;
+    height: 36px;
+    text-align: center;
+}
+
+#local-assessfreq-report-heatmap .month-table td.empty-cell.cell {
+    border: none;
+}
+#local-assessfreq-report-heatmap .month-table tr:nth-of-type(2n+2) {
+    background-color: rgba(0, 0, 0, .03);
+}
+
+#local-assessfreq-report-heatmap .month-title {
+    text-align: center;
+}
+
+#local-assessfreq-report-heatmap .container-fluid {
+    position: relative;
+}
+
+#local-assessfreq-report-heatmap .dialogrow {
+    position: absolute;
+    top: 0;
+    background-color: aqua;
+    width: 98%;
+    height: 100%;
+    display: none;
+}
+
+#local-assessfreq-report-heatmap .has-events {
+    cursor: pointer;
+}
+
+#local-assessfreq-report-heatmap .scales {
+    text-align: end;
+}
+
+
+#local-assessfreq-report-heatmap .scales-table {
+    float: right;
+}
+
+
+.local-assessfreq-day-period {
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 3px;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, .3);
+    border-top: 1px solid #ab72ac;
+    background: #875692 linear-gradient(#a66db3, #875692);
+}
+
+.local-assessfreq-flex-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#local-assessfreq-report-dayview .course-name {
+    width: 25%;
+}
+
+#local-assessfreq-report-dayview .text-center {
+    width: 5%;
+}

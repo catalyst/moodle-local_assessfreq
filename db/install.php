@@ -22,13 +22,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\task\manager;
+use local_assessfreq\task\history_process;
+
 /**
  * Generate ad-hoc task on install.
  */
 function xmldb_local_assessfreq_install() {
     if (!PHPUNIT_TEST) { // I hate this anti-pattern.
         // Create an adhoc task that will process all historical event data.
-        $task = new \local_assessfreq\task\history_process();
-        \core\task\manager::queue_adhoc_task($task, true);
+        $task = new history_process();
+        manager::queue_adhoc_task($task, true);
     }
 }

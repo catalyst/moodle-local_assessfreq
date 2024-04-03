@@ -13,6 +13,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+use local_assessfreq\frequency;
+use local_assessfreq\source_base;
+use local_assessfreq\report_base;
 
 /**
  * This page contains callbacks.
@@ -23,297 +26,213 @@
  */
 
 /**
- * Returns the name of the user preferences as well as the details this plugin uses.
+ * This function extends the navigation with the report link.
+ *
+ * @param navigation_node $navigation The navigation node to extend
+ * @param stdClass $course The course to object for the report
+ * @param context $context The context of the course
+ */
+function local_assessfreq_extend_navigation_course(navigation_node $navigation, stdClass $course, context $context) {
+    global $CFG, $OUTPUT;
+    if (has_capability('local/assessfreq:view', $context)) {
+        $url = new moodle_url('/local/assessfreq/', ['courseid' => $course->id]);
+        $navigation->add(
+            get_string('pluginname', 'local_assessfreq'),
+            $url,
+            navigation_node::TYPE_SETTING,
+            null,
+            null,
+            new pix_icon('i/report', '')
+        );
+    }
+}
+
+/**
+ * Get all of the subplugin reports that are enabled and instantiate the class.
+ *
+ * @param $ignoreenabled
+ * @return array
+ */
+function get_reports($ignoreenabled = false) : array {
+    $reports = [];
+    $pluginmanager = core_plugin_manager::instance();
+    foreach ($pluginmanager->get_plugins_of_type('assessfreqreport') as $subplugin) {
+        /* @var $class report_base */
+        if ($subplugin->is_enabled() || $ignoreenabled) {
+            $class = "assessfreqreport_{$subplugin->name}\\report";
+            $report = $class::get_instance();
+            if ($report->has_access()) {
+                $reports[$subplugin->name] = $report;
+            }
+        }
+    }
+    return $reports;
+}
+
+/**
+ * Get all of the subplugin sources that are enabled and instantiate the class.
+ *
+ * @param $ignoreenabled
+ * @return array
+ */
+function get_sources($ignoreenabled = false) : array {
+    $sources = [];
+    $pluginmanager = core_plugin_manager::instance();
+    foreach ($pluginmanager->get_plugins_of_type('assessfreqsource') as $subplugin) {
+        /* @var $class source_base */
+        if ($subplugin->is_enabled() || $ignoreenabled) {
+            $class = "assessfreqsource_{$subplugin->name}\\source";
+            $source = $class::get_instance();
+            $sources[$subplugin->name] = $source;
+        }
+    }
+    return $sources;
+}
+
+/**
+ * Using the start month defined in config get an ordered year of month names.
  *
  * @return array
  */
-function local_assessfreq_user_preferences() {
+function get_months_ordered() : array {
 
-    $preferences['local_assessfreq_overview_year_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => date('Y'),
-        'type' => PARAM_INT,
-    ];
+    $months = [];
+    $startmonth = get_config('local_assessfreq', 'start_month');
 
-    $preferences['local_assessfreq_heatmap_year_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => date('Y'),
-        'type' => PARAM_INT,
-    ];
+    for ($i = $startmonth; $i < $startmonth + 12; $i++) {
+        $month = $i - 12 > 0 ? $i - 12 : $i;
 
-    $preferences['local_assessfreq_heatmap_metric_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 'assess',
-        'type' => PARAM_ALPHA,
-    ];
+        $date = DateTime::createFromFormat('!m', $month);
+        $monthname = $date->format('F');
 
-    $preferences['local_assessfreq_heatmap_modules_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => '[]',
-        'type' => PARAM_RAW,
-    ];
-
-    $preferences['local_assessfreq_quiz_refresh_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 60,
-        'type' => PARAM_INT,
-    ];
-
-    $preferences['local_assessfreq_quiz_table_rows_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 20,
-        'type' => PARAM_INT,
-    ];
-
-    $preferences['local_assessfreq_student_search_table_rows_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 20,
-        'type' => PARAM_INT,
-    ];
-
-    $preferences['local_assessfreq_student_search_table_hoursahead_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 4,
-        'type' => PARAM_INT,
-    ];
-
-    $preferences['local_assessfreq_student_search_table_hoursbehind_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 1,
-        'type' => PARAM_INT,
-    ];
-
-    $preferences['local_assessfreq_quizzes_inprogress_table_hoursahead_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 0,
-        'type' => PARAM_INT,
-    ];
-
-    $preferences['local_assessfreq_quizzes_inprogress_table_hoursbehind_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 0,
-        'type' => PARAM_INT,
-    ];
-
-    $preferences['local_assessfreq_quiz_table_inprogress_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 20,
-        'type' => PARAM_INT,
-    ];
-
-    $preferences['local_assessfreq_quiz_table_inprogress_sort_preference'] = [
-        'null' => NULL_NOT_ALLOWED,
-        'default' => 'name_asc',
-        'type' => PARAM_ALPHAEXT,
-    ];
-
-    return $preferences;
-}
-
-/**
- * Return the HTML for the given chart.
- *
- * @param string $args JSON from the calling AJAX function.
- * @return string $chartdata The generated chart.
- */
-function local_assessfreq_output_fragment_get_chart($args): string {
-    $allowedcalls = [
-        'assess_by_month',
-        'assess_by_activity',
-        'assess_by_month_student',
-    ];
-
-    $context = $args['context'];
-    has_capability('moodle/site:config', $context);
-    $data = json_decode($args['data']);
-
-    if (in_array($data->call, $allowedcalls)) {
-        $classname = '\\local_assessfreq\\output\\' . $data->call;
-        $methodname = 'get_' . $data->call . '_chart';
-    } else {
-        throw new moodle_exception('Call not allowed');
+        $months[$month] = $monthname;
     }
 
-    $assesschart = new $classname();
-    $chart = $assesschart->$methodname($data->year);
-
-    $chartdata = json_encode($chart);
-    return $chartdata;
+    return $months;
 }
 
 /**
- * Return the HTML for the given chart.
+ * Get the years that have events with the preferred year active.
  *
- * @param string $args JSON from the calling AJAX function.
- * @return string $chartdata The generated chart.
+ * @param $preference
+ * @return array
  */
-function local_assessfreq_output_fragment_get_quiz_chart($args): string {
-    $allowedcalls = [
-        'participant_summary',
-        'participant_trend',
-    ];
+function get_years($preference) : array {
 
-    $context = $args['context'];
-    has_capability('moodle/site:config', $context);
-    $data = json_decode($args['data']);
+    $currentyear = date('Y');
 
-    if (in_array($data->call, $allowedcalls)) {
-        $classname = '\\local_assessfreq\\output\\' . $data->call;
-        $methodname = 'get_' . $data->call . '_chart';
-    } else {
-        throw new moodle_exception('Call not allowed');
+    // Get years that have events and load into context.
+    $frequency = new frequency();
+    $yearlist = $frequency->get_years_has_events();
+
+    if (empty($yearlist)) {
+        $yearlist = [$currentyear];
     }
 
-    $assesschart = new $classname();
-    $chart = $assesschart->$methodname($data->quiz);
-
-    $chartdata = json_encode($chart);
-    return $chartdata;
-}
-
-/**
- * Return the HTML for the given chart.
- *
- * @param string $args JSON from the calling AJAX function.
- * @return string $chartdata The generated chart.
- */
-function local_assessfreq_output_fragment_get_quiz_inprogress_chart($args): string {
-    $allowedcalls = [
-        'upcomming_quizzes',
-        'all_participants_inprogress',
-    ];
-
-    $context = $args['context'];
-    has_capability('moodle/site:config', $context);
-    $data = json_decode($args['data']);
-
-    if (in_array($data->call, $allowedcalls)) {
-        $classname = '\\local_assessfreq\\output\\' . $data->call;
-        $methodname = 'get_' . $data->call . '_chart';
-    } else {
-        throw new moodle_exception('Call not allowed');
+    // Add current year to the selection of years if missing.
+    if (!in_array($currentyear, $yearlist)) {
+        $yearlist[] = $currentyear;
     }
 
-    $assesschart = new $classname();
-    $now = time();
+    $years = [];
 
-    if ($methodname == 'get_all_participants_inprogress_chart') {
-        $chart = $assesschart->$methodname($now, $data->hoursahead, $data->hoursbehind);
-    } else {
-        $chart = $assesschart->$methodname($now);
+    foreach ($yearlist as $year) {
+        $years[$year] = ['year' => ['val' => $year]];
     }
 
-    $chartdata = json_encode($chart);
-    return $chartdata;
+    if (!$preference) {
+        $preference = date('Y');
+    }
+
+    $years[$preference]['year']['active'] = true;
+
+    return array_values($years);
 }
 
 /**
- * Renders the quiz search form for the modal on the quiz dashboard.
+ * Get the modules to use in data collection.
+ * This is based on which sources have been enabled.
  *
- * @param array $args
- * @return string $o Form HTML.
+ * @return array $modules The enabled modules.
  */
-function local_assessfreq_output_fragment_new_base_form($args): string {
+function get_modules($preferences) : array {
 
-    $context = $args['context'];
-    has_capability('moodle/site:config', $context);
+    $sources = get_sources();
 
-    $mform = new \local_assessfreq\form\quiz_search_form(null, null, 'post', '', ['class' => 'ignoredirty']);
+    // Get modules for filters and load into context.
+    $modules = [];
+    $modules['all'] = ['module' => ['val' => 'all', 'name' => get_string('all')]];
 
-    ob_start();
-    $mform->display();
-    $o = ob_get_contents();
-    ob_end_clean();
+    foreach ($sources as $source) {
+        $modulename = get_string('modulename', $source->get_module());
+        $modules[$source->get_module()] = ['module' => ['val' => $source->get_module(), 'name' => $modulename]];
+    }
 
-    return $o;
+    if (!$preferences) {
+        $preferences = ["all"];
+    }
+
+    foreach ($preferences as $preference) {
+        if (isset($modules[$preference])) {
+            $modules[$preference]['module']['active'] = true;
+        }
+    }
+
+    return array_values($modules);
 }
 
 /**
- * Renders the student table on the quiz dashboard screen.
- * We update the table via ajax.
+ * Given a list of user ids, check if the user is logged in our not
+ * and return summary counts of logged in and not logged in users.
  *
- * @param array $args
- * @return string $o Form HTML.
+ * @param array $userids User ids to get logged in status.
+ * @return stdClass $usercounts Object with coutns of users logged in and not logged in.
  */
-function local_assessfreq_output_fragment_get_student_table($args): string {
-    global $CFG, $PAGE;
+function get_loggedin_users(array $userids): stdClass {
+    global $CFG, $DB;
 
-    $context = $args['context'];
-    has_capability('moodle/site:config', $context);
-    $data = json_decode($args['data']);
+    $maxlifetime = $CFG->sessiontimeout;
+    $timedout = time() - $maxlifetime;
+    $userchunks = array_chunk($userids, 250); // Break list of users into chunks so we don't exceed DB IN limits.
 
-    $baseurl = $CFG->wwwroot . '/local/assessfreq/dashboard_quiz.php';
-    $output = $PAGE->get_renderer('local_assessfreq');
+    $loggedinusers = [];
 
-    $o = $output->render_student_table($baseurl, $data->quiz, $context->id, $data->search, $data->page);
+    foreach ($userchunks as $userchunk) {
+        [$insql, $inparams] = $DB->get_in_or_equal($userchunk);
+        $inparams[] = $timedout;
 
-    return $o;
+        $sql = "SELECT DISTINCT(userid)
+                      FROM {sessions}
+                     WHERE userid $insql
+                           AND timemodified >= ?";
+        $users = $DB->get_fieldset_sql($sql, $inparams);
+        $loggedinusers = array_merge($loggedinusers, $users);
+    }
+
+    $loggedoutusers = array_diff($userids, $loggedinusers);
+
+    $loggedin = count($loggedinusers);
+    $loggedout = count($loggedoutusers);
+
+    $usercounts = new stdClass();
+    $usercounts->loggedin = $loggedin;
+    $usercounts->loggedout = $loggedout;
+    $usercounts->loggedinusers = $loggedinusers;
+    $usercounts->loggedoutusers = $loggedoutusers;
+
+    return $usercounts;
 }
 
 /**
- * Renders the student table on the student search screen.
- * We update the table via ajax.
- *
- * @param array $args
- * @return string $o Form HTML.
- */
-function local_assessfreq_output_fragment_get_student_search_table($args): string {
-    global $CFG, $PAGE;
-
-    $context = $args['context'];
-    has_capability('moodle/site:config', $context);
-    $data = json_decode($args['data']);
-    $search = is_null($data->search) ? '' : $data->search;
-    $now = time();
-    $hoursahead = (int)$data->hoursahead;
-    $hoursbehind = (int)$data->hoursbehind;
-
-    $baseurl = $CFG->wwwroot . '/local/assessfreq/student_search.php';
-    $output = $PAGE->get_renderer('local_assessfreq');
-
-    $o = $output->render_student_search_table($baseurl, $context->id, $search, $hoursahead, $hoursbehind, $now, $data->page);
-
-    return $o;
-}
-
-/**
- * Renders the quizzes in progress "table" on the quiz dashboard screen.
- * We update the table via ajax.
- * The table isn't a real table it's a collection of divs.
- *
- * @param array $args
- * @return string $o Form HTML.
- */
-function local_assessfreq_output_fragment_get_quizzes_inprogress_table($args): string {
-    global $PAGE;
-
-    $context = $args['context'];
-    has_capability('moodle/site:config', $context);
-
-    $data = json_decode($args['data']);
-    $search = is_null($data->search) ? '' : $data->search;
-    $sorton = is_null($data->sorton) ? 'name' : $data->sorton;
-    $direction = is_null($data->direction) ? 'asc' : $data->direction;
-    $hoursahead = (int)$data->hoursahead;
-    $hoursbehind = (int)$data->hoursbehind;
-
-    $output = $PAGE->get_renderer('local_assessfreq');
-    $o = $output->render_quizzes_inprogress_table($search, $data->page, $sorton, $direction, $hoursahead, $hoursbehind);
-
-    return $o;
-}
-
-/**
- * Renders the quiz user override form for the modal on the quiz dashboard.
+ * Renders the user override form for the modal.
  *
  * @param array $args
  * @return string $o Form HTML.
  */
 function local_assessfreq_output_fragment_new_override_form($args): string {
-    global $DB;
+    global $DB, $CFG;
 
-    $context = $args['context'];
-    has_capability('mod/quiz:manageoverrides', $context);
+    $module = $args['activitytype'];
 
     $serialiseddata = json_decode($args['jsonformdata'], true);
 
@@ -323,36 +242,17 @@ function local_assessfreq_output_fragment_new_override_form($args): string {
         parse_str($serialiseddata, $formdata);
     }
 
-    // Get some data needed to generate the form.
-    $quizid = $args['quizid'];
-    $quizdata = new \local_assessfreq\quiz();
-    $quizcontext = $quizdata->get_quiz_context($quizid);
-    $quiz = $DB->get_record('quiz', ['id' => $quizid], '*', MUST_EXIST);
-
-    $cm = get_course_and_cm_from_cmid($quizcontext->instanceid, 'quiz')[1];
-
-    // Check if we have an existing override for this user.
-    $override = $DB->get_record('quiz_overrides', ['quiz' => $quiz->id, 'userid' => $args['userid']]);
-
-    if ($override) {
-        $data = clone $override;
-    } else {
-        $data = new \stdClass();
-        $data->userid = $args['userid'];
+    $sources = get_sources();
+    $source = $sources[$module];
+    $o = '';
+    /* @var $source source_base */
+    if (method_exists($source, 'get_override_form')) {
+        $mform = $source->get_override_form($args['activityid'], $args['context'], $args['userid'], $serialiseddata);
+        ob_start();
+        $mform->display();
+        $o = ob_get_contents();
+        ob_end_clean();
     }
-
-    $mform = new \local_assessfreq\form\quiz_override_form($cm, $quiz, $quizcontext, $override, $formdata);
-    $mform->set_data($data);
-
-    if (!empty($serialiseddata)) {
-        // If we were passed non-empty form data we want the mform to call validation functions and show errors.
-        $mform->is_validated();
-    }
-
-    ob_start();
-    $mform->display();
-    $o = ob_get_contents();
-    ob_end_clean();
 
     return $o;
 }

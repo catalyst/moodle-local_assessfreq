@@ -23,7 +23,12 @@
  */
 namespace local_assessfreq\task;
 
+use context_system;
 use core\task\adhoc_task;
+use core\task\manager;
+use local_assessfreq\event\event_processed;
+use local_assessfreq\frequency;
+use moodle_exception;
 
 /**
  * Adhoc task to process historical data used in plugin.
@@ -43,18 +48,18 @@ class history_process extends adhoc_task {
         // Only run if scheduled task is not running.
         // Throw an error if it is and this task will be retried after a delay.
         // The scheduled task won't start while this job is pending.
-        $schedtask = \core\task\manager::get_scheduled_task(\local_assessfreq\task\data_process::class);
+        $schedtask = manager::get_scheduled_task(data_process::class);
         if ($schedtask->get_lock()) {
-            throw new \moodle_exception('local_assessfreq_scheduled_task_running');
+            throw new moodle_exception('local_assessfreq_scheduled_task_running');
         }
 
-        $frequency = new \local_assessfreq\frequency();
-        $context = \context_system::instance();
+        $frequency = new frequency();
+        $context = context_system::instance();
 
         $actionstart = time();
         $frequency->delete_events(0); // Delete ALL event records.
         $actionduration = time() - $actionstart;
-        $event = \local_assessfreq\event\event_processed::create([
+        $event = event_processed::create([
             'context' => $context,
             'other' => ['action' => 'delete', 'duration' => $actionduration],
         ]);
@@ -65,7 +70,7 @@ class history_process extends adhoc_task {
         $actionstart = time();
         $frequency->process_site_events(1); // Process ALL records.
         $actionduration = time() - $actionstart;
-        $event = \local_assessfreq\event\event_processed::create([
+        $event = event_processed::create([
             'context' => $context,
             'other' => ['action' => 'site', 'duration' => $actionduration],
         ]);
@@ -76,7 +81,7 @@ class history_process extends adhoc_task {
         $actionstart = time();
         $frequency->process_user_events(1); // Process ALL user events.
         $actionduration = time() - $actionstart;
-        $event = \local_assessfreq\event\event_processed::create([
+        $event = event_processed::create([
             'context' => $context,
             'other' => ['action' => 'user', 'duration' => $actionduration],
         ]);

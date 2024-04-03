@@ -15,18 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Version file.
  *
- * @package     local_assessfreq
- * @copyright   2020 Matt Porritt <mattp@catalyst-au.net>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   local_assessfreq
+ * @author    Simon Thornett <simon.thornett@catalyst-eu.net>
+ * @copyright Catalyst IT, 2024
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_assessfreq';
-$plugin->release = '2023020700';
-$plugin->version = 2023020700;
-$plugin->requires = 2022041906; // Requires 4.0.
+$plugin->release = '2024040300';
+$plugin->version = 2024040300;
+$plugin->requires = 2022041906; // Requires 4.0
 $plugin->supported = [400, 401];
 $plugin->maturity = MATURITY_STABLE;

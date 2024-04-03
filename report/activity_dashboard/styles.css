@@ -1,0 +1,49 @@
+#local-assessfreq-report-activity-dashboard table {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#local-assessfreq-report-activity-dashboard td,
+#local-assessfreq-report-activity-dashboard th {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+#local-assessfreq-report-activity-dashboard thead {
+    background-color: rgba(0, 0, 0, .03);
+}
+
+#local-assessfreq-report-activity-dashboard tr:nth-of-type(2n) {
+    background-color: rgba(0, 0, 0, .03);
+}
+
+#local-assessfreq-report-activity-dashboard .title {
+    font-weight: bold;
+}
+
+#local-assessfreq-report-activity-dashboard tr.empty {
+    height: 20px;
+}
+
+
+#local-assessfreq-report-activity-dashboard .local-assessfreq-status-icon {
+    display: block;
+    float: left;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    margin-top: 2px;
+    border-radius: 3px;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, .3);
+}
+
+#local-assessfreq-report-activity-dashboard .local-assessfreq-override-status {
+    font-weight: 600;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
+}
+
+#local-assessfreq-report-activity-dashboard .local-assessfreq-disabled {
+    font-weight: 200;
+    color: grey;
+}

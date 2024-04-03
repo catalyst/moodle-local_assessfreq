@@ -70,7 +70,7 @@ class utils {
     /**
      * Sort an array of arrays/objects by multiple values.
      *
-     * @param array $inputarray Array of quizzes to sort.
+     * @param array $inputarray Array of activities to sort.
      * @param array $sorton Associative array to sort by in the format field => direction.
      * @return array $inputarray the sorted array.
      */

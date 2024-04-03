@@ -16,25 +16,25 @@
 /**
  * Javascript for report card display and processing.
  *
- * @package    local_assessfreq
+ * @package
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define(
     ['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/fragment', 'core/ajax'],
-    function ($,Str, ModalFactory, ModalEvents, Fragment, Ajax) {
+    function($, Str, ModalFactory, ModalEvents, Fragment, Ajax) {
 
         /**
          * Module level variables.
          */
-        var OverrideModal = {};
-        var contextid;
-        var modalObj;
-        var callback;
-        var quizid;
-        var userid;
-        var hoursFilter;
+        let OverrideModal = {};
+        let contextid;
+        let activitytype;
+        let modalObj;
+        let activityid;
+        let userid;
+        let tableHandler;
 
         const spinner = '<p class="text-center">'
             + '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>'
@@ -45,8 +45,8 @@ define(
          *
          * @private
          */
-        const createModal = function () {
-            Str.get_string('loading', 'local_assessfreq').then((title) => {
+        const createModal = function() {
+            Str.get_string('loading').then((title) => {
                 // Create the Modal.
                 ModalFactory.create({
                     type: ModalFactory.types.DEFAULT,
@@ -54,46 +54,49 @@ define(
                     body: spinner,
                     large: true
                 })
-                .done((modal) => {
-                    modalObj = modal;
-                    // Explicitly handle form click events.
-                    modalObj.getRoot().on('click', '#id_submitbutton', processModalForm);
-                    modalObj.getRoot().on('click', '#id_cancel', function (e) {
-                        e.preventDefault();
-                        modalObj.setBody(spinner);
-                        modalObj.hide();
+                    .done((modal) => {
+                        modalObj = modal;
+                        // Explicitly handle form click events.
+                        modalObj.getRoot().on('click', '#id_submitbutton', processModalForm);
+                        modalObj.getRoot().on('click', '#id_cancel', function(e) {
+                            e.preventDefault();
+                            modalObj.setBody(spinner);
+                            modalObj.hide();
+                        });
                     });
-                });
-                return;
             }).catch(() => {
-                Notification.exception(new Error('Failed to load string: loading'));
+                // Silently ignore that we couldn't load the string.
+                return false;
             });
         };
 
         /**
          * Updates the body of the modal window.
          *
+         * @param {Integer} activity
+         * @param {Integer} user
          * @param {Object} formdata
          * @private
          */
-        const updateModalBody = function (quiz, user, formdata) {
+        const updateModalBody = function(activity, user, formdata) {
             if (typeof formdata === "undefined") {
                 formdata = {};
             }
 
             let params = {
                 'jsonformdata': JSON.stringify(formdata),
-                'quizid': quiz,
+                'activitytype': activitytype,
+                'activityid': activity,
                 'userid': user
             };
 
             modalObj.setBody(spinner);
-            Str.get_string('useroverride', 'local_assessfreq').then((title) => {
+            Str.get_string('modal:useroverride', 'local_assessfreq').then((title) => {
                 modalObj.setTitle(title);
                 modalObj.setBody(Fragment.loadFragment('local_assessfreq', 'new_override_form', contextid, params));
-                return;
             }).catch(() => {
-                Notification.exception(new Error('Failed to load string: useroverride'));
+                // Silently ignore that we couldn't load the string.
+                return false;
             });
         };
 
@@ -112,7 +115,7 @@ define(
 
             // Handle invalid form fields for better UX.
             // I hate that I had to use JQuery for this.
-            var invalid = $.merge(
+            let invalid = $.merge(
                 modalObj.getRoot().find('[aria-invalid="true"]'),
                 modalObj.getRoot().find('.error')
             );
@@ -127,41 +130,44 @@ define(
                 methodname: 'local_assessfreq_process_override_form',
                 args: {
                     'jsonformdata': formjson,
-                    'quizid': quizid
+                    'activityid': activityid,
+                    'activitytype': activitytype,
                 },
             }])[0].done(() => {
                 // For submission succeeded.
                 modalObj.setBody(spinner);
                 modalObj.hide();
-                if (hoursFilter) {
-                    callback(quizid, hoursFilter);
-                } else {
-                    callback(quizid);
+                if (tableHandler !== undefined) {
+                    tableHandler.getTable();
                 }
             }).fail(() => {
                 // Form submission failed server side, redisplay with errors.
-                updateModalBody(quizid, userid, overrideform);
+                updateModalBody(activityid, userid, overrideform);
             });
         }
 
         /**
          * Display the Modal form.
+         * @param {Integer} activity
+         * @param {Integer} user
          */
-        OverrideModal.displayModalForm = function (quiz, user, hours = null) {
-            quizid = quiz;
+        OverrideModal.displayModalForm = function(activity, user) {
+            activityid = activity;
             userid = user;
-            hoursFilter = hours;
-            updateModalBody(quiz, user);
+            updateModalBody(activityid, user);
             modalObj.show();
         };
 
         /**
-         * Initialise method for quiz dashboard rendering.
+         * Initialise method for dashboard rendering.
+         * @param {Integer} context
+         * @param {String} module
+         * @param {TableHandler} tablehandler If defined will trigger a table refresh on form save.
          */
-        OverrideModal.init = function (context, callbackFunction, hours = null) {
+        OverrideModal.init = function(context, module, tablehandler = undefined) {
+            activitytype = module;
             contextid = context;
-            callback = callbackFunction;
-            hoursFilter = hours;
+            tableHandler = tablehandler;
             createModal();
         };
 

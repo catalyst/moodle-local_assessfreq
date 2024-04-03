@@ -24,6 +24,8 @@
 
 namespace local_assessfreq\event;
 
+use core\event\base;
+
 /**
  * Event class.
  *
@@ -31,7 +33,8 @@ namespace local_assessfreq\event;
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class event_processed extends \core\event\base {
+class event_processed extends base {
+
     /**
      * Init method.
      */
@@ -45,7 +48,7 @@ class event_processed extends \core\event\base {
      *
      * @return string
      */
-    public static function get_name() {
+    public static function get_name() : string {
         return get_string('eventeventprocessed', 'local_assessfreq');
     }
 
@@ -54,7 +57,7 @@ class event_processed extends \core\event\base {
      *
      * @return string
      */
-    public function get_description() {
+    public function get_description() : string {
         return get_string('eventeven_processed_desc', 'local_assessfreq');
     }
 }

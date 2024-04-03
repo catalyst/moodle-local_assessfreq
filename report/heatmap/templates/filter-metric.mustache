@@ -1,0 +1,56 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template assessfreqreport_heatmap/filter-metric
+
+    This template renders the metric filter.
+
+    Example context (json):
+    {}
+}}
+<span id="local-assessfreq-report-heatmap-filter-metric" data-region="metric-filter" class="dropdown">
+    <button type="button" class="btn btn-secondary dropdown-toggle icon-no-margin"
+     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            aria-label="{{strselect}}" aria-controls="local-assessfreq-report-heatmap-filter-metric-options">
+        {{#pix}} i/report {{/pix}} {{# str }} filter:selectmetric, assessfreqreport_heatmap {{/ str }}
+        <span class="sr-only" data-active-item-text>
+                {{# str }} filter:metric:assess, assessfreqreport_heatmap {{/ str }}
+                {{# str }} filter:metric:students, assessfreqreport_heatmap {{/ str }}
+        </span>
+    </button>
+    <div id="local-assessfreq-report-heatmap-filter-metric-options" role="menu" class="dropdown-menu" data-show-active-item>
+        <h6 class="dropdown-header">{{# str }} filter:selectmetric, assessfreqreport_heatmap {{/ str }}</h6>
+        <a
+            class="local-assessfreq-report-heatmap-filter-metric-option dropdown-item {{#filters.metrics}}{{#assess}}active{{/assess}}{{/filters.metrics}}"
+            href="#"
+            data-metric="assess"
+            aria-label="{{# str }} filter:metric:assess, assessfreqreport_heatmap {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} filter:metric:assess, assessfreqreport_heatmap {{/ str }}
+        </a>
+        <a
+            class="local-assessfreq-report-heatmap-filter-metric-option dropdown-item {{#filters.metrics}}{{#students}}active{{/students}}{{/filters.metrics}}"
+            href="#"
+            data-metric="students"
+            aria-label="{{# str }} filter:metric:students, assessfreqreport_heatmap {{/ str }}"
+            role="menuitem"
+        >
+            {{# str }} filter:metric:students, assessfreqreport_heatmap {{/ str }}
+        </a>
+    </div>
+</span>

@@ -46,3 +46,29 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
+
+## Version 2024040300 refactor ##
+
+Post version `2024040300` this plugin was completely refactored to support more reports and modules.
+
+Each report is now a subplugin within the `report` directory
+The subplugins report class should extend from the \local_assessfreq\report_base class
+
+Capability checks were reworked to be relative to the location that they are being loading from. The initial version
+has the following capabilities:
+
+- local/assessfreq:view
+- assessfreqreport/activity_dashboard:view
+- assessfreqreport/activities_in_progress:view
+- assessfreqreport/heatmap:view
+- assessfreqreport/summary_graphs:view
+
+however each future subplugin can define their own access checks by using the abstract `has_access` method.
+Accessing the reports from a course (link now added to the course context menu) will do the capability check at the
+course context level, otherwise system level will be used.
+
+The reports themselves should also be restricted based on the $PAGE->course if it is not the SITEID as this is set
+during the intial load of the index.php file.
+
+Each module is now a subplugin within the `source` directory
+The subplugins source class should extend from the \local_assessfreq\source_base class

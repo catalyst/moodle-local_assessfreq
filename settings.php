@@ -15,99 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin administration pages are defined here.
+ * Settings page for local/assessfreq that also dynamically loads the settings for sources and reports.
  *
- * @package     local_assessfreq
- * @copyright   2020 Matt Porritt <mattp@catalyst-au.net>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   local_assessfreq
+ * @author    Simon Thornett <simon.thornett@catalyst-eu.net>
+ * @copyright Catalyst IT, 2024
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-if (!$hassiteconfig) {
-    return;
-}
-
-// Site wide plugin admin settings.
-$sitesettings = new admin_settingpage('local_assessfreq', get_string('pluginsettings', 'local_assessfreq'));
-
-// Settings page historic data processing.
-$historysettings = new admin_externalpage(
-    'local_assessfreq_history',
-    get_string('clearhistory', 'local_assessfreq'),
-    new moodle_url('/local/assessfreq/history.php')
-);
-
-// New report category.
-$ADMIN->add('reports', new admin_category('local_assessfreq_reports', get_string('reports', 'local_assessfreq')));
+defined('MOODLE_INTERNAL') || die;
 
 // Assessment dashboard link.
-$ADMIN->add('local_assessfreq_reports', new admin_externalpage(
-    'local_assessfreq_assessment',
-    get_string('dashboard:assessment', 'local_assessfreq'),
-    "$CFG->wwwroot/local/assessfreq/dashboard_assessment.php"
+$ADMIN->add('reports', new admin_externalpage(
+    'local_assessfreq_report',
+    get_string('pluginname', 'local_assessfreq'),
+    $CFG->wwwroot . '/local/assessfreq/',
+    'local/assessfreq:view'
 ));
 
-// Quiz dashboard link.
-$ADMIN->add('local_assessfreq_reports', new admin_externalpage(
-    'local_assessfreq_quiz',
-    get_string('dashboard:quiz', 'local_assessfreq'),
-    "$CFG->wwwroot/local/assessfreq/dashboard_quiz.php"
-));
+$ADMIN->add('localplugins', new admin_category('local_assessfreq', get_string('settings:head', 'local_assessfreq')));
 
-// Quiz inprogress dashboard link.
-$ADMIN->add('local_assessfreq_reports', new admin_externalpage(
-    'local_assessfreq_quiz_inprogress',
-    get_string('dashboard:quiz_inprogress', 'local_assessfreq'),
-    "$CFG->wwwroot/local/assessfreq/dashboard_quiz_inprogress.php"
-));
+$reports = core_plugin_manager::instance()->get_plugins_of_type('assessfreqreport');
+$sources = core_plugin_manager::instance()->get_plugins_of_type('assessfreqsource');
 
-// Quiz student search link.
-$ADMIN->add('local_assessfreq_reports', new admin_externalpage(
-    'local_assessfreq_student_search',
-    get_string('student_search', 'local_assessfreq'),
-    "$CFG->wwwroot/local/assessfreq/student_search.php"
-));
-
-// Module settings.
-$sitesettings->add(new admin_setting_heading(
-    'local_assessfreq/moduleheading',
-    get_string('settings:moduleheading', 'local_assessfreq'),
-    get_string('settings:moduleheading_desc', 'local_assessfreq')
-));
-
-$frequency = new \local_assessfreq\frequency();
-$modules = $frequency->get_modules();
-$enabledmodules = $frequency->get_enabled_modules();
-$modarray = [];
-
-foreach ($modules as $module) {
-    if ($enabledmodules[$module] == 1) {
-        $modarray[$module] = get_string('modulename', $module);
-    } else {
-        $modarray[$module] = get_string('modulename', $module) . get_string('systemdisabled', 'local_assessfreq');
-    }
-}
-
-$setting = new admin_setting_configmulticheckbox(
-    'local_assessfreq/modules',
-    get_string('settings:modules', 'local_assessfreq'),
-    get_string('settings:modules_desc', 'local_assessfreq'),
-    $modules,
-    $modarray
+$settings = new admin_settingpage(
+    'local_assessfreq_settings',
+    get_string('settings:local_assessfreq', 'local_assessfreq')
 );
-$setting->set_updatedcallback('\local_assessfreq\frequency::purge_caches');
-$sitesettings->add($setting);
-
-// Include disabled modules.
-$setting = new admin_setting_configcheckbox(
-    'local_assessfreq/disabledmodules',
-    get_string('settings:disabledmodules', 'local_assessfreq'),
-    get_string('settings:disabledmodules_desc', 'local_assessfreq'),
-    1
-);
-$setting->set_updatedcallback('\local_assessfreq\frequency::purge_caches');
-$sitesettings->add($setting);
 
 // Include hidden courses.
 $setting = new admin_setting_configcheckbox(
@@ -116,97 +50,52 @@ $setting = new admin_setting_configcheckbox(
     get_string('settings:hiddencourses_desc', 'local_assessfreq'),
     0
 );
-$setting->set_updatedcallback('\local_assessfreq\frequency::purge_caches');
-$sitesettings->add($setting);
+$settings->add($setting);
 
-// Heat settings.
-$sitesettings->add(new admin_setting_heading(
-    'local_assessfreq/heatheading',
-    get_string('settings:heatheading', 'local_assessfreq'),
-    get_string('settings:heatheading_desc', 'local_assessfreq')
+// Add the start month to calculate reports from for the year.
+$options = [];
+for ($m = 1; $m <= 12; $m++) {
+    $dateobj = DateTime::createFromFormat('!m', $m);
+    $options[$m] = $dateobj->format('F');
+}
+
+$settings->add(new admin_setting_configselect(
+    'local_assessfreq/start_month',
+    get_string('settings:start_month', 'local_assessfreq'),
+    get_string('settings:start_month_desc', 'local_assessfreq'),
+    '1',
+    $options
 ));
 
-$sitesettings->add(new admin_setting_configcolourpicker(
-    'local_assessfreq/heat1',
-    get_string('settings:heat1', 'local_assessfreq'),
-    get_string('settings:heat1_desc', 'local_assessfreq'),
-    '#FDF9CD'
-));
+// Add the enable checkboxes for reports and sources.
+foreach ($sources as $source) {
+    $enabled = new admin_setting_configcheckbox(
+        'assessfreqsource_' . $source->name . '/enabled',
+        get_string('settings:enablesource', 'local_assessfreq', $source->displayname),
+        get_string('settings:enablesource_help', 'local_assessfreq'),
+        1
+    );
+    $settings->add($enabled);
+}
 
-$sitesettings->add(new admin_setting_configcolourpicker(
-    'local_assessfreq/heat2',
-    get_string('settings:heat2', 'local_assessfreq'),
-    get_string('settings:heat2_desc', 'local_assessfreq'),
-    '#A2DAB5'
-));
+foreach ($reports as $report) {
+    $enabled = new admin_setting_configcheckbox(
+        'assessfreqreport_' . $report->name . '/enabled',
+        get_string('settings:enablereport', 'local_assessfreq', $report->displayname),
+        get_string('settings:enablereport_help', 'local_assessfreq'),
+        1
+    );
+    $settings->add($enabled);
+}
 
-$sitesettings->add(new admin_setting_configcolourpicker(
-    'local_assessfreq/heat3',
-    get_string('settings:heat3', 'local_assessfreq'),
-    get_string('settings:heat3_desc', 'local_assessfreq'),
-    '#41B7C5'
-));
+$ADMIN->add('local_assessfreq', $settings);
 
-$sitesettings->add(new admin_setting_configcolourpicker(
-    'local_assessfreq/heat4',
-    get_string('settings:heat4', 'local_assessfreq'),
-    get_string('settings:heat4_desc', 'local_assessfreq'),
-    '#4D7FB9'
-));
+// Add the individual reports settings.
+foreach ($reports as $report) {
+    $report->load_settings($ADMIN, 'local_assessfreq', $hassiteconfig);
+}
 
-$sitesettings->add(new admin_setting_configcolourpicker(
-    'local_assessfreq/heat5',
-    get_string('settings:heat5', 'local_assessfreq'),
-    get_string('settings:heat5_desc', 'local_assessfreq'),
-    '#283B94'
-));
-
-$sitesettings->add(new admin_setting_configcolourpicker(
-    'local_assessfreq/heat6',
-    get_string('settings:heat6', 'local_assessfreq'),
-    get_string('settings:heat6_desc', 'local_assessfreq'),
-    '#8C0010'
-));
-
-// Chart color settings.
-$sitesettings->add(new admin_setting_heading(
-    'local_assessfreq/chartheading',
-    get_string('settings:chartheading', 'local_assessfreq'),
-    get_string('settings:chartheading_desc', 'local_assessfreq')
-));
-
-$sitesettings->add(new admin_setting_configcolourpicker(
-    'local_assessfreq/notloggedincolor',
-    get_string('settings:notloggedincolor', 'local_assessfreq'),
-    get_string('settings:notloggedincolor_desc', 'local_assessfreq'),
-    '#8C0010'
-));
-
-$sitesettings->add(new admin_setting_configcolourpicker(
-    'local_assessfreq/loggedincolor',
-    get_string('settings:loggedincolor', 'local_assessfreq'),
-    get_string('settings:loggedincolor_desc', 'local_assessfreq'),
-    '#FA8900'
-));
-
-$sitesettings->add(new admin_setting_configcolourpicker(
-    'local_assessfreq/inprogresscolor',
-    get_string('settings:inprogresscolor', 'local_assessfreq'),
-    get_string('settings:inprogresscolor_desc', 'local_assessfreq'),
-    '#875692'
-));
-
-$sitesettings->add(new admin_setting_configcolourpicker(
-    'local_assessfreq/finishedcolor',
-    get_string('settings:finishedcolor', 'local_assessfreq'),
-    get_string('settings:finishedcolor_desc', 'local_assessfreq'),
-    '#1B8700'
-));
-
-// Build the admin menu tree.
-$ADMIN->add('localplugins', new admin_category(
-    'local_assessfreq_settings',
-    get_string('pluginname', 'local_assessfreq')
-));
-$ADMIN->add('local_assessfreq_settings', $sitesettings);
-$ADMIN->add('local_assessfreq_settings', $historysettings);
+// Add the individual sources settings.
+foreach ($sources as $source) {
+    $source->load_settings($ADMIN, 'local_assessfreq', $hassiteconfig);
+}

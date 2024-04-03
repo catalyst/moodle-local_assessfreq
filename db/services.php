@@ -26,40 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // Define the web service functions to install.
 $functions = [
-    'local_assessfreq_get_frequency' => [
-        'classname' => 'local_assessfreq_external',
-        'methodname' => 'get_frequency',
-        'classpath' => '',
-        'description' => 'Returns event frequency map.',
-        'type' => 'read',
-        'ajax' => true,
-    ],
-    'local_assessfreq_get_heat_colors' => [
-        'classname' => 'local_assessfreq_external',
-        'methodname' => 'get_heat_colors',
-        'classpath' => '',
-        'description' => 'Returns event heat map colors.',
-        'type' => 'read',
-        'loginrequired' => false,
-        'ajax' => true,
-    ],
-    'local_assessfreq_get_process_modules' => [
-        'classname' => 'local_assessfreq_external',
-        'methodname' => 'get_process_modules',
-        'classpath' => '',
-        'description' => 'Returns modules we are processing .',
-        'type' => 'read',
-        'loginrequired' => false,
-        'ajax' => true,
-    ],
-    'local_assessfreq_get_day_events' => [
-        'classname' => 'local_assessfreq_external',
-        'methodname' => 'get_day_events',
-        'classpath' => '',
-        'description' => 'Gets day event info for use in heatmap.',
-        'type' => 'read',
-        'ajax' => true,
-    ],
     'local_assessfreq_get_courses' => [
         'classname' => 'local_assessfreq_external',
         'methodname' => 'get_courses',
@@ -68,19 +34,11 @@ $functions = [
         'type' => 'read',
         'ajax' => true,
     ],
-    'local_assessfreq_get_quizzes' => [
+    'local_assessfreq_get_activities' => [
         'classname' => 'local_assessfreq_external',
-        'methodname' => 'get_quizzes',
+        'methodname' => 'get_activities',
         'classpath' => '',
-        'description' => 'Gets quizzes.',
-        'type' => 'read',
-        'ajax' => true,
-    ],
-    'local_assessfreq_get_quiz_data' => [
-        'classname' => 'local_assessfreq_external',
-        'methodname' => 'get_quiz_data',
-        'classpath' => '',
-        'description' => 'Gets quiz data.',
+        'description' => 'Gets activities.',
         'type' => 'read',
         'ajax' => true,
     ],
@@ -98,23 +56,6 @@ $functions = [
         'classpath' => '',
         'description' => 'Process the override form.',
         'type' => 'write',
-        'ajax' => true,
-    ],
-    'local_assessfreq_get_system_timezone' => [
-        'classname' => 'local_assessfreq_external',
-        'methodname' => 'get_system_timezone',
-        'classpath' => '',
-        'description' => 'Returns system (not user) timezone.',
-        'type' => 'read',
-        'loginrequired' => false,
-        'ajax' => true,
-    ],
-    'local_assessfreq_get_inprogress_counts' => [
-        'classname' => 'local_assessfreq_external',
-        'methodname' => 'get_inprogress_counts',
-        'classpath' => '',
-        'description' => 'Get counts for inprogress assessments.',
-        'type' => 'read',
         'ajax' => true,
     ],
 ];

@@ -1,0 +1,54 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template assessfreqreport_heatmap/filters
+
+    This template renders all of the filters.
+}}
+
+<div class="filters">
+    <p>{{#str}}report:usage_guidlines, assessfreqreport_heatmap {{/str}}</p>
+    <div class="container-fluid">
+        <div class="row justify-content-between">
+            <div class="col-9">
+                {{> assessfreqreport_heatmap/filter-year}}
+                {{> assessfreqreport_heatmap/filter-type}}
+                {{> assessfreqreport_heatmap/filter-metric}}
+            </div>
+            <!-- Download -->
+            <div class="col-3">
+                {{> assessfreqreport_heatmap/download}}
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row justify-content-between">
+            <div class="col-12">
+                <h5>{{#str}}filter:yearselection, assessfreqreport_heatmap, {{month}} {{year}}{{/str}}</h5>
+            </div>
+            <div class="col-12">
+                <h5>{{# str }} filter:moduleselection, assessfreqreport_heatmap, {{filters.selected_modules}} {{/ str }}</h5>
+            </div>
+            <div class="col-12">
+                <h5>{{# str }} filter:metricselection, assessfreqreport_heatmap, {{filters.selected_metric}} {{/ str }}</h5>
+            </div>
+        </div>
+        <div class="row justify-content-end">
+            <div class="col-3 scales">{{#str}}report:scales, assessfreqreport_heatmap {{/str}} {{{scales}}}</div>
+        </div>
+    </div>
+</div>

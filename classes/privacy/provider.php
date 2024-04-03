@@ -24,10 +24,12 @@
 
 namespace local_assessfreq\privacy;
 
+use context;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\data_provider;
 use core_privacy\local\request\writer;
 use core_privacy\local\request\userlist;
 
@@ -38,7 +40,7 @@ use core_privacy\local\request\userlist;
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\local\request\data_provider, \core_privacy\local\metadata\provider {
+class provider implements data_provider, \core_privacy\local\metadata\provider {
     /**
      * Returns metadata about this plugin's privacy policy.
      *
@@ -75,7 +77,7 @@ class provider implements \core_privacy\local\request\data_provider, \core_priva
      * @return contextlist the contexts in which data is contained.
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
-        $contextlist = new \core_privacy\local\request\contextlist();
+        $contextlist = new contextlist();
         $contextlist->add_user_context($userid);
         $contextlist->add_system_context();
         return $contextlist;
@@ -118,8 +120,8 @@ class provider implements \core_privacy\local\request\data_provider, \core_priva
                 // Get records for user ID.
                 $rows = $DB->get_records('local_assessfreq_user', ['userid' => $userid]);
 
+                $i = 0;
                 if (count($rows) > 0) {
-                    $i = 0;
                     foreach ($rows as $row) {
                         $parentclass[$i]['userid'] = $row->userid;
                         $parentclass[$i]['eventid'] = $row->eventid;
@@ -150,7 +152,7 @@ class provider implements \core_privacy\local\request\data_provider, \core_priva
      *
      * @param context $context The context to delete for.
      */
-    public static function delete_data_for_all_users_in_context(\context $context) {
+    public static function delete_data_for_all_users_in_context(context $context) {
         global $DB;
         // All data contained in system context.
         if ($context->contextlevel == CONTEXT_SYSTEM) {
