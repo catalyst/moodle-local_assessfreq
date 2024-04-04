@@ -27,6 +27,9 @@ namespace local_assessfreq\form;
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
+
+// Note - in Moodle 4.2+ this has moved, but this will still link
+// because of the db/renamedclasses.php linking.
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
 
 /**
@@ -53,6 +56,11 @@ class quiz_override_form extends \quiz_override_form {
         $this->groupmode = false;
         $this->groupid = 0;
         $this->userid = empty($override->userid) ? 0 : $override->userid;
+
+        // Required if MDL-80300 is backported (in core 4.4+).
+        if (property_exists($this, 'overrideid')) {
+            $this->overrideid = $override->id ?? 0;
+        }
 
         \moodleform::__construct(null, null, 'post', '', ['class' => 'ignoredirty'], true, $submitteddata);
     }
