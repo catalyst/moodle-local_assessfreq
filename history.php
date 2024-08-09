@@ -34,21 +34,21 @@ $action = optional_param('action', null, PARAM_ALPHA);
 
 // Build the page output.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('clearhistory', 'local_assessfreq'));
+echo $OUTPUT->heading(get_string('settings:clearhistory', 'local_assessfreq'));
 
 // Page content. (This feels like the lazy way to do things).
 $url = new \moodle_url('/local/assessfreq/history.php', ['action' => 'deleteall']);
 
 if ($action === null) {
     echo $OUTPUT->box_start();
-    echo $OUTPUT->container(get_string('reprocessall_desc', 'local_assessfreq'));
-    echo $OUTPUT->single_button($url, get_string('reprocessall', 'local_assessfreq'), 'get');
+    echo $OUTPUT->container(get_string('history:reprocessall_desc', 'local_assessfreq'));
+    echo $OUTPUT->single_button($url, get_string('history:reprocessall', 'local_assessfreq'), 'get');
     echo $OUTPUT->box_end();
 } else if ($action == 'deleteall') {
     $actionurl = new moodle_url('/local/assessfreq/history.php', ['action' => 'confirmed']);
     $cancelurl = new moodle_url('/local/assessfreq/history.php');
     echo $OUTPUT->confirm(
-        get_string('confirmreprocess', 'local_assessfreq'),
+        get_string('history:confirmreprocess', 'local_assessfreq'),
         new single_button($actionurl, get_string('continue'), 'post', true),
         new single_button($cancelurl, get_string('cancel'), 'get')
     );
@@ -57,8 +57,8 @@ if ($action === null) {
     $task = new \local_assessfreq\task\history_process();
     \core\task\manager::queue_adhoc_task($task, true);
     echo $OUTPUT->box_start();
-    echo $OUTPUT->container(get_string('reprocessall_desc', 'local_assessfreq'));
-    echo $OUTPUT->single_button($url, get_string('reprocessall', 'local_assessfreq'), 'get');
+    echo $OUTPUT->container(get_string('history:reprocessall_desc', 'local_assessfreq'));
+    echo $OUTPUT->single_button($url, get_string('history:reprocessall', 'local_assessfreq'), 'get');
     echo $OUTPUT->box_end();
 }
 

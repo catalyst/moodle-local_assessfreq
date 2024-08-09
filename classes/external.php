@@ -74,7 +74,7 @@ class local_assessfreq_external extends external_api {
         foreach ($courses as $course) {
             $data[$course->id] = [
                 "id" => $course->id,
-                "fullname" => format_string($course->fullname, true, ["escape" => false])
+                "fullname" => external_format_string($course->fullname, true, ["escape" => false])
             ];
         }
 

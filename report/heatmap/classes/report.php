@@ -172,6 +172,9 @@ class report extends report_base {
 
         $scalerange = 5;  // 0 - 5  steps.
         $localrange = $this->heatrangemax - $this->heatrangemin;
+        if ($localrange <= 0) {
+            return 1;
+        }
         $localpercent = ($count - $this->heatrangemin) / $localrange;
         $heat = round(($localpercent * $scalerange) + 1);
 

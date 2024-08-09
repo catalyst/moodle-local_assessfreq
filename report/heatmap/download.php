@@ -69,7 +69,7 @@ if ($metric == 'students') {
     $fields[] = get_string('fullname');
     $fields = array_merge($fields, $extrafields);
 } else {
-    $fields[] = get_string('download:students', 'local_assessfreq');
+    $fields[] = get_string('download:students', 'assessfreqreport_heatmap');
 }
 
 $frequency = new frequency();

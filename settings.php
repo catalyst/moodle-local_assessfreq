@@ -34,6 +34,12 @@ $ADMIN->add('reports', new admin_externalpage(
 ));
 
 $ADMIN->add('localplugins', new admin_category('local_assessfreq', get_string('settings:head', 'local_assessfreq')));
+// Settings page historic data processing.
+$ADMIN->add('localplugins', new admin_externalpage(
+    'local_assessfreq_history',
+    get_string('settings:clearhistory', 'local_assessfreq'),
+    new moodle_url('/local/assessfreq/history.php')
+));
 
 $reports = core_plugin_manager::instance()->get_plugins_of_type('assessfreqreport');
 $sources = core_plugin_manager::instance()->get_plugins_of_type('assessfreqsource');

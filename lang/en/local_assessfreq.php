@@ -30,10 +30,16 @@ $string['privacy:metadata'] = 'The assessment frequency reports only display dat
 $string['assessfreq:view'] = 'Ability to load the inital view. Report subplugins will also need to be allowed.';
 
 $string['task:dataprocess'] = 'Data collection task';
+$string['task:quiztracking'] = 'Quiz tracking task';
 
 $string['noreports'] = 'No reports have been configured for you.
 If you believe this is an error please contact your site administrator.';
 
+$string['history:confirmreprocess'] = 'Delete ALL history and reprocess?';
+$string['history:reprocessall'] = 'Reprocess all events';
+$string['history:reprocessall_desc'] = 'This will delete ALL existing event records from the database and start a process to reprocess all events. This will happen in the background.';
+
+$string['settings:clearhistory'] = 'Assessment Frequency Clear History';
 $string['settings:head'] = 'Assessment Frequency Reports';
 $string['settings:local_assessfreq'] = 'Global Settings';
 $string['settings:start_month'] = 'Start month';
