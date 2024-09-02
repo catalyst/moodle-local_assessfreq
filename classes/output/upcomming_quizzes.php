@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderable for upcomming quizzes card.
+ * Renderable for upcoming quizzes card.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
@@ -27,21 +27,21 @@ namespace local_assessfreq\output;
 use local_assessfreq\quiz;
 
 /**
- * Renderable for upcomming quizzes card.
+ * Renderable for upcoming quizzes card.
  *
  * @package    local_assessfreq
  * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class upcomming_quizzes {
+class upcoming_quizzes {
     /**
-     * Generate the markup for the upcomming quizzes chart,
+     * Generate the markup for the upcoming quizzes chart,
      * used in the in progress quizzes dashboard.
      *
      * @param int $now Timestamp to get chart data for.
      * @return array With Generated chart object and chart data status.
      */
-    public function get_upcomming_quizzes_chart(int $now): array {
+    public function get_upcoming_quizzes_chart(int $now): array {
 
         // Get quizzes for the supplied timestamp.
         $quiz = new quiz();
@@ -56,16 +56,16 @@ class upcomming_quizzes {
         $quizseriesdata = [];
         $participantseriesdata = [];
 
-        foreach ($quizzes['upcomming'] as $timestamp => $upcomming) {
+        foreach ($quizzes['upcoming'] as $timestamp => $upcoming) {
             $quizcount = 0;
             $participantcount = 0;
 
-            foreach ($upcomming as $quiz) {
+            foreach ($upcoming as $quiz) {
                 $quizcount++;
                 $participantcount += $quiz->participants;
             }
 
-            // Check if inprogress quizzes are upcomming quizzes with overrides.
+            // Check if inprogress quizzes are upcoming quizzes with overrides.
             foreach ($quizzes['inprogress'] as $inprogress) {
                 if ($inprogress->timestampopen >= $timestamp && $inprogress->timestampopen < $timestamp + HOURSECS) {
                     $quizcount++;

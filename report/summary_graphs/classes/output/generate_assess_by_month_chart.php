@@ -44,13 +44,14 @@ trait generate_assess_by_month_chart {
 
         // There is always 12 months in a year,
         // even if we don't have data for them all.
-        for ($i = 1; $i <= 12; $i++) {
-            if (!empty($yeardata[$i])) {
-                $seriesdata[] = $yeardata[$i]->count;
+        $orderedmonths = get_months_ordered();
+        foreach ($orderedmonths as $orderedmonth => $monthname) {
+            if (!empty($yeardata[$orderedmonth])) {
+                $seriesdata[] = $yeardata[$orderedmonth]->count;
             } else {
                 $seriesdata[] = 0;
             }
-            $labels[] = DateTime::createFromFormat('!m', $i)->format('F');
+            $labels[] = $monthname;
         }
 
         // Create chart object.

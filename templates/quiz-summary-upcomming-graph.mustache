@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_assessfreq/quiz-summary-upcomming-graph
+    @template local_assessfreq/quiz-summary-upcoming-graph
 
     Report Summary template.
 
@@ -25,15 +25,15 @@
     }
 }}
 
-<div id="local-assessfreq-quiz-summary-upcomming-graph" class="card">
+<div id="local-assessfreq-quiz-summary-upcoming-graph" class="card">
 	<span class="overlay-icon-container" data-region="overlay-icon-container">
 	    <span class="loading-icon icon-no-margin">{{#pix}} i/loading, core, {{#str}} loading {{/str}} {{/pix}}</span>
 	</span>
 
     <div class="card-header">
-        <h5>{{# str }} upcommingquizes, local_assessfreq {{/ str }}</h5>
-        <div id="local-assessfreq-quiz-summary-upcomming-graph-zoom" class="local-assessfreq-zoom"
-             data-title="{{# str }} upcommingquizes, local_assessfreq {{/ str }}" data-call="upcomming_quizzes">
+        <h5>{{# str }} upcomingquizes, local_assessfreq {{/ str }}</h5>
+        <div id="local-assessfreq-quiz-summary-upcoming-graph-zoom" class="local-assessfreq-zoom"
+             data-title="{{# str }} upcomingquizes, local_assessfreq {{/ str }}" data-call="upcoming_quizzes">
              <span  data-toggle="tooltip" data-placement="top" title="{{#str}} zoom, local_assessfreq {{/str}}" data-offset="0,5">
                 {{#pix}} i/preview, core{{/pix}}
              </span>

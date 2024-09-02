@@ -70,12 +70,18 @@ class report extends report_base {
     public function get_contents() : string {
         global $PAGE;
 
-        $year = get_user_preferences('assessfreqreport_summary_graphs_year_preference', date('Y'));
+        if ($PAGE->course->id !== SITEID) {
+            $year = date('Y', $PAGE->course->startdate);
+        } else {
+            $year = get_user_preferences('assessfreqreport_summary_graphs_year_preference', date('Y'));
+        }
+        $orderedmonths = get_months_ordered();
+        $startmonth = array_key_first($orderedmonths);
 
         $data = new stdClass();
-        $data->assessbymonthchart = (new assess_by_month())->get_assess_by_month_chart($year);
-        $data->assessbyactivitychart = (new assess_by_activity())->get_assess_by_activity_chart($year);
-        $data->assessbymonthstudentchart = (new assess_by_month_student())->get_assess_by_month_student_chart($year);
+        $data->assessbymonthchart = (new assess_by_month())->get_assess_by_month_chart($year, $startmonth);
+        $data->assessbyactivitychart = (new assess_by_activity())->get_assess_by_activity_chart($year, $startmonth);
+        $data->assessbymonthstudentchart = (new assess_by_month_student())->get_assess_by_month_student_chart($year, $startmonth);
 
         $renderer = $PAGE->get_renderer("assessfreqreport_summary_graphs");
 

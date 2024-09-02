@@ -60,10 +60,10 @@ $string['filter:hoursbehind'] = 'Hours behind';
 $string['inprogress'] = 'In progress';
 $string['inprogress:head'] = 'In progress';
 
-$string['upcommingchart:head'] = 'Upcomming activities starting';
-$string['upcommingchart:inprogressdatetime'] = '%H:00';
-$string['upcommingchart:activities'] = 'Activities';
-$string['upcommingchart:participants'] = 'Students';
+$string['upcomingchart:head'] = 'Upcoming activities starting';
+$string['upcomingchart:inprogressdatetime'] = '%H:00';
+$string['upcomingchart:activities'] = 'Activities';
+$string['upcomingchart:participants'] = 'Students';
 
 $string['summarychart:head'] = 'Participant summary';
 $string['summarychart:participants'] = 'Students';

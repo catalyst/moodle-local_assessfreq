@@ -77,3 +77,11 @@ $settings->add(new admin_setting_configcolourpicker(
     get_string('settings:heat6_desc', 'assessfreqreport_heatmap'),
     '#8C0010'
 ));
+
+// Course level year filter.
+$settings->add(new admin_setting_configcheckbox(
+    'assessfreqreport_heatmap/courselevelyearfilter',
+    get_string('settings:courselevelyearfilter', 'assessfreqreport_heatmap'),
+    get_string('settings:courselevelyearfilter_desc', 'assessfreqreport_heatmap'),
+    1
+));

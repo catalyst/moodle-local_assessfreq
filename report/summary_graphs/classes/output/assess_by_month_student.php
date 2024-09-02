@@ -43,11 +43,11 @@ class assess_by_month_student {
      * @param int $year Year to get chart data for.
      * @return array With Generated chart object and chart data status.
      */
-    public function get_assess_by_month_student_chart(int $year) : array {
+    public function get_assess_by_month_student_chart(int $year, int $month) : array {
 
         // Get events for the supplied year.
         $frequency = new frequency();
-        $yeardata = $frequency->get_events_due_monthly_by_user($year);
+        $yeardata = $frequency->get_events_due_monthly_by_user($year, $month);
         $charttitle = get_string('chart:assessments_due_type', 'assessfreqreport_summary_graphs');
 
         $config = get_config('assessfreqreport_summary_graphs', 'assessments_due');

@@ -826,14 +826,14 @@ class frequency {
      * @param bool $cache Fetch events from cache.
      * @return array $events The events.
      */
-    public function get_events_due_by_month(int $year, bool $cache = true): array {
+    public function get_events_due_by_month(int $year, int $month = 0, bool $cache = true): array {
         global $DB, $PAGE;
 
         // Adjust the cache key based on course.
         if ($PAGE->course->id != SITEID) {
-            $cachekey = $PAGE->course->id . '_'  . $year;
+            $cachekey = $PAGE->course->id . '_'  . $year . '_'  . $month;
         } else {
-            $cachekey = (string) $year;
+            $cachekey = $year . '_'  . $month;
         }
 
         // Try to get value from cache.
@@ -845,12 +845,10 @@ class frequency {
         } else {  // Not valid cache data.
             $modules = $this->get_process_modules();
             [$insql, $params] = $DB->get_in_or_equal($modules);
-            $params[] = $year;
             $sql = "SELECT s.endmonth, COUNT(s.id) as count
                       FROM {local_assessfreq_site} s
                  LEFT JOIN {course} c ON s.courseid = c.id
-                     WHERE s.module $insql
-                           AND s.endyear = ?";
+                     WHERE s.module $insql ";
 
             $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
             if (!$includehiddencourses) {
@@ -861,10 +859,26 @@ class frequency {
             // Add the courseid restriction.
             if ($PAGE->course->id != SITEID) {
                 $params[] = $PAGE->course->id;
-                $sql .= " AND c.id = ?";
+                $sql .= " AND c.id = ? ";
             }
 
-            $sql .= 'GROUP BY s.endmonth
+            // Add month restrictions.
+            if ($month && $month > 1) {
+                $params[] = $month;
+                $params[] = $year;
+                $params[] = $month;
+                $params[] = $year + 1;
+                $sql .= " AND (s.endmonth >= ? AND s.endyear = ? OR s.endmonth < ? AND s.endyear = ?) ";
+            } else if ($month == 1) {
+                $params[] = $month;
+                $params[] = $year;
+                $sql .= " AND s.endmonth >= ? AND s.endyear = ? ";
+            } else {
+                $params[] = $year;
+                $sql .= " AND s.endyear = ? ";
+            }
+
+            $sql .= ' GROUP BY s.endmonth
                      ORDER BY s.endmonth ASC';
 
             $events = $DB->get_records_sql($sql, $params);
@@ -889,14 +903,14 @@ class frequency {
      * @param bool $cache Fetch events from cache.
      * @return array $events The events.
      */
-    public function get_events_due_monthly_by_user(int $year, bool $cache = true): array {
+    public function get_events_due_monthly_by_user(int $year, int $month = 0, bool $cache = true): array {
         global $DB, $PAGE;
 
         // Adjust the cache key based on course.
         if ($PAGE->course->id != SITEID) {
-            $cachekey = $PAGE->course->id . '_'  . $year;
+            $cachekey = $PAGE->course->id . '_'  . $year . '_'  . $month;
         } else {
-            $cachekey = (string) $year;
+            $cachekey = $year . '_'  . $month;
         }
 
         // Try to get value from cache.
@@ -908,13 +922,11 @@ class frequency {
         } else {  // Not valid cache data.
             $modules = $this->get_process_modules();
             [$insql, $params] = $DB->get_in_or_equal($modules);
-            $params[] = $year;
             $sql = "SELECT s.endmonth, COUNT(u.id) as count
                       FROM {local_assessfreq_site} s
                 INNER JOIN {local_assessfreq_user} u ON s.id = u.eventid
                 INNER JOIN {course} c ON s.courseid = c.id
-                     WHERE s.module $insql
-                           AND s.endyear = ?";
+                     WHERE s.module $insql ";
 
             $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
             if (!$includehiddencourses) {
@@ -925,10 +937,26 @@ class frequency {
             // Add the courseid restriction.
             if ($PAGE->course->id != SITEID) {
                 $params[] = $PAGE->course->id;
-                $sql .= " AND c.id = ?";
+                $sql .= " AND c.id = ? ";
             }
 
-            $sql .= 'GROUP BY s.endmonth
+            // Add month restrictions.
+            if ($month && $month > 1) {
+                $params[] = $month;
+                $params[] = $year;
+                $params[] = $month;
+                $params[] = $year + 1;
+                $sql .= " AND (s.endmonth >= ? AND s.endyear = ? OR s.endmonth < ? AND s.endyear = ?) ";
+            } else if ($month == 1) {
+                $params[] = $month;
+                $params[] = $year;
+                $sql .= " AND s.endmonth >= ? AND s.endyear = ? ";
+            } else {
+                $params[] = $year;
+                $sql .= " AND s.endyear = ? ";
+            }
+
+            $sql .= ' GROUP BY s.endmonth
                      ORDER BY s.endmonth ASC';
 
             $events = $DB->get_records_sql($sql, $params);
@@ -953,14 +981,14 @@ class frequency {
      * @param bool $cache Fetch events from cache.
      * @return array $events The events.
      */
-    public function get_events_due_by_activity(int $year, bool $cache = true): array {
+    public function get_events_due_by_activity(int $year, int $month = 0, bool $cache = true): array {
         global $DB, $PAGE;
 
         // Adjust the cache key based on course.
         if ($PAGE->course->id != SITEID) {
-            $cachekey = $PAGE->course->id . '_'  . $year;
+            $cachekey = $PAGE->course->id . '_'  . $year . '_'  . $month;
         } else {
-            $cachekey = (string) $year;
+            $cachekey = $year . '_'  . $month;
         }
 
         // Try to get value from cache.
@@ -970,11 +998,10 @@ class frequency {
         if ($data && (time() < $data->expiry) && $cache) { // Valid cache data.
             $events = $data->events;
         } else { // Not valid cache data.
-            $params = [$year];
+            $params = [];
             $sql = 'SELECT s.module, COUNT(s.id) as count
                       FROM {local_assessfreq_site} s
-                 LEFT JOIN {course} c ON s.courseid = c.id
-                     WHERE s.endyear = ?';
+                 LEFT JOIN {course} c ON s.courseid = c.id ';
 
             $includehiddencourses = get_config('local_assessfreq', 'hiddencourses');
             if (!$includehiddencourses) {
@@ -985,10 +1012,26 @@ class frequency {
             // Add the courseid restriction.
             if ($PAGE->course->id != SITEID) {
                 $params[] = $PAGE->course->id;
-                $sql .= " AND c.id = ?";
+                $sql .= " AND c.id = ? ";
             }
 
-            $sql .= 'GROUP BY s.module
+            // Add month restrictions.
+            if ($month && $month > 1) {
+                $params[] = $month;
+                $params[] = $year;
+                $params[] = $month;
+                $params[] = $year + 1;
+                $sql .= " AND (s.endmonth >= ? AND s.endyear = ? OR s.endmonth < ? AND s.endyear = ?) ";
+            } else if ($month == 1) {
+                $params[] = $month;
+                $params[] = $year;
+                $sql .= " AND s.endmonth >= ? AND s.endyear = ? ";
+            } else {
+                $params[] = $year;
+                $sql .= " AND s.endyear = ? ";
+            }
+
+            $sql .= ' GROUP BY s.module
                      ORDER BY s.module ASC';
 
             $events = $DB->get_records_sql($sql, $params);
@@ -1121,7 +1164,7 @@ class frequency {
      * @param array $modules List of modules to get events for.
      * @return array $freqarray The array of even frequencies.
      */
-    public function get_frequency_array(int $year, int $month, string $metric, array $modules): array {
+    public function get_frequency_array(int $year = 0, int $month = 0, string $metric = 'assess', array $modules = []): array {
         global $PAGE;
 
         $freqarray = [];

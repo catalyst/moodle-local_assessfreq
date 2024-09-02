@@ -47,6 +47,7 @@ body #local-assessfreq-index {
     height: 40vh;
     width: 40vw;
 }
+
 /* Change background color of buttons on hover */
 #local-assessfreq-index .tabs a:hover {
     text-decoration: none;

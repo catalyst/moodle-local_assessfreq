@@ -42,13 +42,13 @@ class assess_by_activity {
      * @param int $year Year to get chart data for.
      * @return array With Generated chart object and chart data status.
      */
-    public function get_assess_by_activity_chart(int $year) : array {
+    public function get_assess_by_activity_chart(int $year, int $month) : array {
         global $OUTPUT;
 
         // Get events for the supplied year.
         $frequency = new frequency();
         $modules = $frequency->get_process_modules();
-        $activitydata = $frequency->get_events_due_by_activity($year);
+        $activitydata = $frequency->get_events_due_by_activity($year, $month);
         $seriesdata = [];
         $labels = [];
         $charttitle = get_string('chart:by_activity_type', 'assessfreqreport_summary_graphs');

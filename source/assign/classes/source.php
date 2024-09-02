@@ -462,21 +462,21 @@ class source extends source_base {
     }
 
     /**
-     * Get all upcomming data.
+     * Get all upcoming data.
      *
      * @param int $now
      * @return array|array[]
      */
-    public function get_upcomming_data(int $now) : array {
+    public function get_upcoming_data(int $now) : array {
 
         return $this->get_assign_summaries($now);
     }
 
     /**
-     * Get finished, in progress and upcomming assignments and their associated data.
+     * Get finished, in progress and upcoming assignments and their associated data.
      *
      * @param int $now Timestamp to use for reference for time.
-     * @return array $assignments Array of finished, inprogress and upcomming assignments with associated data.
+     * @return array $assignments Array of finished, inprogress and upcoming assignments with associated data.
      */
     public function get_assign_summaries(int $now) : array {
         $hoursahead = (int)get_user_preferences('assessfreqreport_activities_in_progress_hoursahead_preference', 8);
@@ -491,10 +491,10 @@ class source extends source_base {
         $assignments = [
             'finished' => [],
             'inprogress' => [],
-            'upcomming' => [],
+            'upcoming' => [],
         ];
 
-        // Itterate through the hours, processing in progress and upcomming assignments.
+        // Itterate through the hours, processing in progress and upcoming assignments.
         for ($hour = 0; $hour <= $hoursahead; $hour++) {
             $time = $now + (HOURSECS * $hour);
 
@@ -502,9 +502,9 @@ class source extends source_base {
                 $assignments['inprogress'] = [];
             }
 
-            $assignments['upcomming'][$time] = [];
+            $assignments['upcoming'][$time] = [];
 
-            // Seperate out inprogress and upcomming assignments, then get data for each assignment.
+            // Seperate out inprogress and upcoming assignments, then get data for each assignment.
             foreach ($trackedassignments as $assignment) {
                 $assigndata = $this->get_assign_data($assignment);
                 $allowsubmissionsfromdate = $assignment->allowsubmissionsfromdate;
@@ -512,7 +512,7 @@ class source extends source_base {
                     $assignments['inprogress'][$assignment->id] = $assigndata;
                     unset($trackedassignments[$assignment->id]);
                 } else if ($allowsubmissionsfromdate >= $time && $allowsubmissionsfromdate < ($time + HOURSECS)) {
-                    $assignments['upcomming'][$time][$assignment->id] = $assigndata;
+                    $assignments['upcoming'][$time][$assignment->id] = $assigndata;
                     unset($trackedassignments[$assignment->id]);
                 } else {
                     if (isset($assignment->overrides)) {

@@ -72,3 +72,11 @@ $setting = new admin_setting_configselect(
     $types
 );
 $settings->add($setting);
+
+// Course level year filter.
+$settings->add(new admin_setting_configcheckbox(
+    'assessfreqreport_summary_graphs/courselevelyearfilter',
+    get_string('settings:courselevelyearfilter', 'assessfreqreport_summary_graphs'),
+    get_string('settings:courselevelyearfilter_desc', 'assessfreqreport_summary_graphs'),
+    1
+));

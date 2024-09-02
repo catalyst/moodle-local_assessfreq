@@ -58,20 +58,20 @@ class renderer extends plugin_renderer_base {
             ]
         );
 
-        // Upcomming activities starting.
+        // upcoming activities starting.
         $labels = [];
-        $seriestitle = get_string('upcommingchart:activities', 'assessfreqreport_activities_in_progress');
-        $participantseries = get_string('upcommingchart:participants', 'assessfreqreport_activities_in_progress');
+        $seriestitle = get_string('upcomingchart:activities', 'assessfreqreport_activities_in_progress');
+        $participantseries = get_string('upcomingchart:participants', 'assessfreqreport_activities_in_progress');
 
         $seriesdata = [];
         $participantseriesdata = [];
 
-        foreach ($data['upcomming'] as $sourceupcoming) {
-            foreach ($sourceupcoming['upcomming'] as $timestamp => $upcomming) {
+        foreach ($data['upcoming'] as $sourceupcoming) {
+            foreach ($sourceupcoming['upcoming'] as $timestamp => $upcoming) {
                 $count = 0;
                 $participantcount = 0;
 
-                foreach ($upcomming as $activity) {
+                foreach ($upcoming as $activity) {
                     $count++;
                     $participantcount += $activity->participants;
                 }
@@ -93,7 +93,7 @@ class renderer extends plugin_renderer_base {
                 $participantseriesdata[$timestamp] += $participantcount;
                 $labels[$timestamp] = userdate(
                     $timestamp + HOURSECS,
-                    get_string('upcommingchart:inprogressdatetime', 'assessfreqreport_activities_in_progress')
+                    get_string('upcomingchart:inprogressdatetime', 'assessfreqreport_activities_in_progress')
                 );
             }
         }
@@ -112,7 +112,7 @@ class renderer extends plugin_renderer_base {
         $upcomingcontainer = $this->render_from_template(
             'local_assessfreq/card',
             [
-                'header' => get_string('upcommingchart:head', 'assessfreqreport_activities_in_progress'),
+                'header' => get_string('upcomingchart:head', 'assessfreqreport_activities_in_progress'),
                 'contents' => $this->render($chart)
             ]
         );
@@ -253,12 +253,12 @@ class renderer extends plugin_renderer_base {
         $activities = [];
         foreach ($inprogress as $activity) {
             array_push($activities, ...$activity['inprogress']);
-            $upcommingactivities = $activity['upcomming'];
+            $upcomingactivities = $activity['upcoming'];
             $finishedactivities = $activity['finished'];
 
-            foreach ($upcommingactivities as $upcommingactivity) {
-                foreach ($upcommingactivity as $key => $upcomming) {
-                    $activities[$key] = $upcomming;
+            foreach ($upcomingactivities as $upcomingactivity) {
+                foreach ($upcomingactivity as $key => $upcoming) {
+                    $activities[$key] = $upcoming;
                 }
             }
 
@@ -278,6 +278,7 @@ class renderer extends plugin_renderer_base {
         $context = [
             'activities' => array_values($sortedactivities),
             'pagingbar' => $pagingoutput,
+            'iscourse' => $this->page->course->id !== SITEID,
         ];
 
         return $this->render_from_template('assessfreqreport_activities_in_progress/activities-in-progress-table', $context);

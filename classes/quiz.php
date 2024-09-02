@@ -431,10 +431,10 @@ class quiz {
     }
 
     /**
-     * Get finished, in progress and upcomming quizzes and their associated data.
+     * Get finished, in progress and upcoming quizzes and their associated data.
      *
      * @param int $now Timestamp to use for reference for time.
-     * @return array $quizzes Array of finished, inprogress and upcomming quizzes with associated data.
+     * @return array $quizzes Array of finished, inprogress and upcoming quizzes with associated data.
      */
     public function get_quiz_summaries(int $now): array {
         // Get tracked quizzes.
@@ -446,10 +446,10 @@ class quiz {
         $quizzes = [
             'finished' => [],
             'inprogress' => [],
-            'upcomming' => [],
+            'upcoming' => [],
         ];
 
-        // Itterate through the hours, processing in progress and upcomming quizzes.
+        // Itterate through the hours, processing in progress and upcoming quizzes.
         for ($hour = 0; $hour <= $this->hoursahead; $hour++) {
             $time = $now + (HOURSECS * $hour);
 
@@ -457,9 +457,9 @@ class quiz {
                 $quizzes['inprogress'] = [];
             }
 
-            $quizzes['upcomming'][$time] = [];
+            $quizzes['upcoming'][$time] = [];
 
-            // Seperate out inprogress and upcomming quizzes, then get data for each quiz.
+            // Seperate out inprogress and upcoming quizzes, then get data for each quiz.
             foreach ($trackedquizzes as $quiz) {
                 if ($quiz->timeopen < $time && $quiz->timeclose > $time && $hour === 0) { // Get inprogress quizzes.
                     $quizdata = $this->get_quiz_data($quiz->id);
@@ -478,7 +478,7 @@ class quiz {
 
                     $quizzes['inprogress'][$quiz->id] = $quizdata;
                     unset($trackedquizzes[$quiz->id]); // Remove quiz from array to help with performance.
-                } else if (($quiz->timeopen >= $time) && ($quiz->timeopen < ($time + HOURSECS))) { // Get upcomming quizzes.
+                } else if (($quiz->timeopen >= $time) && ($quiz->timeopen < ($time + HOURSECS))) { // Get upcoming quizzes.
                     $quizdata = $this->get_quiz_data($quiz->id);
                     $quizdata->timestampopen = $quiz->timeopen;
                     $quizdata->timestampclose = $quiz->timeclose;
@@ -493,7 +493,7 @@ class quiz {
                     $trackedrecords = $this->get_quiz_tracking($quiz->id);
                     $quizdata->tracking = array_pop($trackedrecords);
 
-                    $quizzes['upcomming'][$time][$quiz->id] = $quizdata;
+                    $quizzes['upcoming'][$time][$quiz->id] = $quizdata;
                     unset($trackedquizzes[$quiz->id]);
                 } else {
                     if (isset($quiz->overrides)) {

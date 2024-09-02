@@ -34,6 +34,8 @@ $string['filter:closeapply'] = 'Close and apply';
 $string['filter:header'] = 'Filters';
 $string['filter:submit'] = 'Filter';
 
+$string['settings:courselevelyearfilter'] = 'Include year filter at course level';
+$string['settings:courselevelyearfilter_desc'] = 'If courses are run annually then the year filter is not required. Course startdate will be used instead.';
 $string['settings:graphsheading'] = 'Summary graph types';
 $string['settings:graphsheading_desc'] = 'Specify the graph types for each summary graph report';
 $string['settings:graphs:bar'] = 'Bar';

@@ -324,12 +324,12 @@ class student_search_table extends table_sql implements renderable {
         $allquizzes = $quiz->get_quiz_summaries($this->now);
 
         $inprogressquizzes = $allquizzes['inprogress'];
-        $upcommingquizzes = [];
+        $upcomingquizzes = [];
         $finishedquizzes = [];
 
-        foreach ($allquizzes['upcomming'] as $upcomming) {
-            foreach ($upcomming as $quizobj) {
-                $upcommingquizzes[] = $quizobj;
+        foreach ($allquizzes['upcoming'] as $upcoming) {
+            foreach ($upcoming as $quizobj) {
+                $upcomingquizzes[] = $quizobj;
             }
         }
 
@@ -339,7 +339,7 @@ class student_search_table extends table_sql implements renderable {
             }
         }
 
-        $quizzes = array_merge($inprogressquizzes, $upcommingquizzes, $finishedquizzes);
+        $quizzes = array_merge($inprogressquizzes, $upcomingquizzes, $finishedquizzes);
 
         $allrecords = [];
 

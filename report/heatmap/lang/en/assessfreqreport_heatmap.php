@@ -61,6 +61,8 @@ $string['download:students'] = 'Students';
 $string['download:title'] = 'Title';
 $string['download:url'] = 'URL';
 
+$string['settings:courselevelyearfilter'] = 'Include year filter at course level';
+$string['settings:courselevelyearfilter_desc'] = 'If courses are run annually then the year filter is not required. Course startdate will be used instead.';
 $string['settings:filter_settings'] = 'Filter settings';
 $string['settings:start_month'] = 'Start month';
 $string['settings:start_month_desc'] = 'Specify the month that the heatmap year should start from.';

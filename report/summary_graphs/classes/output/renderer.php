@@ -30,7 +30,6 @@ use plugin_renderer_base;
 class renderer extends plugin_renderer_base {
 
     public function render_report($data) {
-
         $charts = [];
 
         // Assess by month container.
@@ -82,6 +81,7 @@ class renderer extends plugin_renderer_base {
             'assessfreqreport_summary_graphs/summary-graphs',
             [
                 'charts' => $charts,
+                'iscourse' => $this->page->course->id !== SITEID,
                 'filters' => [
                     'years' => get_years(get_user_preferences('assessfreqreport_summary_graphs_year_preference', date('Y'))),
                 ],

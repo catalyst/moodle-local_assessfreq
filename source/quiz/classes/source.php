@@ -247,12 +247,12 @@ class Source extends source_base {
     }
 
     /**
-     * Get all upcomming data.
+     * Get all upcoming data.
      *
      * @param int $now
      * @return array|array[]
      */
-    public function get_upcomming_data(int $now) : array {
+    public function get_upcoming_data(int $now) : array {
 
         return $this->get_quiz_summaries($now);
     }
@@ -370,12 +370,12 @@ class Source extends source_base {
         $quizzes = $this->get_quiz_summaries($now);
 
         $inprogressquizzes = $quizzes['inprogress'];
-        $upcommingquizzes = $quizzes['upcomming'];
+        $upcomingquizzes = $quizzes['upcoming'];
         $finishedquizzes = $quizzes['finished'];
 
-        foreach ($upcommingquizzes as $upcommingquiz) {
-            foreach ($upcommingquiz as $timestampupcomming => $upcomming) {
-                $inprogressquizzes[$timestampupcomming] = $upcomming;
+        foreach ($upcomingquizzes as $upcomingquiz) {
+            foreach ($upcomingquiz as $timestampupcoming => $upcoming) {
+                $inprogressquizzes[$timestampupcoming] = $upcoming;
             }
         }
 
@@ -408,10 +408,10 @@ class Source extends source_base {
     }
 
     /**
-     * Get finished, in progress and upcomming quizzes and their associated data.
+     * Get finished, in progress and upcoming quizzes and their associated data.
      *
      * @param int $now Timestamp to use for reference for time.
-     * @return array $quizzes Array of finished, inprogress and upcomming quizzes with associated data.
+     * @return array $quizzes Array of finished, inprogress and upcoming quizzes with associated data.
      */
     public function get_quiz_summaries(int $now) : array {
         $hoursahead = (int)get_user_preferences('assessfreqreport_activities_in_progress_hoursahead_preference', 8);
@@ -426,10 +426,10 @@ class Source extends source_base {
         $quizzes = [
             'finished' => [],
             'inprogress' => [],
-            'upcomming' => [],
+            'upcoming' => [],
         ];
 
-        // Itterate through the hours, processing in progress and upcomming quizzes.
+        // Itterate through the hours, processing in progress and upcoming quizzes.
         for ($hour = 0; $hour <= $hoursahead; $hour++) {
             $time = $now + (HOURSECS * $hour);
 
@@ -437,17 +437,17 @@ class Source extends source_base {
                 $quizzes['inprogress'] = [];
             }
 
-            $quizzes['upcomming'][$time] = [];
+            $quizzes['upcoming'][$time] = [];
 
-            // Seperate out inprogress and upcomming quizzes, then get data for each quiz.
+            // Seperate out inprogress and upcoming quizzes, then get data for each quiz.
             foreach ($trackedquizzes as $quiz) {
                 $quizdata = $this->get_quiz_data($quiz);
 
                 if ($quiz->timeopen < $time && $quiz->timeclose > $time && $hour === 0) { // Get inprogress quizzes.
                     $quizzes['inprogress'][$quiz->id] = $quizdata;
                     unset($trackedquizzes[$quiz->id]); // Remove quiz from array to help with performance.
-                } else if (($quiz->timeopen >= $time) && ($quiz->timeopen < ($time + HOURSECS))) { // Get upcomming quizzes.
-                    $quizzes['upcomming'][$time][$quiz->id] = $quizdata;
+                } else if (($quiz->timeopen >= $time) && ($quiz->timeopen < ($time + HOURSECS))) { // Get upcoming quizzes.
+                    $quizzes['upcoming'][$time][$quiz->id] = $quizdata;
                     unset($trackedquizzes[$quiz->id]);
                 } else {
                     if (isset($quiz->overrides)) {

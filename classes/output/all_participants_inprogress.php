@@ -50,12 +50,12 @@ class all_participants_inprogress {
         $quizzes = $quiz->get_quiz_summaries($now);
 
         $inprogressquizzes = $quizzes['inprogress'];
-        $upcommingquizzes = $quizzes['upcomming'];
+        $upcomingquizzes = $quizzes['upcoming'];
         $finishedquizzes = $quizzes['finished'];
 
-        foreach ($upcommingquizzes as $timestamp => $upcommingquiz) {
-            foreach ($upcommingquiz as $timestampupcomming => $upcomming) {
-                $inprogressquizzes[$timestampupcomming] = $upcomming;
+        foreach ($upcomingquizzes as $timestamp => $upcomingquiz) {
+            foreach ($upcomingquiz as $timestampupcoming => $upcoming) {
+                $inprogressquizzes[$timestampupcoming] = $upcoming;
             }
         }
 

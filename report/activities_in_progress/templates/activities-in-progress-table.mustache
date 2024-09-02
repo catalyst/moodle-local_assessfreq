@@ -34,7 +34,9 @@
             <table class="table table-striped table-sm table-bordered local-assessfreq-report-activities-in-progress-summary-table">
                 <thead>
                     <th>{{#str}} inprogresstable:activity, assessfreqreport_activities_in_progress {{/str}}</th>
-                    <th>{{#str}} inprogresstable:course, assessfreqreport_activities_in_progress {{/str}}</th>
+                    {{^iscourse}}
+                        <th>{{#str}} inprogresstable:course, assessfreqreport_activities_in_progress {{/str}}</th>
+                    {{/iscourse}}
                     <th>{{#str}} inprogresstable:timeopen, assessfreqreport_activities_in_progress {{/str}}</th>
                     <th>{{#str}} inprogresstable:timeclose, assessfreqreport_activities_in_progress {{/str}}</th>
                     <th>{{#str}} inprogresstable:timelimit, assessfreqreport_activities_in_progress {{/str}}</th>
@@ -47,7 +49,9 @@
                         <td>
                             <a href='{{{url}}}'>{{{name}}}</a>
                         </td>
-                        <td><a href='{{{courselink}}}'>{{courseshortname}}</a></td>
+                        {{^iscourse}}
+                            <td><a href='{{{courselink}}}'>{{courseshortname}}</a></td>
+                        {{/iscourse}}
                         <td>{{earlyopen}}</td>
                         <td>{{lateclose}}</td>
                         <td>{{timelimit}}</td>

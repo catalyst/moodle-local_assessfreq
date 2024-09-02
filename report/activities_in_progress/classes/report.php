@@ -69,7 +69,7 @@ class report extends report_base {
 
         $data = [];
         $inprogress = [];
-        $upcomming = [];
+        $upcoming = [];
         $participants = [];
         $now = time();
 
@@ -85,15 +85,15 @@ class report extends report_base {
             if (method_exists($source, 'get_inprogress_count')) {
                 $inprogress[] = $source->get_inprogress_count($now);
             }
-            if (method_exists($source, 'get_upcomming_data')) {
-                $upcomming[] = $source->get_upcomming_data($now);
+            if (method_exists($source, 'get_upcoming_data')) {
+                $upcoming[] = $source->get_upcoming_data($now);
             }
             if (method_exists($source, 'get_all_participants_inprogress_data')) {
                 $participants[] = $source->get_all_participants_inprogress_data($now);
             }
         }
         $data['inprogress'] = $inprogress;
-        $data['upcomming'] = $upcomming;
+        $data['upcoming'] = $upcoming;
         $data['participants'] = $participants;
 
         $renderer = $PAGE->get_renderer("assessfreqreport_activities_in_progress");
@@ -112,5 +112,14 @@ class report extends report_base {
             'init',
             [$PAGE->context->id]
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function get_required_css() {
+        global $PAGE;
+
+        $PAGE->requires->css('/local/assessfreq/report/activities_in_progress/styles.css');
     }
 }
