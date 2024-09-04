@@ -22,8 +22,8 @@
  */
 
 define(
-    ['core/str', 'core/modal_factory', 'core/fragment', 'core/ajax'],
-    function (Str, ModalFactory, Fragment, Ajax) {
+    ['core/str', 'core/modal', 'core/fragment', 'core/ajax'],
+    function (Str, Modal, Fragment, Ajax) {
 
         /**
          * Module level variables.
@@ -105,13 +105,12 @@ define(
         const createModal = function () {
             Str.get_string('loading', 'local_assessfreq').then((title) => {
                 // Create the Modal.
-                ModalFactory.create({
-                    type: ModalFactory.types.DEFAULT,
+                Modal.create({
                     title: title,
                     body: spinner,
                     large: true
                 })
-                .done((modal) => {
+                .then((modal) => {
                     modalObj = modal;
 
                     // Explicitly handle form click events.
@@ -122,7 +121,6 @@ define(
                         modalObj.hide();
                     });
                 });
-                return;
             }).catch(() => {
                 Notification.exception(new Error('Failed to load string: loading'));
             });

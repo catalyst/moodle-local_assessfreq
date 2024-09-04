@@ -22,8 +22,8 @@
  */
 
 define(
-    ['core/str', 'core/modal_factory', 'local_assessfreq/modal_large', 'core/fragment', 'core/ajax', 'core/templates'],
-    function(Str, ModalFactory, ModalLarge, Fragment, Ajax, Templates) {
+    ['core/str', 'core/modal', 'local_assessfreq/modal_large', 'core/fragment', 'core/ajax', 'core/templates'],
+    function(Str, Modal, ModalLarge, Fragment, Ajax, Templates) {
 
         /**
          * Module level variables.
@@ -62,12 +62,12 @@ define(
             // eslint-disable-next-line promise/catch-or-return,promise/always-return
             Str.get_string('modal:loading', 'assessfreqreport_activity_dashboard', '', '').then((title) => {
                 // Create the Modal.
-                ModalFactory.create({
+                Modal.create({
                     type: ModalLarge.TYPE,
                     title: title,
                     body: spinner,
                     large: true
-                }).done((modal) => {
+                }).then((modal) => {
                     modalObj = modal;
 
                     // Explicitly handle form click events.
@@ -166,7 +166,7 @@ define(
                     selectElement.disabled = true;
                 }
             });
-        }
+        };
 
         const ObserverCallback = function(mutationsList) {
             for (let i = 0; i < mutationsList.length; i++) {
@@ -215,7 +215,7 @@ define(
 
             let activityElement = document.getElementById('id_activity');
             let activityId = activityElement.options[activityElement.selectedIndex].value;
-            let courseId = document.getElementsByName("coursechoice")[0].value
+            let courseId = document.getElementsByName("coursechoice")[0].value;
 
             if (courseId === undefined || activityId < 1) {
                 if (document.getElementById('noactivitywarning') === null) {

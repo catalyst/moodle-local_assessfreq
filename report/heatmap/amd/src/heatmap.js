@@ -23,7 +23,7 @@
  */
 
 import Ajax from 'core/ajax';
-import ModalFactory from 'core/modal_factory';
+import Modal from 'core/modal';
 import ModalLarge from 'local_assessfreq/modal_large';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
@@ -59,11 +59,11 @@ export const heatmapSelector = (courseid) => {
 
         let addBlockModal = null;
 
-        ModalFactory.create({
+        Modal.create({
             type: ModalLarge.TYPE,
             large: true,
             body: ''
-        }).done(modal => {
+        }).then(modal => {
             addBlockModal = modal;
 
             let args = {

@@ -22,9 +22,9 @@
  */
 
 define(
-    ['core/str', 'core/modal_factory', 'core/fragment', 'core/ajax', 'core/templates', 'local_assessfreq/modal_large',
+    ['core/str', 'core/modal', 'core/fragment', 'core/ajax', 'core/templates', 'local_assessfreq/modal_large',
     'core/notification'],
-    function (Str, ModalFactory, Fragment, Ajax, Templates, ModalLarge, Notification) {
+    function (Str, Modal, Fragment, Ajax, Templates, ModalLarge, Notification) {
 
         /**
          * Module level variables.
@@ -79,12 +79,11 @@ define(
             return new Promise((resolve, reject) => {
                 Str.get_string('loading', 'core').then((title) => {
                     // Create the Modal.
-                    ModalFactory.create({
+                    Modal.create({
                         type: ModalLarge.TYPE,
                         title: title,
                         body: spinner
-                    })
-                    .done((modal) => {
+                    }).then((modal) => {
                         modalObj = modal;
                         resolve();
                     });

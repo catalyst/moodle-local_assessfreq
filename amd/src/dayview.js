@@ -22,8 +22,8 @@
  */
 
 define(
-    ['core/str', 'core/notification', 'core/modal_factory', 'local_assessfreq/modal_large', 'core/templates', 'core/ajax'],
-    function (Str, Notification, ModalFactory, ModalLarge, Templates, Ajax) {
+    ['core/str', 'core/notification', 'core/modal', 'local_assessfreq/modal_large', 'core/templates', 'core/ajax'],
+    function (Str, Notification, Modal, ModalLarge, Templates, Ajax) {
 
         /**
          * Module level variables.
@@ -188,15 +188,14 @@ define(
             Str.get_string('schedule', 'local_assessfreq').then((title) => {
                 dayViewTitle = title;
 
-                // Create the Modal.
-                ModalFactory.create({
+                // // Create the Modal.
+                Modal.create({
                     type: ModalLarge.TYPE,
                     title: title,
                     body: spinner
                 })
-                .done((modal) => {
+                .then((modal) => {
                     modalObj = modal;
-
                 });
             }).catch(() => {
                 Notification.exception(new Error('Failed to load string: loading'));
