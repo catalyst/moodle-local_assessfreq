@@ -65,8 +65,6 @@ define(
                     });
                 });
                 return;
-            }).catch(() => {
-                return;
             });
         };
 
@@ -91,8 +89,6 @@ define(
             Str.get_string('useroverride', 'local_assessfreq').then((title) => {
                 modalObj.setTitle(title);
                 modalObj.setBody(Fragment.loadFragment('local_assessfreq', 'new_override_form', contextid, params));
-                return;
-            }).catch(() => {
                 return;
             });
         };

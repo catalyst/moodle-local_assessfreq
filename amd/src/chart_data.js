@@ -90,8 +90,6 @@ export const getCardCharts = (quizId, hoursFilter, yearSelect) => {
                         chartBody.innerHTML = noDatastr.outerHTML;
                         spinner.classList.add('hide'); // Hide spinner if not already hidden.
                         return;
-                    }).catch(() => {
-                        return;
                     });
                 }
             }).fail(() => {

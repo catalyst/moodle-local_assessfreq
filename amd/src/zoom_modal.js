@@ -59,8 +59,6 @@ define(
                         modalObj.setBody(noDatastr.outerHTML);
                         modalObj.show();
                         return;
-                    }).catch(() => {
-                        return;
                     });
                 }
             }).fail(() => {

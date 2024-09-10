@@ -167,9 +167,7 @@ define(
          */
         Dayview.init = function () {
             // Load the strings we'll need later.
-            Str.get_strings(stringArr).catch(() => { // Get required strings.
-                return;
-            }).then(stringReturn => { // Save string to global to be used later.
+            Str.get_strings(stringArr).then(stringReturn => { // Save string to global to be used later.
                 stringResult = stringReturn;
             });
 
@@ -197,8 +195,6 @@ define(
                     modalObj = modal;
 
                 });
-            }).catch(() => {
-                return;
             });
 
         };

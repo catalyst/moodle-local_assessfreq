@@ -123,8 +123,6 @@ define(
                     });
                 });
                 return;
-            }).catch(() => {
-                return;
             });
         };
 
@@ -174,8 +172,6 @@ define(
                     observer.observe(modalContainer, observerConfig);
 
                     return;
-                }).catch(() => {
-                    return;
                 });
             });
         };
@@ -202,8 +198,6 @@ define(
                         element.classList.add('alert', 'alert-danger');
                         modalObj.getBody().prepend(element);
 
-                        return;
-                    }).catch(() => {
                         return;
                     });
                 }
