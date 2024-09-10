@@ -129,8 +129,6 @@ const processDashboard = (quiz) => {
         Str.get_string('dashboard:quiztitle', 'local_assessfreq', {'quiz': quizArray.name, 'course': quizArray.courseshortname})
         .then((str) => {
             document.title = str;
-        }).catch(() => {
-            Notification.exception(new Error('Failed to load string: dashboard:quiztitle'));
         });
 
         // Populate quiz summary card with details.
@@ -221,8 +219,6 @@ export const init = (context, quiz) => {
     ChartData.init(cards, context, 'get_quiz_chart', 'local_assessfreq/chart');
     Str.get_string('loadingquiztitle', 'local_assessfreq').then((str) => {
         selectQuizStr = str;
-    }).catch(() => {
-        Notification.exception(new Error('Failed to load string: loadingquiz'));
     }).then(() => {
         if (quiz > 0) {
             quizId = quiz;

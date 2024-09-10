@@ -65,8 +65,6 @@ define(
                     });
                 });
                 return;
-            }).catch(() => {
-                Notification.exception(new Error('Failed to load string: loading'));
             });
         };
 
@@ -92,8 +90,6 @@ define(
                 modalObj.setTitle(title);
                 modalObj.setBody(Fragment.loadFragment('local_assessfreq', 'new_override_form', contextid, params));
                 return;
-            }).catch(() => {
-                Notification.exception(new Error('Failed to load string: useroverride'));
             });
         };
 

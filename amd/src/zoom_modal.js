@@ -59,8 +59,6 @@ define(
                         modalObj.setBody(noDatastr.outerHTML);
                         modalObj.show();
                         return;
-                    }).catch(() => {
-                        Notification.exception(new Error('Failed to load string: nodata'));
                     });
                 }
             }).fail(() => {

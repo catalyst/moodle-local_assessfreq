@@ -123,8 +123,6 @@ define(
                     });
                 });
                 return;
-            }).catch(() => {
-                Notification.exception(new Error('Failed to load string: loading'));
             });
         };
 
@@ -174,8 +172,6 @@ define(
                     observer.observe(modalContainer, observerConfig);
 
                     return;
-                }).catch(() => {
-                    Notification.exception(new Error('Failed to load string: searchquiz'));
                 });
             });
         };
@@ -203,8 +199,6 @@ define(
                         modalObj.getBody().prepend(element);
 
                         return;
-                    }).catch(() => {
-                        Notification.exception(new Error('Failed to load string: searchquiz'));
                     });
                 }
             } else {
