@@ -816,7 +816,7 @@ class frequency {
         $params[] = $to;
         $sql .= " AND s.timeend >= ? AND s.timeend < ?";
 
-        return $DB->get_recordset_sql($sql, $params);
+        return $DB->get_records_sql($sql, $params);
     }
 
     /**
