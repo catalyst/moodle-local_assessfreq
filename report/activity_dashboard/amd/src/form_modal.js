@@ -120,9 +120,6 @@ define(
                         });
                     let modalContainer = document.querySelectorAll('[data-region*="modal-container"]')[0];
                     observer.observe(modalContainer, observerConfig);
-                }).catch(() => {
-                    // Silently ignore that we couldn't load the string.
-                    return false;
                 });
             });
         };
@@ -166,7 +163,7 @@ define(
                     selectElement.disabled = true;
                 }
             });
-        }
+        };
 
         const ObserverCallback = function(mutationsList) {
             for (let i = 0; i < mutationsList.length; i++) {
@@ -197,9 +194,6 @@ define(
                         resetOptions.push(el);
                     }
                     resolve();
-                }).catch(() => {
-                    // Silently ignore that we couldn't load the string.
-                    return false;
                 });
             });
         };
@@ -215,7 +209,7 @@ define(
 
             let activityElement = document.getElementById('id_activity');
             let activityId = activityElement.options[activityElement.selectedIndex].value;
-            let courseId = document.getElementsByName("coursechoice")[0].value
+            let courseId = document.getElementsByName("coursechoice")[0].value;
 
             if (courseId === undefined || activityId < 1) {
                 if (document.getElementById('noactivitywarning') === null) {
@@ -226,9 +220,6 @@ define(
                         element.id = 'noactivitywarning';
                         element.classList.add('alert', 'alert-danger');
                         modalObj.getBody().prepend(element);
-                    }).catch(() => {
-                        // Silently ignore that we couldn't load the string.
-                        return false;
                     });
                 }
             } else {

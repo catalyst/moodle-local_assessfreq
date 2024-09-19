@@ -29,7 +29,7 @@ use context_system;
 use local_assessfreq\report_base;
 
 class report extends report_base {
-    const WEIGHT = 2;
+    const WEIGHT = 20;
 
     /**
      * @inheritDoc
@@ -83,5 +83,14 @@ class report extends report_base {
             'init',
             [$PAGE->context->id, $PAGE->course->id != SITEID]
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function get_required_css(): void {
+        global $PAGE;
+
+        $PAGE->requires->css('/local/assessfreq/report/activity_dashboard/styles.css');
     }
 }

@@ -240,12 +240,14 @@ class renderer extends plugin_renderer_base {
         string $direction
     ): string {
         $now = time();
+        $hoursahead = (int)get_user_preferences('assessfreqreport_activities_in_progress_hoursahead_preference', 8);
+        $hoursbehind = (int)get_user_preferences('assessfreqreport_activities_in_progress_hoursbehind_preference', 1);
         $sources = get_sources();
         $inprogress = [];
         /* @var $source source_base */
         foreach ($sources as $source) {
             if (method_exists($source, 'get_inprogress_data')) {
-                $inprogress[] = $source->get_inprogress_data($now);
+                $inprogress[] = $source->get_inprogress_data($now, $hoursahead, $hoursbehind);
             }
         }
         $pagesize = get_user_preferences('assessfreqreport_activities_in_progress_table_rows_preference', 20);

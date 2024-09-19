@@ -64,9 +64,6 @@ define(
                             modalObj.hide();
                         });
                     });
-            }).catch(() => {
-                // Silently ignore that we couldn't load the string.
-                return false;
             });
         };
 
@@ -94,9 +91,6 @@ define(
             Str.get_string('modal:useroverride', 'local_assessfreq').then((title) => {
                 modalObj.setTitle(title);
                 modalObj.setBody(Fragment.loadFragment('local_assessfreq', 'new_override_form', contextid, params));
-            }).catch(() => {
-                // Silently ignore that we couldn't load the string.
-                return false;
             });
         };
 

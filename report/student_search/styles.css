@@ -1,0 +1,49 @@
+#local-assessfreq-report-student-search table {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#local-assessfreq-report-student-search td,
+#local-assessfreq-report-student-search th {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+#local-assessfreq-report-student-search thead {
+    background-color: rgba(0, 0, 0, .03);
+}
+
+#local-assessfreq-report-student-search tr:nth-of-type(2n) {
+    background-color: rgba(0, 0, 0, .03);
+}
+
+#local-assessfreq-report-student-search .title {
+    font-weight: bold;
+}
+
+#local-assessfreq-report-student-search tr.empty {
+    height: 20px;
+}
+
+
+#local-assessfreq-report-student-search .local-assessfreq-status-icon {
+    display: block;
+    float: left;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    margin-top: 2px;
+    border-radius: 3px;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, .3);
+}
+
+#local-assessfreq-report-student-search .local-assessfreq-override-status {
+    font-weight: 600;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
+}
+
+#local-assessfreq-report-student-search .local-assessfreq-disabled {
+    font-weight: 200;
+    color: grey;
+}

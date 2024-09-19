@@ -17,28 +17,25 @@
 /**
  * Main report class.
  *
- * @package   assessfreqreport_summary_graphs
+ * @package   assessfreqreport_student_search
  * @author    Simon Thornett <simon.thornett@catalyst-eu.net>
  * @copyright Catalyst IT, 2024
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace assessfreqreport_summary_graphs;
+namespace assessfreqreport_student_search;
 
-use assessfreqreport_summary_graphs\output\assess_by_activity;
-use assessfreqreport_summary_graphs\output\assess_by_month;
-use assessfreqreport_summary_graphs\output\assess_by_month_student;
+use context_system;
 use local_assessfreq\report_base;
-use stdClass;
 
 class report extends report_base {
-    const WEIGHT = 40;
+    const WEIGHT = 50;
 
     /**
      * @inheritDoc
      */
     public function get_name() : string {
-        return get_string("tab:name", "assessfreqreport_summary_graphs");
+        return get_string("tab:name", "assessfreqreport_student_search");
     }
 
     /**
@@ -52,7 +49,7 @@ class report extends report_base {
      * @inheritDoc
      */
     public function get_tablink() : string {
-        return 'summary_graphs';
+        return 'student_search';
     }
 
     /**
@@ -61,7 +58,7 @@ class report extends report_base {
     public function has_access() : bool {
         global $PAGE;
 
-        return has_capability('assessfreqreport/summary_graphs:view', $PAGE->context);
+        return has_capability('assessfreqreport/student_search:view', $PAGE->context);
     }
 
     /**
@@ -70,22 +67,9 @@ class report extends report_base {
     public function get_contents() : string {
         global $PAGE;
 
-        if ($PAGE->course->id !== SITEID) {
-            $year = date('Y', $PAGE->course->startdate);
-        } else {
-            $year = get_user_preferences('assessfreqreport_summary_graphs_year_preference', date('Y'));
-        }
-        $orderedmonths = get_months_ordered();
-        $startmonth = array_key_first($orderedmonths);
+        $renderer = $PAGE->get_renderer("assessfreqreport_student_search");
 
-        $data = new stdClass();
-        $data->assessbymonthchart = (new assess_by_month())->get_assess_by_month_chart($year, $startmonth);
-        $data->assessbyactivitychart = (new assess_by_activity())->get_assess_by_activity_chart($year, $startmonth);
-        $data->assessbymonthstudentchart = (new assess_by_month_student())->get_assess_by_month_student_chart($year, $startmonth);
-
-        $renderer = $PAGE->get_renderer("assessfreqreport_summary_graphs");
-
-        return $renderer->render_report($data);
+        return $renderer->render_report();
     }
 
     /**
@@ -94,6 +78,19 @@ class report extends report_base {
     protected function get_required_js() : void {
         global $PAGE;
 
-        $PAGE->requires->js_call_amd('assessfreqreport_summary_graphs/summary_graphs', 'init');
+        $PAGE->requires->js_call_amd(
+            'assessfreqreport_student_search/student_search',
+            'init',
+            [$PAGE->context->id, $PAGE->course->id != SITEID]
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function get_required_css(): void {
+        global $PAGE;
+
+        $PAGE->requires->css('/local/assessfreq/report/student_search/styles.css');
     }
 }
