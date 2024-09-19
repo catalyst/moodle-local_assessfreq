@@ -58,7 +58,7 @@ abstract class source_base {
     abstract public function get_module() : string;
 
     /**
-     * Return the
+     * Return the module table. By default, this is the module name, however some mods use a different table.
      * @return string
      */
     public function get_module_table() : string {
