@@ -79,8 +79,8 @@ function get_sources($ignoreenabled = false) : array {
     $sources = [];
     $pluginmanager = core_plugin_manager::instance();
     foreach ($pluginmanager->get_plugins_of_type('assessfreqsource') as $subplugin) {
-        /* @var $class source_base */
         if ($subplugin->is_enabled() || $ignoreenabled) {
+            /* @var $class source_base */
             $class = "assessfreqsource_{$subplugin->name}\\source";
             $source = $class::get_instance();
             $sources[$subplugin->name] = $source;

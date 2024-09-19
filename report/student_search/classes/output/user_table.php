@@ -15,32 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderable table for quiz dashboard users.
+ * Renderable table for student attempt statuses.
  *
- * @package    local_assessfreq
- * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   assessfreqreport_student_search
+ * @author    Simon Thornett <simon.thornett@catalyst-eu.net>
+ * @copyright Catalyst IT, 2024
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_assessfreq\output;
+namespace assessfreqreport_student_search\output;
 
-defined('MOODLE_INTERNAL') || die;
-
-require_once($CFG->libdir . '/tablelib.php');
-
-use table_sql;
+use assessfreqsource_quiz\Source;
+use local_assessfreq\frequency;
 use renderable;
+use table_sql;
 
-/**
- * Renderable table for quiz dashboard users.
- *
- * @package    local_assessfreq
- * @copyright  2020 Matt Porritt <mattp@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class student_search_table extends table_sql implements renderable {
-    use dashboard_table;
-
+class user_table extends table_sql implements renderable {
     /**
      * Ammount of time in hours for lookahead values.
      *
@@ -79,9 +69,6 @@ class student_search_table extends table_sql implements renderable {
      * @param string $baseurl Base URL of the page that contains the table.
      * @param int $contextid The context id for the context the table is being displayed in.
      * @param string $search The string to search for in the table.
-     * @param int $hoursahead Ammount of time in hours to look ahead for quizzes starting.
-     * @param int $hoursbehind Ammount of time in hours to look behind for quizzes starting.
-     * @param int $now The timestamp to use for the current time.
      * @param int $page the page number for pagination.
      *
      * @throws \coding_exception
@@ -90,21 +77,19 @@ class student_search_table extends table_sql implements renderable {
         string $baseurl,
         int $contextid,
         string $search,
-        int $hoursahead,
-        int $hoursbehind,
-        int $now,
         int $page = 0
     ) {
         parent::__construct('local_assessfreq_student_search_table');
+
+        $this->hoursahead = (int)get_user_preferences('assessfreqreport_student_search_hoursahead_preference', 8);
+        $this->hoursbehind = (int)get_user_preferences('assessfreqreport_student_search_hoursbehind_preference', 1);
 
         $this->search = $search;
         $this->set_attribute('id', 'local_assessfreq_ackreport_table');
         $this->set_attribute('class', 'generaltable generalbox');
         $this->downloadable = false;
         $this->define_baseurl($baseurl);
-        $this->hoursahead = $hoursahead;
-        $this->hoursbehind = $hoursbehind;
-        $this->now = $now;
+        $this->now = time();
 
         $context = \context::instance_by_id($contextid);
 
@@ -121,7 +106,7 @@ class student_search_table extends table_sql implements renderable {
             $columns[] = $field;
         }
 
-        $headers[] = get_string('quiz', 'local_assessfreq');
+        $headers[] = get_string('studentsearch:quiz', 'assessfreqreport_student_search');
         $columns[] = 'quizname';
 
         $this->define_columns(array_merge($columns, $this->get_common_columns()));
@@ -130,7 +115,7 @@ class student_search_table extends table_sql implements renderable {
 
         // Setup pagination.
         $this->currpage = $page;
-        $this->sortable(true);
+        $this->sortable(false);
         $this->column_nosort = ['actions'];
     }
 
@@ -141,10 +126,172 @@ class student_search_table extends table_sql implements renderable {
      * @return string html used to display the video field.
      * @throws \moodle_exception
      */
-    public function col_fullname($row) {
+    public function col_fullname($row): string {
         global $OUTPUT;
 
         return $OUTPUT->user_picture($row, ['size' => 35, 'includefullname' => true]);
+    }
+
+    /**
+     * Get content for time start column.
+     * Displays the user attempt start time.
+     *
+     * @param \stdClass $row
+     * @return string html used to display the field.
+     */
+    public function col_timestart($row) {
+        if ($row->timestart == 0) {
+            $content = \html_writer::span(get_string('studentsearch:na', 'assessfreqreport_student_search'));
+        } else {
+            $datetime = userdate($row->timestart, get_string('studentsearch:trenddatetime', 'assessfreqreport_student_search'));
+            $content = \html_writer::span($datetime);
+        }
+
+        return $content;
+    }
+
+    /**
+     * Get content for time finish column.
+     * Displays the user attempt finish time.
+     *
+     * @param \stdClass $row
+     * @return string html used to display the field.
+     */
+    public function col_timefinish($row) {
+        if ($row->timefinish == 0 && $row->timestart == 0) {
+            $content = \html_writer::span(get_string('studentsearch:na', 'assessfreqreport_student_search'));
+        } else if ($row->timefinish == 0 && $row->timestart > 0) {
+            $time = $row->timestart + $row->timelimit;
+            $datetime = userdate($time, get_string('studentsearch:trenddatetime', 'assessfreqreport_student_search'));
+            $content = \html_writer::span($datetime, 'local-assessfreq-disabled');
+        } else {
+            $datetime = userdate($row->timefinish, get_string('studentsearch:trenddatetime', 'assessfreqreport_student_search'));
+            $content = \html_writer::span($datetime);
+        }
+
+        return $content;
+    }
+
+    /**
+     * Get content for state column.
+     * Displays the users state in the quiz.
+     *
+     * @param \stdClass $row
+     * @return string html used to display the field.
+     */
+    public function col_state($row) {
+        if ($row->state == 'notloggedin') {
+            $color = 'background: ' . get_config('assessfreqreport_student_search', 'notloggedincolor');
+        } else if ($row->state == 'loggedin') {
+            $color = 'background: ' . get_config('assessfreqreport_student_search', 'loggedincolor');
+        } else if ($row->state == 'inprogress') {
+            $color = 'background: ' . get_config('assessfreqreport_student_search', 'inprogresscolor');
+        } else if ($row->state == 'uploadpending') {
+            $color = 'background: ' . get_config('assessfreqreport_student_search', 'inprogresscolor');
+        } else if ($row->state == 'finished') {
+            $color = 'background: ' . get_config('assessfreqreport_student_search', 'finishedcolor');
+        } else if ($row->state == 'abandoned') {
+            $color = 'background: ' . get_config('assessfreqreport_student_search', 'finishedcolor');
+        } else if ($row->state == 'overdue') {
+            $color = 'background: ' . get_config('assessfreqreport_student_search', 'finishedcolor');
+        }
+
+        $content = \html_writer::span('', 'local-assessfreq-status-icon', ['style' => $color]);
+        $content .= get_string('studentsearch:'.$row->state, 'assessfreqreport_student_search');
+
+        return $content;
+    }
+
+    /**
+     * Return an array of headers common across dashboard tables.
+     *
+     * @return array
+     */
+    protected function get_common_headers(): array {
+        return [
+            get_string('studentsearch:quiztimeopen', 'assessfreqreport_student_search'),
+            get_string('studentsearch:quiztimeclose', 'assessfreqreport_student_search'),
+            get_string('studentsearch:quiztimelimit', 'assessfreqreport_student_search'),
+            get_string('studentsearch:quiztimestart', 'assessfreqreport_student_search'),
+            get_string('studentsearch:quiztimefinish', 'assessfreqreport_student_search'),
+            get_string('studentsearch:status', 'assessfreqreport_student_search'),
+            get_string('studentsearch:actions', 'assessfreqreport_student_search'),
+        ];
+    }
+
+    /**
+     * Return an array of columns common across dashboard tables.
+     *
+     * @return array
+     */
+    protected function get_common_columns(): array {
+        return [
+            'timeopen',
+            'timeclose',
+            'timelimit',
+            'timestart',
+            'timefinish',
+            'state',
+            'actions',
+        ];
+    }
+
+    /**
+     * Return HTML for common column actions.
+     *
+     * @param \stdClass $row
+     * @return string
+     */
+    protected function get_common_column_actions(\stdClass $row): string {
+        global $OUTPUT;
+        $actions = '';
+        if (
+            $row->state == 'finished'
+            || $row->state == 'inprogress'
+            || $row->state == 'uploadpending'
+            || $row->state == 'abandoned'
+            || $row->state == 'overdue'
+        ) {
+            $classes = 'action-icon';
+            $attempturl = new \moodle_url('/mod/quiz/review.php', ['attempt' => $row->attemptid]);
+            $attributes = [
+                'class' => $classes,
+                'id' => 'tool-assessfreq-attempt-' . $row->id,
+                'data-toggle' => 'tooltip',
+                'data-placement' => 'top',
+                'title' => get_string('studentsearch:userattempt', 'assessfreqreport_student_search'),
+            ];
+        } else {
+            $classes = 'action-icon disabled';
+            $attempturl = '#';
+            $attributes = [
+                'class' => $classes,
+                'id' => 'tool-assessfreq-attempt-' . $row->id,
+            ];
+        }
+        $icon = $OUTPUT->render(new \pix_icon('i/search', ''));
+        $actions .= \html_writer::link($attempturl, $icon, $attributes);
+
+        $profileurl = new \moodle_url('/user/profile.php', ['id' => $row->id]);
+        $icon = $OUTPUT->render(new \pix_icon('i/completion_self', ''));
+        $actions .= \html_writer::link($profileurl, $icon, [
+            'class' => 'action-icon',
+            'id' => 'tool-assessfreq-profile-' . $row->id,
+            'data-toggle' => 'tooltip',
+            'data-placement' => 'top',
+            'title' => get_string('studentsearch:userprofile', 'assessfreqreport_student_search'),
+        ]);
+
+        $logurl = new \moodle_url('/report/log/user.php', ['id' => $row->id, 'course' => 1, 'mode' => 'all']);
+        $icon = $OUTPUT->render(new \pix_icon('i/report', ''));
+        $actions .= \html_writer::link($logurl, $icon, [
+            'class' => 'action-icon',
+            'id' => 'tool-assessfreq-log-' . $row->id,
+            'data-toggle' => 'tooltip',
+            'data-placement' => 'top',
+            'title' => get_string('studentsearch:userlogs', 'assessfreqreport_student_search'),
+        ]);
+        return $actions;
     }
 
     /**
@@ -189,7 +336,7 @@ class student_search_table extends table_sql implements renderable {
      * @return string html used to display the field.
      */
     public function col_timeopen($row) {
-        $datetime = userdate($row->timeopen, get_string('trenddatetime', 'local_assessfreq'));
+        $datetime = userdate($row->timeopen, get_string('studentsearch:trenddatetime', 'assessfreqreport_student_search'));
 
         if ($row->timeopen != $row->quiztimeopen) {
             $content = \html_writer::span($datetime, 'local-assessfreq-override-status');
@@ -208,7 +355,7 @@ class student_search_table extends table_sql implements renderable {
      * @return string html used to display the field.
      */
     public function col_timeclose($row) {
-        $datetime = userdate($row->timeclose, get_string('trenddatetime', 'local_assessfreq'));
+        $datetime = userdate($row->timeclose, get_string('studentsearch:trenddatetime', 'assessfreqreport_student_search'));
 
         if ($row->timeclose != $row->quiztimeclose) {
             $content = \html_writer::span($datetime, 'local-assessfreq-override-status');
@@ -251,13 +398,13 @@ class student_search_table extends table_sql implements renderable {
         $manage = '';
 
         $icon = $OUTPUT->render(new \pix_icon('i/duration', ''));
-        $manage .= \html_writer::link('#', $icon, [
-            'class' => 'action-icon override',
-            'id' => 'tool-assessfreq-override-' . $row->id . '-' . $row->quiz,
-            'data-toggle' => 'tooltip',
-            'data-placement' => 'top',
-            'title' => get_string('useroverride', 'local_assessfreq'),
-        ]);
+        //$manage .= \html_writer::link('#', $icon, [
+        //    'class' => 'action-icon override',
+        //    'id' => 'tool-assessfreq-override-' . $row->id . '-' . $row->quiz,
+        //    'data-toggle' => 'tooltip',
+        //    'data-placement' => 'top',
+        //    'title' => get_string('studentsearch:useroverride', 'assessfreqreport_student_search'),
+        //]);
 
         $manage .= $this->get_common_column_actions($row);
 
@@ -316,12 +463,12 @@ class student_search_table extends table_sql implements renderable {
         // We never want initial bars. We are using a custom search.
         $this->initialbars(false);
 
-        $frequency = new \local_assessfreq\frequency();
+        $frequency = new frequency();
         $capabilities = $frequency->get_module_capabilities('quiz');
 
         // Get the quizzes that we want users for.
-        $quiz = new \local_assessfreq\quiz($this->hoursahead, $this->hoursbehind);
-        $allquizzes = $quiz->get_quiz_summaries($this->now);
+        $quizsource = new Source();
+        $allquizzes = $quizsource->get_quiz_summaries($this->now, $this->hoursahead, $this->hoursbehind);
 
         $inprogressquizzes = $allquizzes['inprogress'];
         $upcomingquizzes = [];
@@ -344,7 +491,7 @@ class student_search_table extends table_sql implements renderable {
         $allrecords = [];
 
         foreach ($quizzes as $quizobj) {
-            $context = $quiz->get_quiz_context($quizobj->assessid);
+            $context = $quizsource->get_quiz_context($quizobj->assessid);
 
             [$joins, $wheres, $params] = $frequency->generate_enrolled_wheres_joins_params($context, $capabilities);
             $attemptsql = 'SELECT qa_a.userid, qa_a.state, qa_a.quiz, qa_a.id as attemptid,
@@ -415,7 +562,7 @@ class student_search_table extends table_sql implements renderable {
             foreach ($records as &$record) {
                 $record->timeopen ??= $quizobj->timestampopen;
                 $record->timeclose ??= $quizobj->timestampclose;
-                $record->timelimit ??= $quizobj->timestampopen;
+                $record->timelimit ??= $quizobj->timestamplimit;
                 $record = (object)array_merge((array)$record, $quizdata);
             }
             $allrecords = array_merge($allrecords, $records);
@@ -425,7 +572,6 @@ class student_search_table extends table_sql implements renderable {
             $allrecords = $this->sort_quizzes($allrecords);
         }
 
-        $pagesize = get_user_preferences('local_assessfreq_student_search_table_rows_preference', 20);
         $data = [];
         $offset = $this->currpage * $pagesize;
         $offsetcount = 0;

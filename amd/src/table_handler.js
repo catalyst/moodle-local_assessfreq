@@ -87,7 +87,7 @@ export default class TableHandler {
                 this.tableEventListeners(); // Re-add table event listeners.
 
             }).fail(() => {
-                Notification.exception(new Error('Failed to update table.'))
+                Notification.exception(new Error('Failed to update table.'));
         });
     };
 

@@ -456,9 +456,9 @@ class source extends source_base {
      * @param int $now
      * @return array|array[]
      */
-    public function get_inprogress_data(int $now) : array {
+    public function get_inprogress_data(int $now, int $hoursahead, int $hoursbehind) : array {
 
-        return $this->get_assign_summaries($now);
+        return $this->get_assign_summaries($now, $hoursahead, $hoursbehind);
     }
 
     /**
@@ -467,9 +467,9 @@ class source extends source_base {
      * @param int $now
      * @return array|array[]
      */
-    public function get_upcoming_data(int $now) : array {
+    public function get_upcoming_data(int $now, int $hoursahead, int $hoursbehind) : array {
 
-        return $this->get_assign_summaries($now);
+        return $this->get_assign_summaries($now, $hoursahead, $hoursbehind);
     }
 
     /**
@@ -478,9 +478,7 @@ class source extends source_base {
      * @param int $now Timestamp to use for reference for time.
      * @return array $assignments Array of finished, inprogress and upcoming assignments with associated data.
      */
-    public function get_assign_summaries(int $now) : array {
-        $hoursahead = (int)get_user_preferences('assessfreqreport_activities_in_progress_hoursahead_preference', 8);
-        $hoursbehind = (int)get_user_preferences('assessfreqreport_activities_in_progress_hoursbehind_preference', 1);
+    public function get_assign_summaries(int $now, int $hoursahead, int $hoursbehind) : array {
 
         // Get tracked assignments.
         $lookahead = $hoursahead * HOURSECS;

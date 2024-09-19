@@ -213,9 +213,9 @@ class Source extends source_base {
      *
      * @param int $now Timestamp to use for reference for time.
      */
-    public function get_inprogress_count(int $now) {
+    public function get_inprogress_count(int $now, int $hoursahead, int $hoursbehind) {
         // Get tracked quizzes.
-        $trackedquizzes = $this->get_tracked_quizzes_with_overrides($now, 8 * HOURSECS, 8 * HOURSECS);
+        $trackedquizzes = $this->get_tracked_quizzes_with_overrides($now, $hoursahead * HOURSECS, $hoursbehind * HOURSECS);
 
         $counts = [
             'assessments' => 0,
@@ -241,9 +241,9 @@ class Source extends source_base {
      * @param int $now
      * @return array|array[]
      */
-    public function get_inprogress_data(int $now) : array {
+    public function get_inprogress_data(int $now, int $hoursahead, int $hoursbehind) : array {
 
-        return $this->get_quiz_summaries($now);
+        return $this->get_quiz_summaries($now, $hoursahead, $hoursbehind);
     }
 
     /**
@@ -252,9 +252,9 @@ class Source extends source_base {
      * @param int $now
      * @return array|array[]
      */
-    public function get_upcoming_data(int $now) : array {
+    public function get_upcoming_data(int $now, int $hoursahead, int $hoursbehind) : array {
 
-        return $this->get_quiz_summaries($now);
+        return $this->get_quiz_summaries($now, $hoursahead, $hoursbehind);
     }
 
     /**
@@ -364,10 +364,10 @@ class Source extends source_base {
      * @param int $now Timestamp to get chart data for.
      * @return array With Generated chart object and chart data status.
      */
-    public function get_all_participants_inprogress_data(int $now) : array {
+    public function get_all_participants_inprogress_data(int $now, int $hoursahead, int $hoursbehind) : array {
 
         // Get quizzes for the supplied timestamp.
-        $quizzes = $this->get_quiz_summaries($now);
+        $quizzes = $this->get_quiz_summaries($now, $hoursahead, $hoursbehind);
 
         $inprogressquizzes = $quizzes['inprogress'];
         $upcomingquizzes = $quizzes['upcoming'];
@@ -413,10 +413,7 @@ class Source extends source_base {
      * @param int $now Timestamp to use for reference for time.
      * @return array $quizzes Array of finished, inprogress and upcoming quizzes with associated data.
      */
-    public function get_quiz_summaries(int $now) : array {
-        $hoursahead = (int)get_user_preferences('assessfreqreport_activities_in_progress_hoursahead_preference', 8);
-        $hoursbehind = (int)get_user_preferences('assessfreqreport_activities_in_progress_hoursbehind_preference', 1);
-
+    public function get_quiz_summaries(int $now, int $hoursahead, int $hoursbehind) : array {
         // Get tracked quizzes.
         $lookahead = $hoursahead * HOURSECS;
         $lookbehind = $hoursbehind * HOURSECS;
@@ -790,4 +787,27 @@ class Source extends source_base {
 
         return $attemptcounts;
     }
+
+    /**
+     * Given a quiz id get the module context.
+     *
+     * @param int $quizid The quiz ID of the context to get.
+     * @return \context_module $context The quiz module context.
+     */
+    public function get_quiz_context(int $quizid): \context_module {
+        global $DB;
+
+        $params = ['module' => 'quiz', 'quiz' => $quizid];
+        $sql = 'SELECT cm.id
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON cm.module = m.id
+            INNER JOIN {quiz} q ON cm.instance = q.id AND cm.course = q.course
+                 WHERE m.name = :module
+                       AND q.id = :quiz';
+        $cmid = $DB->get_field_sql($sql, $params);
+        $context = \context_module::instance($cmid);
+
+        return $context;
+    }
+
 }

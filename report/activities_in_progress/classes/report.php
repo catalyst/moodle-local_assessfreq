@@ -29,7 +29,7 @@ use local_assessfreq\report_base;
 use local_assessfreq\source_base;
 
 class report extends report_base {
-    const WEIGHT = 3;
+    const WEIGHT = 30;
 
     /**
      * @inheritDoc
@@ -77,19 +77,22 @@ class report extends report_base {
             get_user_preferences('assessfreqreport_activities_in_progress_modules_preference', '["all"]')
         );
         $sources = get_sources();
+        $hoursahead = (int)get_user_preferences('assessfreqreport_activities_in_progress_hoursahead_preference', 8);
+        $hoursbehind = (int)get_user_preferences('assessfreqreport_activities_in_progress_hoursbehind_preference', 1);
+
         foreach ($sources as $source) {
             /* @var $source source_base */
             if (!in_array('all', $modulepreference) && !in_array($source->get_module(), $modulepreference)) {
                 continue;
             }
             if (method_exists($source, 'get_inprogress_count')) {
-                $inprogress[] = $source->get_inprogress_count($now);
+                $inprogress[] = $source->get_inprogress_count($now, $hoursahead, $hoursbehind);
             }
             if (method_exists($source, 'get_upcoming_data')) {
-                $upcoming[] = $source->get_upcoming_data($now);
+                $upcoming[] = $source->get_upcoming_data($now, $hoursahead, $hoursbehind);
             }
             if (method_exists($source, 'get_all_participants_inprogress_data')) {
-                $participants[] = $source->get_all_participants_inprogress_data($now);
+                $participants[] = $source->get_all_participants_inprogress_data($now, $hoursahead, $hoursbehind);
             }
         }
         $data['inprogress'] = $inprogress;
@@ -117,7 +120,7 @@ class report extends report_base {
     /**
      * @inheritDoc
      */
-    protected function get_required_css() {
+    protected function get_required_css(): void {
         global $PAGE;
 
         $PAGE->requires->css('/local/assessfreq/report/activities_in_progress/styles.css');

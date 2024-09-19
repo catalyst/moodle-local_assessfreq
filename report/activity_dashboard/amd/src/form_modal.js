@@ -120,9 +120,6 @@ define(
                         });
                     let modalContainer = document.querySelectorAll('[data-region*="modal-container"]')[0];
                     observer.observe(modalContainer, observerConfig);
-                }).catch(() => {
-                    // Silently ignore that we couldn't load the string.
-                    return false;
                 });
             });
         };
@@ -197,9 +194,6 @@ define(
                         resetOptions.push(el);
                     }
                     resolve();
-                }).catch(() => {
-                    // Silently ignore that we couldn't load the string.
-                    return false;
                 });
             });
         };
@@ -226,9 +220,6 @@ define(
                         element.id = 'noactivitywarning';
                         element.classList.add('alert', 'alert-danger');
                         modalObj.getBody().prepend(element);
-                    }).catch(() => {
-                        // Silently ignore that we couldn't load the string.
-                        return false;
                     });
                 }
             } else {

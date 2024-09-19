@@ -62,4 +62,4 @@ const tabs = () => {
     } else {
         document.querySelector('[data-target="tab-' + anchor + '"]').click();
     }
-}
+};

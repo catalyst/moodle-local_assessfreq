@@ -29,7 +29,7 @@ use local_assessfreq\frequency;
 use local_assessfreq\report_base;
 
 class report extends report_base {
-    const WEIGHT = 1;
+    const WEIGHT = 10;
 
     /**
      * @var int
@@ -204,7 +204,7 @@ class report extends report_base {
     /**
      * @inheritDoc
      */
-    protected function get_required_css() {
+    protected function get_required_css(): void {
         global $PAGE;
         // The CSS for the heatmap is based on plugin config. As such this needs to be in-line.
         $PAGE->requires->css('/local/assessfreq/report/heatmap/dynamic-styles.php');

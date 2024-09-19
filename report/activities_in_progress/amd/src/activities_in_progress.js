@@ -68,7 +68,7 @@ export const init = (context) => {
  * Add the event listeners to the modules in the module select dropdown.
  */
 const moduleDropdown = () => {
-    let links = document.getElementById('local-assessfreq-report-activities-in-progress-filter-type').getElementsByTagName('a')
+    let links = document.getElementById('local-assessfreq-report-activities-in-progress-filter-type').getElementsByTagName('a');
     let all = links[0];
     let modules = [];
 
