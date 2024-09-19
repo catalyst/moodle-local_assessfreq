@@ -58,6 +58,14 @@ abstract class source_base {
     abstract public function get_module() : string;
 
     /**
+     * Return the
+     * @return string
+     */
+    public function get_module_table() : string {
+        return $this->get_module();
+    }
+
+    /**
      * Return the timelimit field used in the module table.
      * @return string
      */
