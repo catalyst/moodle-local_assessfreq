@@ -256,7 +256,7 @@ class frequency {
 
                 /* @var $source source_base */
                 $sql = $this->get_sql_query(
-                    $source->get_module(),
+                    $source->get_module_table(),
                     $source->get_close_field(),
                     $source->get_open_field(),
                     $source->get_timelimit_field()
