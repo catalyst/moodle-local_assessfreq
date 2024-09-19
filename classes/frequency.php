@@ -1114,6 +1114,8 @@ class frequency {
             }
         }
 
+        $sources = get_sources();
+
         // Get additional information and format the event data.
         foreach ($events as $event) {
             $context = context::instance_by_id($event->contextid, IGNORE_MISSING);
@@ -1125,10 +1127,14 @@ class frequency {
                 $event->usercount = count($this->get_event_users($event->contextid, $event->module));
                 $event->timelimit =
                     ($event->timelimit == 0) ? '-' : round(($event->timelimit / 60));
+                $event->dashurl = '';
 
-                $dashurl = new \moodle_url('/local/assessfreq/', ['activityid' => $context->instanceid], 'activity_dashboard');
-                $event->dashurl = $dashurl->out();
-
+                /* @var $source source_base */
+                $source = $sources[$event->module];
+                if (method_exists($source, 'get_activity_dashboard')) {
+                    $dashurl = new \moodle_url('/local/assessfreq/', ['activityid' => $context->instanceid], 'activity_dashboard');
+                    $event->dashurl = $dashurl->out();
+                }
                 $event->courseshortname = $course->shortname;
 
                 $dayevents[] = $event;
