@@ -25,6 +25,8 @@
 
 namespace assessfreqreport_student_search\output;
 
+require_once($CFG->libdir . '/tablelib.php');
+
 use assessfreqsource_quiz\Source;
 use local_assessfreq\frequency;
 use renderable;
