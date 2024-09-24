@@ -32,6 +32,7 @@ $string['assessfreq:view'] = 'Ability to load the inital view. Report subplugins
 $string['task:dataprocess'] = 'Data collection task';
 $string['task:quiztracking'] = 'Quiz tracking task';
 
+$string['courseselect'] = 'Select course...';
 $string['noreports'] = 'No reports have been configured for you.
 If you believe this is an error please contact your site administrator.';
 

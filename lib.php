@@ -33,17 +33,13 @@ use local_assessfreq\report_base;
  * @param context $context The context of the course
  */
 function local_assessfreq_extend_navigation_course(navigation_node $navigation, stdClass $course, context $context) {
-    global $CFG, $OUTPUT;
     if (has_capability('local/assessfreq:view', $context)) {
         $url = new moodle_url('/local/assessfreq/', ['courseid' => $course->id]);
-        $navigation->add(
-            get_string('pluginname', 'local_assessfreq'),
-            $url,
-            navigation_node::TYPE_SETTING,
-            null,
-            null,
-            new pix_icon('i/report', '')
-        );
+        $settingsnode = navigation_node::create(get_string('pluginname', 'local_assessfreq'), $url);
+        $reportnode = $navigation->get('coursereports');
+        if (isset($settingsnode) && !empty($reportnode)) {
+            $reportnode->add_node($settingsnode);
+        }
     }
 }
 
