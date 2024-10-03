@@ -70,7 +70,7 @@ class report extends report_base {
     public function get_contents() : string {
         global $PAGE;
 
-        if ($PAGE->course->id !== SITEID) {
+        if ($PAGE->course->id !== SITEID && !get_config('assessfreqreport_summary_graphs', 'courselevelyearfilter')) {
             $year = date('Y', $PAGE->course->startdate);
         } else {
             $year = get_user_preferences('assessfreqreport_summary_graphs_year_preference', date('Y'));
