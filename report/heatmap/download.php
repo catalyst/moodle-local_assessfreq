@@ -73,7 +73,9 @@ if ($metric == 'students') {
 }
 
 $frequency = new frequency();
-$data = $frequency->get_download_data($year, $metric, $modules);
+$orderedmonths = get_months_ordered();
+$month = array_key_first($orderedmonths);
+$data = $frequency->get_download_data($year, $month, $metric, $modules);
 
 $rawfilename = $year . '_' . $metric . '_' . implode('_', $modules);
 $filename = clean_filename($rawfilename);

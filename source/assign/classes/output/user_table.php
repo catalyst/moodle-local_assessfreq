@@ -154,6 +154,10 @@ class user_table extends table_sql implements renderable {
      * @return string html used to display the field.
      */
     public function col_timeopen(stdClass $row) : string {
+        if (!$row->timeopen) {
+            return '-';
+        }
+
         $datetime = userdate($row->timeopen, get_string('studentattempt:trenddatetime', 'assessfreqsource_assign'));
 
         if ($row->timeopen != $this->timeopen) {
@@ -173,6 +177,10 @@ class user_table extends table_sql implements renderable {
      * @return string html used to display the field.
      */
     public function col_timeclose(stdClass $row) : string {
+        if (!$row->timeclose) {
+            return '-';
+        }
+
         $datetime = userdate($row->timeclose, get_string('studentattempt:trenddatetime', 'assessfreqsource_assign'));
 
         if ($row->timeclose != $this->timeclose) {
@@ -192,7 +200,11 @@ class user_table extends table_sql implements renderable {
      * @return string html used to display the field.
      */
     public function col_cutoffdate(stdClass $row) : string {
-        $cutoffdate = format_time($row->cutoffdate);
+        if (!$row->cutoffdate) {
+            return '-';
+        }
+
+        $cutoffdate = format_time($row->cutoffdate ? $row->cutoffdate - time() : 0);
 
         if ($row->cutoffdate != $this->cutoffdate) {
             $content = html_writer::span($cutoffdate, 'local-assessfreq-override-status');
@@ -229,6 +241,19 @@ class user_table extends table_sql implements renderable {
         return $manage;
     }
 
+    /**
+     * Get the status for the assignment column.
+     *
+     * @param stdClass $row
+     * @return string html used to display the field.
+     */
+    public function col_status(stdClass $row) : string {
+        if (!$row->status || $row->status == 'new') {
+            return '';
+        }
+
+        return get_string('submissionstatus_' . $row->status, 'assign');
+    }
 
     /**
      * Query the database for results to display in the table.

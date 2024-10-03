@@ -81,7 +81,7 @@ class renderer extends plugin_renderer_base {
             'assessfreqreport_summary_graphs/summary-graphs',
             [
                 'charts' => $charts,
-                'iscourse' => $this->page->course->id !== SITEID,
+                'yearfilter' => get_config('assessfreqreport_summary_graphs', 'courselevelyearfilter'),
                 'filters' => [
                     'years' => get_years(get_user_preferences('assessfreqreport_summary_graphs_year_preference', date('Y'))),
                 ],
