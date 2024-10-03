@@ -93,3 +93,11 @@ body #local-assessfreq-index {
 .modal-dialog.local-assessfreq-modal-large .modal-body .chartjs-render-monitor {
     min-height: calc(100vh - 250px);
 }
+
+#local-assessfreq-index .dropdown-menu .dropdown-item:active,
+#local-assessfreq-index .dropdown-menu .dropdown-item:focus,
+#local-assessfreq-index .dropdown-menu .dropdown-item:focus-within {
+    outline: 0 !important;
+    background-color: #0176be !important;
+    color: #fff !important;
+}

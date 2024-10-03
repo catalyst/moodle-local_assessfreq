@@ -25,9 +25,9 @@
     <div class="container-fluid">
         <div class="row justify-content-between">
             <div class="col-9">
-                {{^iscourse}}
+                {{#yearfilter}}
                     {{> assessfreqreport_heatmap/filter-year}}
-                {{/iscourse}}
+                {{/yearfilter}}
                 {{> assessfreqreport_heatmap/filter-type}}
                 {{> assessfreqreport_heatmap/filter-metric}}
             </div>

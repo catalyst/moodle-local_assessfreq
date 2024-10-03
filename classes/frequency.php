@@ -1258,13 +1258,13 @@ class frequency {
      * @param array $modules The modules to get.
      * @return array $data The data for the download file.
      */
-    public function get_download_data(int $year, string $metric, array $modules): array {
+    public function get_download_data(int $year, int $month, string $metric, array $modules): array {
         global $DB, $PAGE;
 
         $data = [];
         $events = [];
-        $from = mktime(0, 0, 0, 1, 1, $year);
-        $to = mktime(23, 59, 59, 12, 31, $year);
+        $from = mktime(0, 0, 0, $month, 1, $year);
+        $to = strtotime("+1 year", $from) - 1;
 
         if ($metric == 'assess') {
             if ($PAGE->course->id == SITEID) {
@@ -1293,6 +1293,11 @@ class frequency {
                 }
             }
         }
+
+        // Soert the data by timeend.
+        usort($events, function($a, $b) {
+            return strcmp($a->timeend, $b->timeend);
+        });
 
         // Format the data ready for download.
         foreach ($events as $event) {

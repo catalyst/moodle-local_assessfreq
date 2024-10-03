@@ -21,8 +21,8 @@
 }}
 
 <div class="filters">
-    {{^iscourse}}
+    {{#yearfilter}}
         <p>{{#str}}report:usage_guidlines, assessfreqreport_summary_graphs {{/str}}</p>
         {{> assessfreqreport_summary_graphs/filter-year}}
-    {{/iscourse}}
+    {{/yearfilter}}
 </div>

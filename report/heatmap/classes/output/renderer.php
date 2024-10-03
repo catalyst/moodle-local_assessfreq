@@ -82,7 +82,7 @@ class renderer extends plugin_renderer_base {
                 ],
                 'downloadmetric' => $preferencemetric,
                 'sesskey' => sesskey(),
-                'iscourse' => $this->page->course->id !== SITEID,
+                'yearfilter' => get_config('assessfreqreport_heatmap', 'courselevelyearfilter'),
                 'courseid' => $this->page->course->id,
                 'months' => $months,
                 'scales' => html_writer::table($scalestable),

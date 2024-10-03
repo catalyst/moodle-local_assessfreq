@@ -152,6 +152,10 @@ class user_table extends table_sql implements renderable {
      * @return string html used to display the field.
      */
     public function col_timeopen(stdClass $row) : string {
+        if (!$row->timeopen) {
+            return '-';
+        }
+
         $datetime = userdate($row->timeopen, get_string('studentattempt:trenddatetime', 'assessfreqsource_quiz'));
 
         if ($row->timeopen != $this->timeopen) {
@@ -171,6 +175,9 @@ class user_table extends table_sql implements renderable {
      * @return string html used to display the field.
      */
     public function col_timeclose(stdClass $row) : string {
+        if (!$row->timeclose) {
+            return '-';
+        }
         $datetime = userdate($row->timeclose, get_string('studentattempt:trenddatetime', 'assessfreqsource_quiz'));
 
         if ($row->timeclose != $this->timeclose) {
@@ -190,7 +197,11 @@ class user_table extends table_sql implements renderable {
      * @return string html used to display the field.
      */
     public function col_timelimit(stdClass $row) : string {
-        $timelimit = format_time($row->timelimit);
+        if (!$row->timeclose) {
+            return '-';
+        }
+
+        $timelimit = format_time($row->timeclose ? $row->timeclose - time() : 0);
 
         if ($row->timelimit != $this->timelimit) {
             $content = html_writer::span($timelimit, 'local-assessfreq-override-status');

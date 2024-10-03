@@ -97,7 +97,7 @@ class report extends report_base {
     public function get_contents() : string {
         global $PAGE;
 
-        if ($PAGE->course->id !== SITEID) {
+        if ($PAGE->course->id !== SITEID && !get_config('assessfreqreport_heatmap', 'courselevelyearfilter')) {
             $this->preferenceyear = date('Y', $PAGE->course->startdate);
         } else {
             $this->preferenceyear = get_user_preferences('assessfreqreport_heatmap_year_preference', date('Y'));
