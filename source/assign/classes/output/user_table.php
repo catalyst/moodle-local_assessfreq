@@ -25,6 +25,8 @@
 
 namespace assessfreqsource_assign\output;
 
+require_once($CFG->libdir . '/tablelib.php');
+
 use coding_exception;
 use context;
 use context_system;
