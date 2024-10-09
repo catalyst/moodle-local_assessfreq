@@ -24,6 +24,8 @@
 
 namespace assessfreqsource_quiz\output;
 
+require_once($CFG->libdir . '/tablelib.php');
+
 use coding_exception;
 use context;
 use context_system;
